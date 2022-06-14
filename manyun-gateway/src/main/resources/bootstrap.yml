@@ -1,0 +1,43 @@
+# Tomcat
+server:
+  port: 8080
+
+# Spring
+spring: 
+  application:
+    # 应用名称
+    name: manyun-gateway
+#  profiles:
+    # 环境配置
+#    active: dev
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
+  cloud:
+    nacos:
+      discovery:
+        # 服务注册地址
+        server-addr: ${spring.cloud.nacos.server}
+      config:
+        # 配置中心地址
+        server-addr: ${spring.cloud.nacos.server}
+        # 配置文件格式
+        file-extension: yml
+        # 共享配置
+        shared-configs:
+          - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+    sentinel:
+      # 取消控制台懒加载
+      eager: true
+      transport:
+        # 控制台地址
+        dashboard: 127.0.0.1:8718
+      # nacos配置持久化
+      datasource:
+        ds1:
+          nacos:
+            server-addr: ${spring.cloud.nacos.server}
+            dataId: sentinel-manyun-gateway
+            groupId: SENTINEL_SECURITY
+            data-type: json
+            rule-type: flow

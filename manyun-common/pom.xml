@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.manyun</groupId>
+        <artifactId>manyun</artifactId>
+        <version>3.5.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <modules>
+        <module>manyun-common-log</module>
+        <module>manyun-common-core</module>
+        <module>manyun-common-redis</module>
+        <module>manyun-common-swagger</module>
+        <module>manyun-common-security</module>
+        <module>manyun-common-datascope</module>
+		<module>manyun-common-datasource</module>
+    </modules>
+
+    <artifactId>manyun-common</artifactId>
+    <packaging>pom</packaging>
+
+    <description>
+	    manyun-common通用模块
+    </description>
+
+</project>
