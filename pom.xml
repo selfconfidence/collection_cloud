@@ -228,6 +228,13 @@
                 <version>${manyun.version}</version>
             </dependency>
 
+            <!-- mybatis-plus -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${spring-boot.mybatis}</version>
+            </dependency>
+
             <!-- 缓存服务 -->
             <dependency>
                 <groupId>com.manyun</groupId>
@@ -256,12 +263,7 @@
     <packaging>pom</packaging>
 
     <dependencies>
-        <!-- lombok -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>${spring-boot.mybatis}</version>
-        </dependency>
+
         <!-- lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -7,17 +7,17 @@ spring:
   application:
     # 应用名称
     name: manyun-auth
-  profiles:
+#  profiles:
     # 环境配置
-    active: dev
+#    active: dev
   cloud:
     nacos:
       discovery:
         # 服务注册地址
-        server-addr: 172.16.11.45:8848
+        server-addr: ${spring.cloud.nacos.server}
       config:
         # 配置中心地址
-        server-addr: 172.16.11.45:8848
+        server-addr: ${spring.cloud.nacos.server}
         # 配置文件格式
         file-extension: yml
         # 共享配置
