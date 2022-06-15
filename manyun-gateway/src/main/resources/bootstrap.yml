@@ -17,10 +17,10 @@ spring:
     nacos:
       discovery:
         # 服务注册地址
-        server-addr: ${spring.cloud.nacos.server}
+        server-addr: 172.16.8.26:8848
       config:
         # 配置中心地址
-        server-addr: ${spring.cloud.nacos.server}
+        server-addr: 172.16.8.26:8848
         # 配置文件格式
         file-extension: yml
         # 共享配置
