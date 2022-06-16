@@ -31,7 +31,7 @@ spring:
       eager: true
       transport:
         # 控制台地址
-        dashboard: 127.0.0.1:8718
+        dashboard: ${spring.cloud.sentinue.server}
       # nacos配置持久化
       datasource:
         ds1:
