@@ -1,12 +1,14 @@
-package com.manyun.business.domain.entity;
+package com.manyun.business.domain.vo;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -16,11 +18,10 @@ import lombok.ToString;
  * @author yanwei
  * @since 2022-06-17
  */
-@TableName("cnt_collection_info")
-@ApiModel(value = "CollectionInfo对象", description = "藏品详情表")
+@ApiModel(value = "商品详细信息返回视图", description = "藏品详情表")
 @Data
 @ToString
-public class CollectionInfo implements Serializable {
+public class CollectionInfoVo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -39,16 +40,5 @@ public class CollectionInfo implements Serializable {
     @ApiModelProperty("发行方")
     private String publishOther;
 
-    @ApiModelProperty("创建人")
-    private String createdBy;
-
-    @ApiModelProperty("创建时间")
-    private LocalDateTime createdTime;
-
-    @ApiModelProperty("更新人")
-    private String updatedBy;
-
-    @ApiModelProperty("更新时间")
-    private LocalDateTime updatedTime;
 
 }

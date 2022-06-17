@@ -4,8 +4,12 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.ToString;
 
 /**
  * <p>
@@ -17,12 +21,18 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @TableName("cnt_collection")
 @ApiModel(value = "Collection对象", description = "藏品表")
+@Data
+@ToString
 public class CnfCollection implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键")
     private String id;
+
+
+    @ApiModelProperty("系列编号")
+    private String cateId;
 
     @ApiModelProperty("藏品名称")
     private String collectionName;
@@ -70,189 +80,28 @@ public class CnfCollection implements Serializable {
     private String createdBy;
 
     @ApiModelProperty("创建时间")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdTime;
 
     @ApiModelProperty("更新人")
     private String updatedBy;
 
     @ApiModelProperty("更新时间")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedTime;
 
 
-    public String getId() {
-        return id;
+    public void createD(String createId){
+        this.createdBy = createId;
+        this.createdTime = LocalDateTime.now();
+        if (this.createdTime != null)
+            this.updatedTime = this.createdTime;
+        this.updatedBy = this.createdBy;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void updateD(String updateId){
+        this.updatedBy = updateId;
+        this.updatedTime = LocalDateTime.now();
     }
 
-    public String getCollectionName() {
-        return collectionName;
-    }
-
-    public void setCollectionName(String collectionName) {
-        this.collectionName = collectionName;
-    }
-
-    public BigDecimal getSourcePrice() {
-        return sourcePrice;
-    }
-
-    public void setSourcePrice(BigDecimal sourcePrice) {
-        this.sourcePrice = sourcePrice;
-    }
-
-    public BigDecimal getRealPrice() {
-        return realPrice;
-    }
-
-    public void setRealPrice(BigDecimal realPrice) {
-        this.realPrice = realPrice;
-    }
-
-    public String getCollectionNumber() {
-        return collectionNumber;
-    }
-
-    public void setCollectionNumber(String collectionNumber) {
-        this.collectionNumber = collectionNumber;
-    }
-
-    public String getCollectionHash() {
-        return collectionHash;
-    }
-
-    public void setCollectionHash(String collectionHash) {
-        this.collectionHash = collectionHash;
-    }
-
-    public String getLinkAddr() {
-        return linkAddr;
-    }
-
-    public void setLinkAddr(String linkAddr) {
-        this.linkAddr = linkAddr;
-    }
-
-    public String getRealCompany() {
-        return realCompany;
-    }
-
-    public void setRealCompany(String realCompany) {
-        this.realCompany = realCompany;
-    }
-
-    public Integer getIsLink() {
-        return isLink;
-    }
-
-    public void setIsLink(Integer isLink) {
-        this.isLink = isLink;
-    }
-
-    public Integer getSelfBalance() {
-        return selfBalance;
-    }
-
-    public void setSelfBalance(Integer selfBalance) {
-        this.selfBalance = selfBalance;
-    }
-
-    public Integer getBalance() {
-        return balance;
-    }
-
-    public void setBalance(Integer balance) {
-        this.balance = balance;
-    }
-
-    public Integer getVersionFlag() {
-        return versionFlag;
-    }
-
-    public void setVersionFlag(Integer versionFlag) {
-        this.versionFlag = versionFlag;
-    }
-
-    public Integer getStatusBy() {
-        return statusBy;
-    }
-
-    public void setStatusBy(Integer statusBy) {
-        this.statusBy = statusBy;
-    }
-
-    public LocalDateTime getPublishTime() {
-        return publishTime;
-    }
-
-    public void setPublishTime(LocalDateTime publishTime) {
-        this.publishTime = publishTime;
-    }
-
-    public String getBindCreation() {
-        return bindCreation;
-    }
-
-    public void setBindCreation(String bindCreation) {
-        this.bindCreation = bindCreation;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public LocalDateTime getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(LocalDateTime createdTime) {
-        this.createdTime = createdTime;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public LocalDateTime getUpdatedTime() {
-        return updatedTime;
-    }
-
-    public void setUpdatedTime(LocalDateTime updatedTime) {
-        this.updatedTime = updatedTime;
-    }
-
-    @Override
-    public String toString() {
-        return "Collection{" +
-        "id=" + id +
-        ", collectionName=" + collectionName +
-        ", sourcePrice=" + sourcePrice +
-        ", realPrice=" + realPrice +
-        ", collectionNumber=" + collectionNumber +
-        ", collectionHash=" + collectionHash +
-        ", linkAddr=" + linkAddr +
-        ", realCompany=" + realCompany +
-        ", isLink=" + isLink +
-        ", selfBalance=" + selfBalance +
-        ", balance=" + balance +
-        ", versionFlag=" + versionFlag +
-        ", statusBy=" + statusBy +
-        ", publishTime=" + publishTime +
-        ", bindCreation=" + bindCreation +
-        ", createdBy=" + createdBy +
-        ", createdTime=" + createdTime +
-        ", updatedBy=" + updatedBy +
-        ", updatedTime=" + updatedTime +
-        "}";
-    }
 }

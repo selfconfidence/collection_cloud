@@ -2,6 +2,11 @@ package com.manyun.business.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.entity.CnfCollection;
+import com.manyun.business.domain.query.CollectionQuery;
+import com.manyun.business.domain.vo.CollectionAllVo;
+import com.manyun.business.domain.vo.CollectionVo;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +18,7 @@ import com.manyun.business.domain.entity.CnfCollection;
  */
 public interface ICollectionService extends IService<CnfCollection> {
 
+    List<CollectionVo> pageQueryList(CollectionQuery collectionQuery);
+
+    CollectionAllVo info(String id);
 }
