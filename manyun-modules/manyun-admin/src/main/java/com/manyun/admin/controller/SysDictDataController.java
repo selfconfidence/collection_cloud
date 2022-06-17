@@ -22,7 +22,7 @@ import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
 import com.manyun.common.security.annotation.RequiresPermissions;
 import com.manyun.common.security.utils.SecurityUtils;
-import com.manyun.admin.api.domain.SysDictData;
+import com.manyun.comm.api.domain.SysDictData;
 import com.manyun.admin.service.ISysDictDataService;
 import com.manyun.admin.service.ISysDictTypeService;
 

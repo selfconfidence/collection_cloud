@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.file.FileUtils;
 import com.manyun.base.service.ISysFileService;
-import com.manyun.admin.api.domain.SysFile;
+import com.manyun.comm.api.domain.SysFile;
 
 /**
  * 文件请求处理

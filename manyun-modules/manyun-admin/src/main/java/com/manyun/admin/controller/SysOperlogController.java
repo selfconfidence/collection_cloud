@@ -18,7 +18,7 @@ import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
 import com.manyun.common.security.annotation.InnerAuth;
 import com.manyun.common.security.annotation.RequiresPermissions;
-import com.manyun.admin.api.domain.SysOperLog;
+import com.manyun.comm.api.domain.SysOperLog;
 import com.manyun.admin.service.ISysOperLogService;
 
 /**

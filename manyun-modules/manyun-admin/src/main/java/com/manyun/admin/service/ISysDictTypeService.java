@@ -1,8 +1,8 @@
 package com.manyun.admin.service;
 
 import java.util.List;
-import com.manyun.admin.api.domain.SysDictData;
-import com.manyun.admin.api.domain.SysDictType;
+import com.manyun.comm.api.domain.SysDictData;
+import com.manyun.comm.api.domain.SysDictType;
 
 /**
  * 字典 业务层

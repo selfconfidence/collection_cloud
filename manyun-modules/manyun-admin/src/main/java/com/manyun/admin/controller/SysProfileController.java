@@ -21,10 +21,10 @@ import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
 import com.manyun.common.security.service.TokenService;
 import com.manyun.common.security.utils.SecurityUtils;
-import com.manyun.admin.api.RemoteFileService;
-import com.manyun.admin.api.domain.SysFile;
-import com.manyun.admin.api.domain.SysUser;
-import com.manyun.admin.api.model.LoginUser;
+import com.manyun.comm.api.RemoteFileService;
+import com.manyun.comm.api.domain.SysFile;
+import com.manyun.comm.api.domain.SysUser;
+import com.manyun.comm.api.model.LoginUser;
 import com.manyun.admin.service.ISysUserService;
 
 /**

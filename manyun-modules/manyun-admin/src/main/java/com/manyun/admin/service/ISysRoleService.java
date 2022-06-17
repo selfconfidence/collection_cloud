@@ -2,7 +2,7 @@ package com.manyun.admin.service;
 
 import java.util.List;
 import java.util.Set;
-import com.manyun.admin.api.domain.SysRole;
+import com.manyun.comm.api.domain.SysRole;
 import com.manyun.admin.domain.SysUserRole;
 
 /**

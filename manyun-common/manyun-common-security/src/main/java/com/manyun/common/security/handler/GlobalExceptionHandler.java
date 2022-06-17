@@ -1,6 +1,8 @@
 package com.manyun.common.security.handler;
 
 import javax.servlet.http.HttpServletRequest;
+
+import com.manyun.common.core.exception.auth.NotLoginException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.BindException;
@@ -17,10 +19,12 @@ import com.manyun.common.core.exception.auth.NotRoleException;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.web.domain.AjaxResult;
 
+import static com.manyun.common.core.constant.HttpStatus.NOT_LOGIN;
+
 /**
  * 全局异常处理器
  * 
- * @author ruoyi
+ * @author yanwei
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler
@@ -81,6 +85,17 @@ public class GlobalExceptionHandler
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',发生未知异常.", requestURI, e);
         return AjaxResult.error(e.getMessage());
+    }
+
+    /**
+     * 拦截未知的运行时异常
+     */
+    @ExceptionHandler(NotLoginException.class)
+    public AjaxResult handleRuntimeException(NotLoginException e, HttpServletRequest request)
+    {
+        String requestURI = request.getRequestURI();
+        log.error("请求地址'{}',发生未知异常.", requestURI, e);
+        return AjaxResult.error(NOT_LOGIN,e.getMessage());
     }
 
     /**

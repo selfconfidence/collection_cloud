@@ -3,6 +3,9 @@ package com.manyun.common.security.auth;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.security.service.UserTokenService;
 import org.springframework.util.PatternMatchUtils;
 import com.manyun.common.core.exception.auth.NotLoginException;
 import com.manyun.common.core.exception.auth.NotPermissionException;
@@ -15,7 +18,7 @@ import com.manyun.common.security.annotation.RequiresPermissions;
 import com.manyun.common.security.annotation.RequiresRoles;
 import com.manyun.common.security.service.TokenService;
 import com.manyun.common.security.utils.SecurityUtils;
-import com.manyun.admin.api.model.LoginUser;
+import com.manyun.comm.api.model.LoginUser;
 
 /**
  * Token 权限验证，逻辑实现类
@@ -31,6 +34,7 @@ public class AuthLogic
     private static final String SUPER_ADMIN = "admin";
 
     public TokenService tokenService = SpringUtils.getBean(TokenService.class);
+    private UserTokenService userTokenService = SpringUtils.getBean(UserTokenService.class);
 
     /**
      * 会话注销
@@ -56,9 +60,17 @@ public class AuthLogic
     /**
      * 检验用户是否已经登录，如未登录，则抛出异常
      */
-    public void checkLogin()
+    public void checkAdminLogin()
     {
         getLoginUser();
+    }
+
+    /**
+     * 检验业务端用户是否已经登录，如未登录，则抛出异常
+     */
+    public void checkUserLogin()
+    {
+        getLoginBusinessUser();
     }
 
     /**
@@ -74,6 +86,27 @@ public class AuthLogic
             throw new NotLoginException("未提供token");
         }
         LoginUser loginUser = SecurityUtils.getLoginUser();
+        if (loginUser == null)
+        {
+            throw new NotLoginException("无效的token");
+        }
+        return loginUser;
+    }
+
+
+    /**
+     * 获取当前用户缓存信息, 如果未登录，则抛出异常
+     *
+     * @return 用户缓存信息
+     */
+    public LoginBusinessUser getLoginBusinessUser()
+    {
+        String token = SecurityUtils.getToken();
+        if (token == null)
+        {
+            throw new NotLoginException("未提供token");
+        }
+        LoginBusinessUser loginUser = SecurityUtils.getLoginBusinessUser();
         if (loginUser == null)
         {
             throw new NotLoginException("无效的token");
@@ -100,6 +133,28 @@ public class AuthLogic
     public void verifyLoginUserExpire(LoginUser loginUser)
     {
         tokenService.verifyToken(loginUser);
+    }
+
+
+    /**
+     * 获取当前用户缓存信息, 如果未登录，则抛出异常
+     *
+     * @param token 前端传递的认证信息
+     * @return 用户缓存信息
+     */
+    public LoginBusinessUser getLoginBusinessUser(String token)
+    {
+        return userTokenService.getLoginBusinessUser(token);
+    }
+
+    /**
+     * 验证当前用户有效期, 如果相差不足120分钟，自动刷新缓存
+     *
+     * @param loginUser 当前用户信息
+     */
+    public void verifyLoginUserExpire(LoginBusinessUser loginUser)
+    {
+        userTokenService.verifyToken(loginUser);
     }
 
     /**
@@ -268,7 +323,7 @@ public class AuthLogic
      */
     public void checkByAnnotation(RequiresLogin at)
     {
-        this.checkLogin();
+        this.checkAdminLogin();
     }
 
     /**

@@ -1,7 +1,7 @@
 package com.manyun.admin.service;
 
 import java.util.List;
-import com.manyun.admin.api.domain.SysUser;
+import com.manyun.comm.api.domain.SysUser;
 
 /**
  * 用户 业务层

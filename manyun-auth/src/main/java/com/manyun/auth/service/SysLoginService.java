@@ -12,11 +12,11 @@ import com.manyun.common.core.utils.ServletUtils;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.ip.IpUtils;
 import com.manyun.common.security.utils.SecurityUtils;
-import com.manyun.admin.api.RemoteLogService;
-import com.manyun.admin.api.RemoteUserService;
-import com.manyun.admin.api.domain.SysLogininfor;
-import com.manyun.admin.api.domain.SysUser;
-import com.manyun.admin.api.model.LoginUser;
+import com.manyun.comm.api.RemoteLogService;
+import com.manyun.comm.api.RemoteUserService;
+import com.manyun.comm.api.domain.SysLogininfor;
+import com.manyun.comm.api.domain.SysUser;
+import com.manyun.comm.api.model.LoginUser;
 
 /**
  * 登录校验方法

@@ -2,7 +2,7 @@ package com.manyun.admin.service.impl;
 
 import org.springframework.stereotype.Service;
 import com.manyun.common.core.utils.StringUtils;
-import com.manyun.admin.api.model.LoginUser;
+import com.manyun.comm.api.model.LoginUser;
 import com.manyun.admin.domain.SysUserOnline;
 import com.manyun.admin.service.ISysUserOnlineService;
 

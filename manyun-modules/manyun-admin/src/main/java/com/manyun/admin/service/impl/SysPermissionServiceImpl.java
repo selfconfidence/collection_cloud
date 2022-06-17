@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.manyun.admin.api.domain.SysUser;
+import com.manyun.comm.api.domain.SysUser;
 import com.manyun.admin.service.ISysMenuService;
 import com.manyun.admin.service.ISysPermissionService;
 import com.manyun.admin.service.ISysRoleService;

@@ -23,7 +23,7 @@ import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessStatus;
 import com.manyun.common.log.service.AsyncLogService;
 import com.manyun.common.security.utils.SecurityUtils;
-import com.manyun.admin.api.domain.SysOperLog;
+import com.manyun.comm.api.domain.SysOperLog;
 
 /**
  * 操作日志记录处理
