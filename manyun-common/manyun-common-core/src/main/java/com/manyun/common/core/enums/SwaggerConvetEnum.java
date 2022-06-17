@@ -17,7 +17,8 @@ public enum SwaggerConvetEnum
     MANYUN_FILE("manyun-base", "基础能力服务"),
     MANYUN_SYSTEM("manyun-admin", "后台管理相关模块"),
     MANYUN_DEMO("manyun-demo", "示例相关模块"),
-
+    MANYUN_USER("manyun-user", "(移动端)用户相关相关模块"),
+    MANYUN_BUSINESS("manyun-business", "(移动端)业务相关模块"),
     MANYUN_UNON("未知", "未知");
 
     private final String id;

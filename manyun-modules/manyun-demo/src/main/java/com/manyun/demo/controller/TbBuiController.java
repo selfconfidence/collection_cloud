@@ -31,6 +31,7 @@ public class TbBuiController {
 
     @GetMapping("/list")
     public R list(){
+        new TbBui().insert();
         return R.ok();
     }
 

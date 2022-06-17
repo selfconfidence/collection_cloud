@@ -4,7 +4,11 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.annotations.ApiModel;
+import lombok.Data;
+import lombok.ToString;
 
 /**
  * <p>
@@ -16,37 +20,15 @@ import io.swagger.annotations.ApiModel;
  */
 @TableName("tb_bui")
 @ApiModel(value = "TbBui对象", description = "测试表")
-public class TbBui implements Serializable {
+@Data
+@ToString
+public class TbBui extends Model<TbBui> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Integer id;
 
     private String name;
 
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return "TbBui{" +
-        "id=" + id +
-        ", name=" + name +
-        "}";
-    }
 }
