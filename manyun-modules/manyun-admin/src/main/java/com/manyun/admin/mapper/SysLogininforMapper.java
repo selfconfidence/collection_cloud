@@ -1,7 +1,7 @@
 package com.manyun.admin.mapper;
 
 import java.util.List;
-import com.manyun.admin.api.domain.SysLogininfor;
+import com.manyun.comm.api.domain.SysLogininfor;
 
 /**
  * 系统访问日志情况信息 数据层

@@ -3,7 +3,7 @@ package com.manyun.common.core.constant;
 /**
  * 返回状态码
  * 
- * @author ruoyi
+ * @author yawnei
  */
 public class HttpStatus
 {
@@ -86,4 +86,9 @@ public class HttpStatus
      * 接口未实现
      */
     public static final int NOT_IMPLEMENTED = 501;
+
+    /**
+     * 未登录
+     */
+    public static final int NOT_LOGIN = 700;
 }

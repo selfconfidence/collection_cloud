@@ -3,7 +3,7 @@ package com.manyun.admin;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.manyun.common.security.annotation.EnableCustomConfig;
-import com.manyun.common.security.annotation.EnableRyFeignClients;
+import com.manyun.common.security.annotation.EnableManyunFeignClients;
 import com.manyun.common.swagger.annotation.EnableCustomSwagger2;
 
 /**
@@ -13,7 +13,7 @@ import com.manyun.common.swagger.annotation.EnableCustomSwagger2;
  */
 @EnableCustomConfig
 @EnableCustomSwagger2
-@EnableRyFeignClients
+@EnableManyunFeignClients
 @SpringBootApplication
 public class ManyunAdminApplication
 {

@@ -3,7 +3,7 @@ package com.manyun.admin.service.impl;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.manyun.admin.api.domain.SysOperLog;
+import com.manyun.comm.api.domain.SysOperLog;
 import com.manyun.admin.mapper.SysOperLogMapper;
 import com.manyun.admin.service.ISysOperLogService;
 

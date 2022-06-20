@@ -7,7 +7,7 @@ import com.manyun.common.core.constant.Constants;
 import com.manyun.common.core.utils.SpringUtils;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.redis.service.RedisService;
-import com.manyun.admin.api.domain.SysDictData;
+import com.manyun.comm.api.domain.SysDictData;
 
 /**
  * 字典工具类

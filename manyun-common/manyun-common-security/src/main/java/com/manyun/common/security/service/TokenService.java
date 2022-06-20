@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
+
+import com.manyun.common.core.enums.UserLoginSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.manyun.common.core.constant.CacheConstants;
@@ -15,7 +17,7 @@ import com.manyun.common.core.utils.ip.IpUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.manyun.common.redis.service.RedisService;
 import com.manyun.common.security.utils.SecurityUtils;
-import com.manyun.admin.api.model.LoginUser;
+import com.manyun.comm.api.model.LoginUser;
 
 /**
  * token验证处理
@@ -57,6 +59,7 @@ public class TokenService
         claimsMap.put(SecurityConstants.USER_KEY, token);
         claimsMap.put(SecurityConstants.DETAILS_USER_ID, userId);
         claimsMap.put(SecurityConstants.DETAILS_USERNAME, userName);
+        claimsMap.put(SecurityConstants.DETAILS_LOGIN_SOURCE, UserLoginSource.PC.getInfo());
 
         // 接口返回信息
         Map<String, Object> rspMap = new HashMap<String, Object>();

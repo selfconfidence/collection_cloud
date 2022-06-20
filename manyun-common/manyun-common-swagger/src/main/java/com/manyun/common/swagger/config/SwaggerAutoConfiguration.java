@@ -1,8 +1,6 @@
 package com.manyun.common.swagger.config;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -72,9 +70,10 @@ public class SwaggerAutoConfiguration
         swaggerProperties.getBasePath().forEach(p -> builder.paths(PathSelectors.ant(p)));
         swaggerProperties.getExcludePath().forEach(p -> builder.paths(PathSelectors.ant(p).negate()));
 
-        return builder.build().securitySchemes(securitySchemes()).securityContexts(securityContexts()).pathMapping("/");
+        return builder.build().securitySchemes(securitySchemes()).securityContexts(securityContexts()).consumes(DEFAULT_PRODUCES_AND_CONSUMES).produces(DEFAULT_PRODUCES_AND_CONSUMES).pathMapping("/");
     }
-
+    private static final Set<String> DEFAULT_PRODUCES_AND_CONSUMES =
+            new HashSet<String>(Arrays.asList("application/json"));
     /**
      * 安全模式，这里指定token通过Authorization头请求头传递
      */

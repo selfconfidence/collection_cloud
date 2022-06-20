@@ -8,9 +8,9 @@ import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.web.domain.BaseEntity;
 import com.manyun.common.datascope.annotation.DataScope;
 import com.manyun.common.security.utils.SecurityUtils;
-import com.manyun.admin.api.domain.SysRole;
-import com.manyun.admin.api.domain.SysUser;
-import com.manyun.admin.api.model.LoginUser;
+import com.manyun.comm.api.domain.SysRole;
+import com.manyun.comm.api.domain.SysUser;
+import com.manyun.comm.api.model.LoginUser;
 
 /**
  * 数据过滤处理

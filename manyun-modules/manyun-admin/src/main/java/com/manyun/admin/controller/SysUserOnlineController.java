@@ -19,7 +19,7 @@ import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
 import com.manyun.common.redis.service.RedisService;
 import com.manyun.common.security.annotation.RequiresPermissions;
-import com.manyun.admin.api.model.LoginUser;
+import com.manyun.comm.api.model.LoginUser;
 import com.manyun.admin.domain.SysUserOnline;
 import com.manyun.admin.service.ISysUserOnlineService;
 

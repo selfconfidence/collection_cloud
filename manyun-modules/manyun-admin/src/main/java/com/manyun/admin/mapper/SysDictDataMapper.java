@@ -2,7 +2,7 @@ package com.manyun.admin.mapper;
 
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
-import com.manyun.admin.api.domain.SysDictData;
+import com.manyun.comm.api.domain.SysDictData;
 
 /**
  * 字典表 数据层

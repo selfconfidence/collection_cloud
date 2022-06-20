@@ -3,7 +3,7 @@ package com.manyun.admin.service.impl;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.manyun.admin.api.domain.SysLogininfor;
+import com.manyun.comm.api.domain.SysLogininfor;
 import com.manyun.admin.mapper.SysLogininforMapper;
 import com.manyun.admin.service.ISysLogininforService;
 

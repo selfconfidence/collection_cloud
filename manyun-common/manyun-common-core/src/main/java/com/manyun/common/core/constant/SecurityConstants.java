@@ -41,4 +41,9 @@ public class SecurityConstants
      * 登录用户
      */
     public static final String LOGIN_USER = "login_user";
+
+    /**
+     * 登录来源
+     */
+    public static final String DETAILS_LOGIN_SOURCE = "login_source";
 }

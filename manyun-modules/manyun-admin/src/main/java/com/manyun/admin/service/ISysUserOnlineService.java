@@ -1,6 +1,6 @@
 package com.manyun.admin.service;
 
-import com.manyun.admin.api.model.LoginUser;
+import com.manyun.comm.api.model.LoginUser;
 import com.manyun.admin.domain.SysUserOnline;
 
 /**

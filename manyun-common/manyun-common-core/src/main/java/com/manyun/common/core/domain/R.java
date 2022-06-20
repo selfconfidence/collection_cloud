@@ -2,12 +2,19 @@ package com.manyun.common.core.domain;
 
 import java.io.Serializable;
 import com.manyun.common.core.constant.Constants;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 响应信息主体
  *
  * @author ruoyi
  */
+@ApiModel("通用返回属性")
+@Getter
+@Setter
 public class R<T> implements Serializable
 {
     private static final long serialVersionUID = 1L;
@@ -18,10 +25,13 @@ public class R<T> implements Serializable
     /** 失败 */
     public static final int FAIL = Constants.FAIL;
 
+    @ApiModelProperty(value = "状态码，200 就是成功", example = "状态码")
     private int code;
 
+    @ApiModelProperty(value = "返回信息，一般状态码不是200,前台就可以展示", example = "返回信息")
     private String msg;
 
+    @ApiModelProperty(value = "返回内容,查询操作才会有值", example = "返回信息")
     private T data;
 
     public static <T> R<T> ok()
@@ -73,33 +83,4 @@ public class R<T> implements Serializable
         return apiResult;
     }
 
-    public int getCode()
-    {
-        return code;
-    }
-
-    public void setCode(int code)
-    {
-        this.code = code;
-    }
-
-    public String getMsg()
-    {
-        return msg;
-    }
-
-    public void setMsg(String msg)
-    {
-        this.msg = msg;
-    }
-
-    public T getData()
-    {
-        return data;
-    }
-
-    public void setData(T data)
-    {
-        this.data = data;
-    }
 }

@@ -1,7 +1,7 @@
 package com.manyun.admin.mapper;
 
 import java.util.List;
-import com.manyun.admin.api.domain.SysRole;
+import com.manyun.comm.api.domain.SysRole;
 
 /**
  * 角色表 数据层

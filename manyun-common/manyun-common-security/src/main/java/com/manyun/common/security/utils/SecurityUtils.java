@@ -1,18 +1,21 @@
 package com.manyun.common.security.utils;
 
 import javax.servlet.http.HttpServletRequest;
+
+import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.exception.auth.NotLoginException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.constant.TokenConstants;
 import com.manyun.common.core.context.SecurityContextHolder;
 import com.manyun.common.core.utils.ServletUtils;
 import com.manyun.common.core.utils.StringUtils;
-import com.manyun.admin.api.model.LoginUser;
+import com.manyun.comm.api.model.LoginUser;
 
 /**
  * 权限获取工具类
  * 
- * @author ruoyi
+ * @author yanwei
  */
 public class SecurityUtils
 {
@@ -41,11 +44,43 @@ public class SecurityUtils
     }
 
     /**
+     * 获取用户来源
+     */
+    public static String getSource()
+    {
+        return SecurityContextHolder.getSource();
+    }
+
+
+    /**
      * 获取登录用户信息
      */
     public static LoginUser getLoginUser()
     {
         return SecurityContextHolder.get(SecurityConstants.LOGIN_USER, LoginUser.class);
+    }
+
+    /**
+     * 获取登录用户信息
+     * 可以为 null
+     */
+    public static LoginBusinessUser getLoginBusinessUser()
+    {
+        return SecurityContextHolder.get(SecurityConstants.LOGIN_USER, LoginBusinessUser.class);
+    }
+
+
+    /**
+     * 获取登录用户信息
+     * 必须有用户
+     */
+    public static LoginBusinessUser getNotNullLoginBusinessUser()
+    {
+        LoginBusinessUser loginBusinessUser= null;
+        if ((loginBusinessUser = SecurityContextHolder.get(SecurityConstants.LOGIN_USER, LoginBusinessUser.class)) != null) {
+            return loginBusinessUser;
+        }
+        throw new NotLoginException("暂未登录");
     }
 
     /**

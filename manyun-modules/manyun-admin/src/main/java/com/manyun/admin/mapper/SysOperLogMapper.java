@@ -1,7 +1,7 @@
 package com.manyun.admin.mapper;
 
 import java.util.List;
-import com.manyun.admin.api.domain.SysOperLog;
+import com.manyun.comm.api.domain.SysOperLog;
 
 /**
  * 操作日志 数据层

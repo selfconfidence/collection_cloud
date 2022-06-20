@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.manyun.admin.api.domain.SysDept;
+import com.manyun.comm.api.domain.SysDept;
 import com.manyun.admin.domain.SysMenu;
 
 /**

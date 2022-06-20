@@ -1,7 +1,7 @@
 package com.manyun.admin.service;
 
 import java.util.List;
-import com.manyun.admin.api.domain.SysDept;
+import com.manyun.comm.api.domain.SysDept;
 import com.manyun.admin.domain.vo.TreeSelect;
 
 /**

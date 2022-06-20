@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.business.mapper.CnfCollectionMapper">
+     <resultMap id="collectionVo" type="com.manyun.business.domain.vo.CollectionVo">
+         <id column="id" property="id"/>
+         <result column="balance" property="balance"/>
+         <result column="collection_name" property="collectionName"/>
+         <result column="source_price" property="sourcePrice"/>
+         <result column="self_balance" property="selfBalance"/>
+         <result column="balance" property="balance"/>
+         <result column="real_price" property="realPrice"/>
+         <result column="publish_time" property="publishTime"/>
+         <result column="created_time" property="createdTime"/>
+<!--         <collection property="mediaVos" ofType="com.manyun.business.domain.vo.MediaVo" >
+             <id column="m_id" property="id"/>
+             <id column="bui_id" property="buiId"/>
+             <id column="model_type" property="modelType"/>
+             <id column="media_url" property="mediaUrl"/>
+             <id column="media_type" property="mediaType"/>
+         </collection>
+         <collection property="lableVos" ofType="com.manyun.business.domain.vo.LableVo">
+             <id column="ab_id" property="id"/>
+             <id column="lable_name" property="lableName"/>
+         </collection>-->
+     </resultMap>
+
+    <select id="pageQueryList" resultMap="collectionVo">
+
+    </select>
+
+</mapper>

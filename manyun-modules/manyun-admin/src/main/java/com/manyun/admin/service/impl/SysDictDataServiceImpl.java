@@ -4,7 +4,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.manyun.common.security.utils.DictUtils;
-import com.manyun.admin.api.domain.SysDictData;
+import com.manyun.comm.api.domain.SysDictData;
 import com.manyun.admin.mapper.SysDictDataMapper;
 import com.manyun.admin.service.ISysDictDataService;
 

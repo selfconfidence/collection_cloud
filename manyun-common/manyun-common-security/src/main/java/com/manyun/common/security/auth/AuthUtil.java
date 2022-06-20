@@ -1,8 +1,9 @@
 package com.manyun.common.security.auth;
 
+import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.security.annotation.RequiresPermissions;
 import com.manyun.common.security.annotation.RequiresRoles;
-import com.manyun.admin.api.model.LoginUser;
+import com.manyun.comm.api.model.LoginUser;
 
 /**
  * Token 权限验证工具类
@@ -39,7 +40,7 @@ public class AuthUtil
      */
     public static void checkLogin()
     {
-        authLogic.checkLogin();
+        authLogic.checkAdminLogin();
     }
 
     /**
@@ -50,10 +51,26 @@ public class AuthUtil
         return authLogic.getLoginUser(token);
     }
 
+
+    /**
+     * 获取当前登录用户信息
+     */
+    public static LoginBusinessUser getLoginBusinessUserUser(String token)
+    {
+        return authLogic.getLoginBusinessUser(token);
+    }
     /**
      * 验证当前用户有效期
      */
     public static void verifyLoginUserExpire(LoginUser loginUser)
+    {
+        authLogic.verifyLoginUserExpire(loginUser);
+    }
+
+    /**
+     * 验证当前用户有效期
+     */
+    public static void verifyLoginUserExpire(LoginBusinessUser loginUser)
     {
         authLogic.verifyLoginUserExpire(loginUser);
     }

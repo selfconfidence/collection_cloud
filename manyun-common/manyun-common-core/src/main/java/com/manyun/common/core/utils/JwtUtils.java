@@ -110,6 +110,17 @@ public class JwtUtils
     }
 
     /**
+     * 获取来源
+     *
+     * @param claims 获取来源
+     * @return 来源
+     */
+    public static String getSource(Claims claims)
+    {
+        return getValue(claims, SecurityConstants.DETAILS_LOGIN_SOURCE);
+    }
+
+    /**
      * 根据身份信息获取键值
      * 
      * @param claims 身份信息

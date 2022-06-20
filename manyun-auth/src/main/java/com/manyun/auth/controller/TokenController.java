@@ -15,12 +15,12 @@ import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.security.auth.AuthUtil;
 import com.manyun.common.security.service.TokenService;
 import com.manyun.common.security.utils.SecurityUtils;
-import com.manyun.admin.api.model.LoginUser;
+import com.manyun.comm.api.model.LoginUser;
 
 /**
  * token 控制
  * 
- * @author ruoyi
+ * @author yanwei
  */
 @RestController
 public class TokenController
