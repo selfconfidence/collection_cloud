@@ -4,6 +4,7 @@ import java.io.Serializable;
 import com.manyun.common.core.constant.Constants;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,8 +14,7 @@ import lombok.Setter;
  * @author ruoyi
  */
 @ApiModel("通用返回属性")
-@Getter
-@Setter
+@Data
 public class R<T> implements Serializable
 {
     private static final long serialVersionUID = 1L;
@@ -31,8 +31,21 @@ public class R<T> implements Serializable
     @ApiModelProperty(value = "返回信息，一般状态码不是200,前台就可以展示", example = "返回信息")
     private String msg;
 
-    @ApiModelProperty(value = "返回内容,查询操作才会有值", example = "返回信息")
+    @ApiModelProperty(value = "返回内容,一般查询才会有值", example = "返回信息")
     private T data;
+
+    public R() {
+    }
+
+    public R(T data) {
+        this.data = data;
+    }
+
+    public R(int code, String msg, T data) {
+        this.code = code;
+        this.msg = msg;
+        this.data = data;
+    }
 
     public static <T> R<T> ok()
     {
@@ -44,6 +57,11 @@ public class R<T> implements Serializable
         return restResult(data, SUCCESS, null);
     }
 
+    public static <T> R<T> success(T data)
+    {
+        return new R<T>( SUCCESS, null,data);
+    }
+
     public static <T> R<T> ok(T data, String msg)
     {
         return restResult(data, SUCCESS, msg);
@@ -51,7 +69,8 @@ public class R<T> implements Serializable
 
     public static <T> R<T> fail()
     {
-        return restResult(null, FAIL, null);
+      return   new R<T>().restResult(null, FAIL, null);
+        //return restResult();
     }
 
     public static <T> R<T> fail(String msg)
@@ -74,8 +93,16 @@ public class R<T> implements Serializable
         return restResult(null, code, msg);
     }
 
-    private static <T> R<T> restResult(T data, int code, String msg)
+/*    private static <T> R<T> restResult(T data, int code, String msg)
     {
+        R<T> apiResult = new R<>();
+        apiResult.setCode(code);
+        apiResult.setData(data);
+        apiResult.setMsg(msg);
+        return apiResult;
+    }*/
+
+    public static  <T> R<T> restResult(T data, int code, String msg){
         R<T> apiResult = new R<>();
         apiResult.setCode(code);
         apiResult.setData(data);
