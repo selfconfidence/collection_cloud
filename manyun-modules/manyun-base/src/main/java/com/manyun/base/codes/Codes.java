@@ -1,3 +1,4 @@
+/*
 package com.manyun.base.codes;
 
 import com.baomidou.mybatisplus.core.enums.SqlLike;
@@ -36,3 +37,4 @@ public class Codes {
 
     }
 }
+*/

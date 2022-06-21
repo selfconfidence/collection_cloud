@@ -7,9 +7,9 @@ spring:
   application:
     # 应用名称
     name: manyun-auth
-  profiles:
+#  profiles:
     # 环境配置
-    active: dev
+#    active: dev
   cloud:
     nacos:
       discovery:
