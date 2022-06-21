@@ -5,6 +5,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.domain.entity.*;
+import com.manyun.business.domain.form.CollectionSellForm;
 import com.manyun.business.domain.query.CollectionQuery;
 import com.manyun.business.domain.vo.*;
 import com.manyun.business.mapper.*;
@@ -76,6 +77,17 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     public CollectionAllVo info(String id) {
 
         return Builder.of(CollectionAllVo::new).with(CollectionAllVo::setCollectionVo,providerCollectionVo(getById(id))).with(CollectionAllVo::setCollectionInfoVo,providerCollectionInfoVo(id)).build();
+    }
+
+    /**
+     * 购买藏品
+     * @param userId
+     * @param collectionSellForm
+     * @return
+     */
+    @Override
+    public PayVo sellCollection(String userId, CollectionSellForm collectionSellForm) {
+        return null;
     }
 
     /**

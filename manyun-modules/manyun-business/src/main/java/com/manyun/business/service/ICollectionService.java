@@ -1,9 +1,11 @@
 package com.manyun.business.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.entity.CntCollection;
+import com.manyun.business.domain.form.CollectionSellForm;
 import com.manyun.business.domain.query.CollectionQuery;
 import com.manyun.business.domain.vo.CollectionAllVo;
 import com.manyun.business.domain.vo.CollectionVo;
+import com.manyun.business.domain.vo.PayVo;
 
 import java.util.List;
 
@@ -20,4 +22,7 @@ public interface ICollectionService extends IService<CntCollection> {
     List<CollectionVo> pageQueryList(CollectionQuery collectionQuery);
 
     CollectionAllVo info(String id);
+
+    PayVo sellCollection(String userId, CollectionSellForm collectionSellForm);
+
 }

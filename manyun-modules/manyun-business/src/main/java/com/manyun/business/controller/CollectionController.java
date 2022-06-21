@@ -2,16 +2,22 @@ package com.manyun.business.controller;
 
 
 import com.github.pagehelper.PageHelper;
+import com.manyun.business.domain.form.CollectionSellForm;
 import com.manyun.business.domain.query.CollectionQuery;
 import com.manyun.business.domain.vo.CollectionAllVo;
 import com.manyun.business.domain.vo.CollectionVo;
+import com.manyun.business.domain.vo.PayVo;
 import com.manyun.business.service.ICollectionService;
+import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.security.utils.SecurityUtils;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -42,6 +48,14 @@ public class CollectionController extends BaseController{
     @ApiOperation(value = "查询藏品详情信息",notes = "根据藏品编号查询藏品详情信息")
     public R<CollectionAllVo> info(@PathVariable String id){
         return R.ok(collectionService.info(id));
+    }
+
+
+    @PostMapping("sellCollection")
+    @ApiOperation("购买藏品")
+    public R<PayVo> sellCollection(@RequestBody @Valid CollectionSellForm collectionSellForm){
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return R.ok(collectionService.sellCollection(loginBusinessUser.getUserId(),collectionSellForm));
     }
 }
 
