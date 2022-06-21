@@ -1,0 +1,7 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.manyun.common.pays.config.AliPayConfig,\
+  com.manyun.common.pays.config.WechatPayConfig,\
+      com.manyun.common.pays.PayAutoConfiguration
+
+
+  
