@@ -1,16 +1,12 @@
 package com.manyun.business.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.manyun.business.domain.dto.OrderCreateDto;
 import com.manyun.business.domain.entity.Order;
+import com.manyun.business.domain.query.OrderQuery;
+import com.manyun.business.domain.vo.OrderVo;
 import com.manyun.business.mapper.OrderMapper;
 import com.manyun.business.service.IOrderService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.common.core.domain.Builder;
 import com.manyun.business.service.ISystemService;
 import com.manyun.business.service.IUserBoxService;
 import com.manyun.business.service.IUserCollectionService;
@@ -18,6 +14,8 @@ import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -37,6 +35,20 @@ import static com.manyun.common.core.enums.OrderStatus.WAIT_ORDER;
  */
 @Service
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements IOrderService {
+
+    @Override
+    public List<OrderVo> pageQueryList(OrderQuery orderQuery) {
+        List<Order> orderList = list(Wrappers.<Order>lambdaQuery()
+                .eq(orderQuery.getOrderStatus() != null, Order::getOrderStatus, orderQuery.getOrderStatus())
+                .orderByDesc(Order::getCreatedTime));
+        return orderList.parallelStream().map(this::providerOrderVo).collect(Collectors.toList());
+    }
+
+    private OrderVo providerOrderVo(Order order) {
+        OrderVo orderVo = Builder.of(OrderVo::new).build();
+        BeanUtil.copyProperties(order, orderVo);
+        return orderVo;
+    }
 
 
     @Autowired
