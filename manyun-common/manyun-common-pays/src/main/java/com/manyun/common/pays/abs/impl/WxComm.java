@@ -18,6 +18,7 @@ import com.manyun.common.pays.abs.CommPayAbs;
 import com.manyun.common.pays.config.WechatPayConfig;
 import com.manyun.common.pays.model.PayAliModel;
 import com.manyun.common.pays.model.PayWxModel;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,6 +30,7 @@ import java.util.Map;
  * 支付宝 相关 支付 & 用户等
  */
 @Slf4j
+@Getter
 public class WxComm extends CommPayAbs {
 
     private WechatPayConfig wechatPayConfig;

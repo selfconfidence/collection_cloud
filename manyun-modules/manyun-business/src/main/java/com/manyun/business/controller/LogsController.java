@@ -7,15 +7,15 @@ import org.springframework.stereotype.Controller;
 
 /**
  * <p>
- * 创作者表 前端控制器
+ * 业务收支日志记录表 前端控制器
  * </p>
  *
  * @author yanwei
- * @since 2022-06-17
+ * @since 2022-06-21
  */
 @Controller
-@RequestMapping("/cnfCreationd")
-public class CnfCreationdController {
+@RequestMapping("/logs")
+public class LogsController {
 
 }
 

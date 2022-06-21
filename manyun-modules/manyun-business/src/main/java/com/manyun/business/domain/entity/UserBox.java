@@ -2,7 +2,6 @@ package com.manyun.business.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -11,17 +10,17 @@ import lombok.ToString;
 
 /**
  * <p>
- * 钱包表
+ * 用户购买盲盒中间表
  * </p>
  *
  * @author yanwei
- * @since 2022-06-17
+ * @since 2022-06-21
  */
-@TableName("cnt_money")
-@ApiModel(value = "Money对象", description = "钱包表")
+@TableName("cnt_user_box")
+@ApiModel(value = "UserBox对象", description = "用户购买盲盒中间表")
 @Data
 @ToString
-public class Money implements Serializable {
+public class UserBox implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -31,29 +30,11 @@ public class Money implements Serializable {
     @ApiModelProperty("用户编号")
     private String userId;
 
-    @ApiModelProperty("真实姓名")
-    private String realName;
+    @ApiModelProperty("盲盒编号")
+    private String boxId;
 
-    @ApiModelProperty("真实手机号")
-    private String realPhone;
-
-    @ApiModelProperty("身份证正面_图片链接")
-    private String cartJust;
-
-    @ApiModelProperty("身份证反面_图片链接")
-    private String cartBack;
-
-    @ApiModelProperty("钱包余量")
-    private BigDecimal moneyBalance;
-
-    @ApiModelProperty("银行卡名称;中国银行,工商银行等")
-    private String bankName;
-
-    @ApiModelProperty("银行卡号")
-    private String bankCart;
-
-    @ApiModelProperty("银行开户行")
-    private String bankOpen;
+    @ApiModelProperty("来源")
+    private String sourceInfo;
 
     @ApiModelProperty("创建人")
     private String createdBy;
@@ -79,5 +60,4 @@ public class Money implements Serializable {
         this.updatedBy = updateId;
         this.updatedTime = LocalDateTime.now();
     }
-
 }

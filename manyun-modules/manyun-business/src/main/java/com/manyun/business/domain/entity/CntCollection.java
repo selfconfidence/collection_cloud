@@ -23,7 +23,7 @@ import lombok.ToString;
 @ApiModel(value = "Collection对象", description = "藏品表")
 @Data
 @ToString
-public class CnfCollection implements Serializable {
+public class CntCollection implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -43,20 +43,6 @@ public class CnfCollection implements Serializable {
     @ApiModelProperty("藏品现价_实际支付的价格")
     private BigDecimal realPrice;
 
-    @ApiModelProperty("藏品编号;购买后")
-    private String collectionNumber;
-
-    @ApiModelProperty("藏品哈希;购买后")
-    private String collectionHash;
-
-    @ApiModelProperty("链上地址;购买后")
-    private String linkAddr;
-
-    @ApiModelProperty("认证机构;购买后")
-    private String realCompany;
-
-    @ApiModelProperty("是否上链;1=未上链,2=已上链")
-    private Integer isLink;
 
     @ApiModelProperty("已售")
     private Integer selfBalance;

@@ -29,6 +29,7 @@ spring:
             refresh: true
           - data-id:  application-alipay-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
             refresh: true
-          - application-wechatpay-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+          - data-id:  application-wechatpay-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+            refresh: true
   main:
     allow-bean-definition-overriding: true

@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.ToString;
 
 /**
  * <p>
@@ -17,6 +19,8 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @TableName("cnt_order")
 @ApiModel(value = "Order对象", description = "订单")
+@Data
+@ToString
 public class Order implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -42,17 +46,21 @@ public class Order implements Serializable {
     @ApiModelProperty("用户id")
     private String userId;
 
-    @ApiModelProperty("藏品id")
-    private String collectionId;
+    @ApiModelProperty("业务编号")
+    private String buiId;
 
     @ApiModelProperty("商品类型;0藏品，1盲盒")
     private Integer goodsType;
 
-    @ApiModelProperty("订单状态;0待付款，1已完成，2已取消，-1支付未回调")
+    @ApiModelProperty("订单状态;0待付款，1已完成，2已取消，-1支付未回调，3=进行中(这个比较特殊 属于寄售的时候用的)")
     private Integer orderStatus;
 
     @ApiModelProperty("支付方式;0平台，1支付宝，2微信，3银联")
     private Integer payType;
+
+    @ApiModelProperty("购买数量,默认为1")
+    private Integer goodsNum;
+
 
     @ApiModelProperty("订单金额")
     private BigDecimal orderAmount;
@@ -61,150 +69,21 @@ public class Order implements Serializable {
     private LocalDateTime endTime;
 
     @ApiModelProperty("付款时间")
-    private String payTime;
+    private LocalDateTime payTime;
 
     @ApiModelProperty("藏品名称")
     private String collectionName;
 
-
-    public String getId() {
-        return id;
+    public void createD(String createId){
+        this.createdBy = createId;
+        this.createdTime = LocalDateTime.now();
+        if (this.createdTime != null)
+            this.updatedTime = this.createdTime;
+        this.updatedBy = this.createdBy;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public LocalDateTime getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(LocalDateTime createdTime) {
-        this.createdTime = createdTime;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public LocalDateTime getUpdatedTime() {
-        return updatedTime;
-    }
-
-    public void setUpdatedTime(LocalDateTime updatedTime) {
-        this.updatedTime = updatedTime;
-    }
-
-    public String getOrderNo() {
-        return orderNo;
-    }
-
-    public void setOrderNo(String orderNo) {
-        this.orderNo = orderNo;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getCollectionId() {
-        return collectionId;
-    }
-
-    public void setCollectionId(String collectionId) {
-        this.collectionId = collectionId;
-    }
-
-    public Integer getGoodsType() {
-        return goodsType;
-    }
-
-    public void setGoodsType(Integer goodsType) {
-        this.goodsType = goodsType;
-    }
-
-    public Integer getOrderStatus() {
-        return orderStatus;
-    }
-
-    public void setOrderStatus(Integer orderStatus) {
-        this.orderStatus = orderStatus;
-    }
-
-    public Integer getPayType() {
-        return payType;
-    }
-
-    public void setPayType(Integer payType) {
-        this.payType = payType;
-    }
-
-    public BigDecimal getOrderAmount() {
-        return orderAmount;
-    }
-
-    public void setOrderAmount(BigDecimal orderAmount) {
-        this.orderAmount = orderAmount;
-    }
-
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }
-
-    public String getPayTime() {
-        return payTime;
-    }
-
-    public void setPayTime(String payTime) {
-        this.payTime = payTime;
-    }
-
-    public String getCollectionName() {
-        return collectionName;
-    }
-
-    public void setCollectionName(String collectionName) {
-        this.collectionName = collectionName;
-    }
-
-    @Override
-    public String toString() {
-        return "Order{" +
-        "id=" + id +
-        ", createdBy=" + createdBy +
-        ", createdTime=" + createdTime +
-        ", updatedBy=" + updatedBy +
-        ", updatedTime=" + updatedTime +
-        ", orderNo=" + orderNo +
-        ", userId=" + userId +
-        ", collectionId=" + collectionId +
-        ", goodsType=" + goodsType +
-        ", orderStatus=" + orderStatus +
-        ", payType=" + payType +
-        ", orderAmount=" + orderAmount +
-        ", endTime=" + endTime +
-        ", payTime=" + payTime +
-        ", collectionName=" + collectionName +
-        "}";
+    public void updateD(String updateId){
+        this.updatedBy = updateId;
+        this.updatedTime = LocalDateTime.now();
     }
 }

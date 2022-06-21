@@ -18,6 +18,7 @@ import com.manyun.common.pays.abs.CommPayAbs;
 import com.manyun.common.pays.config.AliPayConfig;
 import com.manyun.common.pays.model.PayAliModel;
 import com.manyun.common.pays.model.PayWxModel;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import java.math.BigDecimal;
@@ -26,8 +27,9 @@ import java.math.BigDecimal;
  * 支付宝 相关 支付 & 用户等
  */
 @Slf4j
+@Getter
 public class AliComm extends CommPayAbs {
-    AliPayConfig aliPayApiConfig ;
+   private AliPayConfig aliPayApiConfig ;
 
     public AliComm(AliPayConfig aliPayApiConfig) {
         this.aliPayApiConfig = aliPayApiConfig;

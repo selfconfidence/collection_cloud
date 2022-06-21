@@ -16,7 +16,7 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @TableName("cnf_creationd")
 @ApiModel(value = "CnfCreationd对象", description = "创作者表")
-public class CnfCreationd implements Serializable {
+public class CntCreationd implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

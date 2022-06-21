@@ -1,6 +1,6 @@
 package com.manyun.business.service;
 
-import com.manyun.business.domain.entity.CnfCreationd;
+import com.manyun.business.domain.entity.CntCreationd;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author yanwei
  * @since 2022-06-17
  */
-public interface ICnfCreationdService extends IService<CnfCreationd> {
+public interface ICntCreationdService extends IService<CntCreationd> {
 
 }

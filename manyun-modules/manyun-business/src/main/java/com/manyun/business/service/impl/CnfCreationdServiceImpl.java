@@ -1,9 +1,9 @@
 package com.manyun.business.service.impl;
 
-import com.manyun.business.domain.entity.CnfCreationd;
-import com.manyun.business.mapper.CnfCreationdMapper;
-import com.manyun.business.service.ICnfCreationdService;
+import com.manyun.business.domain.entity.CntCreationd;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.business.mapper.CntCreationdMapper;
+import com.manyun.business.service.ICntCreationdService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2022-06-17
  */
 @Service
-public class CnfCreationdServiceImpl extends ServiceImpl<CnfCreationdMapper, CnfCreationd> implements ICnfCreationdService {
+public class CnfCreationdServiceImpl extends ServiceImpl<CntCreationdMapper, CntCreationd> implements ICntCreationdService {
 
 }

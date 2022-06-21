@@ -8,6 +8,7 @@ import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.query.CollectionQuery;
 import com.manyun.business.domain.vo.*;
 import com.manyun.business.mapper.*;
+import com.manyun.business.service.ICntCreationdService;
 import com.manyun.business.service.ICollectionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.business.service.IMediaService;
@@ -31,15 +32,15 @@ import static com.manyun.common.core.enums.CollectionStatus.DOWN_ACTION;
  * @since 2022-06-17
  */
 @Service
-public class CollectionServiceImpl extends ServiceImpl<CnfCollectionMapper, CnfCollection> implements ICollectionService {
+public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntCollection> implements ICollectionService {
     @Resource
-    private CnfCollectionMapper cnfCollectionMapper;
+    private CntCollectionMapper CntCollectionMapper;
 
     @Resource
     private CateMapper cateMapper;
 
     @Resource
-    private CnfCreationdMapper cnfCreationdMapper;
+    private ICntCreationdService cntCreationdService;
 
     @Resource
     private LableMapper lableMapper;
@@ -60,15 +61,15 @@ public class CollectionServiceImpl extends ServiceImpl<CnfCollectionMapper, CnfC
     @Override
     public List<CollectionVo> pageQueryList(CollectionQuery collectionQuery) {
         // 查询条件部分
-        List<CnfCollection> cnfCollections = list(Wrappers.<CnfCollection>lambdaQuery()
-                .eq(StrUtil.isNotBlank(collectionQuery.getCateId()), CnfCollection::getCateId, collectionQuery.getCateId())
-                .ne(CnfCollection::getStatusBy,DOWN_ACTION.getCode())
-                .like(StrUtil.isNotBlank(collectionQuery.getCollectionName()), CnfCollection::getCollectionName, collectionQuery.getCollectionName())
-                .eq(StrUtil.isNotBlank(collectionQuery.getBindCreationId()), CnfCollection::getBindCreation, collectionQuery.getBindCreationId())
-                .orderByDesc(CnfCollection::getCreatedTime)
+        List<CntCollection> CntCollections = list(Wrappers.<CntCollection>lambdaQuery()
+                .eq(StrUtil.isNotBlank(collectionQuery.getCateId()), CntCollection::getCateId, collectionQuery.getCateId())
+                .ne(CntCollection::getStatusBy,DOWN_ACTION.getCode())
+                .like(StrUtil.isNotBlank(collectionQuery.getCollectionName()), CntCollection::getCollectionName, collectionQuery.getCollectionName())
+                .eq(StrUtil.isNotBlank(collectionQuery.getBindCreationId()), CntCollection::getBindCreation, collectionQuery.getBindCreationId())
+                .orderByDesc(CntCollection::getCreatedTime)
         );
         // 聚合数据
-        return cnfCollections.parallelStream().map(this::providerCollectionVo).collect(Collectors.toList());
+        return CntCollections.parallelStream().map(this::providerCollectionVo).collect(Collectors.toList());
     }
 
     @Override
@@ -89,13 +90,13 @@ public class CollectionServiceImpl extends ServiceImpl<CnfCollectionMapper, CnfC
         return collectionInfoVo;
     }
 
-    private CollectionVo providerCollectionVo(CnfCollection cnfCollection){
+    private CollectionVo providerCollectionVo(CntCollection CntCollection){
         CollectionVo collectionVo = Builder.of(CollectionVo::new).build();
-        BeanUtil.copyProperties(cnfCollection,collectionVo);
-        collectionVo.setLableVos(initLableVos(cnfCollection.getId()));
-        collectionVo.setMediaVos(initMediaVos(cnfCollection.getId()));
-        collectionVo.setCnfCreationdVo(initCnfCreationVo(cnfCollection.getBindCreation()));
-        collectionVo.setCateVo(initCateVo(cnfCollection.getCateId()));
+        BeanUtil.copyProperties(CntCollection,collectionVo);
+        collectionVo.setLableVos(initLableVos(CntCollection.getId()));
+        collectionVo.setMediaVos(initMediaVos(CntCollection.getId()));
+        collectionVo.setCnfCreationdVo(initCnfCreationVo(CntCollection.getBindCreation()));
+        collectionVo.setCateVo(initCateVo(CntCollection.getCateId()));
         return collectionVo;
     }
 
@@ -117,7 +118,7 @@ public class CollectionServiceImpl extends ServiceImpl<CnfCollectionMapper, CnfC
      * @return
      */
     private CnfCreationdVo initCnfCreationVo(String bindCreationId) {
-        CnfCreationd cnfCreationd = cnfCreationdMapper.selectById(bindCreationId);
+        CntCreationd cnfCreationd = cntCreationdService.getById(bindCreationId);
         CnfCreationdVo creationdVo = Builder.of(CnfCreationdVo::new).build();
         BeanUtil.copyProperties(cnfCreationd,creationdVo);
         return creationdVo;

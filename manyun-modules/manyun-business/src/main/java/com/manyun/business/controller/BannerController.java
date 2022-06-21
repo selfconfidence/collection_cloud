@@ -34,11 +34,6 @@ import java.util.stream.Collectors;
 @Api(tags = "首页轮播相关")
 public class BannerController {
 
-    @Autowired
-    private AliComm aliComm;
-
-    @Autowired
-    private WxComm wxComm;
 
     @Autowired
     private IBannerService bannerService;
@@ -53,8 +48,6 @@ public class BannerController {
     @ApiOperation(value = "查询轮播列表,最多只返回6条",notes = "无需查询轮播详情，根据返回的 jumpLink 标识符去判定流转逻辑")
     public R<List<BannerVo>> list(@PathVariable Integer type){
         //LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        aliComm.initAliConfig();
-        wxComm.initWxConfig();
         return R.ok(bannerService.list(Wrappers.<Banner>lambdaQuery().eq(Banner::getBannerType,type).orderByDesc(Banner::getCreatedTime,Banner::getUpdatedTime).last(" limit 6")).parallelStream().map(item ->{
             BannerVo bannerVo = Builder.of(BannerVo::new).build();
             BeanUtil.copyProperties(item,bannerVo);

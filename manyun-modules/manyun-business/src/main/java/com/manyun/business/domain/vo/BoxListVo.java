@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,6 +26,14 @@ public class BoxListVo implements Serializable {
 
     @ApiModelProperty("盲盒状态;1=正常,2=售罄")
     private Integer statusBy;
+
+
+    @ApiModelProperty("盲盒现价_实际支付的价格")
+    private BigDecimal realPrice;
+
+    @ApiModelProperty("盲盒原价")
+    private BigDecimal sourcePrice;
+
 
 
     @ApiModelProperty("盲盒主图")

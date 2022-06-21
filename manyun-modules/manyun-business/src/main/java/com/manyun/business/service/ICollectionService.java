@@ -1,7 +1,6 @@
 package com.manyun.business.service;
-
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.manyun.business.domain.entity.CnfCollection;
+import com.manyun.business.domain.entity.CntCollection;
 import com.manyun.business.domain.query.CollectionQuery;
 import com.manyun.business.domain.vo.CollectionAllVo;
 import com.manyun.business.domain.vo.CollectionVo;
@@ -16,7 +15,7 @@ import java.util.List;
  * @author yanwei
  * @since 2022-06-17
  */
-public interface ICollectionService extends IService<CnfCollection> {
+public interface ICollectionService extends IService<CntCollection> {
 
     List<CollectionVo> pageQueryList(CollectionQuery collectionQuery);
 

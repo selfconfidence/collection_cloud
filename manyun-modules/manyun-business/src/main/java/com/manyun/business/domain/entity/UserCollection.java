@@ -2,7 +2,6 @@ package com.manyun.business.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -11,17 +10,17 @@ import lombok.ToString;
 
 /**
  * <p>
- * 钱包表
+ * 用户购买藏品中间表
  * </p>
  *
  * @author yanwei
- * @since 2022-06-17
+ * @since 2022-06-21
  */
-@TableName("cnt_money")
-@ApiModel(value = "Money对象", description = "钱包表")
+@TableName("cnt_user_collection")
+@ApiModel(value = "UserCollection对象", description = "用户购买藏品中间表")
 @Data
 @ToString
-public class Money implements Serializable {
+public class UserCollection implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -31,29 +30,26 @@ public class Money implements Serializable {
     @ApiModelProperty("用户编号")
     private String userId;
 
-    @ApiModelProperty("真实姓名")
-    private String realName;
+    @ApiModelProperty("藏品id")
+    private String collectionId;
 
-    @ApiModelProperty("真实手机号")
-    private String realPhone;
+    @ApiModelProperty("藏品编号;购买后")
+    private String collectionNumber;
 
-    @ApiModelProperty("身份证正面_图片链接")
-    private String cartJust;
+    @ApiModelProperty("藏品哈希;购买后")
+    private String collectionHash;
 
-    @ApiModelProperty("身份证反面_图片链接")
-    private String cartBack;
+    @ApiModelProperty("链上地址;购买后")
+    private String linkAddr;
 
-    @ApiModelProperty("钱包余量")
-    private BigDecimal moneyBalance;
+    @ApiModelProperty("是否上链;1=未上链,2=已上链")
+    private Integer isLink;
 
-    @ApiModelProperty("银行卡名称;中国银行,工商银行等")
-    private String bankName;
+    @ApiModelProperty("来源")
+    private String sourceInfo;
 
-    @ApiModelProperty("银行卡号")
-    private String bankCart;
-
-    @ApiModelProperty("银行开户行")
-    private String bankOpen;
+    @ApiModelProperty("认证机构;购买后")
+    private String realCompany;
 
     @ApiModelProperty("创建人")
     private String createdBy;
@@ -67,6 +63,7 @@ public class Money implements Serializable {
     @ApiModelProperty("更新时间")
     private LocalDateTime updatedTime;
 
+
     public void createD(String createId){
         this.createdBy = createId;
         this.createdTime = LocalDateTime.now();
@@ -79,5 +76,4 @@ public class Money implements Serializable {
         this.updatedBy = updateId;
         this.updatedTime = LocalDateTime.now();
     }
-
 }

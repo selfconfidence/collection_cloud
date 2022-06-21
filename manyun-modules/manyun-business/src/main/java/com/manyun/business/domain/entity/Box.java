@@ -2,6 +2,7 @@ package com.manyun.business.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -30,6 +31,13 @@ public class Box implements Serializable {
 
     @ApiModelProperty("盲盒标题")
     private String boxTitle;
+
+    @ApiModelProperty("盲盒现价_实际支付的价格")
+    private BigDecimal realPrice;
+
+    @ApiModelProperty("盲盒原价")
+    private BigDecimal sourcePrice;
+
 
 
     @ApiModelProperty("分类编号")

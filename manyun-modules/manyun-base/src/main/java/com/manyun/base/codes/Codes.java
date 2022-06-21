@@ -1,4 +1,3 @@
-/*
 package com.manyun.base.codes;
 
 import com.baomidou.mybatisplus.core.enums.SqlLike;
@@ -26,7 +25,9 @@ public class Codes {
                 })
                 .strategyConfig(builder -> {
                     builder // 设置需要生成的表名
-                            .addInclude("cnf_creationd")
+                            .addInclude("cnt_user_collection")
+                            .addInclude("cnt_user_box")
+
                             //.likeTable(new LikeTable("cnt_", SqlLike.RIGHT))
                             .addTablePrefix("cnt_"); // 设置过滤表前缀
                 })
@@ -35,4 +36,3 @@ public class Codes {
 
     }
 }
-*/

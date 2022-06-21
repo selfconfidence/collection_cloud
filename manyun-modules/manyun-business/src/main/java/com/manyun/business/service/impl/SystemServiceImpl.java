@@ -1,10 +1,15 @@
 package com.manyun.business.service.impl;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.domain.entity.System;
 import com.manyun.business.mapper.SystemMapper;
 import com.manyun.business.service.ISystemService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * <p>
@@ -17,4 +22,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class SystemServiceImpl extends ServiceImpl<SystemMapper, System> implements ISystemService {
 
+    @Override
+    public <T> T getVal(String type, Class<T> classType) {
+        System system = getOne(Wrappers.<System>lambdaQuery().eq(System::getSystemType, type));
+        Assert.isTrue(Objects.nonNull(system),"not font system  type = " + type);
+        String systemVal = system.getSystemVal();
+        return (T)Convert.convert(classType,systemVal);
+    }
 }

@@ -10,7 +10,7 @@ import lombok.Getter;
 @Getter
 public enum WxPayEnum
 {
-    BOX_ORDER_TEST("/web/aliPay/test_url", "盲盒支付");
+    BOX_WECHAT_PAY("/notify_pay/wechatPay/boxNotify", "盲盒支付");
 
     private final String notifyUrl;
     private final String body;

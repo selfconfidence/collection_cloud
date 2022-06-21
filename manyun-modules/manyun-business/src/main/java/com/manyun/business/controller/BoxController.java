@@ -5,6 +5,7 @@ import com.manyun.business.domain.form.BoxSellForm;
 import com.manyun.business.domain.query.BoxQuery;
 import com.manyun.business.domain.vo.BoxListVo;
 import com.manyun.business.domain.vo.BoxVo;
+import com.manyun.business.domain.vo.PayVo;
 import com.manyun.business.service.IBoxService;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.domain.R;
@@ -52,11 +53,9 @@ public class BoxController extends BaseController {
 
     @PostMapping("/sellBox")
     @ApiOperation("购买普通盲盒")
-    public R sellBox(@Valid @RequestBody BoxSellForm boxSellForm){
-
+    public R<PayVo> sellBox(@Valid @RequestBody BoxSellForm boxSellForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        boxService.sellBox(boxSellForm,notNullLoginBusinessUser.getUserId());
-        return R.ok();
+        return R.ok(boxService.sellBox(boxSellForm,notNullLoginBusinessUser.getUserId()));
     }
 
 

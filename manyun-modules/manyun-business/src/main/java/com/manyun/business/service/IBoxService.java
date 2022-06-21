@@ -6,6 +6,7 @@ import com.manyun.business.domain.form.BoxSellForm;
 import com.manyun.business.domain.query.BoxQuery;
 import com.manyun.business.domain.vo.BoxListVo;
 import com.manyun.business.domain.vo.BoxVo;
+import com.manyun.business.domain.vo.PayVo;
 
 import java.util.List;
 
@@ -23,5 +24,5 @@ public interface IBoxService extends IService<Box> {
 
     BoxVo info(String id);
 
-    void sellBox(BoxSellForm boxSellForm,String userId);
+    PayVo sellBox(BoxSellForm boxSellForm, String userId);
 }

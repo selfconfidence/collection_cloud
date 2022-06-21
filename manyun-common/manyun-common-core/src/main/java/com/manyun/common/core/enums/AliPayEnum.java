@@ -10,7 +10,7 @@ import lombok.Getter;
 @Getter
 public enum AliPayEnum
 {
-    BOX_PAY("/web/aliPay/test_url", "盲盒支付");
+    BOX_ALI_PAY("/business/notify_pay/aliPay/boxNotify", "盲盒支付");
 
     private final String notifyUrl;
     private final String body;
