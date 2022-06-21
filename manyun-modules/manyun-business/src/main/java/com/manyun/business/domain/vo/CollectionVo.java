@@ -13,7 +13,6 @@ import java.util.List;
 
 @Data
 @ApiModel("藏品返回视图")
-@Builder
 public class CollectionVo implements Serializable {
 
     @ApiModelProperty("藏品编号")
@@ -33,6 +32,10 @@ public class CollectionVo implements Serializable {
 
     @ApiModelProperty("藏品原价")
     private BigDecimal sourcePrice;
+
+
+    @ApiModelProperty("藏品状态;1=正常,2=售罄")
+    private Integer statusBy;
 
     @ApiModelProperty("已售数量")
     private Integer selfBalance;

@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.ToString;
 
 /**
  * <p>
@@ -16,6 +18,8 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @TableName("cnt_box")
 @ApiModel(value = "Box对象", description = "盲盒;盲盒主体表")
+@Data
+@ToString
 public class Box implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -23,8 +27,13 @@ public class Box implements Serializable {
     @ApiModelProperty("主键")
     private String id;
 
+
     @ApiModelProperty("盲盒标题")
     private String boxTitle;
+
+
+    @ApiModelProperty("分类编号")
+    private String cateId;
 
     @ApiModelProperty("已售")
     private Integer selfBalance;
@@ -53,109 +62,4 @@ public class Box implements Serializable {
     @ApiModelProperty("更新时间")
     private LocalDateTime updatedTime;
 
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getBoxTitle() {
-        return boxTitle;
-    }
-
-    public void setBoxTitle(String boxTitle) {
-        this.boxTitle = boxTitle;
-    }
-
-    public Integer getSelfBalance() {
-        return selfBalance;
-    }
-
-    public void setSelfBalance(Integer selfBalance) {
-        this.selfBalance = selfBalance;
-    }
-
-    public Integer getBalance() {
-        return balance;
-    }
-
-    public void setBalance(Integer balance) {
-        this.balance = balance;
-    }
-
-    public Integer getStatusBy() {
-        return statusBy;
-    }
-
-    public void setStatusBy(Integer statusBy) {
-        this.statusBy = statusBy;
-    }
-
-    public String getBoxInfo() {
-        return boxInfo;
-    }
-
-    public void setBoxInfo(String boxInfo) {
-        this.boxInfo = boxInfo;
-    }
-
-    public LocalDateTime getPublishTime() {
-        return publishTime;
-    }
-
-    public void setPublishTime(LocalDateTime publishTime) {
-        this.publishTime = publishTime;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public LocalDateTime getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(LocalDateTime createdTime) {
-        this.createdTime = createdTime;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public LocalDateTime getUpdatedTime() {
-        return updatedTime;
-    }
-
-    public void setUpdatedTime(LocalDateTime updatedTime) {
-        this.updatedTime = updatedTime;
-    }
-
-    @Override
-    public String toString() {
-        return "Box{" +
-        "id=" + id +
-        ", boxTitle=" + boxTitle +
-        ", selfBalance=" + selfBalance +
-        ", balance=" + balance +
-        ", statusBy=" + statusBy +
-        ", boxInfo=" + boxInfo +
-        ", publishTime=" + publishTime +
-        ", createdBy=" + createdBy +
-        ", createdTime=" + createdTime +
-        ", updatedBy=" + updatedBy +
-        ", updatedTime=" + updatedTime +
-        "}";
-    }
 }

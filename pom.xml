@@ -43,6 +43,8 @@
          <lombok-version>1.18.6</lombok-version>
          <huto-version>5.8.3</huto-version>
         <kun-version>1.9.6</kun-version>
+        <pays-version>2.7.4</pays-version>
+
     </properties>
 
     <!-- 依赖声明 -->
@@ -253,6 +255,13 @@
             <dependency>
                 <groupId>com.manyun</groupId>
                 <artifactId>manyun-api-system</artifactId>
+                <version>${manyun.version}</version>
+            </dependency>
+
+            <!-- 支付 -->
+            <dependency>
+                <groupId>com.manyun</groupId>
+                <artifactId>manyun-common-pays</artifactId>
                 <version>${manyun.version}</version>
             </dependency>
 

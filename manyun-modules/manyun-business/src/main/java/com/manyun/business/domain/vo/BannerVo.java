@@ -12,39 +12,40 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 藏品系列_分类
+ * 轮播表
  * </p>
  *
  * @author yanwei
  * @since 2022-06-17
  */
-@ApiModel(value = "系列相关返回视图", description = "藏品系列_分类")
+@ApiModel(value = "轮播返回视图", description = "轮播视图")
 @Data
 @ToString
-public class CateVo implements Serializable {
+public class BannerVo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键")
     private String id;
 
-    @ApiModelProperty("系列名称")
-    private String cateName;
+    @ApiModelProperty("轮播标题")
+    private String bannerTitle;
 
-    @ApiModelProperty("系列主图")
-    private String cateImage;
+    @ApiModelProperty("轮播图片地址")
+    private String bannerImage;
 
-    @ApiModelProperty("系列详情")
-    private String cateInfo;
+    @ApiModelProperty("轮播简介 富文本")
+    private String bannerInfo;
 
-    @ApiModelProperty("创作者编号;当前系列的创作者编号; null 代表没有")
-    private String bindCreation;
+    @ApiModelProperty("轮播类型;1=首页轮播,2=竞拍轮播; 2不需要有逻辑判定,看详情即可")
+    private Integer bannerType;
 
+    @ApiModelProperty("跳转链接;bannerType=1 有效, QUICK_VIEW 跳转拍卖中心,BANNER_VIEW 查询 轮播简介,BOX_VIEW 跳转邀请好友得盲盒")
+    private String jumpLink;
 
     @ApiModelProperty("创建时间 yyyy-MM-dd HH:mm:ss")
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdTime;
-
 
 
 }

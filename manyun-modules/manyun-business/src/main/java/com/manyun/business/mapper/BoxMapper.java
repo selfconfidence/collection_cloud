@@ -2,6 +2,8 @@ package com.manyun.business.mapper;
 
 import com.manyun.business.domain.entity.Box;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Update;
 
 /**
  * <p>
@@ -13,4 +15,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface BoxMapper extends BaseMapper<Box> {
 
+    int updateLock(@Param("id") String id,@Param("sellNum") Integer sellNum);
 }

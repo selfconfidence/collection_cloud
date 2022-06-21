@@ -81,6 +81,13 @@
             <groupId>com.manyun</groupId>
             <artifactId>manyun-common-swagger</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.manyun</groupId>
+            <artifactId>manyun-common-pays</artifactId>
+        </dependency>
+
+
         
     </dependencies>
 

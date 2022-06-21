@@ -11,11 +11,12 @@ import lombok.Setter;
 /**
  * 响应信息主体
  *
- * @author ruoyi
+ * @author yanwei
  */
 @ApiModel("通用返回属性")
-@Data
-public class R<T> implements Serializable
+@Getter
+@Setter
+public class R<T> extends IResult<T> implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
@@ -31,20 +32,19 @@ public class R<T> implements Serializable
     @ApiModelProperty(value = "返回信息，一般状态码不是200,前台就可以展示", example = "返回信息")
     private String msg;
 
-    @ApiModelProperty(value = "返回内容,一般查询才会有值", example = "返回信息")
-    private T data;
+    public R(T data)     {
+        super(data);
 
-    public R() {
     }
+    public R()     {
+      super(null);
 
-    public R(T data) {
-        this.data = data;
     }
-
     public R(int code, String msg, T data) {
+        super(data);
         this.code = code;
         this.msg = msg;
-        this.data = data;
+
     }
 
     public static <T> R<T> ok()
@@ -54,7 +54,7 @@ public class R<T> implements Serializable
 
     public static <T> R<T> ok(T data)
     {
-        return restResult(data, SUCCESS, null);
+        return restResult(data, SUCCESS, CodeStatus.SUCCESS.getMessage());
     }
 
     public static <T> R<T> success(T data)
@@ -103,9 +103,8 @@ public class R<T> implements Serializable
     }*/
 
     public static  <T> R<T> restResult(T data, int code, String msg){
-        R<T> apiResult = new R<>();
+        R<T> apiResult = new R<>(data);
         apiResult.setCode(code);
-        apiResult.setData(data);
         apiResult.setMsg(msg);
         return apiResult;
     }

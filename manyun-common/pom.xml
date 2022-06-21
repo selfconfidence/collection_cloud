@@ -16,6 +16,8 @@
         <module>manyun-common-security</module>
         <module>manyun-common-datascope</module>
 		<module>manyun-common-datasource</module>
+        <module>manyun-common-pays</module>
+
     </modules>
 
     <artifactId>manyun-common</artifactId>

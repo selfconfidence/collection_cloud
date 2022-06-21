@@ -9,13 +9,9 @@ import com.manyun.business.service.ICollectionService;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.TableDataInfo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.stereotype.Controller;
-
 import java.util.List;
 
 /**
@@ -29,17 +25,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/collection")
 @Api(tags = "藏品相关apis")
-public class CollectionController extends BaseController {
+public class CollectionController extends BaseController{
 
     @Autowired
     private ICollectionService collectionService;
 
     @PostMapping("/pageList")
     @ApiOperation("分页查询藏品列表信息")
-    public TableDataInfo<CollectionVo> pageList(@RequestBody CollectionQuery collectionQuery){
+    public R<TableDataInfo<CollectionVo>> pageList(@RequestBody CollectionQuery collectionQuery){
         PageHelper.startPage(collectionQuery.getPageNum(),collectionQuery.getPageSize());
         List<CollectionVo> collectionVos =  collectionService.pageQueryList(collectionQuery);
-        return getDataTable(collectionVos);
+        return R.ok(getDataTable(collectionVos));
     }
 
     @GetMapping("/info/{id}")
@@ -47,6 +43,5 @@ public class CollectionController extends BaseController {
     public R<CollectionAllVo> info(@PathVariable String id){
         return R.ok(collectionService.info(id));
     }
-
 }
 

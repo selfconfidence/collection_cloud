@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.ToString;
 
 /**
  * <p>
@@ -16,12 +18,19 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @TableName("cnt_cate")
 @ApiModel(value = "Cate对象", description = "藏品系列_分类")
+@Data
+@ToString
 public class Cate implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键")
     private String id;
+
+
+
+    @ApiModelProperty("系列_分类 1=藏品系列，2=盲盒分类")
+    private Integer cateType;
 
     @ApiModelProperty("系列名称")
     private String cateName;
@@ -47,91 +56,4 @@ public class Cate implements Serializable {
     @ApiModelProperty("更新时间")
     private LocalDateTime updatedTime;
 
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getCateName() {
-        return cateName;
-    }
-
-    public void setCateName(String cateName) {
-        this.cateName = cateName;
-    }
-
-    public String getCateImage() {
-        return cateImage;
-    }
-
-    public void setCateImage(String cateImage) {
-        this.cateImage = cateImage;
-    }
-
-    public String getCateInfo() {
-        return cateInfo;
-    }
-
-    public void setCateInfo(String cateInfo) {
-        this.cateInfo = cateInfo;
-    }
-
-    public String getBindCreation() {
-        return bindCreation;
-    }
-
-    public void setBindCreation(String bindCreation) {
-        this.bindCreation = bindCreation;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public LocalDateTime getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(LocalDateTime createdTime) {
-        this.createdTime = createdTime;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public LocalDateTime getUpdatedTime() {
-        return updatedTime;
-    }
-
-    public void setUpdatedTime(LocalDateTime updatedTime) {
-        this.updatedTime = updatedTime;
-    }
-
-    @Override
-    public String toString() {
-        return "Cate{" +
-        "id=" + id +
-        ", cateName=" + cateName +
-        ", cateImage=" + cateImage +
-        ", cateInfo=" + cateInfo +
-        ", bindCreation=" + bindCreation +
-        ", createdBy=" + createdBy +
-        ", createdTime=" + createdTime +
-        ", updatedBy=" + updatedBy +
-        ", updatedTime=" + updatedTime +
-        "}";
-    }
 }

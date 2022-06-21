@@ -122,12 +122,7 @@ public enum  CodeStatus {
          */
         AUTH_REQUEST_ERROR(400, "账号密码错误"),
         VALUE_LACK(400,"余量不足"),
-        QR_ERROR(201,"未返回"),
-
-        /**
-         * nxfc 用户
-         */
-        NXFC_USER_EX(300,"NXFC未登录");
+        QR_ERROR(201,"未返回");
 
         CodeStatus(int code, String message) {
             this.code = code;
