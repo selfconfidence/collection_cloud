@@ -2,6 +2,9 @@ package com.manyun.business.service;
 
 import com.manyun.business.domain.entity.Media;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.manyun.business.domain.vo.MediaVo;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IMediaService extends IService<Media> {
 
+    List<MediaVo> initMediaVos(String buiId, String modelType);
 }

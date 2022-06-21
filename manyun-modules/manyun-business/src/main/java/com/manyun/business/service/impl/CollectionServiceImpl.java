@@ -10,6 +10,8 @@ import com.manyun.business.domain.vo.*;
 import com.manyun.business.mapper.*;
 import com.manyun.business.service.ICollectionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.business.service.IMediaService;
+import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.manyun.common.core.enums.CollectionStatus.DOWN_ACTION;
 
 /**
  * <p>
@@ -43,6 +47,9 @@ public class CollectionServiceImpl extends ServiceImpl<CnfCollectionMapper, CnfC
     @Resource
     private MediaMapper mediaMapper;
 
+    @Autowired
+    private IMediaService mediaService;
+
     @Resource
     private CollectionLableMapper collectionLableMapper;
 
@@ -55,6 +62,7 @@ public class CollectionServiceImpl extends ServiceImpl<CnfCollectionMapper, CnfC
         // 查询条件部分
         List<CnfCollection> cnfCollections = list(Wrappers.<CnfCollection>lambdaQuery()
                 .eq(StrUtil.isNotBlank(collectionQuery.getCateId()), CnfCollection::getCateId, collectionQuery.getCateId())
+                .ne(CnfCollection::getStatusBy,DOWN_ACTION.getCode())
                 .like(StrUtil.isNotBlank(collectionQuery.getCollectionName()), CnfCollection::getCollectionName, collectionQuery.getCollectionName())
                 .eq(StrUtil.isNotBlank(collectionQuery.getBindCreationId()), CnfCollection::getBindCreation, collectionQuery.getBindCreationId())
                 .orderByDesc(CnfCollection::getCreatedTime)
@@ -82,7 +90,7 @@ public class CollectionServiceImpl extends ServiceImpl<CnfCollectionMapper, CnfC
     }
 
     private CollectionVo providerCollectionVo(CnfCollection cnfCollection){
-        CollectionVo collectionVo = CollectionVo.builder().build();
+        CollectionVo collectionVo = Builder.of(CollectionVo::new).build();
         BeanUtil.copyProperties(cnfCollection,collectionVo);
         collectionVo.setLableVos(initLableVos(cnfCollection.getId()));
         collectionVo.setMediaVos(initMediaVos(cnfCollection.getId()));
@@ -122,12 +130,7 @@ public class CollectionServiceImpl extends ServiceImpl<CnfCollectionMapper, CnfC
      * @return
      */
     private List<MediaVo> initMediaVos(String collectionId) {
-       return mediaMapper.selectList(Wrappers.<Media>lambdaQuery().eq(Media::getBuiId,collectionId)).parallelStream().map(item ->{
-           MediaVo mediaVo =  Builder.of(MediaVo::new).build();
-           BeanUtil.copyProperties(item,mediaVo);
-           return mediaVo;
-       }).collect(Collectors.toList());
-
+      return  mediaService.initMediaVos(collectionId, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
     }
 
     /**

@@ -2,6 +2,7 @@ package com.manyun.common.security.handler;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.manyun.common.core.domain.CodeStatus;
 import com.manyun.common.core.exception.auth.NotLoginException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +77,16 @@ public class GlobalExceptionHandler
         return StringUtils.isNotNull(code) ? AjaxResult.error(code, e.getMessage()) : AjaxResult.error(e.getMessage());
     }
 
+
+    /**
+     * web端业务异常统一处理切面
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public AjaxResult handleServiceException(IllegalArgumentException e, HttpServletRequest request)
+    {
+        log.error(e.getMessage(), e);
+        return AjaxResult.error(CodeStatus.FAIL.getCode(), e.getMessage());
+    }
     /**
      * 拦截未知的运行时异常
      */

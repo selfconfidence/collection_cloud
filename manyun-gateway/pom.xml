@@ -88,10 +88,10 @@
             <version>${swagger.fox.version}</version>
         </dependency>
 
+        <!-- swagger ui 增强处理 -->
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
-            <artifactId>knife4j-spring-ui</artifactId>
-            <version>${knife4j-swagger.version}</version>
+            <artifactId>knife4j-spring-boot-starter</artifactId>
         </dependency>
 
     </dependencies>

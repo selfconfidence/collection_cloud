@@ -2,6 +2,12 @@ package com.manyun.business.service;
 
 import com.manyun.business.domain.entity.Box;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.manyun.business.domain.form.BoxSellForm;
+import com.manyun.business.domain.query.BoxQuery;
+import com.manyun.business.domain.vo.BoxListVo;
+import com.manyun.business.domain.vo.BoxVo;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +19,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IBoxService extends IService<Box> {
 
+    List<BoxListVo> pageList(BoxQuery boxQuery);
+
+    BoxVo info(String id);
+
+    void sellBox(BoxSellForm boxSellForm,String userId);
 }

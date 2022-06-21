@@ -41,13 +41,6 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 		
-        <!-- Swagger UI -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>${swagger.fox.version}</version>
-        </dependency>
-		
         <!-- Quartz -->
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
@@ -88,6 +81,13 @@
             <groupId>com.manyun</groupId>
             <artifactId>manyun-common-swagger</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.manyun</groupId>
+            <artifactId>manyun-common-pays</artifactId>
+        </dependency>
+
+
         
     </dependencies>
 
