@@ -17,7 +17,7 @@ import com.manyun.business.service.ISystemService;
 import com.manyun.business.service.IUserBoxService;
 import com.manyun.business.service.IUserCollectionService;
 import com.manyun.common.core.constant.BusinessConstants;
-import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -45,6 +45,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Override
     public List<OrderVo> pageQueryList(OrderQuery orderQuery) {
         List<Order> orderList = list(Wrappers.<Order>lambdaQuery()
+                .eq(StringUtils.isNotBlank(orderQuery.getUserId()), Order::getUserId, orderQuery.getUserId())
                 .eq(orderQuery.getOrderStatus() != null, Order::getOrderStatus, orderQuery.getOrderStatus())
                 .orderByDesc(Order::getCreatedTime));
         return orderList.parallelStream().map(this::providerOrderVo).collect(Collectors.toList());
@@ -55,6 +56,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         BeanUtil.copyProperties(order, orderVo);
         return orderVo;
     }
+
+    @Override
+    public List<Order> checkUnpaidOrder(String userId) {
+        return list(Wrappers.<Order>lambdaQuery()
+                .eq(StringUtils.isNotBlank(userId), Order::getUserId, userId)
+                .eq(Order::getOrderStatus, WAIT_ORDER.getCode()));
+    }
+
+
 
 
     @Autowired

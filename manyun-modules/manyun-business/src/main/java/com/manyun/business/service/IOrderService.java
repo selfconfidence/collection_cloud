@@ -22,6 +22,13 @@ public interface IOrderService extends IService<Order> {
     List<OrderVo> pageQueryList(OrderQuery orderQuery) ;
 
     /**
+     * 检查未支付订单
+     * @param userId
+     * @return
+     */
+    List<Order> checkUnpaidOrder (String userId);
+
+    /**
      * 创建订单
      * @param orderCreateDto
      * @return

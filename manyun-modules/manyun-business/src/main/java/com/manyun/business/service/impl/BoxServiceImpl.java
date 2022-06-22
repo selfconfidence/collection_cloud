@@ -12,6 +12,7 @@ import com.manyun.business.domain.dto.PayInfoDto;
 import com.manyun.business.domain.entity.Box;
 import com.manyun.business.domain.entity.Media;
 import com.manyun.business.domain.entity.Money;
+import com.manyun.business.domain.entity.Order;
 import com.manyun.business.domain.form.BoxSellForm;
 import com.manyun.business.domain.query.BoxQuery;
 import com.manyun.business.domain.vo.*;
@@ -105,6 +106,9 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
     @Override
     @Transactional(rollbackFor = Exception.class)
     public PayVo sellBox(BoxSellForm boxSellForm,String userId) {
+        //是否有未支付订单
+        List<Order> orders = orderService.checkUnpaidOrder(userId);
+        Assert.isFalse(orders.size() > 0 ,"您有未支付订单，暂不可购买");
         // 总结校验 —— 支付方式
         Box box = getById(boxSellForm.getBoxId());
         // 实际需要支付的金额
