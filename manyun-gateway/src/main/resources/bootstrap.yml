@@ -2,7 +2,7 @@
 server:
   port: 8080
 # Spring
-spring: 
+spring:
   application:
     # 应用名称
     name: manyun-gateway
@@ -16,10 +16,10 @@ spring:
     nacos:
       discovery:
         # 服务注册地址
-        server-addr: 172.16.8.26:8848
+        server-addr: ${spring.cloud.nacos.server}
       config:
         # 配置中心地址
-        server-addr: 172.16.8.26:8848
+        server-addr: ${spring.cloud.nacos.server}
         # 配置文件格式
         file-extension: yml
         # 共享配置
