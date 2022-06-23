@@ -35,6 +35,12 @@ public class CollectionController extends BaseController{
     @Autowired
     private ICollectionService collectionService;
 
+    @GetMapping("/queryDict/{keyword}")
+    @ApiOperation(value = "/根据词条 查询藏品完整 标题信息",notes = "返回的都是 盲盒词条完整信息 ")
+    public R<List<String>> queryDict(@PathVariable String keyword){
+        return R.ok(collectionService.queryDict(keyword));
+    }
+
     @PostMapping("/pageList")
     @ApiOperation("分页查询藏品列表信息")
     public R<TableDataInfo<CollectionVo>> pageList(@RequestBody CollectionQuery collectionQuery){

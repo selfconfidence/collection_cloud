@@ -190,6 +190,11 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         return userCateVoList;
     }
 
+    @Override
+    public List<String> queryDict(String keyword) {
+        return  list(Wrappers.<CntCollection>lambdaQuery().select(CntCollection::getCollectionName).like(CntCollection::getCollectionName,keyword).orderByDesc(CntCollection::getCreatedTime).last(" limit 10")).parallelStream().map(item -> item.getCollectionName()).collect(Collectors.toList());
+    }
+
     private UserCateCollectionVo initUserCateCollectionVo(CntCollection cntCollection) {
         UserCateCollectionVo userCateCollectionVo = Builder.of(UserCateCollectionVo::new).build();
         userCateCollectionVo.setCollectionName(cntCollection.getCollectionName());

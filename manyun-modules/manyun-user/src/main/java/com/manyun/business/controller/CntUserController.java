@@ -2,23 +2,28 @@ package com.manyun.business.controller;
 
 
 import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.manyun.business.domain.form.UserChangeForm;
+import com.manyun.business.domain.form.UserRealForm;
+import com.manyun.business.domain.vo.UserInfoVo;
 import com.manyun.business.service.ICntUserService;
 import com.manyun.comm.api.domain.CntUser;
 import com.manyun.comm.api.domain.vo.AccTokenVo;
+import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.comm.api.model.LoginPhoneCodeForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.redis.service.RedisService;
+import com.manyun.common.security.utils.SecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 import static com.manyun.common.core.constant.BusinessConstants.RedisDict.PHONE_CODE;
 
@@ -58,6 +63,42 @@ public class CntUserController extends BaseController {
         CntUser cntUser =   userService.codeLogin(loginPhoneCodeForm.getPhone());
         return R.ok(cntUser);
     }
+
+    @PostMapping("/changeUser")
+    @ApiOperation("修改个人信息")
+    public R changeUser(@RequestBody UserChangeForm userChangeForm){
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        userService.changeUser(userChangeForm,notNullLoginBusinessUser.getUserId());
+        return R.ok();
+    }
+
+    @GetMapping("/info")
+    @ApiOperation("查询用户的详细信息")
+    public R<UserInfoVo> info(){
+
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        // 详细信息
+        UserInfoVo userInfoVo = userService.info(notNullLoginBusinessUser.getUserId());
+        return R.ok(userInfoVo);
+    }
+
+    // 实名认证
+    @PostMapping("/realUser")
+    @ApiOperation("实名认证")
+    public R realUser(@RequestBody @Valid UserRealForm userRealForm){
+
+        return R.ok();
+    }
+
+    // 修改登录密码
+
+
+
+    // 修改支付密码
+
+
+
+
 
 }
 

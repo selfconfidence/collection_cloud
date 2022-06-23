@@ -1,6 +1,8 @@
 package com.manyun.business.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.manyun.business.domain.form.UserChangeForm;
+import com.manyun.business.domain.vo.UserInfoVo;
 import com.manyun.comm.api.domain.CntUser;
 import com.manyun.comm.api.model.LoginPhoneForm;
 
@@ -17,4 +19,8 @@ public interface ICntUserService extends IService<CntUser> {
     CntUser login(LoginPhoneForm loginPhoneForm);
 
     CntUser codeLogin(String phone);
+
+    void changeUser(UserChangeForm userChangeForm,String userId);
+
+    UserInfoVo info(String userId);
 }

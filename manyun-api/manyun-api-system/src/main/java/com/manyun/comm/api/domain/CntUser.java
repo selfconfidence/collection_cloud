@@ -69,5 +69,16 @@ public class CntUser implements Serializable {
     @ApiModelProperty("更新时间")
     private LocalDateTime updatedTime;
 
+    public void createD(String createId){
+        this.createdBy = createId;
+        this.createdTime = LocalDateTime.now();
+        if (this.createdTime != null)
+            this.updatedTime = this.createdTime;
+        this.updatedBy = this.createdBy;
+    }
 
+    public void updateD(String updateId){
+        this.updatedBy = updateId;
+        this.updatedTime = LocalDateTime.now();
+    }
 }

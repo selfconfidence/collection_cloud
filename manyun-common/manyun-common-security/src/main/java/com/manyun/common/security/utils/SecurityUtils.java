@@ -86,6 +86,7 @@ public class SecurityUtils
     /**
      * 获取登录用户信息
      * 必须有用户
+     * 缓存数据,不可为实时数据使用！！！
      */
     public static LoginBusinessUser getNotNullLoginBusinessUser()
     {

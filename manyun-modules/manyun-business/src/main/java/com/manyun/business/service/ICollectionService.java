@@ -27,4 +27,6 @@ public interface ICollectionService extends IService<CntCollection> {
     List<UserCollectionVo> userCollectionPageList(PageQuery pageQuery, String userId);
 
     List<UserCateVo> cateCollectionByUserId(String userId);
+
+    List<String> queryDict(String keyword);
 }
