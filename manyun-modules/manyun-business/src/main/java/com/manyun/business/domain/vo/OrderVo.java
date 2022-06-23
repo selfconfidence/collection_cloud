@@ -27,7 +27,7 @@ public class OrderVo implements Serializable {
     private String userId;
 
     @ApiModelProperty("藏品id")
-    private String collectionId;
+    private String buiId;
 
     @ApiModelProperty("商品类型;0藏品，1盲盒")
     private Integer goodsType;

@@ -47,10 +47,10 @@ import static com.manyun.common.core.enums.OrderStatus.*;
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements IOrderService {
 
     @Override
-    public List<OrderVo> pageQueryList(OrderQuery orderQuery) {
+    public List<OrderVo> pageQueryList(OrderQuery orderQuery, String userId) {
         List<Order> orderList = list(Wrappers.<Order>lambdaQuery()
-                .eq(StringUtils.isNotBlank(orderQuery.getUserId()), Order::getUserId, orderQuery.getUserId())
-                .eq(orderQuery.getOrderStatus() != null, Order::getOrderStatus, orderQuery.getOrderStatus())
+                .eq(StringUtils.isNotBlank(userId), Order::getUserId, userId)
+                .eq(orderQuery.getOrderStatus() != null && orderQuery.getOrderStatus() != 0, Order::getOrderStatus, orderQuery.getOrderStatus())
                 .orderByDesc(Order::getCreatedTime));
         return orderList.parallelStream().map(this::providerOrderVo).collect(Collectors.toList());
     }
