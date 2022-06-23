@@ -33,6 +33,10 @@ public class UserCollection implements Serializable {
     @ApiModelProperty("藏品id")
     private String collectionId;
 
+    @ApiModelProperty("藏品名称;")
+    private String collectionName;
+
+
     @ApiModelProperty("藏品编号;购买后")
     private String collectionNumber;
 

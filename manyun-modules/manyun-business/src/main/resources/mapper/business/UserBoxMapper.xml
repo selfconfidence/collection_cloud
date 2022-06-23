@@ -1,5 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.manyun.business.mapper.UserBoxMapper">
+     <resultMap id="baseMap" type="com.manyun.business.domain.vo.UserBoxVo">
+         <id column="box_id" property="boxId"/>
+         <result column="balance" property="balance"/>
+         <result column="box_title" property="boxTitle"/>
+         <result column="self_balance" property="selfBalance"/>
+         <result column="created_time" property="createdTime"/>
+         <result column="status_by" property="statusBy"/>
+         <result column="real_price" property="realPrice"/>
+         <result column="source_price" property="sourcePrice"/>
+         <result column="box_info" property="boxInfo"/>
+         <result column="box_open" property="boxOpen"/>
+         <result column="source_info" property="sourceInfo"/>
+<!--         <collection property="mediaVos" ofType="com.manyun.business.domain.vo.MediaVo">-->
+<!--             <id column="m_id" property="id"/>-->
+<!--             <id column="bui_id" property="buiId"/>-->
+<!--             <id column="model_type" property="modelType"/>-->
+<!--             <id column="media_url" property="mediaUrl"/>-->
+<!--             <id column="media_type" property="mediaType"/>-->
+<!--         </collection>-->
+     </resultMap>
 
+    <select id="pageUserBox" resultMap="baseMap">
+        SELECT
+        c.box_id,
+        b.balance,
+        b.box_title,
+        b.self_balance,
+        c.created_time,
+        b.status_by,
+        b.real_price,
+        b.source_price,
+        b.box_info,
+        c.box_open,
+        c.source_info
+        FROM
+        cnt_user_box AS c
+        INNER JOIN cnt_box AS b ON c.box_id = b.id
+         <where>
+            <if test="userId != null">
+                c.user_id = #{userId}
+            </if>
+        </where>
+        order by c.created_time desc
+    </select>
+
+<!--    <select id="pageUserBox" resultMap="baseMap">
+        select c.box_id  ,b.balance,b.box_title, b.self_balance, c.created_time , b.status_by,b.real_price,b.source_price, b.box_info,c.box_open,c.source_info,m.id m_id,m.bui_id,m.model_type,m.media_url,m.media_type from cnt_user_box as c left join  cnt_box as b on  c.box_id = b.id left join  cnt_media as m on  b.id = m.bui_id
+     <where>
+         <if test="userId != null">
+             b.user_id = #{userId}
+         </if>
+     </where>
+     order by c.created_time desc
+    </select>-->
 </mapper>

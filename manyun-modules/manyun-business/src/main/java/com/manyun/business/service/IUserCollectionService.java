@@ -2,6 +2,9 @@ package com.manyun.business.service;
 
 import com.manyun.business.domain.entity.UserCollection;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.manyun.business.domain.vo.UserCollectionVo;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,6 +16,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IUserCollectionService extends IService<UserCollection> {
 
-    void bindCollection(String userId, String buiId, String info, Integer goodsNum);
+    void bindCollection(String userId, String buiId, String collectionName,String info, Integer goodsNum);
 
+    List<UserCollectionVo> userCollectionPageList(String userId);
 }

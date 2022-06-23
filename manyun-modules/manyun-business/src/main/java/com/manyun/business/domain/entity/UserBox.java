@@ -33,6 +33,9 @@ public class UserBox implements Serializable {
     @ApiModelProperty("盲盒编号")
     private String boxId;
 
+    @ApiModelProperty("1未开启,2已开启")
+    private Integer boxOpen;
+
     @ApiModelProperty("来源")
     private String sourceInfo;
 

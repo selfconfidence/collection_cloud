@@ -13,6 +13,7 @@ import com.manyun.business.domain.entity.Box;
 import com.manyun.business.domain.entity.Media;
 import com.manyun.business.domain.entity.Money;
 import com.manyun.business.domain.entity.Order;
+import com.manyun.business.domain.entity.UserBox;
 import com.manyun.business.domain.form.BoxSellForm;
 import com.manyun.business.domain.query.BoxQuery;
 import com.manyun.business.domain.vo.*;
@@ -23,6 +24,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.enums.BoxStatus;
+import com.manyun.common.core.web.page.PageQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
+import static com.manyun.common.core.enums.BoxOpenType.NO_OPEN;
+import static com.manyun.common.core.enums.BoxOpenType.OK_OPEN;
 import static com.manyun.common.core.enums.BoxStatus.DOWN_ACTION;
 import static com.manyun.common.core.enums.PayTypeEnum.MONEY_TAPE;
 import static com.manyun.common.core.enums.WxPayEnum.BOX_WECHAT_PAY;
@@ -56,6 +60,8 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
     @Autowired
     private IBoxCollectionService  boxCollectionService;
 
+    @Autowired
+    private IUserBoxService userBoxService;
     @Resource
     private BoxMapper boxMapper;
 
@@ -106,9 +112,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
     @Override
     @Transactional(rollbackFor = Exception.class)
     public PayVo sellBox(BoxSellForm boxSellForm,String userId) {
-        //是否有未支付订单
-        List<Order> orders = orderService.checkUnpaidOrder(userId);
-        Assert.isFalse(orders.size() > 0 ,"您有未支付订单，暂不可购买");
+
         // 总结校验 —— 支付方式
         Box box = getById(boxSellForm.getBoxId());
         // 实际需要支付的金额
@@ -148,6 +152,35 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
 
     }
 
+    /**
+     * 查询我的盲盒分页信息
+     * @param pageQuery
+     * @param userId
+     * @return
+     */
+    @Override
+    public List<UserBoxVo> userBoxPageList(PageQuery pageQuery, String userId) {
+        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
+        List<UserBoxVo> userBoxList = userBoxService.pageUserBox(userId);
+        // 数据组合
+        return userBoxList.parallelStream().map(item ->{item.setMediaVos(mediaService.initMediaVos(item.getBoxId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)); return item;}).collect(Collectors.toList());
+    }
+
+    /**
+     * 开启盲盒
+     * @param boxId
+     * @param userId
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public synchronized String openBox(String boxId, String userId) {
+        UserBox userBox = userBoxService.getOne(Wrappers.<UserBox>lambdaQuery().eq(UserBox::getBoxId, boxId).eq(UserBox::getUserId, userId).eq(UserBox::getBoxOpen, NO_OPEN.getCode()));
+        Assert.isTrue(Objects.nonNull(userBox),"盲盒已被开启,请核实!");
+       // 什么样的随机算法 去得到概率性的藏品？
+
+        return null;
+    }
 
 
     private void checkSell(Box box,String userId,Integer payType,BigDecimal realPayMoney) {
@@ -159,6 +192,11 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         Assert.isFalse(Integer.valueOf(0).equals(box.getBalance()),"库存不足了!");
         // 重复校验状态
         Assert.isTrue(BoxStatus.UP_ACTION.getCode().equals(box.getStatusBy()),"您来晚了,售罄了!");
+
+        //是否有未支付订单
+        List<Order> orders = orderService.checkUnpaidOrder(userId);
+        Assert.isFalse(orders.size() > 0 ,"您有未支付订单，暂不可购买");
+
        // 如果是余额支付,需要验证下是否充足
         if (MONEY_TAPE.getCode().equals(payType)) {
             Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));

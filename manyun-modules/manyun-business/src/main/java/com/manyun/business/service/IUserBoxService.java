@@ -2,8 +2,10 @@ package com.manyun.business.service;
 
 import com.manyun.business.domain.entity.UserBox;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.manyun.business.domain.vo.UserBoxVo;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * <p>
@@ -16,4 +18,6 @@ import java.math.BigDecimal;
 public interface IUserBoxService extends IService<UserBox> {
 
     void bindBox(String userId, String buiId, String sourceInfo, Integer goodsNum);
+
+    List<UserBoxVo> pageUserBox(String userId);
 }

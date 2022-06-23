@@ -72,6 +72,19 @@ public class SecurityUtils
 
     /**
      * 获取登录用户信息
+     * 可以为 null
+     */
+    public static LoginBusinessUser getTestLoginBusinessUser()
+    {
+        //  测试用户
+        LoginBusinessUser loginBusinessUser = new LoginBusinessUser();
+        loginBusinessUser.setUserId("1");
+        return loginBusinessUser;
+    }
+
+
+    /**
+     * 获取登录用户信息
      * 必须有用户
      */
     public static LoginBusinessUser getNotNullLoginBusinessUser()

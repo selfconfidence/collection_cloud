@@ -2,27 +2,47 @@ package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Lists;
+import com.manyun.business.design.pay.RootPay;
+import com.manyun.business.domain.dto.OrderCreateDto;
+import com.manyun.business.domain.dto.PayInfoDto;
 import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.form.CollectionSellForm;
 import com.manyun.business.domain.query.CollectionQuery;
 import com.manyun.business.domain.vo.*;
 import com.manyun.business.mapper.*;
-import com.manyun.business.service.ICntCreationdService;
-import com.manyun.business.service.ICollectionService;
+import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.manyun.business.service.IMediaService;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.enums.BoxStatus;
+import com.manyun.common.core.enums.CollectionStatus;
+import com.manyun.common.core.web.page.PageQuery;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE;
+import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
+import static com.manyun.common.core.enums.CateType.COLLECTION_CATE;
 import static com.manyun.common.core.enums.CollectionStatus.DOWN_ACTION;
+import static com.manyun.common.core.enums.PayTypeEnum.MONEY_TAPE;
+import static com.manyun.common.core.enums.WxPayEnum.BOX_WECHAT_PAY;
 
 /**
  * <p>
@@ -33,30 +53,30 @@ import static com.manyun.common.core.enums.CollectionStatus.DOWN_ACTION;
  * @since 2022-06-17
  */
 @Service
+@RequiredArgsConstructor(onConstructor_= {@Autowired})
 public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntCollection> implements ICollectionService {
-    @Resource
-    private CntCollectionMapper CntCollectionMapper;
+    private final CntCollectionMapper cntCollectionMapper;
 
-    @Resource
-    private CateMapper cateMapper;
+    private final CateMapper cateMapper;
 
-    @Resource
-    private ICntCreationdService cntCreationdService;
+    private final IUserCollectionService userCollectionService;
 
-    @Resource
-    private LableMapper lableMapper;
+    private final ICntCreationdService cntCreationdService;
 
-    @Resource
-    private MediaMapper mediaMapper;
+    private final LableMapper lableMapper;
 
-    @Autowired
-    private IMediaService mediaService;
 
-    @Resource
-    private CollectionLableMapper collectionLableMapper;
+    private final IMediaService mediaService;
 
-    @Resource
-    private CollectionInfoMapper collectionInfoMapper;
+    private final CollectionLableMapper collectionLableMapper;
+
+    private final CollectionInfoMapper collectionInfoMapper;
+
+    private final IMoneyService moneyService;
+
+    private final IOrderService orderService;
+
+    private final RootPay rootPay;
 
 
     @Override
@@ -75,7 +95,6 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
 
     @Override
     public CollectionAllVo info(String id) {
-
         return Builder.of(CollectionAllVo::new).with(CollectionAllVo::setCollectionVo,providerCollectionVo(getById(id))).with(CollectionAllVo::setCollectionInfoVo,providerCollectionInfoVo(id)).build();
     }
 
@@ -87,7 +106,119 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
      */
     @Override
     public PayVo sellCollection(String userId, CollectionSellForm collectionSellForm) {
-        return null;
+        // 总结校验 —— 支付方式
+        CntCollection  cntCollection = getById(collectionSellForm.getCollectionId());
+
+        // 实际需要支付的金额
+        BigDecimal realPayMoney = NumberUtil.mul(collectionSellForm.getSellNum(), cntCollection.getRealPrice());
+        checkCollection(cntCollection,userId,collectionSellForm.getPayType(),realPayMoney);
+        // 锁优化
+        int rows = cntCollectionMapper.updateLock(cntCollection.getId(),collectionSellForm.getSellNum());
+        Assert.isTrue(rows>=1,"您来晚了!");
+
+        // 根据支付方式创建订单  通用适配方案 余额直接 减扣操作
+        //1. 先创建对应的订单
+        String outHost =   orderService.createOrder(OrderCreateDto.builder()
+                .orderAmount(realPayMoney)
+                .buiId(cntCollection.getId())
+                .payType(collectionSellForm.getPayType())
+                .goodsType(BusinessConstants.ModelTypeConstant.BOX_TAYPE)
+                .collectionName(cntCollection.getCollectionName())
+                .goodsNum(collectionSellForm.getSellNum())
+                .userId(userId)
+                .build());
+        //2. 然后调取对应支付即可
+        /**
+         * 根据类型  发起支付订单
+         * 余额支付直接扣除 订单状态做变更即可
+         **/
+        PayVo payVo =  rootPay.execPayVo(
+                PayInfoDto.builder()
+                        .payType(collectionSellForm.getPayType())
+                        .realPayMoney(realPayMoney)
+                        .outHost(outHost)
+                        .aliPayEnum(BOX_ALI_PAY)
+                        .wxPayEnum(BOX_WECHAT_PAY)
+                        .userId(userId).build());
+        return payVo;
+    }
+
+    /**
+     * 分页查询用户的 所有藏品信息
+     * @param pageQuery
+     * @param userId
+     * @return
+     */
+    @Override
+    public List<UserCollectionVo> userCollectionPageList(PageQuery pageQuery, String userId) {
+        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
+        List<UserCollectionVo> userCollectionVos =  userCollectionService.userCollectionPageList(userId);
+        // 组合数据
+        return userCollectionVos.parallelStream().map(item -> {item.setMediaVos(mediaService.initMediaVos(item.getCollectionId(),COLLECTION_MODEL_TYPE)); return item;}).collect(Collectors.toList());
+    }
+
+    /**
+     * 查询用户下 所有藏品 组系列
+     * @param userId
+     * @return
+     */
+    @Override
+    public List<UserCateVo> cateCollectionByUserId(String userId) {
+        List<UserCateVo> userCateVoList = Lists.newLinkedList();
+
+        List<UserCollection> userCollections = userCollectionService.list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getUserId, userId));
+        // 如果没有,直接返回
+       if (userCollections.isEmpty()) return userCateVoList;
+        // 开始得到分类
+        Set<String> collectionIds = userCollections.parallelStream().map(item -> item.getCollectionId()).collect(Collectors.toSet());
+        // 三个字段足以
+        List<CntCollection> cateCollectionList = list(Wrappers.<CntCollection>lambdaQuery().select(CntCollection::getId, CntCollection::getCateId, CntCollection::getCollectionName).in(CntCollection::getId, collectionIds));
+        // 并行执行
+        Set<String> cateIds = cateCollectionList.parallelStream().map(item -> item.getCateId()).collect(Collectors.toSet());
+        if (cateIds.isEmpty()) return userCateVoList;
+
+        Map<String, List<CntCollection>> cateLists = cateCollectionList.parallelStream().collect(Collectors.groupingBy(CntCollection::getCateId));
+        List<Cate> cates = cateMapper.selectBatchIds(cateIds);
+        Map<String, Cate> cateMap = cates.parallelStream().collect(Collectors.toMap(Cate::getId, Function.identity()));
+        cateLists.forEach((cateId,cntCollections)->{
+            Cate cate = cateMap.get(cateId);
+            UserCateVo userCateVo = Builder.of(UserCateVo::new).build();
+            BeanUtil.copyProperties(cate,userCateVo,"userCateCollectionVos");
+            userCateVo.setUserCateCollectionVos(cntCollections.parallelStream().map(this::initUserCateCollectionVo).collect(Collectors.toList()));
+            userCateVoList.add(userCateVo);
+        });
+        return userCateVoList;
+    }
+
+    private UserCateCollectionVo initUserCateCollectionVo(CntCollection cntCollection) {
+        UserCateCollectionVo userCateCollectionVo = Builder.of(UserCateCollectionVo::new).build();
+        userCateCollectionVo.setCollectionName(cntCollection.getCollectionName());
+        userCateCollectionVo.setId(cntCollection.getId());
+        userCateCollectionVo.setMediaVos(mediaService.initMediaVos(cntCollection.getId(),COLLECTION_MODEL_TYPE));
+        return userCateCollectionVo;
+    }
+
+
+    private void checkCollection(CntCollection cntCollection,String userId,Integer payType,BigDecimal realPayMoney) {
+        // 校验盲盒主体是否存在
+        Assert.isTrue(Objects.nonNull(cntCollection),"藏品编号有误,请核实!");
+        // 校验盲盒是否到了发行时间
+        Assert.isTrue(LocalDateTime.now().compareTo(cntCollection.getPublishTime()) >= 0,"发行时间未到,请核实!");
+        // 校验是否库存不够了
+        Assert.isFalse(Integer.valueOf(0).equals(cntCollection.getBalance()),"库存不足了!");
+        // 重复校验状态
+        Assert.isTrue(CollectionStatus.UP_ACTION.getCode().equals(cntCollection.getStatusBy()),"您来晚了,售罄了!");
+
+        //是否有未支付订单
+        List<Order> orders = orderService.checkUnpaidOrder(userId);
+        Assert.isFalse(orders.size() > 0 ,"您有未支付订单，暂不可购买");
+
+        // 如果是余额支付,需要验证下是否充足
+        if (MONEY_TAPE.getCode().equals(payType)) {
+            Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
+            Assert.isTrue(money.getMoneyBalance().compareTo(realPayMoney) >=0,"余额不足,请核实!");
+        }
+
     }
 
     /**
@@ -143,7 +274,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
      * @return
      */
     private List<MediaVo> initMediaVos(String collectionId) {
-      return  mediaService.initMediaVos(collectionId, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
+      return  mediaService.initMediaVos(collectionId, COLLECTION_MODEL_TYPE);
     }
 
     /**

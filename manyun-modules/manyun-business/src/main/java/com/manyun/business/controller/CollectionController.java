@@ -4,13 +4,12 @@ package com.manyun.business.controller;
 import com.github.pagehelper.PageHelper;
 import com.manyun.business.domain.form.CollectionSellForm;
 import com.manyun.business.domain.query.CollectionQuery;
-import com.manyun.business.domain.vo.CollectionAllVo;
-import com.manyun.business.domain.vo.CollectionVo;
-import com.manyun.business.domain.vo.PayVo;
+import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.ICollectionService;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
+import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.security.utils.SecurityUtils;
 import io.swagger.annotations.*;
@@ -51,11 +50,25 @@ public class CollectionController extends BaseController{
     }
 
 
-    @PostMapping("sellCollection")
+    @PostMapping("/sellCollection")
     @ApiOperation("购买藏品")
     public R<PayVo> sellCollection(@RequestBody @Valid CollectionSellForm collectionSellForm){
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(collectionService.sellCollection(loginBusinessUser.getUserId(),collectionSellForm));
+    }
+
+    @PostMapping("/userCollectionPageList")
+    @ApiOperation("用户查询自己的藏品信息")
+    public R<TableDataInfo<UserCollectionVo>> userCollectionPageList(@RequestBody PageQuery pageQuery){
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return R.ok(getDataTable(collectionService.userCollectionPageList(pageQuery,notNullLoginBusinessUser.getUserId())));
+    }
+
+    @GetMapping("/cateCollectionAll")
+    @ApiOperation("用户查询自己所有 系列分组的藏品信息")
+    public R<List<UserCateVo>> cateCollectionAll(){
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return R.ok(collectionService.cateCollectionByUserId(notNullLoginBusinessUser.getUserId()));
     }
 }
 

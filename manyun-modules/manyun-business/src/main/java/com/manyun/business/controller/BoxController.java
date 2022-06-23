@@ -6,10 +6,12 @@ import com.manyun.business.domain.query.BoxQuery;
 import com.manyun.business.domain.vo.BoxListVo;
 import com.manyun.business.domain.vo.BoxVo;
 import com.manyun.business.domain.vo.PayVo;
+import com.manyun.business.domain.vo.UserBoxVo;
 import com.manyun.business.service.IBoxService;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
+import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.security.utils.SecurityUtils;
 import io.swagger.annotations.Api;
@@ -56,6 +58,20 @@ public class BoxController extends BaseController {
     public R<PayVo> sellBox(@Valid @RequestBody BoxSellForm boxSellForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(boxService.sellBox(boxSellForm,notNullLoginBusinessUser.getUserId()));
+    }
+
+    @PostMapping("/userBoxPageList")
+    @ApiOperation("查询用户的盲盒列表")
+    public R<TableDataInfo<UserBoxVo>> userBoxPageList(@RequestBody PageQuery pageQuery){
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return R.ok(getDataTable(boxService.userBoxPageList(pageQuery,loginBusinessUser.getUserId())));
+    }
+
+    @GetMapping("/openBox/{boxId}")
+    @ApiOperation(value = "开启盲盒",notes = "盲盒编号  点击后, 返回的 data 会弹出对应的提示信息给用户即可.")
+    public R<String> openBox(@PathVariable String boxId){
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return R.ok(boxService.openBox(boxId,notNullLoginBusinessUser.getUserId()));
     }
 
 

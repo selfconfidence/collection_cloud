@@ -7,6 +7,8 @@ import com.manyun.business.domain.query.BoxQuery;
 import com.manyun.business.domain.vo.BoxListVo;
 import com.manyun.business.domain.vo.BoxVo;
 import com.manyun.business.domain.vo.PayVo;
+import com.manyun.business.domain.vo.UserBoxVo;
+import com.manyun.common.core.web.page.PageQuery;
 
 import java.util.List;
 
@@ -25,4 +27,8 @@ public interface IBoxService extends IService<Box> {
     BoxVo info(String id);
 
     PayVo sellBox(BoxSellForm boxSellForm, String userId);
+
+    List<UserBoxVo> userBoxPageList(PageQuery pageQuery, String userId);
+
+    String openBox(String boxId, String userId);
 }

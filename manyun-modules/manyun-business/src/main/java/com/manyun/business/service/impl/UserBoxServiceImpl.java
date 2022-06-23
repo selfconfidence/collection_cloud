@@ -4,16 +4,20 @@ import cn.hutool.core.util.IdUtil;
 import com.google.common.collect.Lists;
 import com.manyun.business.domain.dto.LogInfoDto;
 import com.manyun.business.domain.entity.UserBox;
+import com.manyun.business.domain.vo.UserBoxVo;
 import com.manyun.business.mapper.UserBoxMapper;
 import com.manyun.business.service.ILogsService;
 import com.manyun.business.service.IUserBoxService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.enums.BoxOpenType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.PULL_SOURCE;
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE;
@@ -33,6 +37,9 @@ public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> impl
     @Autowired
     private ILogsService logsService;
 
+    @Resource
+    private UserBoxMapper userBoxMapper;
+
     /**
      * 绑定盲盒信息, 新增盲盒日志
      * @param userId
@@ -50,6 +57,7 @@ public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> impl
             userBox.setId(IdUtil.getSnowflake().nextIdStr());
             userBox.createD(userId);
             userBox.setSourceInfo(sourceInfo);
+            userBox.setBoxOpen(BoxOpenType.NO_OPEN.getCode());
             userBoxList.add(userBox);
             //save(userBox);
         }
@@ -57,5 +65,10 @@ public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> impl
 
         // 增加日志
         logsService.saveLogs(LogInfoDto.builder().jsonTxt(sourceInfo).buiId(userId).modelType(BOX_MODEL_TYPE).isType(PULL_SOURCE).formInfo(goodsNum.toString()).build());
+    }
+
+    @Override
+    public List<UserBoxVo> pageUserBox(String userId) {
+        return userBoxMapper.pageUserBox(userId);
     }
 }

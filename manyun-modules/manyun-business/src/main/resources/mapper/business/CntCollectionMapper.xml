@@ -27,5 +27,7 @@
     <select id="pageQueryList" resultMap="collectionVo">
 
     </select>
-
+    <update id="updateLock">
+        update cnt_collection set balance =  balance - #{sellNum} ,self_balance =  self_balance + #{sellNum} WHERE id = #{id} and balance >=#{sellNum};
+    </update>
 </mapper>

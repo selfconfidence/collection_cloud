@@ -2,6 +2,10 @@ package com.manyun.business.mapper;
 
 import com.manyun.business.domain.entity.UserCollection;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.manyun.business.domain.vo.UserCollectionVo;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +17,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface UserCollectionMapper extends BaseMapper<UserCollection> {
 
+    List<UserCollectionVo> userCollectionPageList(@Param("userId") String userId);
 }

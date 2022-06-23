@@ -3,6 +3,7 @@ package com.manyun.business.domain.vo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -11,13 +12,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@ApiModel("盲盒列表返回视图")
-public class BoxListVo implements Serializable {
+@ApiModel("我的盲盒基本信息")
+public class UserBoxVo  implements Serializable {
 
     @ApiModelProperty("盲盒编号")
-    private String id;
-
-
+    private String boxId;
 
     @ApiModelProperty("盲盒标题")
     private String boxTitle;
@@ -46,16 +45,15 @@ public class BoxListVo implements Serializable {
     @ApiModelProperty("盲盒详情")
     private String boxInfo;
 
+    @ApiModelProperty("1未开启,2已开启")
+    private Integer boxOpen;
+
+    @ApiModelProperty("来源")
+    private String sourceInfo;
 
 
-    @ApiModelProperty("发售时间;到达对应时间点才可以正常交易_平台   yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime publishTime;
-
-
-    @ApiModelProperty("创建时间")
+    @ApiModelProperty("购买时间")
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdTime;
-
 
 }

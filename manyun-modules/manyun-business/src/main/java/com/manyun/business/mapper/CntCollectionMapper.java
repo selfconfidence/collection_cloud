@@ -18,4 +18,7 @@ import java.util.List;
 public interface CntCollectionMapper extends BaseMapper<CntCollection> {
 
     List<CollectionVo> pageQueryList(CollectionQuery collectionQuery);
+
+    int updateLock(String id, Integer sellNum);
+
 }

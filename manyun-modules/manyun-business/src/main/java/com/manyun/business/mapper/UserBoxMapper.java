@@ -2,6 +2,10 @@ package com.manyun.business.mapper;
 
 import com.manyun.business.domain.entity.UserBox;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.manyun.business.domain.vo.UserBoxVo;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +17,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface UserBoxMapper extends BaseMapper<UserBox> {
 
+    List<UserBoxVo> pageUserBox(@Param("userId") String userId);
 }
