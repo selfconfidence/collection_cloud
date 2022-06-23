@@ -1,7 +1,7 @@
 package com.manyun.business.mapper;
 
-import com.manyun.business.domain.entity.CntUser;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.manyun.comm.api.domain.CntUser;
 
 /**
  * <p>

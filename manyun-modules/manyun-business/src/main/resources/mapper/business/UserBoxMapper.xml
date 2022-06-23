@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.manyun.business.mapper.UserBoxMapper">
      <resultMap id="baseMap" type="com.manyun.business.domain.vo.UserBoxVo">
-         <id column="box_id" property="boxId"/>
+         <id column="id" property="id"/>
          <result column="balance" property="balance"/>
          <result column="box_title" property="boxTitle"/>
          <result column="self_balance" property="selfBalance"/>
@@ -24,6 +24,7 @@
 
     <select id="pageUserBox" resultMap="baseMap">
         SELECT
+        c.id,
         c.box_id,
         b.balance,
         b.box_title,

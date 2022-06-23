@@ -87,6 +87,11 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.manyun</groupId>
+            <artifactId>manyun-common-redis</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

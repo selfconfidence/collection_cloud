@@ -1,5 +1,7 @@
 package com.manyun.common.security.service;
 
+import com.manyun.comm.api.domain.CntUser;
+import com.manyun.comm.api.domain.vo.AccTokenVo;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.comm.api.model.LoginUser;
 import com.manyun.common.core.constant.CacheConstants;
@@ -44,15 +46,17 @@ public class UserTokenService
     /**
      * 创建令牌
      */
-    public Map<String, Object> createToken(LoginBusinessUser loginBusinessUser)
+    public AccTokenVo createToken(CntUser cntUser)
     {
+        LoginBusinessUser loginBusinessUser=new LoginBusinessUser();
         String token = IdUtils.fastUUID();
-        String userId = loginBusinessUser.getCntUser().getId();
-        String nickName = loginBusinessUser.getCntUser().getNickName();
+        String userId = cntUser.getId();
+        String nickName = cntUser.getNickName();
         loginBusinessUser.setToken(token);
         loginBusinessUser.setUserId(userId);
         loginBusinessUser.setUsername(nickName);
         loginBusinessUser.setIpaddr(IpUtils.getIpAddr(ServletUtils.getRequest()));
+        loginBusinessUser.setCntUser(cntUser);
         refreshToken(loginBusinessUser);
 
         // Jwt存储信息
@@ -61,12 +65,7 @@ public class UserTokenService
         claimsMap.put(SecurityConstants.DETAILS_USER_ID, userId);
         claimsMap.put(SecurityConstants.DETAILS_USERNAME, nickName);
         claimsMap.put(SecurityConstants.DETAILS_LOGIN_SOURCE, UserLoginSource.APP.getInfo());
-
-        // 接口返回信息
-        Map<String, Object> rspMap = new HashMap<String, Object>();
-        rspMap.put("access_token", JwtUtils.createToken(claimsMap));
-        rspMap.put("expires_in", expireTime);
-        return rspMap;
+        return AccTokenVo.builder().access_token(JwtUtils.createToken(claimsMap)).expires_in(loginBusinessUser.getExpireTime()).build();
     }
 
     /**

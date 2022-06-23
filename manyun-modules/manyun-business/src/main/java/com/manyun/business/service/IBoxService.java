@@ -31,4 +31,6 @@ public interface IBoxService extends IService<Box> {
     List<UserBoxVo> userBoxPageList(PageQuery pageQuery, String userId);
 
     String openBox(String boxId, String userId);
+
+    List<String> queryDict(String keyword);
 }

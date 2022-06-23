@@ -1,28 +1,20 @@
 package com.manyun.business.controller.notify;
-
-
-import com.alipay.api.AlipayApiException;
-import com.alipay.api.internal.util.AlipaySignature;
-import com.ijpay.alipay.AliPayApi;
 import com.ijpay.core.enums.SignType;
 import com.ijpay.core.kit.HttpKit;
 import com.ijpay.core.kit.WxPayKit;
 import com.ijpay.wxpay.WxPayApiConfigKit;
 import com.manyun.business.service.IOrderService;
-import com.manyun.common.pays.abs.impl.AliComm;
 import com.manyun.common.pays.abs.impl.WxComm;
-import lombok.RequiredArgsConstructor;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
-
 /**
  * 微信    验证
  */
@@ -30,7 +22,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/notify_pay/wechatPay")
 @Slf4j
-@RequiredArgsConstructor(onConstructor_= {@Autowired})
+@Api(hidden = true)
 public class WechatPayNotifyController {
 
     @Autowired

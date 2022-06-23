@@ -1,4 +1,4 @@
-package com.manyun.auth.form;
+package com.manyun.auth.domian.form;
 
 /**
  * 用户登录对象

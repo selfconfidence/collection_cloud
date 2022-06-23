@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * <p>
@@ -38,6 +39,14 @@ public class BoxController extends BaseController {
 
     @Autowired
     private IBoxService boxService;
+
+
+
+    @GetMapping("/queryDict/{keyword}")
+    @ApiOperation(value = "/根据词条 查询盲盒完整 标题信息",notes = "返回的都是 盲盒词条完整信息 ")
+    public R<List<String>> queryDict(@PathVariable String keyword){
+        return R.ok(boxService.queryDict(keyword));
+    }
 
 
     @PostMapping("/pageList")

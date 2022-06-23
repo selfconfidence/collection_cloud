@@ -15,6 +15,9 @@ import java.util.List;
 @ApiModel("我的盲盒基本信息")
 public class UserBoxVo  implements Serializable {
 
+    @ApiModelProperty("用户和盲盒唯一标识联系")
+    private String id;
+
     @ApiModelProperty("盲盒编号")
     private String boxId;
 

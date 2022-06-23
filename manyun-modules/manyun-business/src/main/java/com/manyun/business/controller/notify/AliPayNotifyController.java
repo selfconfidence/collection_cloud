@@ -6,6 +6,7 @@ import com.alipay.api.internal.util.AlipaySignature;
 import com.ijpay.alipay.AliPayApi;
 import com.manyun.business.service.IOrderService;
 import com.manyun.common.pays.abs.impl.AliComm;
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/notify_pay/aliPay")
 @Slf4j
-@RequiredArgsConstructor(onConstructor_= {@Autowired})
+@Api(hidden = true)
 public class AliPayNotifyController {
 
     @Autowired

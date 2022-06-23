@@ -21,4 +21,10 @@ public class ServiceNameConstants
      * 文件服务的serviceid
      */
     public static final String FILE_SERVICE = "manyun-base";
+
+
+    /**
+     * 业务用户服务的serviceid
+     */
+    public static final String BUI_USER_SERVICE = "manyun-user";
 }

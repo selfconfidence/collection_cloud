@@ -1,19 +1,18 @@
 package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Maps;
 import com.manyun.business.design.pay.RootPay;
 import com.manyun.business.domain.dto.OrderCreateDto;
 import com.manyun.business.domain.dto.PayInfoDto;
-import com.manyun.business.domain.entity.Box;
-import com.manyun.business.domain.entity.Media;
-import com.manyun.business.domain.entity.Money;
-import com.manyun.business.domain.entity.Order;
-import com.manyun.business.domain.entity.UserBox;
+import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.form.BoxSellForm;
 import com.manyun.business.domain.query.BoxQuery;
 import com.manyun.business.domain.vo.*;
@@ -30,8 +29,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.lang.System;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -73,6 +75,9 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
 
     @Autowired
     private RootPay rootPay;
+
+    @Autowired
+    private IUserCollectionService userCollectionService;
 
 
 
@@ -178,8 +183,54 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         UserBox userBox = userBoxService.getOne(Wrappers.<UserBox>lambdaQuery().eq(UserBox::getBoxId, boxId).eq(UserBox::getUserId, userId).eq(UserBox::getBoxOpen, NO_OPEN.getCode()));
         Assert.isTrue(Objects.nonNull(userBox),"盲盒已被开启,请核实!");
        // 什么样的随机算法 去得到概率性的藏品？
+        // 1. 将所有藏品的概率比例拿到
+        List<BoxCollection> boxCollections = boxCollectionService.list(Wrappers.<BoxCollection>lambdaQuery().eq(BoxCollection::getBoxId, userBox.getBoxId()));
+        // 2. 进行分流 容放
+        BoxCollection luckCollection  = luckGetCollection(boxCollections);
+        // 3. 得到后开始绑定了
+        String info = StrUtil.format("恭喜您,开启盲盒,得到 {} 藏品,请注意查收!", luckCollection.getCollectionName());
+        userCollectionService.bindCollection(userId,luckCollection.getCollectionId(),luckCollection.getCollectionName(),info,Integer.valueOf(1));
+        userBox.setBoxOpen(OK_OPEN.getCode());
+        userBoxService.updateById(userBox);
+        return info;
+    }
 
-        return null;
+    @Override
+    public List<String> queryDict(String keyword) {
+        return  list(Wrappers.<Box>lambdaQuery().select(Box::getBoxTitle).like(Box::getBoxTitle,keyword).orderByDesc(Box::getCreatedTime).last(" limit 10")).parallelStream().map(item -> item.getBoxTitle()).collect(Collectors.toList());
+    }
+
+    /**
+     * 根据 组件 规则 获取到幸运藏品,进行绑定用户
+     * @param boxCollections
+     * @return
+     */
+    private  BoxCollection luckGetCollection(List<BoxCollection> boxCollections) {
+       return nowTimeGave(boxCollections);
+    }
+
+    /**
+     * 根据当前 概率 做时间戳 取余操作, 相当于有时间 节点才能开出来好盲盒
+     * @param boxCollections
+     * @return
+     */
+    private BoxCollection nowTimeGave(List<BoxCollection> boxCollections){
+        // tranSvg 为概率比
+        int count = 0;
+        HashMap<Integer, String> collectionMap = Maps.newHashMap();
+        // 得到所有概率
+        for (BoxCollection boxCollection : boxCollections) {
+            // 向上取整
+            int value = boxCollection.getTranSvg().setScale(0, RoundingMode.HALF_UP).intValue();
+            value = count + value;
+            for (int i = count; i < value; i++) {
+                collectionMap.put(i,boxCollection.getId());
+                count ++;
+            }
+        }
+        Integer luckBum =  Long.valueOf(DateUtil.current() % (long)count).intValue();
+        String id = collectionMap.get(luckBum);
+        return boxCollections.parallelStream().filter(item -> item.getId().equals(id)).findAny().get();
     }
 
 
