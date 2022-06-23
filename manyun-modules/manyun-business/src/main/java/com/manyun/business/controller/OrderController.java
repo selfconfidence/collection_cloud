@@ -6,9 +6,11 @@ import com.manyun.business.domain.vo.CollectionAllVo;
 import com.manyun.business.domain.vo.OrderVo;
 import com.manyun.business.service.ICollectionService;
 import com.manyun.business.service.IOrderService;
+import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.security.utils.SecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +28,7 @@ import java.util.List;
  * @author yanwei
  * @since 2022-06-17
  */
-@Controller
+@RestController
 @RequestMapping("/order")
 @Api(tags = "订单相关apis")
 public class OrderController extends BaseController {
@@ -37,11 +39,12 @@ public class OrderController extends BaseController {
     @Autowired
     private ICollectionService collectionService;
 
-    @PostMapping("/pageList")
-    @ApiOperation("分页查询订单信息")
-    public R<TableDataInfo<OrderVo>> pagelist (@RequestBody OrderQuery orderQuery) {
+    @PostMapping("/myOrderList")
+    @ApiOperation("分页查询我的订单信息")
+    public R<TableDataInfo<OrderVo>> myOrderList (@RequestBody OrderQuery orderQuery) {
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
         PageHelper.startPage(orderQuery.getPageNum(), orderQuery.getPageSize());
-        List<OrderVo> orderVos = orderService.pageQueryList(orderQuery);
+        List<OrderVo> orderVos = orderService.pageQueryList(orderQuery, loginBusinessUser.getUserId());
         return R.ok(getDataTable(orderVos));
 
     }

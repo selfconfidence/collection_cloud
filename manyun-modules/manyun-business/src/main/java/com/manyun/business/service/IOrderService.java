@@ -19,7 +19,7 @@ import java.math.BigDecimal;
  * @since 2022-06-17
  */
 public interface IOrderService extends IService<Order> {
-    List<OrderVo> pageQueryList(OrderQuery orderQuery) ;
+    List<OrderVo> pageQueryList(OrderQuery orderQuery, String userId) ;
 
     /**
      * 检查未支付订单
