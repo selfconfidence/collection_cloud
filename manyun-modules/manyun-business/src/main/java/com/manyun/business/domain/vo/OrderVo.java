@@ -41,11 +41,13 @@ public class OrderVo implements Serializable {
     @ApiModelProperty("订单金额")
     private BigDecimal orderAmount;
 
-    @ApiModelProperty("付款截止时间")
+    @ApiModelProperty("付款截止时间 yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endTime;
 
-    @ApiModelProperty("付款时间")
-    private String payTime;
+    @ApiModelProperty("付款时间 yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime payTime;
 
     @ApiModelProperty("藏品名称")
     private String collectionName;
