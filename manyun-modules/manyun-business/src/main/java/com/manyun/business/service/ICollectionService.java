@@ -5,6 +5,7 @@ import com.manyun.business.domain.form.CollectionSellForm;
 import com.manyun.business.domain.query.CollectionQuery;
 import com.manyun.business.domain.vo.*;
 import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 import java.util.List;
 
@@ -18,13 +19,13 @@ import java.util.List;
  */
 public interface ICollectionService extends IService<CntCollection> {
 
-    List<CollectionVo> pageQueryList(CollectionQuery collectionQuery);
+    TableDataInfo<CollectionVo> pageQueryList(CollectionQuery collectionQuery);
 
     CollectionAllVo info(String id);
 
     PayVo sellCollection(String userId, CollectionSellForm collectionSellForm);
 
-    List<UserCollectionVo> userCollectionPageList(PageQuery pageQuery, String userId);
+    TableDataInfo<UserCollectionVo> userCollectionPageList(PageQuery pageQuery, String userId);
 
     List<UserCateVo> cateCollectionByUserId(String userId);
 

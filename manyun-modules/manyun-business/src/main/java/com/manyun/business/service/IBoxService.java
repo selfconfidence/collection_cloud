@@ -9,6 +9,7 @@ import com.manyun.business.domain.vo.BoxVo;
 import com.manyun.business.domain.vo.PayVo;
 import com.manyun.business.domain.vo.UserBoxVo;
 import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 import java.util.List;
 
@@ -22,13 +23,13 @@ import java.util.List;
  */
 public interface IBoxService extends IService<Box> {
 
-    List<BoxListVo> pageList(BoxQuery boxQuery);
+    TableDataInfo<BoxListVo> pageList(BoxQuery boxQuery);
 
     BoxVo info(String id);
 
     PayVo sellBox(BoxSellForm boxSellForm, String userId);
 
-    List<UserBoxVo> userBoxPageList(PageQuery pageQuery, String userId);
+    TableDataInfo<UserBoxVo> userBoxPageList(PageQuery pageQuery, String userId);
 
     String openBox(String boxId, String userId);
 

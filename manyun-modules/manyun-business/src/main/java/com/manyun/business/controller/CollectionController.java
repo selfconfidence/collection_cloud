@@ -45,8 +45,7 @@ public class CollectionController extends BaseController{
     @ApiOperation("分页查询藏品列表信息")
     public R<TableDataInfo<CollectionVo>> pageList(@RequestBody CollectionQuery collectionQuery){
         PageHelper.startPage(collectionQuery.getPageNum(),collectionQuery.getPageSize());
-        List<CollectionVo> collectionVos =  collectionService.pageQueryList(collectionQuery);
-        return R.ok(getDataTable(collectionVos));
+        return R.ok(collectionService.pageQueryList(collectionQuery));
     }
 
     @GetMapping("/info/{id}")
@@ -67,7 +66,7 @@ public class CollectionController extends BaseController{
     @ApiOperation("用户查询自己的藏品信息")
     public R<TableDataInfo<UserCollectionVo>> userCollectionPageList(@RequestBody PageQuery pageQuery){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        return R.ok(getDataTable(collectionService.userCollectionPageList(pageQuery,notNullLoginBusinessUser.getUserId())));
+        return R.ok(collectionService.userCollectionPageList(pageQuery,notNullLoginBusinessUser.getUserId()));
     }
 
     @GetMapping("/cateCollectionAll")

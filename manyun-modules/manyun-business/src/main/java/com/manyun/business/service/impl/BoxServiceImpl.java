@@ -24,6 +24,8 @@ import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.enums.BoxStatus;
 import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,11 +89,11 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
      * @return
      */
     @Override
-    public List<BoxListVo> pageList(BoxQuery boxQuery) {
+    public TableDataInfo<BoxListVo> pageList(BoxQuery boxQuery) {
         PageHelper.startPage(boxQuery.getPageNum(),boxQuery.getPageSize());
         List<Box> boxList = list(Wrappers.<Box>lambdaQuery().eq(StrUtil.isNotBlank(boxQuery.getCateId()),Box::getCateId,boxQuery.getCateId()).like(StrUtil.isNotBlank(boxQuery.getBoxName()), Box::getBoxTitle, boxQuery.getBoxName()).ne(Box::getStatusBy,DOWN_ACTION.getCode()).orderByDesc(Box::getCreatedTime));
         // 数据组合查询
-        return boxList.parallelStream().map(this::initBoxListVo).collect(Collectors.toList());
+        return TableDataInfoUtil.pageTableDataInfo(boxList.parallelStream().map(this::initBoxListVo).collect(Collectors.toList()),boxList);
     }
 
     /**
@@ -164,11 +166,16 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
      * @return
      */
     @Override
-    public List<UserBoxVo> userBoxPageList(PageQuery pageQuery, String userId) {
+    public TableDataInfo<UserBoxVo> userBoxPageList(PageQuery pageQuery, String userId) {
         PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
         List<UserBoxVo> userBoxList = userBoxService.pageUserBox(userId);
         // 数据组合
-        return userBoxList.parallelStream().map(item ->{item.setMediaVos(mediaService.initMediaVos(item.getBoxId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)); return item;}).collect(Collectors.toList());
+        List<UserBoxVo> tarData = userBoxList.parallelStream().map(item -> {
+            item.setMediaVos(mediaService.initMediaVos(item.getBoxId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+            return item;
+        }).collect(Collectors.toList());
+        return TableDataInfoUtil.pageTableDataInfo(tarData,userBoxList);
+
     }
 
     /**

@@ -52,7 +52,7 @@ public class BoxController extends BaseController {
     @PostMapping("/pageList")
     @ApiOperation("分页查询盲盒列表")
     public R<TableDataInfo<BoxListVo>>  pageList(@RequestBody BoxQuery boxQuery){
-        return R.ok(getDataTable(boxService.pageList(boxQuery)));
+        return R.ok(boxService.pageList(boxQuery));
     }
 
 
@@ -73,7 +73,7 @@ public class BoxController extends BaseController {
     @ApiOperation("查询用户的盲盒列表")
     public R<TableDataInfo<UserBoxVo>> userBoxPageList(@RequestBody PageQuery pageQuery){
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        return R.ok(getDataTable(boxService.userBoxPageList(pageQuery,loginBusinessUser.getUserId())));
+        return R.ok(boxService.userBoxPageList(pageQuery,loginBusinessUser.getUserId()));
     }
 
     @GetMapping("/openBox/{boxId}")

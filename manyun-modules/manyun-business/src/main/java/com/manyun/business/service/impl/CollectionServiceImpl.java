@@ -23,6 +23,8 @@ import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.enums.BoxStatus;
 import com.manyun.common.core.enums.CollectionStatus;
 import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -80,9 +82,9 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
 
 
     @Override
-    public List<CollectionVo> pageQueryList(CollectionQuery collectionQuery) {
+    public TableDataInfo<CollectionVo> pageQueryList(CollectionQuery collectionQuery) {
         // 查询条件部分
-        List<CntCollection> CntCollections = list(Wrappers.<CntCollection>lambdaQuery()
+        List<CntCollection> cntCollections = list(Wrappers.<CntCollection>lambdaQuery()
                 .eq(StrUtil.isNotBlank(collectionQuery.getCateId()), CntCollection::getCateId, collectionQuery.getCateId())
                 .ne(CntCollection::getStatusBy,DOWN_ACTION.getCode())
                 .like(StrUtil.isNotBlank(collectionQuery.getCollectionName()), CntCollection::getCollectionName, collectionQuery.getCollectionName())
@@ -90,7 +92,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
                 .orderByDesc(CntCollection::getCreatedTime)
         );
         // 聚合数据
-        return CntCollections.parallelStream().map(this::providerCollectionVo).collect(Collectors.toList());
+        return TableDataInfoUtil.pageTableDataInfo(cntCollections.parallelStream().map(this::providerCollectionVo).collect(Collectors.toList()),cntCollections);
     }
 
     @Override
@@ -150,11 +152,11 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
      * @return
      */
     @Override
-    public List<UserCollectionVo> userCollectionPageList(PageQuery pageQuery, String userId) {
+    public TableDataInfo<UserCollectionVo> userCollectionPageList(PageQuery pageQuery, String userId) {
         PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
         List<UserCollectionVo> userCollectionVos =  userCollectionService.userCollectionPageList(userId);
         // 组合数据
-        return userCollectionVos.parallelStream().map(item -> {item.setMediaVos(mediaService.initMediaVos(item.getCollectionId(),COLLECTION_MODEL_TYPE)); return item;}).collect(Collectors.toList());
+        return TableDataInfoUtil.pageTableDataInfo(userCollectionVos.parallelStream().map(item -> {item.setMediaVos(mediaService.initMediaVos(item.getCollectionId(),COLLECTION_MODEL_TYPE)); return item;}).collect(Collectors.toList()),userCollectionVos);
     }
 
     /**
