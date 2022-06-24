@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.exception.auth.NotLoginException;
+import com.manyun.common.core.text.Convert;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.constant.TokenConstants;
@@ -20,11 +21,19 @@ import com.manyun.comm.api.model.LoginUser;
 public class SecurityUtils
 {
     /**
-     * 获取用户ID
+     *  后台管理获取用户ID
      */
     public static Long getUserId()
     {
         return SecurityContextHolder.getUserId();
+    }
+
+    /**
+     * 用户端 获取用户ID
+     */
+    public static String getBuiUserId()
+    {
+        return SecurityContextHolder.getBuiUserId();
     }
 
     /**

@@ -1,14 +1,14 @@
 package com.manyun.business.controller;
-
-
 import cn.hutool.core.lang.Assert;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.manyun.business.domain.form.UserChangeForm;
+import com.manyun.business.domain.form.UserChangeLoginForm;
+import com.manyun.business.domain.form.UserChangePayPass;
 import com.manyun.business.domain.form.UserRealForm;
 import com.manyun.business.domain.vo.UserInfoVo;
+import com.manyun.business.domain.vo.UserLevelVo;
+import com.manyun.business.domain.vo.UserPleaseBoxVo;
 import com.manyun.business.service.ICntUserService;
 import com.manyun.comm.api.domain.CntUser;
-import com.manyun.comm.api.domain.vo.AccTokenVo;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.comm.api.model.LoginPhoneCodeForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
@@ -20,10 +20,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.stereotype.Controller;
-
 import javax.validation.Valid;
+import javax.xml.transform.Result;
+
+import java.util.List;
 
 import static com.manyun.common.core.constant.BusinessConstants.RedisDict.PHONE_CODE;
 
@@ -86,16 +86,56 @@ public class CntUserController extends BaseController {
     @PostMapping("/realUser")
     @ApiOperation("实名认证")
     public R realUser(@RequestBody @Valid UserRealForm userRealForm){
+        //TODO 实名认证未完善
 
         return R.ok();
     }
 
     // 修改登录密码
-
-
-
+    @PostMapping("/changeLogin")
+    @ApiOperation("修改登录密码")
+    public R changeLogin(@RequestBody @Valid UserChangeLoginForm userChangeLoginForm){
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        userService.changeLogin(notNullLoginBusinessUser.getUserId(),userChangeLoginForm);
+        return R.ok();
+    }
     // 修改支付密码
+    @PostMapping("/changePayPass")
+    @ApiOperation("修改支付密码")
+    public R changePayPass(@RequestBody @Valid UserChangePayPass userChangePayPass){
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        String phone = notNullLoginBusinessUser.getCntUser().getPhone();
+        String phoneCode = (String) redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(phone));
+        Assert.isTrue(userChangePayPass.getPhoneCode().equals(phoneCode),"验证码输入错误,请核实!");
+        userService.changePayPass(notNullLoginBusinessUser.getUserId(),userChangePayPass);
+        return R.ok();
+    }
 
+    @GetMapping("/userLevel")
+    @ApiOperation("查看我的下级人数")
+    public R<UserLevelVo> userLevel(){
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return R.ok(userService.userLevel(notNullLoginBusinessUser.getUserId()));
+    }
+
+
+    @GetMapping("/userPleaseBox")
+    @ApiOperation("邀请盲盒奖励规则 下级实名才可以")
+    public R<List<UserPleaseBoxVo>> userPleaseBox(){
+        String userId = SecurityUtils.getNotNullLoginBusinessUser().getUserId();
+        List<UserPleaseBoxVo> userPleaseBoxVos =  userService.userPleaseBoxVo(userId);
+        return R.ok(userPleaseBoxVos);
+    }
+
+
+    @GetMapping("/openPleaseBox/{id}")
+    @ApiOperation(value = "邀请奖励进行领取 id 为领取编号",notes = "返回的 data 是消息提示,给用户看即可!")
+    public R<String> openPleaseBox(@PathVariable String id){
+        String userId = SecurityUtils.getNotNullLoginBusinessUser().getUserId();
+        String msg = userService.openPleaseBox(userId,id);
+        return R.ok(msg);
+
+    }
 
 
 

@@ -56,6 +56,14 @@ public class SecurityContextHolder
         return Convert.toLong(get(SecurityConstants.DETAILS_USER_ID), 0L);
     }
 
+    /**
+     * 获取用户ID
+     */
+    public static String getBuiUserId()
+    {
+        return get(SecurityConstants.DETAILS_USER_ID);
+    }
+
     public static void setUserId(String account)
     {
         set(SecurityConstants.DETAILS_USER_ID, account);
@@ -94,4 +102,6 @@ public class SecurityContextHolder
     {
         THREAD_LOCAL.remove();
     }
+
+
 }
