@@ -10,6 +10,8 @@ import com.manyun.business.service.IAnnouncementService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,9 +29,10 @@ import java.util.stream.Collectors;
 public class AnnouncementServiceImpl extends ServiceImpl<AnnouncementMapper, Announcement> implements IAnnouncementService {
 
     @Override
-    public List<AnnouncementVo> list(PageQuery pageQuery) {
+    public TableDataInfo<AnnouncementVo> list(PageQuery pageQuery) {
         List<Announcement> announcementList = list(Wrappers.<Announcement>lambdaQuery().orderByDesc(Announcement::getCreatedTime));
-        return announcementList.parallelStream().map(this::providerAnnouncementVo).collect(Collectors.toList());
+        return TableDataInfoUtil.pageTableDataInfo(announcementList.parallelStream()
+                .map(this::providerAnnouncementVo).collect(Collectors.toList()), announcementList);
     }
 
     private AnnouncementVo providerAnnouncementVo(Announcement announcement) {

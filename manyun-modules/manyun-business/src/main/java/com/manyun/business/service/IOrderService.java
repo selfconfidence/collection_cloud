@@ -5,6 +5,7 @@ import com.manyun.business.domain.entity.Order;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.query.OrderQuery;
 import com.manyun.business.domain.vo.OrderVo;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ import java.math.BigDecimal;
  * @since 2022-06-17
  */
 public interface IOrderService extends IService<Order> {
-    List<OrderVo> pageQueryList(OrderQuery orderQuery, String userId) ;
+    TableDataInfo<OrderVo> pageQueryList(OrderQuery orderQuery, String userId) ;
 
     /**
      * 检查未支付订单

@@ -4,6 +4,7 @@ import com.manyun.business.domain.entity.Announcement;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.vo.AnnouncementVo;
 import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 import java.util.List;
 
@@ -17,6 +18,6 @@ import java.util.List;
  */
 public interface IAnnouncementService extends IService<Announcement> {
 
-    List<AnnouncementVo> list(PageQuery pageQuery);
+    TableDataInfo<AnnouncementVo> list(PageQuery pageQuery);
 
 }
