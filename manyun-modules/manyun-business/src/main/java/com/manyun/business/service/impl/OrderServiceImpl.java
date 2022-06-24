@@ -20,6 +20,8 @@ import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +49,13 @@ import static com.manyun.common.core.enums.OrderStatus.*;
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements IOrderService {
 
     @Override
-    public List<OrderVo> pageQueryList(OrderQuery orderQuery, String userId) {
+    public TableDataInfo<OrderVo> pageQueryList(OrderQuery orderQuery, String userId) {
         List<Order> orderList = list(Wrappers.<Order>lambdaQuery()
                 .eq(StringUtils.isNotBlank(userId), Order::getUserId, userId)
                 .eq(orderQuery.getOrderStatus() != null && orderQuery.getOrderStatus() != 0, Order::getOrderStatus, orderQuery.getOrderStatus())
                 .orderByDesc(Order::getCreatedTime));
-        return orderList.parallelStream().map(this::providerOrderVo).collect(Collectors.toList());
+        return TableDataInfoUtil.pageTableDataInfo(orderList.parallelStream().map(this::providerOrderVo).collect(Collectors.toList()),orderList);
+
     }
 
     private OrderVo providerOrderVo(Order order) {

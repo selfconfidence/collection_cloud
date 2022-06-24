@@ -38,9 +38,7 @@ public class AnnouncementController extends BaseController {
     @ApiOperation("查询公告")
     public R<TableDataInfo<AnnouncementVo>> list (@RequestBody PageQuery pageQuery) {
         PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize());
-        List<AnnouncementVo> list = announcementService.list(pageQuery);
-        return R.ok(getDataTable(list));
-
+        return R.ok(announcementService.list(pageQuery));
     }
 
 }

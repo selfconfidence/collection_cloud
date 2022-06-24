@@ -44,8 +44,8 @@ public class OrderController extends BaseController {
     public R<TableDataInfo<OrderVo>> myOrderList (@RequestBody OrderQuery orderQuery) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
         PageHelper.startPage(orderQuery.getPageNum(), orderQuery.getPageSize());
-        List<OrderVo> orderVos = orderService.pageQueryList(orderQuery, loginBusinessUser.getUserId());
-        return R.ok(getDataTable(orderVos));
+        TableDataInfo<OrderVo> orderVoTableDataInfo = orderService.pageQueryList(orderQuery, loginBusinessUser.getUserId());
+        return R.ok(orderVoTableDataInfo);
 
     }
 
