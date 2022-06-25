@@ -68,7 +68,7 @@
 
 
 
-        <!-- mybatis-plus-generator
+        <!-- mybatis-plus-generator-->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-generator</artifactId>
@@ -82,7 +82,7 @@
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
             <version>2.1</version>
-        </dependency>-->
+        </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>

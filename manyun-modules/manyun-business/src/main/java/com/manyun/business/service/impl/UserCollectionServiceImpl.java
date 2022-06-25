@@ -67,6 +67,12 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         logsService.saveLogs(LogInfoDto.builder().jsonTxt(info).buiId(userId).modelType(COLLECTION_MODEL_TYPE).isType(PULL_SOURCE).formInfo(goodsNum.toString()).build());
     }
 
+    /**
+     * 绑定盲盒
+     * @param userId
+     * @return
+     */
+
     @Override
     public List<UserCollectionVo> userCollectionPageList(String userId) {
         return userCollectionMapper.userCollectionPageList(userId);

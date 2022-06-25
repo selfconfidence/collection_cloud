@@ -18,5 +18,5 @@ public interface IUserPleaseService extends IService<UserPlease> {
 
     List<UserPleaseBoxVo> userPleaseBoxVo(String userId, long userRealCount);
 
-    String openPleaseBox(long userRealCount, String pleaseId);
+    String openPleaseBox(long userRealCount, String pleaseId,String userId);
 }

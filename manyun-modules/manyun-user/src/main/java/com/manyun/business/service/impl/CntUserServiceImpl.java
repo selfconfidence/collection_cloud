@@ -135,10 +135,8 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
      */
     @Override
     public String openPleaseBox(String userId, String pleaseId) {
-        //TODO 领取 邀请盲盒权益
-        // 1. 将当前用户下级查出 实名过的
         long userRealCount = count(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getParentId, userId).eq(CntUser::getIsReal,OK_REAL.getCode()));
-        String msg = userPleaseService.openPleaseBox(userRealCount,pleaseId);
+        String msg = userPleaseService.openPleaseBox(userRealCount,pleaseId,userId);
         return msg;
     }
 

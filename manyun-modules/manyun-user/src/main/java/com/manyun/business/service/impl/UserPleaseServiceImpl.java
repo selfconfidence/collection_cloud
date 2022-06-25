@@ -1,6 +1,8 @@
 package com.manyun.business.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
 import com.manyun.business.domain.entity.PleaseBox;
@@ -11,8 +13,15 @@ import com.manyun.business.mapper.UserPleaseMapper;
 import com.manyun.business.service.IPleaseBoxService;
 import com.manyun.business.service.IUserPleaseService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.comm.api.RemoteBoxService;
+import com.manyun.comm.api.domain.dto.OpenPleaseBoxDto;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.domain.CodeStatus;
+import com.manyun.common.core.domain.R;
+import com.manyun.common.core.exception.ServiceException;
 import com.manyun.common.core.text.Convert;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -37,6 +46,9 @@ public class UserPleaseServiceImpl extends ServiceImpl<UserPleaseMapper, UserPle
 
     @Resource
     private PleaseBoxMapper pleaseBoxMapper;
+
+    @Autowired
+    private RemoteBoxService remoteBoxService;
 
 
 
@@ -85,6 +97,7 @@ public class UserPleaseServiceImpl extends ServiceImpl<UserPleaseMapper, UserPle
         return arrayList;
     }
 
+
     /**
      * 用户领取邀请奖励
      * @param userRealCount
@@ -92,16 +105,25 @@ public class UserPleaseServiceImpl extends ServiceImpl<UserPleaseMapper, UserPle
      * @return
      */
     @Override
-    public String openPleaseBox(long userRealCount, String pleaseId) {
+    public String openPleaseBox(long userRealCount, String pleaseId,String userId) {
         Integer userRealIntCount = Convert.toInt(userRealCount);
         PleaseBox pleaseBox = pleaseBoxMapper.selectById(pleaseId);
         Assert.isTrue(Objects.nonNull(pleaseBox),"此领取编号有误!");
         Assert.isTrue(userRealIntCount.compareTo(pleaseBox.getPleaseNumber()) >=0,"推荐实名人数不够,请核实!");
         // 开始领取
+        UserPlease userPlease = Builder.of(UserPlease::new).build();
+        userPlease.setId(IdUtil.getSnowflake().nextIdStr());
+        userPlease.setPleaseId(pleaseId);
+        userPlease.setIsProcess(OK_PRO.getCode());
+        userPlease.createD(userId);
+        userPlease.setUserId(userId);
+        save(userPlease);
+        // 进行绑定
+        String source = StrUtil.format("推荐人数满{}领取获得盲盒", userRealCount);
+        R<String> stringR = remoteBoxService.openPleaseBox(OpenPleaseBoxDto.builder().goodsNum(Integer.valueOf(1)).boxId(pleaseBox.getBoxId()).sourceInfo(source).userId(userId).build());
+        if (CodeStatus.SUCCESS.getCode().equals(stringR.getCode()))
+            return source;
+        throw new ServiceException(stringR.getMsg());
 
-
-
-
-        return null;
     }
 }

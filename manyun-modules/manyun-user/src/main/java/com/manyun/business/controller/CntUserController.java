@@ -15,6 +15,7 @@ import com.manyun.comm.api.model.LoginPhoneForm;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.redis.service.RedisService;
+import com.manyun.common.security.annotation.InnerAuth;
 import com.manyun.common.security.utils.SecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,6 +50,7 @@ public class CntUserController extends BaseController {
 
     @PostMapping("/login")
     @ApiOperation(value = "用户登录",notes = "用户账号密码登录",hidden = true)
+    @InnerAuth
     public R<CntUser>  login(@RequestBody LoginPhoneForm loginPhoneForm){
          CntUser cntUser =  userService.login(loginPhoneForm);
         return R.ok(cntUser);
@@ -57,6 +59,7 @@ public class CntUserController extends BaseController {
 
     @PostMapping("/codeLogin")
     @ApiOperation(value = "用户验证码登录",notes = "验证码登录",hidden = true)
+    @InnerAuth
     public R<CntUser> codeLogin(@RequestBody LoginPhoneCodeForm loginPhoneCodeForm){
         String phoneCode = (String) redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(loginPhoneCodeForm.getPhone()));
         Assert.isTrue(loginPhoneCodeForm.getPhoneCode().equals(phoneCode),"验证码输入错误,请核实!");

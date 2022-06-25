@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.ToString;
 
 /**
  * <p>
@@ -16,6 +18,8 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @TableName("cnt_user_please")
 @ApiModel(value = "UserPlease对象", description = "用户邀请奖励历程")
+@Data
+@ToString
 public class UserPlease implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -44,82 +48,17 @@ public class UserPlease implements Serializable {
     @ApiModelProperty("更新时间")
     private LocalDateTime updatedTime;
 
-
-    public String getId() {
-        return id;
+    public void createD(String createId){
+        this.createdBy = createId;
+        this.createdTime = LocalDateTime.now();
+        if (this.createdTime != null)
+            this.updatedTime = this.createdTime;
+        this.updatedBy = this.createdBy;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void updateD(String updateId){
+        this.updatedBy = updateId;
+        this.updatedTime = LocalDateTime.now();
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getPleaseId() {
-        return pleaseId;
-    }
-
-    public void setPleaseId(String pleaseId) {
-        this.pleaseId = pleaseId;
-    }
-
-    public Integer getIsProcess() {
-        return isProcess;
-    }
-
-    public void setIsProcess(Integer isProcess) {
-        this.isProcess = isProcess;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public LocalDateTime getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(LocalDateTime createdTime) {
-        this.createdTime = createdTime;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public LocalDateTime getUpdatedTime() {
-        return updatedTime;
-    }
-
-    public void setUpdatedTime(LocalDateTime updatedTime) {
-        this.updatedTime = updatedTime;
-    }
-
-    @Override
-    public String toString() {
-        return "UserPlease{" +
-        "id=" + id +
-        ", userId=" + userId +
-        ", pleaseId=" + pleaseId +
-        ", isProcess=" + isProcess +
-        ", createdBy=" + createdBy +
-        ", createdTime=" + createdTime +
-        ", updatedBy=" + updatedBy +
-        ", updatedTime=" + updatedTime +
-        "}";
-    }
 }

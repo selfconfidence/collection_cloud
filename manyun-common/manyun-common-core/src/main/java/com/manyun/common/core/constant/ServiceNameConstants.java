@@ -22,6 +22,11 @@ public class ServiceNameConstants
      */
     public static final String FILE_SERVICE = "manyun-base";
 
+    /**
+     * 业务模块服务的serviceid
+     */
+    public static final String BUSINESS_SERVICE = "manyun-business";
+
 
     /**
      * 业务用户服务的serviceid
