@@ -21,6 +21,8 @@ public interface ICollectionService extends IService<CntCollection> {
 
     TableDataInfo<CollectionVo> pageQueryList(CollectionQuery collectionQuery);
 
+    CollectionAllVo info(String id,String userId);
+
     CollectionAllVo info(String id);
 
     PayVo sellCollection(String userId, CollectionSellForm collectionSellForm);
@@ -30,4 +32,6 @@ public interface ICollectionService extends IService<CntCollection> {
     List<UserCateVo> cateCollectionByUserId(String userId);
 
     List<String> queryDict(String keyword);
+
+    Integer tarCollection(String id, String userId);
 }

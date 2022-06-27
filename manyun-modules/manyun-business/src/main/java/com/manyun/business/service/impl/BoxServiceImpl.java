@@ -45,6 +45,8 @@ import static com.manyun.common.core.enums.BoxOpenType.NO_OPEN;
 import static com.manyun.common.core.enums.BoxOpenType.OK_OPEN;
 import static com.manyun.common.core.enums.BoxStatus.DOWN_ACTION;
 import static com.manyun.common.core.enums.PayTypeEnum.MONEY_TAPE;
+import static com.manyun.common.core.enums.TarStatus.CEN_YES_TAR;
+import static com.manyun.common.core.enums.TarStatus.NO_TAR;
 import static com.manyun.common.core.enums.WxPayEnum.BOX_WECHAT_PAY;
 
 /**
@@ -76,10 +78,22 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
     private IMoneyService moneyService;
 
     @Autowired
+    private ICntPostExcelService cntPostExcelService;
+
+    @Autowired
     private RootPay rootPay;
 
     @Autowired
     private IUserCollectionService userCollectionService;
+
+    @Autowired
+    private ICntTarService tarService;
+
+    @Autowired
+    private ITbPostConfigService postConfigService;
+
+    @Autowired
+    private  ICntTarService cntTarService;
 
 
 
@@ -102,15 +116,35 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
      * @return
      */
     @Override
-    public BoxVo info(String id) {
+    public BoxVo info(String id,String userId) {
         Box box = getById(id);
         BoxListVo boxListVo = initBoxListVo(box);
         BoxVo boxVo = Builder.of(BoxVo::new).build();
         boxVo.setBoxListVo(boxListVo);
         // 组合与藏品关联数据
         boxVo.setBoxCollectionJoinVos(boxCollectionService.findJoinCollections(id));
+        // 是否能够购买? 预先状态判定
+        boxVo.setTarStatus(NO_TAR.getCode());
+        // 低耦性校验
+        if (StrUtil.isNotBlank(box.getTarId()))
+            boxVo.setTarStatus(tarService.tarStatus(userId,id));
+
+
+        Integer postTime = null;
+        //提前购?
+        if (Objects.nonNull(box.getPostTime())){
+            // 两种验证,一种 excel , 一种 关联性 方式
+            //1. excel true 可以提前购, false 不可以
+            //2. 配置模板 true 可以提前购 false 不可以
+            if (cntPostExcelService.isExcelPostCustomer(userId,id) || postConfigService.isConfigPostCustomer(userId,id)){
+                postTime = box.getPostTime();
+            }
+        }
+        boxVo.setPostTime(postTime);
         return boxVo;
     }
+
+
 
     /**
      * 购买盲盒
@@ -207,6 +241,11 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         return  list(Wrappers.<Box>lambdaQuery().select(Box::getBoxTitle).like(Box::getBoxTitle,keyword).orderByDesc(Box::getCreatedTime).last(" limit 10")).parallelStream().map(item -> item.getBoxTitle()).collect(Collectors.toList());
     }
 
+    @Override
+    public Integer tarBox(String id, String userId) {
+        return cntTarService.tarBox(getById(id),userId);
+    }
+
     /**
      * 根据 组件 规则 获取到幸运藏品,进行绑定用户
      * @param boxCollections
@@ -244,8 +283,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
     private void checkSell(Box box,String userId,Integer payType,BigDecimal realPayMoney) {
         // 校验盲盒主体是否存在
         Assert.isTrue(Objects.nonNull(box),"盲盒编号有误,请核实!");
-        // 校验盲盒是否到了发行时间
-        Assert.isTrue(LocalDateTime.now().compareTo(box.getPublishTime()) >= 0,"发行时间未到,请核实!");
+
         // 校验是否库存不够了
         Assert.isFalse(Integer.valueOf(0).equals(box.getBalance()),"库存不足了!");
         // 重复校验状态
@@ -260,6 +298,30 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
             Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
            Assert.isTrue(money.getMoneyBalance().compareTo(realPayMoney) >=0,"余额不足,请核实!");
         }
+
+        // 是否需要抽？
+        if (StrUtil.isNotBlank(box.getTarId()) && CEN_YES_TAR.getCode().equals(tarService.tarStatus(userId,box.getId())))
+            Assert.isFalse(Boolean.TRUE,"未参与抽签,或暂未购买资格!");
+
+        // 是否能够提前购？
+        Boolean publishTimeFlag = Boolean.TRUE;
+        // 如果是提前购 并且 购买的时机符合判定条件就进去判定 是否有资格提前购买
+        if (Objects.nonNull(box.getPostTime()) && LocalDateTime.now().compareTo(box.getPublishTime()) < 0){
+            // 是提前购的属性
+            //  表格是否满足提前购 && 配置是否满足提前购
+            // 1.1 满足就 根据发售时间 - postTime(分钟) ;
+               //1.1.1 判定下当前时间 就可以购买了 publishTimeFlag = false
+               // 1.1.2 如果当前时间还不满足 就拦截提示 好了
+            // 1.2 不满足就 直接拦截,提示.
+            if (cntPostExcelService.isExcelPostCustomer(userId, box.getId()) || postConfigService.isConfigPostCustomer(userId, box.getId())){
+                if (LocalDateTime.now().compareTo(box.getPublishTime().minusMinutes(box.getPostTime())) >=0){
+                    publishTimeFlag = Boolean.FALSE;
+                }
+            }
+        }
+
+        // 校验盲盒是否到了发行时间
+        if (publishTimeFlag)Assert.isTrue(LocalDateTime.now().compareTo(box.getPublishTime()) >= 0,"发行时间未到,请核实!");
 
     }
 

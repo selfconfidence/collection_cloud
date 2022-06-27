@@ -25,11 +25,13 @@ public class Codes {
                 })
                 .strategyConfig(builder -> {
                     builder // 设置需要生成的表名
-                            .addInclude("cnt_user_please")
-                            .addInclude("cnt_please_box")
+                            .addInclude("cnt_post_excel")
+                            .addInclude("tb_post_exist")
+                            .addInclude("tb_post_sell")
+                            .addInclude("tb_post_config");
 
                             //.likeTable(new LikeTable("cnt_", SqlLike.RIGHT))
-                            .addTablePrefix("cnt_"); // 设置过滤表前缀
+                            //.addTablePrefix("cnt_"); // 设置过滤表前缀
                 })
                 //.templateEngine(new FreemarkerTemplateEngine()) // 使用Freemarker引擎模板，默认的是Velocity引擎模板
                 .execute();

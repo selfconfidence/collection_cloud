@@ -20,7 +20,6 @@ import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
-import com.manyun.common.core.enums.BoxStatus;
 import com.manyun.common.core.enums.CollectionStatus;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
@@ -29,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,9 +39,10 @@ import java.util.stream.Collectors;
 
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE;
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
-import static com.manyun.common.core.enums.CateType.COLLECTION_CATE;
 import static com.manyun.common.core.enums.CollectionStatus.DOWN_ACTION;
 import static com.manyun.common.core.enums.PayTypeEnum.MONEY_TAPE;
+import static com.manyun.common.core.enums.TarStatus.CEN_YES_TAR;
+import static com.manyun.common.core.enums.TarStatus.NO_TAR;
 import static com.manyun.common.core.enums.WxPayEnum.BOX_WECHAT_PAY;
 
 /**
@@ -67,6 +66,8 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
 
     private final LableMapper lableMapper;
 
+    private final ICntTarService tarService;
+
 
     private final IMediaService mediaService;
 
@@ -79,6 +80,11 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     private final IOrderService orderService;
 
     private final RootPay rootPay;
+
+    private final ICntTarService cntTarService;
+
+    private final ICntPostExcelService cntPostExcelService;
+    private final ITbPostConfigService postConfigService;
 
 
     @Override
@@ -96,8 +102,33 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     }
 
     @Override
+    public CollectionAllVo info(String id,String userId) {
+        CntCollection cntCollection = getById(id);
+        CollectionAllVo collectionAllVo = Builder.of(CollectionAllVo::new).with(CollectionAllVo::setCollectionVo, providerCollectionVo(cntCollection)).with(CollectionAllVo::setCollectionInfoVo, providerCollectionInfoVo(id)).build();
+        // 是否能够购买? 预先状态判定
+        collectionAllVo.setTarStatus(NO_TAR.getCode());
+        // 低耦性校验
+        if (StrUtil.isNotBlank(cntCollection.getTarId()))
+        collectionAllVo.setTarStatus(tarService.tarStatus(userId,id));
+
+        Integer postTime = null;
+        //提前购?
+        if (Objects.nonNull(cntCollection.getPostTime())){
+            // 两种验证,一种 excel , 一种 关联性 方式
+            //1. excel true 可以提前购, false 不可以
+            //2. 配置模板 true 可以提前购 false 不可以
+            if (cntPostExcelService.isExcelPostCustomer(userId,id) || postConfigService.isConfigPostCustomer(userId,id)){
+                postTime = cntCollection.getPostTime();
+            }
+        }
+        collectionAllVo.setPostTime(postTime);
+
+        return collectionAllVo;
+    }
+
+    @Override
     public CollectionAllVo info(String id) {
-        return Builder.of(CollectionAllVo::new).with(CollectionAllVo::setCollectionVo,providerCollectionVo(getById(id))).with(CollectionAllVo::setCollectionInfoVo,providerCollectionInfoVo(id)).build();
+        return info(id,null);
     }
 
     /**
@@ -110,7 +141,6 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     public PayVo sellCollection(String userId, CollectionSellForm collectionSellForm) {
         // 总结校验 —— 支付方式
         CntCollection  cntCollection = getById(collectionSellForm.getCollectionId());
-
         // 实际需要支付的金额
         BigDecimal realPayMoney = NumberUtil.mul(collectionSellForm.getSellNum(), cntCollection.getRealPrice());
         checkCollection(cntCollection,userId,collectionSellForm.getPayType(),realPayMoney);
@@ -197,6 +227,18 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         return  list(Wrappers.<CntCollection>lambdaQuery().select(CntCollection::getCollectionName).like(CntCollection::getCollectionName,keyword).orderByDesc(CntCollection::getCreatedTime).last(" limit 10")).parallelStream().map(item -> item.getCollectionName()).collect(Collectors.toList());
     }
 
+    /**
+     *
+     * @param id     藏品编号
+     * @param userId 用户编号
+     * @return
+     */
+    @Override
+    public Integer tarCollection(String id, String userId) {
+        // 开始抽签
+        return cntTarService.tarCollection(getById(id),userId);
+    }
+
     private UserCateCollectionVo initUserCateCollectionVo(CntCollection cntCollection) {
         UserCateCollectionVo userCateCollectionVo = Builder.of(UserCateCollectionVo::new).build();
         userCateCollectionVo.setCollectionName(cntCollection.getCollectionName());
@@ -209,8 +251,6 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     private void checkCollection(CntCollection cntCollection,String userId,Integer payType,BigDecimal realPayMoney) {
         // 校验盲盒主体是否存在
         Assert.isTrue(Objects.nonNull(cntCollection),"藏品编号有误,请核实!");
-        // 校验盲盒是否到了发行时间
-        Assert.isTrue(LocalDateTime.now().compareTo(cntCollection.getPublishTime()) >= 0,"发行时间未到,请核实!");
         // 校验是否库存不够了
         Assert.isFalse(Integer.valueOf(0).equals(cntCollection.getBalance()),"库存不足了!");
         // 重复校验状态
@@ -225,6 +265,29 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
             Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
             Assert.isTrue(money.getMoneyBalance().compareTo(realPayMoney) >=0,"余额不足,请核实!");
         }
+        // 是否需要抽？
+        if (StrUtil.isNotBlank(cntCollection.getTarId()) && CEN_YES_TAR.getCode().equals(tarService.tarStatus(userId,cntCollection.getId())))
+            Assert.isFalse(Boolean.TRUE,"未参与抽签,或暂未购买资格!");
+
+        // 是否能够提前购？
+        Boolean publishTimeFlag = Boolean.TRUE;
+        // 如果是提前购 并且 购买的时机符合判定条件就进去判定 是否有资格提前购买
+        if (Objects.nonNull(cntCollection.getPostTime()) && LocalDateTime.now().compareTo(cntCollection.getPublishTime()) < 0){
+            // 是提前购的属性
+            //  表格是否满足提前购 && 配置是否满足提前购
+            // 1.1 满足就 根据发售时间 - postTime(分钟) ;
+            //1.1.1 判定下当前时间 就可以购买了 publishTimeFlag = false
+            // 1.1.2 如果当前时间还不满足 就拦截提示 好了
+            // 1.2 不满足就 直接拦截,提示.
+            if (cntPostExcelService.isExcelPostCustomer(userId, cntCollection.getId()) || postConfigService.isConfigPostCustomer(userId, cntCollection.getId())){
+                if (LocalDateTime.now().compareTo(cntCollection.getPublishTime().minusMinutes(cntCollection.getPostTime())) >=0){
+                    publishTimeFlag = Boolean.FALSE;
+                }
+            }
+        }
+
+        // 校验盲盒是否到了发行时间
+        if (publishTimeFlag)Assert.isTrue(LocalDateTime.now().compareTo(cntCollection.getPublishTime()) >= 0,"发行时间未到,请核实!");
 
     }
 

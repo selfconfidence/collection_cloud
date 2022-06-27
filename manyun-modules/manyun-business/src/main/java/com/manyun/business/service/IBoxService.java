@@ -25,7 +25,7 @@ public interface IBoxService extends IService<Box> {
 
     TableDataInfo<BoxListVo> pageList(BoxQuery boxQuery);
 
-    BoxVo info(String id);
+    BoxVo info(String id,String userId);
 
     PayVo sellBox(BoxSellForm boxSellForm, String userId);
 
@@ -34,4 +34,6 @@ public interface IBoxService extends IService<Box> {
     String openBox(String boxId, String userId);
 
     List<String> queryDict(String keyword);
+
+    Integer tarBox(String id, String userId);
 }

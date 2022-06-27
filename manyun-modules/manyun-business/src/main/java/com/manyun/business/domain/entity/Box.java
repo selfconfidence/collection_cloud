@@ -29,6 +29,13 @@ public class Box implements Serializable {
     private String id;
 
 
+
+    @ApiModelProperty("如果为null不需要抽签,否则需要抽签")
+    private String tarId;
+
+    @ApiModelProperty("提前购（分钟为单位） 如果为null 就代表不是提前购")
+    private Integer postTime;
+
     @ApiModelProperty("盲盒标题")
     private String boxTitle;
 

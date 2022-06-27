@@ -49,9 +49,18 @@ public class CollectionController extends BaseController{
     }
 
     @GetMapping("/info/{id}")
-    @ApiOperation(value = "查询藏品详情信息",notes = "根据藏品编号查询藏品详情信息")
+    @ApiOperation(value = "查询藏品详情信息",notes = "根据藏品编号查询藏品详情信息 -需登录")
     public R<CollectionAllVo> info(@PathVariable String id){
-        return R.ok(collectionService.info(id));
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        String userId = notNullLoginBusinessUser.getUserId();
+        return R.ok(collectionService.info(id,userId));
+    }
+
+    @GetMapping("/tarCollection/{id}")
+    @ApiOperation(value = "对需要抽签的藏品,进行抽签",notes = " id = 藏品编号  \rdata = 状态,(1=抽中,2=未抽中)")
+    public R<Integer> tarCollection(@PathVariable String id){
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return R.ok(collectionService.tarCollection(id,notNullLoginBusinessUser.getUserId()));
     }
 
 
