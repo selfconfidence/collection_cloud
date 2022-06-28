@@ -1,20 +1,33 @@
 package com.manyun.business.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.github.pagehelper.PageHelper;
 import com.manyun.business.domain.dto.LogInfoDto;
+import com.manyun.business.domain.entity.Logs;
 import com.manyun.business.domain.entity.Money;
+import com.manyun.business.domain.form.AccountInfoForm;
+import com.manyun.business.domain.query.MoneyLogQuery;
+import com.manyun.business.domain.vo.AccountInfoVo;
+import com.manyun.business.domain.vo.MoneyLogVo;
 import com.manyun.business.mapper.MoneyMapper;
 import com.manyun.business.service.ILogsService;
 import com.manyun.business.service.IMoneyService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.manyun.business.service.IOrderService;
+import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.utils.DateUtils;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.POLL_SOURCE;
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.MONEY_TYPE;
@@ -35,6 +48,8 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
 
 
 
+
+
     /**
      * 根据进行进行扣除余额操作
      * @param userId
@@ -52,4 +67,42 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         logsService.saveLogs(LogInfoDto.builder().buiId(userId).jsonTxt(formInfo).formInfo(realPayMoney.toString()).isType(POLL_SOURCE).modelType(MONEY_TYPE).build());
 
     }
+
+    @Override
+    public AccountInfoVo accountInfo(String userId) {
+        Money moneyUser = getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
+        AccountInfoVo accountInfo = Builder.of(AccountInfoVo::new).build();
+        BeanUtil.copyProperties(moneyUser,accountInfo);
+        // 是否绑定银行卡了
+        return accountInfo;
+    }
+
+    @Override
+    public void updateAccountInfo(String userId, AccountInfoForm accountInfoForm) {
+        Money money = getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
+        BeanUtil.copyProperties(accountInfoForm,money);
+        money.updateD(userId);
+        updateById(money);
+    }
+
+    /**
+     * 分页查询收支明细列表
+     * @param userId
+     * @param moneyLogQuery
+     * @return
+     */
+    @Override
+    public TableDataInfo<MoneyLogVo> pageMoneyLog(String userId, MoneyLogQuery moneyLogQuery) {
+        PageHelper.startPage(moneyLogQuery.getPageNum(),moneyLogQuery.getPageSize());
+        List<Logs> logsList = logsService.list(Wrappers.<Logs>lambdaQuery().eq(Logs::getBuiId, userId).eq(Logs::getModelType, MONEY_TYPE).eq(Objects.nonNull(moneyLogQuery.getIsType()), Logs::getIsType, moneyLogQuery.getIsType()).last(Objects.nonNull(moneyLogQuery.getCreatedTime()), " and DATE_FORMAT(created_time,'%Y-%m-%d') = " + DateUtils.getDate() + " ").orderByDesc(Logs::getCreatedTime));
+        List<MoneyLogVo> moneyLogVos = logsList.parallelStream().map(this::initMoneyLogVo).collect(Collectors.toList());
+        return TableDataInfoUtil.pageTableDataInfo(moneyLogVos,logsList);
+    }
+
+    private MoneyLogVo initMoneyLogVo(Logs logs) {
+        MoneyLogVo moneyLogVo = Builder.of(MoneyLogVo::new).build();
+        BeanUtil.copyProperties(logs,moneyLogVo);
+        return moneyLogVo;
+    }
+
 }

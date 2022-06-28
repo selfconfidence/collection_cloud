@@ -37,7 +37,7 @@ public class MoneyPay implements RootPayServer {
         if (MONEY_TAPE.getCode().equals(payInfoDto.getPayType())){
             // 是自己执行的
             // 钱包自行扣除进行支付
-            String formInfo = StrUtil.format("使用余额进行消费了,此次消费%s", payInfoDto.getRealPayMoney().toString());
+            String formInfo = StrUtil.format("消费-{}", payInfoDto.getRealPayMoney().toString());
             moneyService.ordePay(payInfoDto.getOutHost(),payInfoDto.getUserId(),payInfoDto.getRealPayMoney(),formInfo);
             // 调用完成订单
             orderService.notifyPaySuccess(payInfoDto.getOutHost());

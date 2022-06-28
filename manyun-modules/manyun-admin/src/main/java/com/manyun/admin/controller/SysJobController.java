@@ -31,6 +31,7 @@ import java.util.List;
 @RequestMapping("/job")
 public class SysJobController extends BaseController
 {
+
     @Autowired
     private ISysJobService jobService;
 

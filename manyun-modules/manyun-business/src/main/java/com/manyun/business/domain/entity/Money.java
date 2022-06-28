@@ -46,6 +46,9 @@ public class Money implements Serializable {
     @ApiModelProperty("钱包余量")
     private BigDecimal moneyBalance;
 
+    @ApiModelProperty("是否绑定银行卡  1=绑定,2=未绑定")
+    private Integer isBindCart;
+
     @ApiModelProperty("银行卡名称;中国银行,工商银行等")
     private String bankName;
 
