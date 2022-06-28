@@ -1,27 +1,17 @@
-package com.manyun.business.domain.entity;
+package com.manyun.business.domain.vo;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-/**
- * <p>
- * 拍卖订单表
- * </p>
- *
- * @author yanwei
- * @since 2022-06-17
- */
-@TableName("cnt_auction_order")
-@ApiModel(value = "AuctionOrder对象", description = "拍卖订单表")
-@Data
-public class AuctionOrder implements Serializable {
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
-    private static final long serialVersionUID = 1L;
+@Data
+@ApiModel("拍卖订单返回视图")
+public class AuctionOrderVo implements Serializable {
 
     @ApiModelProperty("主键")
     private String id;
@@ -32,13 +22,15 @@ public class AuctionOrder implements Serializable {
     @ApiModelProperty("创建人")
     private String createdBy;
 
-    @ApiModelProperty("创建时间")
+    @ApiModelProperty("创建时间 yyyy-MM-dd HH:mm:ss"  )
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdTime;
 
     @ApiModelProperty("更新人")
     private String updatedBy;
 
-    @ApiModelProperty("更新时间")
+    @ApiModelProperty("更新时间 yyyy-MM-dd HH:mm:ss"  )
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedTime;
 
     @ApiModelProperty("商品类型;1藏品，2盲盒")
