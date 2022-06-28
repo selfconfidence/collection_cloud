@@ -1,9 +1,25 @@
 package com.manyun.business.controller;
 
 
+import com.github.pagehelper.PageHelper;
+import com.manyun.business.domain.form.AuctionSendForm;
+import com.manyun.business.domain.query.AuctionSendQuery;
+import com.manyun.business.domain.vo.MyAuctionSendVo;
+import com.manyun.business.service.IAuctionSendService;
+import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.security.utils.SecurityUtils;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import org.springframework.stereotype.Controller;
+import javax.validation.Valid;
 
 /**
  * <p>
@@ -13,9 +29,30 @@ import org.springframework.stereotype.Controller;
  * @author yanwei
  * @since 2022-06-17
  */
-@Controller
+@RestController
 @RequestMapping("/auctionSend")
+@Api(tags = "我的送拍相关apis")
 public class AuctionSendController {
+
+    @Autowired
+    private IAuctionSendService auctionSendService;
+
+    @PostMapping("/auctionSend")
+    @ApiOperation("提交送拍")
+    public R auctionSend(@Valid @RequestBody AuctionSendForm auctionSendForm) {
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
+        return auctionSendService.auctionSend(auctionSendForm, loginBusinessUser.getUserId());
+    }
+
+
+    @PostMapping("/mySend")
+    @ApiOperation("我的送拍列表")
+    public R<TableDataInfo<MyAuctionSendVo>> mySend(@RequestBody AuctionSendQuery sendQuery) {
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
+        PageHelper.startPage(sendQuery.getPageNum(), sendQuery.getPageSize());
+        return R.ok(auctionSendService.pageList(sendQuery,loginBusinessUser.getUserId()));
+    }
+
 
 }
 
