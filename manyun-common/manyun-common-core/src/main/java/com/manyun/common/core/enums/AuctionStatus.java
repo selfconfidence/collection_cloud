@@ -8,8 +8,8 @@ import lombok.Getter;
  */
 @Getter
 public enum AuctionStatus {
-    BID_BIDING(Integer.valueOf(1), "竞拍中"), BID_MISSED(2, "未拍中"), WAIT_PAY(3, "待支付"),
-    PAY_SUCCESS(4, "已支付"), BID_BREAK(5, "已违约");
+    WAIT_START(Integer.valueOf(1),"待开始"), BID_BIDING(2, "竞拍中"), BID_MISSED(3, "未拍中"), WAIT_PAY(4, "待支付"),
+    PAY_SUCCESS(5, "已支付"), BID_BREAK(6, "已违约");
 
     private final Integer code;
     private final String info;
