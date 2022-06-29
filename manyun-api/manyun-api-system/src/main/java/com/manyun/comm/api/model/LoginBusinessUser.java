@@ -1,7 +1,6 @@
 package com.manyun.comm.api.model;
 
-import com.manyun.comm.api.domain.CntUser;
-import com.manyun.comm.api.domain.SysUser;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -60,6 +59,6 @@ public class LoginBusinessUser implements Serializable
     /**
      * 用户信息
      */
-    private CntUser cntUser;
+    private CntUserDto cntUser;
 
 }

@@ -6,6 +6,7 @@ import com.ijpay.wxpay.WxPayApiConfigKit;
 import com.manyun.business.service.IOrderService;
 import com.manyun.common.pays.abs.impl.WxComm;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -31,10 +32,9 @@ public class WechatPayNotifyController {
     @Autowired
     private IOrderService orderService;
 
-
-
     @RequestMapping(value = "/boxNotify")
     @ResponseBody
+    @ApiOperation(value = "盲盒支付回调",hidden = true)
     public String certNotifyUrl(HttpServletRequest request) {
         String xmlMsg = HttpKit.readData(request);
         log.info("支付通知=" + xmlMsg);

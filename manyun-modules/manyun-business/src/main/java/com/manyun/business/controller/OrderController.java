@@ -10,6 +10,7 @@ import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.security.annotation.InnerAuth;
 import com.manyun.common.security.utils.SecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -55,6 +56,14 @@ public class OrderController extends BaseController {
         System.out.println(111);
 
         return R.ok(collectionService.info(id));
+    }
+
+    @GetMapping("/timeCancel")
+    @ApiOperation(value = "定时调度取消未支付的订单",hidden = true)
+    @InnerAuth
+    public R timeCancel(){
+         orderService.timeCancel();
+        return R.ok();
     }
 
 }

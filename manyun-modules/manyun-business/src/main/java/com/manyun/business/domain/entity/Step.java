@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.ToString;
 
 /**
  * <p>
@@ -16,6 +18,8 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @TableName("cnt_step")
 @ApiModel(value = "Step对象", description = "藏品盲盒流转信息")
+@Data
+@ToString
 public class Step implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -50,100 +54,16 @@ public class Step implements Serializable {
     @ApiModelProperty("更新时间")
     private LocalDateTime updatedTime;
 
-
-    public String getId() {
-        return id;
+    public void createD(String createId){
+        this.createdBy = createId;
+        this.createdTime = LocalDateTime.now();
+        if (this.createdTime != null)
+            this.updatedTime = this.createdTime;
+        this.updatedBy = this.createdBy;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getModelType() {
-        return modelType;
-    }
-
-    public void setModelType(String modelType) {
-        this.modelType = modelType;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getBuiId() {
-        return buiId;
-    }
-
-    public void setBuiId(String buiId) {
-        this.buiId = buiId;
-    }
-
-    public String getReMark() {
-        return reMark;
-    }
-
-    public void setReMark(String reMark) {
-        this.reMark = reMark;
-    }
-
-    public String getFormInfo() {
-        return formInfo;
-    }
-
-    public void setFormInfo(String formInfo) {
-        this.formInfo = formInfo;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public LocalDateTime getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(LocalDateTime createdTime) {
-        this.createdTime = createdTime;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public LocalDateTime getUpdatedTime() {
-        return updatedTime;
-    }
-
-    public void setUpdatedTime(LocalDateTime updatedTime) {
-        this.updatedTime = updatedTime;
-    }
-
-    @Override
-    public String toString() {
-        return "Step{" +
-        "id=" + id +
-        ", modelType=" + modelType +
-        ", userId=" + userId +
-        ", buiId=" + buiId +
-        ", reMark=" + reMark +
-        ", formInfo=" + formInfo +
-        ", createdBy=" + createdBy +
-        ", createdTime=" + createdTime +
-        ", updatedBy=" + updatedBy +
-        ", updatedTime=" + updatedTime +
-        "}";
+    public void updateD(String updateId){
+        this.updatedBy = updateId;
+        this.updatedTime = LocalDateTime.now();
     }
 }

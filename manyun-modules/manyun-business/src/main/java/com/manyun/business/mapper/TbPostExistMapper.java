@@ -1,7 +1,7 @@
 package com.manyun.business.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.manyun.business.domain.entity.TbPostExist;
+import com.manyun.business.domain.entity.CntPostExist;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.manyun.business.domain.entity.TbPostExist;
  * @author yanwei
  * @since 2022-06-27
  */
-public interface TbPostExistMapper extends BaseMapper<TbPostExist> {
+public interface TbPostExistMapper extends BaseMapper<CntPostExist> {
 
 }

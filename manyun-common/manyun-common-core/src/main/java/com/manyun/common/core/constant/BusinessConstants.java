@@ -33,6 +33,9 @@ public interface BusinessConstants {
         // 订单到期时间
         String ORDER_END_TIME= "ORDER_PAY_END";
 
+        // 是否开启转增
+        String TRAN_ACC= "TRAN_ACC";
+
     }
 
 

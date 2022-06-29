@@ -1,8 +1,10 @@
-package com.manyun.comm.api.domain;
+package com.manyun.business.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -15,8 +17,9 @@ import java.time.LocalDateTime;
  * @author yanwei
  * @since 2022-06-17
  */
-@ApiModel(value = "CntUser对象", description = "用户表")
 @Data
+@TableName("cnt_user")
+@ToString
 public class CntUser implements Serializable {
 
     private static final long serialVersionUID = 1L;

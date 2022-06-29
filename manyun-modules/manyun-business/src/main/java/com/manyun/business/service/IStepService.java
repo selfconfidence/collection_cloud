@@ -1,5 +1,6 @@
 package com.manyun.business.service;
 
+import com.manyun.business.domain.dto.StepDto;
 import com.manyun.business.domain.entity.Step;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +14,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IStepService extends IService<Step> {
 
+    void saveBatch(StepDto... stepDtos);
 }

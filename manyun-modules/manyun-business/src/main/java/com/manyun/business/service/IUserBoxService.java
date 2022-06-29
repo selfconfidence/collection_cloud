@@ -23,4 +23,8 @@ public interface IUserBoxService extends IService<UserBox> {
     void bindBox(String userId, String buiId, String sourceInfo, Integer goodsNum);
 
     List<UserBoxVo> pageUserBox(String userId);
+
+    Boolean existUserBox(String userId, String id);
+
+    void tranBox(String tranUserId, String toUserId, String buiId);
 }

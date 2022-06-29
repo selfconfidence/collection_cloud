@@ -14,7 +14,7 @@ import com.manyun.business.mapper.CntUserMapper;
 import com.manyun.business.service.ICntUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.business.service.IUserPleaseService;
-import com.manyun.comm.api.domain.CntUser;
+import com.manyun.business.domain.entity.CntUser;
 import com.manyun.comm.api.model.LoginPhoneForm;
 import com.manyun.common.core.domain.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,6 +138,16 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         long userRealCount = count(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getParentId, userId).eq(CntUser::getIsReal,OK_REAL.getCode()));
         String msg = userPleaseService.openPleaseBox(userRealCount,pleaseId,userId);
         return msg;
+    }
+
+    /**
+     * 手机号|区块链地址|ID
+     * @param commUni
+     * @return
+     */
+    @Override
+    public CntUser commUni(String commUni) {
+        return getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getUserId, commUni).or().eq(CntUser::getLinkAddr, commUni).or().eq(CntUser::getPhone, commUni));
     }
 
     private UserInfoVo initUserLevelVo(CntUser cntUser) {

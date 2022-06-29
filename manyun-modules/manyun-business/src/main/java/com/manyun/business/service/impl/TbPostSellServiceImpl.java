@@ -1,9 +1,9 @@
 package com.manyun.business.service.impl;
 
-import com.manyun.business.domain.entity.TbPostSell;
+import com.manyun.business.domain.entity.CntPostSell;
 import com.manyun.business.mapper.TbPostSellMapper;
-import com.manyun.business.service.ITbPostSellService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.business.service.ICntPostSellService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2022-06-27
  */
 @Service
-public class TbPostSellServiceImpl extends ServiceImpl<TbPostSellMapper, TbPostSell> implements ITbPostSellService {
+public class TbPostSellServiceImpl extends ServiceImpl<TbPostSellMapper, CntPostSell> implements ICntPostSellService {
 
 }

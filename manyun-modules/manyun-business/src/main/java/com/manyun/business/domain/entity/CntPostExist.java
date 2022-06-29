@@ -6,41 +6,33 @@ import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.ToString;
 
 /**
  * <p>
- * 邀请好友送盲盒规则
+ * 提前购配置已经拥有
  * </p>
  *
  * @author yanwei
- * @since 2022-06-24
+ * @since 2022-06-27
  */
-@TableName("cnt_please_box")
-@ApiModel(value = "PleaseBox对象", description = "邀请好友送盲盒规则")
+@TableName("cnt_post_exist")
+@ApiModel(value = "CntPostExist对象", description = "提前购配置已经拥有")
 @Data
-@ToString
-public class PleaseBox implements Serializable {
+public class CntPostExist implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键")
     private String id;
 
-    @ApiModelProperty("邀请人数;邀请人数")
-    private Integer pleaseNumber;
+    @ApiModelProperty("藏品编号")
+    private String collectionId;
 
-    @ApiModelProperty("奖励的盲盒编号")
-    private String boxId;
+    @ApiModelProperty("配置编号")
+    private String configId;
 
-    @ApiModelProperty("已售")
-    private Integer selfBalance;
-
-    @ApiModelProperty("库存")
-    private Integer balance;
-
-    @ApiModelProperty("是否使用;1=使用，2=未使用")
-    private Integer isUse;
+    @ApiModelProperty("业务名称")
+    private String buiName;
 
     @ApiModelProperty("创建人")
     private String createdBy;

@@ -13,6 +13,9 @@ import java.util.List;
 @ApiModel("用户拥有藏品返回视图")
 public class UserCollectionVo  implements Serializable {
 
+    @ApiModelProperty("用户和藏品唯一标识联系")
+    private String id;
+
     @ApiModelProperty("藏品id")
     private String collectionId;
 

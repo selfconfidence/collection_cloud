@@ -7,7 +7,7 @@ import com.manyun.business.domain.form.UserChangePayPass;
 import com.manyun.business.domain.vo.UserInfoVo;
 import com.manyun.business.domain.vo.UserLevelVo;
 import com.manyun.business.domain.vo.UserPleaseBoxVo;
-import com.manyun.comm.api.domain.CntUser;
+import com.manyun.business.domain.entity.CntUser;
 import com.manyun.comm.api.model.LoginPhoneForm;
 
 import java.util.List;
@@ -39,4 +39,6 @@ public interface ICntUserService extends IService<CntUser> {
     List<UserPleaseBoxVo> userPleaseBoxVo(String userId);
 
     String openPleaseBox(String userId, String pleaseId);
+
+    CntUser commUni(String commUni);
 }

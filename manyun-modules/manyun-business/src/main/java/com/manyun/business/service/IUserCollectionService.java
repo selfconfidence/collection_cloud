@@ -19,4 +19,8 @@ public interface IUserCollectionService extends IService<UserCollection> {
     void bindCollection(String userId, String buiId, String collectionName,String info, Integer goodsNum);
 
     List<UserCollectionVo> userCollectionPageList(String userId);
+
+    Boolean existUserCollection(String userId, String id);
+
+    void tranCollection(String tranUserId, String toUserId, String buiId);
 }

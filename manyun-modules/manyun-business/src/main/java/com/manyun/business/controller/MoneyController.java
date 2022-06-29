@@ -70,6 +70,7 @@ public class MoneyController extends BaseController {
     @GetMapping("/bindCard")
     @ApiOperation("调取银联 一键绑卡 -暂未实现 ")
     public R bindCard(){
+        //TODO 调取银联 一键绑卡 -暂未实现
 
         return R.ok();
     }

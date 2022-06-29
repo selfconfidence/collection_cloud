@@ -7,6 +7,7 @@ import com.ijpay.alipay.AliPayApi;
 import com.manyun.business.service.IOrderService;
 import com.manyun.common.pays.abs.impl.AliComm;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ public class AliPayNotifyController {
 
     @RequestMapping(value = "/boxNotify")
     @ResponseBody
+    @ApiOperation(value = "盲盒支付回调",hidden = true)
     public String certNotifyUrl(HttpServletRequest request) {
         try {
             // 获取支付宝POST过来反馈信息
@@ -55,7 +57,6 @@ public class AliPayNotifyController {
                 return "success";
             } else {
                 log.info("test_url 验证失败");
-                // TODO
                 return "failure";
             }
         } catch (AlipayApiException e) {

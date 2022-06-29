@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.query.OrderQuery;
 import com.manyun.business.domain.vo.OrderVo;
 import com.manyun.common.core.web.page.TableDataInfo;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -37,4 +38,6 @@ public interface IOrderService extends IService<Order> {
     String createOrder(OrderCreateDto orderCreateDto);
 
     void notifyPaySuccess(String outHost);
+
+    void timeCancel();
 }

@@ -6,33 +6,32 @@ import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.ToString;
 
 /**
  * <p>
- * 提前购配置已经拥有
+ * 提前购配置表
  * </p>
  *
  * @author yanwei
  * @since 2022-06-27
  */
-@TableName("tb_post_exist")
-@ApiModel(value = "TbPostExist对象", description = "提前购配置已经拥有")
+@TableName("cnt_post_config")
+@ApiModel(value = "TbPostConfig对象", description = "提前购配置表")
 @Data
-public class TbPostExist implements Serializable {
+@ToString
+public class CntPostConfig implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键")
     private String id;
 
-    @ApiModelProperty("藏品编号")
-    private String collectionId;
+    @ApiModelProperty("配置名称")
+    private String configName;
 
-    @ApiModelProperty("配置编号")
-    private String configId;
-
-    @ApiModelProperty("业务名称")
-    private String buiName;
+    @ApiModelProperty("备注")
+    private String reMark;
 
     @ApiModelProperty("创建人")
     private String createdBy;

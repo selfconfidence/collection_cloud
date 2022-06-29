@@ -1,9 +1,7 @@
 package com.manyun.comm.api.factory;
 
 import com.manyun.comm.api.RemoteBuiUserService;
-import com.manyun.comm.api.RemoteFileService;
-import com.manyun.comm.api.domain.CntUser;
-import com.manyun.comm.api.domain.SysFile;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.model.LoginPhoneCodeForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
 import com.manyun.common.core.domain.R;
@@ -11,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 文件服务降级处理
@@ -29,13 +26,18 @@ public class RemoteBuiUserFallbackFactory implements FallbackFactory<RemoteBuiUs
         log.error("业务用户服务调用失败:{}", throwable.getMessage());
         return new RemoteBuiUserService() {
             @Override
-            public R<CntUser> login(LoginPhoneForm loginPhoneForm) {
+            public R<CntUserDto> login(LoginPhoneForm loginPhoneForm) {
                 return R.fail("登录失败:" + throwable.getMessage());
             }
 
             @Override
-            public R<CntUser> codeLogin(LoginPhoneCodeForm loginPhoneCodeForm) {
+            public R<CntUserDto> codeLogin(LoginPhoneCodeForm loginPhoneCodeForm) {
                 return R.fail("登录失败:" + throwable.getMessage());
+            }
+
+            @Override
+            public R<CntUserDto> commUni(String commUni, String source) {
+                return R.fail("查询失败:" + throwable.getMessage());
             }
         };
     }

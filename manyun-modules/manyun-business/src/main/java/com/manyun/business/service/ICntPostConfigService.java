@@ -1,7 +1,7 @@
 package com.manyun.business.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.manyun.business.domain.entity.TbPostConfig;
+import com.manyun.business.domain.entity.CntPostConfig;
 
 /**
  * <p>
@@ -11,7 +11,7 @@ import com.manyun.business.domain.entity.TbPostConfig;
  * @author yanwei
  * @since 2022-06-27
  */
-public interface ITbPostConfigService extends IService<TbPostConfig> {
+public interface ICntPostConfigService extends IService<CntPostConfig> {
 
     boolean isConfigPostCustomer(String userId, String buiId);
 }

@@ -1,16 +1,14 @@
 package com.manyun.comm.api;
 
-import com.manyun.comm.api.domain.CntUser;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.factory.RemoteBuiUserFallbackFactory;
-import com.manyun.comm.api.factory.RemoteUserFallbackFactory;
 import com.manyun.comm.api.model.LoginPhoneCodeForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.constant.ServiceNameConstants;
 import com.manyun.common.core.domain.R;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 业务板块 用户服务
@@ -21,10 +19,13 @@ public interface RemoteBuiUserService {
     /**
      * 用户登录
      */
-    @PostMapping("/cntUser/login")
-     R<CntUser> login(@RequestBody LoginPhoneForm loginPhoneForm);
+     @PostMapping("/cntUser/login")
+     R<CntUserDto> login(@RequestBody LoginPhoneForm loginPhoneForm);
 
-    @PostMapping("/codeLogin")
-     R<CntUser> codeLogin(@RequestBody LoginPhoneCodeForm loginPhoneCodeForm);
+     @PostMapping("/cntUser/codeLogin")
+     R<CntUserDto> codeLogin(@RequestBody LoginPhoneCodeForm loginPhoneCodeForm);
+
+    @GetMapping("/cntUser/commUni/{commUni}")
+    R<CntUserDto> commUni(@PathVariable String commUni, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 
 }

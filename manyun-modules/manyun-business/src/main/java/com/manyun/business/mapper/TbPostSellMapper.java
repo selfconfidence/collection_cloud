@@ -1,7 +1,7 @@
 package com.manyun.business.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.manyun.business.domain.entity.TbPostSell;
+import com.manyun.business.domain.entity.CntPostSell;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.manyun.business.domain.entity.TbPostSell;
  * @author yanwei
  * @since 2022-06-27
  */
-public interface TbPostSellMapper extends BaseMapper<TbPostSell> {
+public interface TbPostSellMapper extends BaseMapper<CntPostSell> {
 
 }

@@ -42,4 +42,5 @@ public class BoxCollectionServiceImpl extends ServiceImpl<BoxCollectionMapper, B
         return collectionJoinVo;
 
     }
+
 }

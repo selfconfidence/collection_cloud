@@ -2,6 +2,9 @@ package com.manyun.business.service;
 
 import com.manyun.business.domain.entity.Version;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.manyun.business.domain.vo.VersionVo;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IVersionService extends IService<Version> {
 
+    VersionVo newVersion(Integer isType);
+
+    List<VersionVo> allVersionList(Integer isType);
 }

@@ -3,6 +3,7 @@
 <mapper namespace="com.manyun.business.mapper.UserCollectionMapper">
 
     <resultMap id="baseMap" type="com.manyun.business.domain.vo.UserCollectionVo">
+        <id column="id" property="id"/>
         <result property="collectionId" column="collection_id"/>
         <result property="collectionNumber" column="collection_number"/>
         <result property="collectionHash" column="collection_hash"/>
@@ -33,6 +34,7 @@
 
     <select id="userCollectionPageList" resultMap="baseMap">
         SELECT
+        uc.id,
         uc.collection_id,
         uc.collection_number,
         uc.collection_hash,

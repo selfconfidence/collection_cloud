@@ -91,7 +91,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
     private ICntTarService tarService;
 
     @Autowired
-    private ITbPostConfigService postConfigService;
+    private ICntPostConfigService postConfigService;
 
     @Autowired
     private  ICntTarService cntTarService;

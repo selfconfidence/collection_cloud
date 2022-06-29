@@ -84,7 +84,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     private final ICntTarService cntTarService;
 
     private final ICntPostExcelService cntPostExcelService;
-    private final ITbPostConfigService postConfigService;
+    private final ICntPostConfigService postConfigService;
 
 
     @Override

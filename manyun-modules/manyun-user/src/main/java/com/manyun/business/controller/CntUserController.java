@@ -1,5 +1,7 @@
 package com.manyun.business.controller;
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import com.manyun.business.domain.entity.CntUser;
 import com.manyun.business.domain.form.UserChangeForm;
 import com.manyun.business.domain.form.UserChangeLoginForm;
 import com.manyun.business.domain.form.UserChangePayPass;
@@ -8,10 +10,11 @@ import com.manyun.business.domain.vo.UserInfoVo;
 import com.manyun.business.domain.vo.UserLevelVo;
 import com.manyun.business.domain.vo.UserPleaseBoxVo;
 import com.manyun.business.service.ICntUserService;
-import com.manyun.comm.api.domain.CntUser;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.comm.api.model.LoginPhoneCodeForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
+import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.redis.service.RedisService;
@@ -22,7 +25,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
-import javax.xml.transform.Result;
 
 import java.util.List;
 
@@ -51,20 +53,24 @@ public class CntUserController extends BaseController {
     @PostMapping("/login")
     @ApiOperation(value = "用户登录",notes = "用户账号密码登录",hidden = true)
     @InnerAuth
-    public R<CntUser>  login(@RequestBody LoginPhoneForm loginPhoneForm){
+    public R<CntUserDto>  login(@RequestBody LoginPhoneForm loginPhoneForm){
          CntUser cntUser =  userService.login(loginPhoneForm);
-        return R.ok(cntUser);
+        CntUserDto cntUserDto = Builder.of(CntUserDto::new).build();
+        BeanUtil.copyProperties(cntUser,cntUserDto);
+        return R.ok(cntUserDto);
     }
 
 
     @PostMapping("/codeLogin")
     @ApiOperation(value = "用户验证码登录",notes = "验证码登录",hidden = true)
     @InnerAuth
-    public R<CntUser> codeLogin(@RequestBody LoginPhoneCodeForm loginPhoneCodeForm){
+    public R<CntUserDto> codeLogin(@RequestBody LoginPhoneCodeForm loginPhoneCodeForm){
         String phoneCode = (String) redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(loginPhoneCodeForm.getPhone()));
         Assert.isTrue(loginPhoneCodeForm.getPhoneCode().equals(phoneCode),"验证码输入错误,请核实!");
         CntUser cntUser =   userService.codeLogin(loginPhoneCodeForm.getPhone());
-        return R.ok(cntUser);
+        CntUserDto cntUserDto = Builder.of(CntUserDto::new).build();
+        BeanUtil.copyProperties(cntUser,cntUserDto);
+        return R.ok(cntUserDto);
     }
 
     @PostMapping("/changeUser")
@@ -90,6 +96,7 @@ public class CntUserController extends BaseController {
     @ApiOperation("实名认证")
     public R realUser(@RequestBody @Valid UserRealForm userRealForm){
         //TODO 实名认证未完善
+
 
         return R.ok();
     }
@@ -138,6 +145,19 @@ public class CntUserController extends BaseController {
         String msg = userService.openPleaseBox(userId,id);
         return R.ok(msg);
 
+    }
+
+    /**
+     * 根据用户的  手机号|区块链地址|ID 查询用户信息
+     */
+    @GetMapping("/commUni/{commUni}")
+    @InnerAuth
+    @ApiOperation(value = "根据用户的  手机号|区块链地址|ID 查询用户信息",hidden = true)
+    public R<CntUserDto> commUni(@PathVariable String commUni){
+        CntUser cntUser = userService.commUni(commUni);
+        CntUserDto cntUserDto = Builder.of(CntUserDto::new).build();
+        BeanUtil.copyProperties(cntUser,cntUserDto);
+        return R.ok(cntUserDto);
     }
 
 

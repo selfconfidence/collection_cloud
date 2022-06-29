@@ -1,9 +1,9 @@
 package com.manyun.business.service.impl;
 
-import com.manyun.business.domain.entity.TbPostExist;
+import com.manyun.business.domain.entity.CntPostExist;
 import com.manyun.business.mapper.TbPostExistMapper;
-import com.manyun.business.service.ITbPostExistService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.business.service.ICntPostExistService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2022-06-27
  */
 @Service
-public class TbPostExistServiceImpl extends ServiceImpl<TbPostExistMapper, TbPostExist> implements ITbPostExistService {
+public class TbPostExistServiceImpl extends ServiceImpl<TbPostExistMapper, CntPostExist> implements ICntPostExistService {
 
 }

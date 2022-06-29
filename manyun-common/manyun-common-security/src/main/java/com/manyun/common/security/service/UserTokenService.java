@@ -1,9 +1,8 @@
 package com.manyun.common.security.service;
 
-import com.manyun.comm.api.domain.CntUser;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.domain.vo.AccTokenVo;
 import com.manyun.comm.api.model.LoginBusinessUser;
-import com.manyun.comm.api.model.LoginUser;
 import com.manyun.common.core.constant.CacheConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.enums.UserLoginSource;
@@ -46,7 +45,7 @@ public class UserTokenService
     /**
      * 创建令牌
      */
-    public AccTokenVo createToken(CntUser cntUser)
+    public AccTokenVo createToken(CntUserDto cntUser)
     {
         LoginBusinessUser loginBusinessUser=new LoginBusinessUser();
         String token = IdUtils.fastUUID();

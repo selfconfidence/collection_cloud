@@ -12,17 +12,14 @@ import com.manyun.business.domain.entity.CntCollection;
 import com.manyun.business.domain.entity.Order;
 import com.manyun.business.domain.query.OrderQuery;
 import com.manyun.business.domain.vo.OrderVo;
-import com.manyun.business.mapper.BoxMapper;
 import com.manyun.business.mapper.OrderMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.utils.StringUtils;
-import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,8 +28,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static com.manyun.common.core.enums.OrderStatus.*;
@@ -153,6 +148,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      * 更改订单状态 为 已取消
      */
     @Transactional(rollbackFor = Exception.class)
+    @Override
     public synchronized  void timeCancel(){
         List<Order> orderList = list(Wrappers.<Order>lambdaQuery().eq(Order::getOrderStatus, WAIT_ORDER.getCode()).lt(Order::getEndTime, LocalDateTime.now()));
         if (orderList.isEmpty()) return;
