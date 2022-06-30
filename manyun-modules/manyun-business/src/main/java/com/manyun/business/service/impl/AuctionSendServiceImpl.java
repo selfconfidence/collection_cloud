@@ -47,18 +47,18 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
     @Autowired
     IMediaService mediaService;
 
+
     @Override
     public R auctionSend(AuctionSendForm auctionSendForm, String userId) {
-        AuctionSend auctionSend = new AuctionSend();
-        auctionSend.setUserId(userId);
-        auctionSend.setAuctionStatus(AuctionStatus.WAIT_START.getCode());
-        auctionSend.setGoodsId(auctionSendForm.getGoodsId());
-        auctionSend.setGoodsType(auctionSendForm.getGoodsType());
-        auctionSend.setStartPrice(auctionSendForm.getStartPrice());
-        auctionSend.setSoldPrice(auctionSendForm.getSoldPrice());
-        auctionSend.setCreatedTime(LocalDateTime.now());
-        getBaseMapper().insert(auctionSend);
-        return R.ok();
+        AuctionSend auctionSend = Builder.of(AuctionSend::new)
+                .with(AuctionSend::setUserId, userId)
+                .with(AuctionSend::setAuctionStatus, AuctionStatus.WAIT_START.getCode())
+                .with(AuctionSend::setGoodsId, auctionSendForm.getGoodsId())
+                .with(AuctionSend::setGoodsType, auctionSendForm.getGoodsType())
+                .with(AuctionSend::setStartPrice, auctionSendForm.getStartPrice())
+                .with(AuctionSend::setSoldPrice, auctionSendForm.getSoldPrice())
+                .with(AuctionSend::setCreatedTime, LocalDateTime.now()).build();
+        return this.save(auctionSend) ? R.ok() : R.fail();
     }
 
     @Override
