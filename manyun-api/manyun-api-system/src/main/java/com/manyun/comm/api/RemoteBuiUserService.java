@@ -26,6 +26,6 @@ public interface RemoteBuiUserService {
      R<CntUserDto> codeLogin(@RequestBody LoginPhoneCodeForm loginPhoneCodeForm);
 
     @GetMapping("/cntUser/commUni/{commUni}")
-    R<CntUserDto> commUni(@PathVariable String commUni, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+    R<CntUserDto> commUni(@PathVariable(name = "commUni") String commUni, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 
 }

@@ -153,7 +153,7 @@ public class CntUserController extends BaseController {
     @GetMapping("/commUni/{commUni}")
     @InnerAuth
     @ApiOperation(value = "根据用户的  手机号|区块链地址|ID 查询用户信息",hidden = true)
-    public R<CntUserDto> commUni(@PathVariable String commUni){
+    public R<CntUserDto> commUni(@PathVariable(name = "commUni") String commUni){
         CntUser cntUser = userService.commUni(commUni);
         CntUserDto cntUserDto = Builder.of(CntUserDto::new).build();
         BeanUtil.copyProperties(cntUser,cntUserDto);
