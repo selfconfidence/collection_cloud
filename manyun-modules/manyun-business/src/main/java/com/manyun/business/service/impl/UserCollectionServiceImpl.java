@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
 import com.manyun.business.domain.dto.LogInfoDto;
 import com.manyun.business.domain.dto.StepDto;
+import com.manyun.business.domain.dto.UserCollectionCountDto;
 import com.manyun.business.domain.entity.UserCollection;
 import com.manyun.business.domain.vo.UserCollectionVo;
 import com.manyun.business.mapper.UserCollectionMapper;
@@ -149,6 +150,22 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         userCollection.setSourceInfo(StrUtil.join("\n", userCollection.getSourceInfo(),info));
         updateById(userCollection);
         return userCollection.getCollectionId();
+    }
+
+
+    /**
+     *  查询用户拥有个藏品的数量
+     * @param collectionIds
+     * @return
+     */
+    @Override
+    public List<UserCollectionCountDto> selectUserCollectionCount(List<String> collectionIds, String userId) {
+        return userCollectionMapper.selectUserCollectionCount(collectionIds,userId);
+    }
+
+    @Override
+    public void deleteMaterial(String userId,String collectionId, Integer deleteNum) {
+        userCollectionMapper.deleteMaterial(userId,collectionId,deleteNum);
     }
 
 }

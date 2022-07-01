@@ -15,6 +15,9 @@ public class AuctionPriceVo {
     @ApiModelProperty("用户名")
     private String userName;
 
+    @ApiModelProperty("用户头像")
+    private String headImage;
+
     @ApiModelProperty("出价")
     private BigDecimal bidPrice;
 

@@ -43,6 +43,9 @@ public class Action implements Serializable {
     @ApiModelProperty("此活动合成的藏品编号")
     private String collectionId;
 
+    @ApiModelProperty("合成规则")
+    private String ruleContent;
+
     @ApiModelProperty("创建人")
     private String createdBy;
 

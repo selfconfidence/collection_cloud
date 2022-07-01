@@ -1,5 +1,6 @@
 package com.manyun.business.service;
 
+import com.manyun.business.domain.dto.UserCollectionCountDto;
 import com.manyun.business.domain.entity.UserCollection;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.vo.UserCollectionVo;
@@ -23,6 +24,11 @@ public interface IUserCollectionService extends IService<UserCollection> {
     Boolean existUserCollection(String userId, String id);
 
     void tranCollection(String tranUserId, String toUserId, String buiId);
+
+    List<UserCollectionCountDto> selectUserCollectionCount(List<String> collectionIds, String userId);
+
+    void deleteMaterial(String userId,String collectionId, Integer deleteNum);
+
 
     String hideUserCollection(String buiId, String userId, String info);
 }

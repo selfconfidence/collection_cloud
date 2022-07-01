@@ -11,7 +11,10 @@ import com.manyun.business.mapper.AuctionPriceMapper;
 import com.manyun.business.service.IAuctionPriceService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.business.service.IAuctionSendService;
+import com.manyun.comm.api.RemoteBuiUserService;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.AuctionStatus;
@@ -39,6 +42,9 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
     @Autowired
     IAuctionSendService sendService;
+
+    @Autowired
+    private RemoteBuiUserService remoteBuiUserService;
 
     @Override
     public synchronized R myAuctionPrice(AuctionPriceForm auctionPriceForm) {
@@ -72,15 +78,19 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     /**
      * 竞拍列表
      */
+    @Override
     public TableDataInfo<AuctionPriceVo> auctionPriceList(AuctionPriceQuery priceQuery) {
         List<AuctionPrice> priceList = list(Wrappers.<AuctionPrice>lambdaQuery().eq(AuctionPrice::getAuctionSendId, priceQuery.getAuctionSendId())
                 .orderByDesc(AuctionPrice::getBidPrice));
         return TableDataInfoUtil.pageTableDataInfo(priceList.parallelStream().map(this::providerAuctionPriceVo).collect(Collectors.toList()), priceList);
     }
 
+
     private AuctionPriceVo providerAuctionPriceVo(AuctionPrice auctionPrice) {
+        R<CntUserDto> cntUserDtoR = remoteBuiUserService.commUni(auctionPrice.getUserId(), SecurityConstants.INNER);
         AuctionPriceVo auctionPriceVo = Builder.of(AuctionPriceVo::new).build();
         BeanUtil.copyProperties(auctionPrice, auctionPriceVo);
+        auctionPriceVo.setHeadImage(cntUserDtoR.getData().getHeadImage());
         return auctionPriceVo;
     }
 

@@ -1,23 +1,27 @@
 package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.manyun.business.domain.entity.Action;
-import com.manyun.business.domain.entity.ActionRecord;
-import com.manyun.business.domain.vo.SynthesisVo;
-import com.manyun.business.domain.vo.SyntheticRecordVo;
+import com.manyun.business.domain.dto.UserCollectionCountDto;
+import com.manyun.business.domain.entity.*;
+import com.manyun.business.domain.vo.*;
 import com.manyun.business.mapper.CntActionMapper;
-import com.manyun.business.service.IActionRecordService;
-import com.manyun.business.service.IActionService;
+import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.domain.R;
+import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -37,15 +41,27 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
     @Autowired
     private IActionRecordService actionRecordService;
 
+    @Autowired
+    private IActionTarService actionTarService;
+
+    @Autowired
+    private ICollectionService collectionService;
+
+    @Autowired
+    private IUserCollectionService userCollectionService;
+
+    @Autowired
+    private IMediaService mediaService;
+
     /**
-     * 查询合成列表
+     * 查询活动合成列表
      * @return
      */
     @Override
-    public TableDataInfo<SynthesisVo> synthesisList() {
+    public TableDataInfo<SyntheticActivityVo> syntheticActivityList() {
         List<Action> actionList = list(Wrappers.<Action>lambdaQuery().orderByAsc(Action::getActionStatus));
         return TableDataInfoUtil.pageTableDataInfo(actionList.parallelStream()
-                .map(this::SynthesisVo).collect(Collectors.toList()), actionList);
+                .map(this::syntheticActivityVo).collect(Collectors.toList()), actionList);
     }
 
     /**
@@ -56,19 +72,192 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
     public TableDataInfo<SyntheticRecordVo> syntheticRecordList() {
         List<ActionRecord> actionRecordList = actionRecordService.list(Wrappers.<ActionRecord>lambdaQuery().orderByDesc(ActionRecord::getCreatedTime));
         return TableDataInfoUtil.pageTableDataInfo(actionRecordList.parallelStream()
-                .map(this::SyntheticRecordVo).collect(Collectors.toList()), actionRecordList);
+                .map(this::syntheticRecordVo).collect(Collectors.toList()), actionRecordList);
     }
 
-    private SyntheticRecordVo SyntheticRecordVo(ActionRecord actionRecord) {
+    /**
+     * 查询合成详情
+     * @param userId
+     * @param id
+     * @return
+     */
+    @Override
+    public R<SynthesisVo> synthesisInfo(String userId, String id) {
+        //查询相关信息
+        R<Map> relatedData = getRelatedData(id, userId);
+        if(200!=relatedData.getCode()){
+            return R.fail(relatedData.getCode(),relatedData.getMsg());
+        }
+        Action action = (Action) relatedData.getData().get("action");
+        List<ActionTar> actionTarList = (List<ActionTar>)relatedData.getData().get("actionTarList");
+        CntCollection collection = (CntCollection) relatedData.getData().get("collection");
+        List<MediaVo> mediaVoList = (List<MediaVo>)relatedData.getData().get("mediaVoList");
+        List<UserCollectionCountDto> userCollectionCountDtos = (List<UserCollectionCountDto>)relatedData.getData().get("userCollectionCountDtos");
+        //组装合成材料数据
+        List<MaterialVo> materialVoList = actionTarList.stream().map(m -> {
+            MaterialVo materialVo=new MaterialVo();
+            materialVo.setMaterialId(m.getActionId());
+            materialVo.setMaterialName(m.getCollectionName());
+            materialVo.setMaterialImage(m.getCollectionImage());
+            materialVo.setReleaseNum(m.getReleaseNum());
+            materialVo.setDeleteNum(m.getDeleteNum());
+            if(userCollectionCountDtos.size()==0){
+                materialVo.setNumCount(0);
+            }else {
+                userCollectionCountDtos.stream().filter(f -> m.getCollectionId().equals(f.getCollectionId())).forEach(mm -> {
+                    materialVo.setNumCount(mm.getCount());
+                });
+            }
+            return materialVo;
+        }).collect(Collectors.toList());
+        //组装目标藏品数据
+        SynthesisVo synthesisVo=new SynthesisVo();
+        synthesisVo.setActionId(action.getId());
+        synthesisVo.setCollectionId(action.getCollectionId());
+        synthesisVo.setCollectionName(collection.getCollectionName());
+        synthesisVo.setMediaVos(mediaVoList);
+        synthesisVo.setMaterials(materialVoList);
+        synthesisVo.setRuleContent(action.getRuleContent());
+        //比较碎片是否充足
+        int success = 1;
+        if(actionTarList.size()==userCollectionCountDtos.size()) {
+            a: for (int i = 0; i < actionTarList.size(); i++) {
+                b: for (int j = 0; j < userCollectionCountDtos.size(); j++) {
+                    if (userCollectionCountDtos.get(j).getCollectionId().equals(actionTarList.get(i).getCollectionId())) {
+                        if (userCollectionCountDtos.get(j).getCount() < actionTarList.get(i).getReleaseNum()) {
+                            success = 0;
+                            break a;
+                        }
+                    }
+                }
+            }
+        }else {
+            success = 0;
+        }
+        synthesisVo.setMergeStatus(success==0?1:2);
+        return R.ok(synthesisVo);
+    }
+
+    /**
+     *  立即合成
+     * @param userId
+     * @param id
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public R<SynthesizeNowVo> synthesizeNow(String userId, String id) {
+        //查询相关数据
+        R<Map> relatedData = getRelatedData(id, userId);
+        if(200!=relatedData.getCode()){
+            return R.fail(relatedData.getCode(),relatedData.getMsg());
+        }
+        Action action = (Action) relatedData.getData().get("action");
+        List<ActionTar> actionTarList = (List<ActionTar>)relatedData.getData().get("actionTarList");
+        CntCollection collection = (CntCollection) relatedData.getData().get("collection");
+        List<MediaVo> mediaVoList = (List<MediaVo>)relatedData.getData().get("mediaVoList");
+        List<UserCollectionCountDto> userCollectionCountDtos = (List<UserCollectionCountDto>)relatedData.getData().get("userCollectionCountDtos");
+
+        //比较两个时间大小，前者大 = -1， 相等 =0，后者大 = 1
+        if (DateUtils.compareTo(new Date(), DateUtils.toDate(action.getStartTime()), DateUtils.YYYY_MM_DD_HH_MM_SS) == 1) {
+            return R.fail("合成暂未开始!");
+        }
+        if (DateUtils.compareTo(new Date(), DateUtils.toDate(action.getEndTime()), DateUtils.YYYY_MM_DD_HH_MM_SS) == -1) {
+            return R.fail("本轮合成已结束");
+        }
+
+        //比较碎片是否充足
+        int success = 1;
+        if(actionTarList.size()==userCollectionCountDtos.size()) {
+           a: for (int i = 0; i < actionTarList.size(); i++) {
+             b: for (int j = 0; j < userCollectionCountDtos.size(); j++) {
+                    if (userCollectionCountDtos.get(j).getCollectionId().equals(actionTarList.get(i).getCollectionId())) {
+                        if (userCollectionCountDtos.get(j).getCount() < actionTarList.get(i).getReleaseNum()) {
+                            success = 0;
+                            break a;
+                        }
+                    }
+                }
+            }
+        }else {
+            success = 0;
+        }
+
+        if(success == 0){
+            return R.fail("合成材料不足");
+        }
+
+        //删除需消耗的合成材料
+        actionTarList.stream().forEach(e ->{
+            userCollectionService.deleteMaterial(userId,e.getCollectionId(),e.getDeleteNum());
+        });
+
+        //增加用户收藏
+        LocalDateTime now = LocalDateTime.now();
+        UserCollection userCollection=new UserCollection();
+        userCollection.setUserId(userId);
+        userCollection.setCollectionId(action.getCollectionId());
+        userCollection.setCollectionName(collection.getCollectionName());
+        userCollection.setCreatedBy(userId);
+        userCollection.setCreatedTime(now);
+        userCollectionService.save(userCollection);
+
+        //增加合成记录
+            actionRecordService.save(
+                    Builder
+                        .of(ActionRecord::new)
+                        .with(ActionRecord::setActionId,action.getId())
+                        .with(ActionRecord::setCollectionId,action.getCollectionId())
+                        .with(ActionRecord::setCollectionName,collection.getCollectionName())
+                        .with(ActionRecord::setCreatedBy,userId)
+                        .with(ActionRecord::setCreatedTime,now)
+                        .build()
+            );
+        return R.ok(
+                Builder
+                    .of(SynthesizeNowVo::new)
+                    .with(SynthesizeNowVo::setCollectionName,collection.getCollectionName())
+                    .with(SynthesizeNowVo::setMediaVos,mediaVoList)
+                    .build()
+            );
+    }
+
+    private SyntheticRecordVo syntheticRecordVo(ActionRecord actionRecord) {
         SyntheticRecordVo syntheticRecordVo = Builder.of(SyntheticRecordVo::new).build();
         BeanUtil.copyProperties(actionRecord, syntheticRecordVo);
+        List<MediaVo> mediaVoList = mediaService.initMediaVos(syntheticRecordVo.getId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
+        syntheticRecordVo.setMediaVos(mediaVoList);
         return syntheticRecordVo;
     }
 
-    private SynthesisVo SynthesisVo(Action action) {
-        SynthesisVo synthesisVo = Builder.of(SynthesisVo::new).build();
+    private SyntheticActivityVo syntheticActivityVo(Action action) {
+        SyntheticActivityVo synthesisVo = Builder.of(SyntheticActivityVo::new).build();
         BeanUtil.copyProperties(action, synthesisVo);
         return synthesisVo;
+    }
+
+    private R<Map> getRelatedData(String id,String userId) {
+        Map map=new HashMap();
+        //查询活动、活动材料、目标藏品、目标藏品图片、用户拥有的藏品数
+        Action action = actionMapper.selectOne(Wrappers.<Action>lambdaQuery().eq(Action::getActionStatus, 2).eq(Action::getId, id));
+        Assert.isTrue(Objects.nonNull(action),"活动藏品不存在!");
+        List<ActionTar> actionTarList = actionTarService.list(Wrappers.<ActionTar>lambdaQuery().eq(ActionTar::getActionId, id));
+        if(actionTarList.size()==0){
+            return R.fail("获取活动材料信息失败!");
+        }
+        CntCollection collection = collectionService.getById(action.getCollectionId());
+        List<MediaVo> mediaVoList = mediaService.initMediaVos(action.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
+        if(collection==null || mediaVoList.size()==0){
+            return R.fail("获取目标藏品信息失败!");
+        }
+        List<String> collectionIds = actionTarList.stream().map(ActionTar::getCollectionId).collect(Collectors.toList());
+        List<UserCollectionCountDto> userCollectionCountDtos=userCollectionService.selectUserCollectionCount(collectionIds,userId);
+        map.put("action",action);
+        map.put("actionTarList",actionTarList);
+        map.put("collection",collection);
+        map.put("mediaVoList",mediaVoList);
+        map.put("userCollectionCountDtos",userCollectionCountDtos);
+        return R.ok(map);
     }
 
 }
