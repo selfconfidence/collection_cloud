@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.manyun.common.core.constant.BusinessConstants.RedisDict.PHONE_CODE;
 
@@ -148,13 +149,14 @@ public class CntUserController extends BaseController {
     }
 
     /**
-     * 根据用户的  手机号|区块链地址|ID 查询用户信息
+     * 根据用户的  手机号|区块链地址|ID|系统编号 查询用户信息
      */
     @GetMapping("/commUni/{commUni}")
     @InnerAuth
     @ApiOperation(value = "根据用户的  手机号|区块链地址|ID 查询用户信息",hidden = true)
     public R<CntUserDto> commUni(@PathVariable(name = "commUni") String commUni){
         CntUser cntUser = userService.commUni(commUni);
+        if (Objects.isNull(cntUser)) return R.ok();
         CntUserDto cntUserDto = Builder.of(CntUserDto::new).build();
         BeanUtil.copyProperties(cntUser,cntUserDto);
         return R.ok(cntUserDto);

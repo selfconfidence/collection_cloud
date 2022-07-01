@@ -2,6 +2,7 @@ package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.DesensitizedUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.domain.form.UserChangeForm;
@@ -141,18 +142,20 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     }
 
     /**
-     * 手机号|区块链地址|ID
+     * 手机号|区块链地址|ID|系统ID
      * @param commUni
-     * @return
+     * @return 没有就返回  null 即可！！！
      */
     @Override
     public CntUser commUni(String commUni) {
-        return getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getUserId, commUni).or().eq(CntUser::getLinkAddr, commUni).or().eq(CntUser::getPhone, commUni));
+        return getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getUserId, commUni).or().eq(CntUser::getLinkAddr, commUni).or().eq(CntUser::getId,commUni).or().eq(CntUser::getPhone, commUni));
     }
 
     private UserInfoVo initUserLevelVo(CntUser cntUser) {
         UserInfoVo userInfoVo = Builder.of(UserInfoVo::new).build();
         BeanUtil.copyProperties(cntUser,userInfoVo);
+        if (StrUtil.isNotBlank(userInfoVo.getPhone()) && userInfoVo.getPhone().length() >= 11)
+            userInfoVo.setPhone(DesensitizedUtil.mobilePhone(userInfoVo.getPhone()));
         return userInfoVo;
     }
 }
