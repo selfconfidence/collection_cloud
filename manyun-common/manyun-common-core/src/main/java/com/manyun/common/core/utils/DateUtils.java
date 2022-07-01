@@ -176,4 +176,69 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
         ZonedDateTime zdt = localDateTime.atZone(ZoneId.systemDefault());
         return Date.from(zdt.toInstant());
     }
+
+    /**
+     * 比较两个时间大小，前者大 = -1， 相等 =0，后者大 = 1
+     *
+     * @param date1
+     * @param date2
+     * @param pattern yyyy-MM-dd
+     * @return
+     */
+    public static int compareTo(Date date1, Date date2, String pattern) {
+        date1 = getDateToDate(date1, pattern);
+        date2 = getDateToDate(date2, pattern);
+        if (date1.getTime() > date2.getTime()) {
+            return -1;
+        } else if (date1.getTime() < date2.getTime()) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * 将时间转换成指定格式的时间， 如 2019-10-10 10:10:10  转换格式为 yyyy-MM-dd 则最终会得到一个date对象为 2019-10-10
+     *
+     * @param date
+     * @param pattern
+     * @return
+     */
+    public static Date getDateToDate(Date date, String pattern) {
+        String dateToStr = getDateToStr(date, pattern);
+        return getStrToDate(dateToStr, pattern);
+    }
+
+    /**
+     * 将date转换成字符串
+     *
+     * @param date    需要格式化的时间对象
+     * @param pattern 字符串的时间格式 比如 字符串为:2017-01-01  需要转换对象则 pattern需要传入 yyyy-MM-dd
+     * @return
+     */
+    public static String getDateToStr(Date date, String pattern) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+            return dateFormat.format(date);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * 字符串转换成date对象
+     *
+     * @param str     需要转换的字符串
+     * @param pattern 字符串的时间格式 比如 字符串为:2017-01-01  需要转换对象则 pattern需要传入 yyyy-MM-dd
+     * @return
+     */
+    public static Date getStrToDate(String str, String pattern) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+            return dateFormat.parse(str);
+        } catch (ParseException e) {
+            return null;
+        }
+    }
+
 }

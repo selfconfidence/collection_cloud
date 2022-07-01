@@ -54,7 +54,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerServiceMapper, Cust
                         <CustomerService>lambdaQuery()
                         .eq(CustomerService::getMenuStatus,0)
                         .orderByAsc(CustomerService::getOrderNum));
-        return getChildPerms(customerServiceList.parallelStream().map(this::CustomerServiceVo).collect(Collectors.toList()), 0);
+        return getChildPerms(customerServiceList.parallelStream().map(this::customerServiceVo).collect(Collectors.toList()), 0);
     }
 
     /**
@@ -117,7 +117,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerServiceMapper, Cust
         return feedbackService.save(feedback)==true?1:0;
     }
 
-    private CustomerServiceVo CustomerServiceVo(CustomerService customerService) {
+    private CustomerServiceVo customerServiceVo(CustomerService customerService) {
         CustomerServiceVo customerServiceVo = Builder.of(CustomerServiceVo::new).build();
         BeanUtil.copyProperties(customerService,customerServiceVo);
         return customerServiceVo;

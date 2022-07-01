@@ -3,7 +3,11 @@ package com.manyun.business.service;
 import com.manyun.business.domain.entity.Action;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.vo.SynthesisVo;
+import com.manyun.business.domain.vo.SynthesizeNowVo;
+import com.manyun.business.domain.vo.SyntheticActivityVo;
 import com.manyun.business.domain.vo.SyntheticRecordVo;
+import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
@@ -16,8 +20,12 @@ import com.manyun.common.core.web.page.TableDataInfo;
  */
 public interface IActionService extends IService<Action> {
 
-    TableDataInfo<SynthesisVo> synthesisList();
+    TableDataInfo<SyntheticActivityVo> syntheticActivityList();
 
     TableDataInfo<SyntheticRecordVo> syntheticRecordList();
+
+    R<SynthesisVo> synthesisInfo(String userId, String id);
+
+    R<SynthesizeNowVo> synthesizeNow(String userId, String id);
 
 }

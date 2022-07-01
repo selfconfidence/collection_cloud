@@ -66,4 +66,31 @@
     </where>
     order by uc.created_time desc
     </select>
+
+
+    <select id="selectUserCollectionCount" resultType="com.manyun.business.domain.dto.UserCollectionCountDto">
+        select
+        collection_id as collectionId,
+        count( collection_id ) as count
+        from
+        cnt_user_collection
+        where
+        user_id = #{userId}
+        and collection_id in
+        <foreach close=")" collection="collectionIds" item="collectionId" open="(" separator=",">
+            #{collectionId}
+        </foreach>
+        group by
+        collection_id
+    </select>
+
+    <delete id="deleteMaterial">
+        delete from
+            cnt_user_collection
+        where
+            user_id = #{userId}
+            and collection_id = #{collectionId}
+            limit #{deleteNum}
+    </delete>
+
 </mapper>

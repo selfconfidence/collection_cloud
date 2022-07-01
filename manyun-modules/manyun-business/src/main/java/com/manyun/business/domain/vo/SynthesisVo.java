@@ -1,31 +1,32 @@
 package com.manyun.business.domain.vo;
 
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
-@ApiModel("合成列表")
 public class SynthesisVo {
 
-    @ApiModelProperty("主键")
-    private String id;
+    @ApiModelProperty("活动编号")
+    private String actionId;
 
-    @ApiModelProperty("活动标题")
-    private String actionTitle;
+    @ApiModelProperty("目标藏品id")
+    private String collectionId;
 
-    @ApiModelProperty("活动封面")
-    private String actionImage;
+    @ApiModelProperty("目标藏品名称")
+    private String collectionName;
 
-    @ApiModelProperty("活动状态;1=待开始,2=进行中,3=结束")
-    private Integer actionStatus;
+    @ApiModelProperty("藏品主图")
+    private List<MediaVo> mediaVos;
 
-    @ApiModelProperty("活动开始时间")
-    private LocalDateTime startTime;
+    @ApiModelProperty("合成材料")
+    private List<MaterialVo> materials;
 
-    @ApiModelProperty("活动结束时间")
-    private LocalDateTime endTime;
+    @ApiModelProperty("规则内容")
+    private String ruleContent;
+
+    @ApiModelProperty("合并状态 1材料不足 2材料充足")
+    private Integer mergeStatus;
 
 }
