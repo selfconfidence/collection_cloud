@@ -26,23 +26,14 @@ public class AuctionSend implements Serializable {
     @ApiModelProperty("主键")
     private String id;
 
-    @ApiModelProperty("创建人")
-    private String createdBy;
-
-    @ApiModelProperty("创建时间")
-    private LocalDateTime createdTime;
-
-    @ApiModelProperty("更新人")
-    private String updatedBy;
-
-    @ApiModelProperty("更新时间")
-    private LocalDateTime updatedTime;
-
     @ApiModelProperty("送拍人id")
     private String userId;
 
     @ApiModelProperty("类型（藏品，盲盒）;1藏品，2盲盒")
     private Integer goodsType;
+
+    @ApiModelProperty("我的藏品id")
+    private String myGoodsId;
 
     @ApiModelProperty("商品id")
     private String goodsId;
@@ -58,5 +49,25 @@ public class AuctionSend implements Serializable {
 
     @ApiModelProperty("拍卖状态;1待开始，2竞拍中，3待支付，4已完成，5已违约，6已流拍")
     private Integer auctionStatus;
+
+    @ApiModelProperty("创建人")
+    private String createdBy;
+
+    @ApiModelProperty("创建时间")
+    private LocalDateTime createdTime;
+
+    @ApiModelProperty("更新人")
+    private String updatedBy;
+
+    @ApiModelProperty("更新时间")
+    private LocalDateTime updatedTime;
+
+    public void createD(String createId){
+        this.createdBy = createId;
+        this.createdTime = LocalDateTime.now();
+        if (this.createdTime != null)
+            this.updatedTime = this.createdTime;
+        this.updatedBy = this.createdBy;
+    }
 
 }

@@ -14,6 +14,10 @@ import java.math.BigDecimal;
 @ApiModel("我的送拍提交表单")
 public class AuctionSendForm {
 
+    @ApiModelProperty(value = "我的藏品id", required = true)
+    @NotBlank
+    private String myGoodsId;
+
     @ApiModelProperty(value = "商品id", required = true)
     @NotBlank
     private String goodsId;
@@ -21,6 +25,10 @@ public class AuctionSendForm {
     @ApiModelProperty(value = "商品类型,1藏品，2盲盒", required = true)
     @Range(min = 1,max = 2,message = "藏品类型错误")
     private Integer goodsType;
+
+    @ApiModelProperty(value = "商品名称", required = true)
+    @NotBlank
+    private String goodsName;
 
     @ApiModelProperty(value = "起拍价", required = true)
     @Digits(integer = MoneyConstants.MoneyPrecision, fraction = MoneyConstants.MoneyScale)

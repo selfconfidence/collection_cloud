@@ -3,12 +3,13 @@ package com.manyun.business.controller;
 
 import com.github.pagehelper.PageHelper;
 import com.manyun.business.domain.form.AuctionSendForm;
+import com.manyun.business.domain.query.AuctionMarketQuery;
 import com.manyun.business.domain.query.AuctionSendQuery;
+import com.manyun.business.domain.vo.AuctionMarketVo;
 import com.manyun.business.domain.vo.MyAuctionSendVo;
 import com.manyun.business.service.IAuctionSendService;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.domain.R;
-import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.security.utils.SecurityUtils;
 import io.swagger.annotations.Api;
@@ -51,6 +52,13 @@ public class AuctionSendController {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
         PageHelper.startPage(sendQuery.getPageNum(), sendQuery.getPageSize());
         return R.ok(auctionSendService.pageList(sendQuery,loginBusinessUser.getUserId()));
+    }
+
+    @PostMapping("/auctionMarketList")
+    @ApiOperation("拍卖市场列表")
+    public R<TableDataInfo<AuctionMarketVo>> auctionMarketList(@RequestBody AuctionMarketQuery marketQuery) {
+        PageHelper.startPage(marketQuery.getPageNum(), marketQuery.getPageSize());
+        return R.ok(auctionSendService.auctionMarketList(marketQuery));
     }
 
 

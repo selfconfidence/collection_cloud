@@ -3,18 +3,15 @@ package com.manyun.business.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.domain.entity.AuctionSend;
-import com.manyun.business.domain.entity.Box;
-import com.manyun.business.domain.entity.CntCollection;
 import com.manyun.business.domain.form.AuctionSendForm;
+import com.manyun.business.domain.query.AuctionMarketQuery;
 import com.manyun.business.domain.query.AuctionSendQuery;
+import com.manyun.business.domain.vo.AuctionMarketVo;
 import com.manyun.business.domain.vo.MediaVo;
 import com.manyun.business.domain.vo.MyAuctionSendVo;
 import com.manyun.business.mapper.AuctionSendMapper;
-import com.manyun.business.service.IAuctionSendService;
+import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.manyun.business.service.IBoxService;
-import com.manyun.business.service.ICollectionService;
-import com.manyun.business.service.IMediaService;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
@@ -47,16 +44,32 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
     @Autowired
     IMediaService mediaService;
 
+    @Autowired
+    IUserCollectionService userCollectionService;
+
+    @Autowired
+    IUserBoxService userBoxService;
+
 
     @Override
     public R auctionSend(AuctionSendForm auctionSendForm, String userId) {
+        //判断是否已送拍过
+        boolean exists = this.baseMapper.exists(Wrappers.<AuctionSend>lambdaQuery()
+                .eq(AuctionSend::getMyGoodsId, auctionSendForm.getMyGoodsId())
+                .ne(AuctionSend::getAuctionStatus, AuctionStatus.BID_BREAK.getCode()));
+        if (exists) {
+            return R.fail("请勿重复送拍");
+        }
         AuctionSend auctionSend = Builder.of(AuctionSend::new)
                 .with(AuctionSend::setUserId, userId)
                 .with(AuctionSend::setAuctionStatus, AuctionStatus.WAIT_START.getCode())
+                .with(AuctionSend::setMyGoodsId, auctionSendForm.getMyGoodsId())
                 .with(AuctionSend::setGoodsId, auctionSendForm.getGoodsId())
                 .with(AuctionSend::setGoodsType, auctionSendForm.getGoodsType())
+                .with(AuctionSend::setGoodsName, auctionSendForm.getGoodsName())
                 .with(AuctionSend::setStartPrice, auctionSendForm.getStartPrice())
                 .with(AuctionSend::setSoldPrice, auctionSendForm.getSoldPrice())
+                .with(AuctionSend::setAuctionStatus, AuctionStatus.WAIT_START.getCode())
                 .with(AuctionSend::setCreatedTime, LocalDateTime.now()).build();
         return this.save(auctionSend) ? R.ok() : R.fail();
     }
@@ -73,15 +86,35 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         MyAuctionSendVo auctionSendVo = Builder.of(MyAuctionSendVo::new).build();
         BeanUtil.copyProperties(auctionSend, auctionSendVo);
         if (auctionSend.getGoodsType() == 1) {
-            CntCollection collection = collectionService.getById(auctionSend.getGoodsId());
-            auctionSendVo.setGoodsName(collection.getCollectionName());
-            List<MediaVo> mediaVos = mediaService.initMediaVos(collection.getId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
+            List<MediaVo> mediaVos = mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
             auctionSendVo.setMediaVos(mediaVos);
         }
         if (auctionSend.getGoodsType() == 2) {
-            Box box = boxService.getById(auctionSend.getGoodsId());
-            auctionSendVo.setGoodsName(box.getBoxTitle());
+            List<MediaVo> mediaVos = mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
+            auctionSendVo.setMediaVos(mediaVos);
         }
         return auctionSendVo;
     }
+
+    @Override
+    public TableDataInfo<AuctionMarketVo> auctionMarketList(AuctionMarketQuery marketQuery) {
+        List<AuctionSend> list = list(Wrappers.<AuctionSend>lambdaQuery().eq(AuctionSend::getGoodsType, marketQuery.getGoodsType())
+                .orderByDesc(AuctionSend::getCreatedTime));
+        return TableDataInfoUtil.pageTableDataInfo(list.parallelStream().map(this::providerAuctionMarketVo).collect(Collectors.toList()), list);
+    }
+
+    private AuctionMarketVo providerAuctionMarketVo (AuctionSend auctionSend) {
+        AuctionMarketVo marketVo = Builder.of(AuctionMarketVo::new).build();
+        BeanUtil.copyProperties(auctionSend, marketVo);
+        if (auctionSend.getGoodsType() == 1) {
+            marketVo.setMediaVos(mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
+        }
+        if (auctionSend.getGoodsType() == 2) {
+            marketVo.setMediaVos(mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+        }
+        return marketVo;
+    }
+
+
+
 }
