@@ -23,4 +23,6 @@ public interface IUserCollectionService extends IService<UserCollection> {
     Boolean existUserCollection(String userId, String id);
 
     void tranCollection(String tranUserId, String toUserId, String buiId);
+
+    String hideUserCollection(String buiId, String userId, String info);
 }

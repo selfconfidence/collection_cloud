@@ -3,21 +3,21 @@ package com.manyun.common.core.enums;
 import lombok.Getter;
 
 /**
- * 订单状态
- * 
+ * 资产状态
+ *
  * @author yanwei
  *
- *  1=藏品系列，2=盲盒分类
+ *1=存在,2=不存在
  */
 @Getter
-public enum CateType
+public enum CommAssetStatus
 {
-   COLLECTION_CATE(1, "藏品系列"), BOX_CATE(2, "盲盒分类");
+    USE_EXIST(Integer.valueOf(1), "存在"), NOT_EXIST(2, "不存在");
 
     private final Integer code;
     private final String info;
 
-    CateType(Integer code, String info)
+    CommAssetStatus(Integer code, String info)
     {
         this.code = code;
         this.info = info;

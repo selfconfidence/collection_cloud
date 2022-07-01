@@ -7,6 +7,7 @@ import com.manyun.business.domain.vo.*;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -34,4 +35,6 @@ public interface ICollectionService extends IService<CntCollection> {
     List<String> queryDict(String keyword);
 
     Integer tarCollection(String id, String userId);
+
+    CollectionVo getBaseCollectionVo(@NotNull String collectionId);
 }

@@ -36,4 +36,6 @@ public interface IBoxService extends IService<Box> {
     List<String> queryDict(String keyword);
 
     Integer tarBox(String id, String userId);
+
+    BoxListVo getBaseBoxListVo(String boxId);
 }

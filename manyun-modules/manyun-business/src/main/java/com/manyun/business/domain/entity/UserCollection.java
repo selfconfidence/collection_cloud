@@ -49,6 +49,10 @@ public class UserCollection implements Serializable {
     @ApiModelProperty("是否上链;1=未上链,2=已上链")
     private Integer isLink;
 
+    @ApiModelProperty("内部字段,1=存在,2=不存在(寄售回滚有用)")
+    private Integer isExist;
+
+
     @ApiModelProperty("来源")
     private String sourceInfo;
 

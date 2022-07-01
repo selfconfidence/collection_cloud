@@ -39,6 +39,9 @@ public class UserBox implements Serializable {
     @ApiModelProperty("来源")
     private String sourceInfo;
 
+    @ApiModelProperty("内部字段,1=存在,2=不存在(寄售回滚有用)")
+    private Integer isExist;
+
     @ApiModelProperty("创建人")
     private String createdBy;
 

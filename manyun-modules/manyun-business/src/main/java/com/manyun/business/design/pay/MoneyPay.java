@@ -23,8 +23,6 @@ public class MoneyPay implements RootPayServer {
     @Autowired
     private IMoneyService moneyService;
 
-    @Autowired
-    private IOrderService orderService;
 
 
     /**
@@ -39,8 +37,6 @@ public class MoneyPay implements RootPayServer {
             // 钱包自行扣除进行支付
             String formInfo = StrUtil.format("消费-{}", payInfoDto.getRealPayMoney().toString());
             moneyService.ordePay(payInfoDto.getOutHost(),payInfoDto.getUserId(),payInfoDto.getRealPayMoney(),formInfo);
-            // 调用完成订单
-            orderService.notifyPaySuccess(payInfoDto.getOutHost());
         }
         throw new IllegalArgumentException("not fount pay_type = " + payInfoDto.getPayType());
     }

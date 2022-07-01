@@ -1,5 +1,6 @@
 package com.manyun.business.service.impl;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -28,6 +29,8 @@ import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstan
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE;
 import static com.manyun.common.core.enums.CollectionLink.NOT_LINK;
 import static com.manyun.common.core.enums.CollectionLink.OK_LINK;
+import static com.manyun.common.core.enums.CommAssetStatus.NOT_EXIST;
+import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
 
 /**
  * <p>
@@ -66,6 +69,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
             userCollection.setCollectionId(buiId);
             userCollection.setUserId(userId);
             userCollection.setSourceInfo(info);
+            userCollection.setIsExist(USE_EXIST.getCode());
             userCollection.setCollectionName(collectionName);
             // 初始化 未上链过程
             userCollection.setIsLink(NOT_LINK.getCode());
@@ -98,7 +102,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
     @Override
     public Boolean existUserCollection(String userId, String id) {
         // 必须是已上链的
-        return Objects.nonNull(getOne(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getId,id).eq(UserCollection::getUserId,userId).eq(UserCollection::getIsLink,OK_LINK)));
+        return Objects.nonNull(getOne(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getIsExist,USE_EXIST.getCode()).eq(UserCollection::getId,id).eq(UserCollection::getUserId,userId).eq(UserCollection::getIsLink,OK_LINK)));
     }
 
     /**
@@ -114,7 +118,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         String formatTran = StrUtil.format("{}:藏品被赠送!",userCollection.getCollectionName());
         //TODO 转让还是重新上链?
         bindCollection(toUserId,userCollection.getCollectionId(),userCollection.getCollectionName(),format,Integer.valueOf(1));
-        //删除原始拥有者的绑定关系
+        //删除原始拥有者的绑定关系 //TODO 此处可以考虑,新增 是否存在 字段,可以用此字段做过渡....
         removeById(userCollection.getId());
         // 增加日志 ...................
         logsService.saveLogs(
@@ -129,4 +133,22 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
 
 
     }
+
+    /**
+     * 隐藏对应藏品
+     * @param buiId
+     * @param userId
+     * @param info
+     */
+    @Override
+    public String hideUserCollection(String buiId, String userId, String info) {
+        UserCollection userCollection = getOne(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getIsExist, USE_EXIST.getCode()).eq(UserCollection::getId, buiId).eq(UserCollection::getUserId, userId).eq(UserCollection::getIsLink, OK_LINK));
+        Assert.isTrue(Objects.nonNull(userCollection),"藏品有误,检查藏品是否上链!");
+        userCollection.setIsExist(NOT_EXIST.getCode());
+        userCollection.updateD(userId);
+        userCollection.setSourceInfo(StrUtil.join("\n", userCollection.getSourceInfo(),info));
+        updateById(userCollection);
+        return userCollection.getCollectionId();
+    }
+
 }

@@ -6,7 +6,6 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Maps;
 import com.manyun.business.design.pay.RootPay;
@@ -17,7 +16,6 @@ import com.manyun.business.domain.form.BoxSellForm;
 import com.manyun.business.domain.query.BoxQuery;
 import com.manyun.business.domain.vo.*;
 import com.manyun.business.mapper.BoxMapper;
-import com.manyun.business.mapper.MediaMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.constant.BusinessConstants;
@@ -31,11 +29,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.lang.System;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -188,6 +184,12 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
                         .aliPayEnum(BOX_ALI_PAY)
                         .wxPayEnum(BOX_WECHAT_PAY)
                         .userId(userId).build());
+        // 走这一步如果 是余额支付 那就说明扣款成功了！！！
+        if (MONEY_TAPE.getCode().equals(boxSellForm.getPayType())){
+            // 调用完成订单
+            orderService.notifyPaySuccess(payVo.getOutHost());
+        }
+
         return payVo;
 
 
@@ -326,6 +328,16 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
 
     }
 
+
+    /**
+     * 获取盲盒基本数据
+     * @param boxId
+     * @return
+     */
+    @Override
+    public BoxListVo getBaseBoxListVo(String boxId){
+        return initBoxListVo(getById(boxId));
+    }
 
     /**
      * 转义数据

@@ -31,6 +31,8 @@ import java.util.Objects;
 import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.POLL_SOURCE;
 import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.PULL_SOURCE;
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE;
+import static com.manyun.common.core.enums.CommAssetStatus.NOT_EXIST;
+import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
 
 /**
  * <p>
@@ -85,6 +87,7 @@ public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> impl
             userBox.setBoxId(buiId);
             userBox.setId(IdUtil.getSnowflake().nextIdStr());
             userBox.createD(userId);
+            userBox.setIsExist(USE_EXIST.getCode());
             userBox.setSourceInfo(sourceInfo);
             userBox.setBoxOpen(BoxOpenType.NO_OPEN.getCode());
             userBoxList.add(userBox);
@@ -110,7 +113,7 @@ public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> impl
      */
     @Override
     public Boolean existUserBox(String userId, String id){
-        return Objects.nonNull(getOne(Wrappers.<UserBox>lambdaQuery().eq(UserBox::getUserId,userId).eq(UserBox::getBoxId,id).eq(UserBox::getBoxOpen,BoxOpenType.NO_OPEN.getCode())));
+        return Objects.nonNull(getOne(Wrappers.<UserBox>lambdaQuery().eq(UserBox::getIsExist,USE_EXIST.getCode()).eq(UserBox::getUserId,userId).eq(UserBox::getId,id).eq(UserBox::getBoxOpen,BoxOpenType.NO_OPEN.getCode())));
     }
 
 
@@ -144,5 +147,22 @@ public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> impl
       ,StepDto.builder().buiId(buiId).userId(toUserId).modelType(BOX_MODEL_TYPE).reMark("受让方").formInfo(format).build()
       );
 
+    }
+
+    /**
+     * 隐藏 当前盲盒
+     * @param buiId
+     * @param userId
+     * @param info
+     */
+    @Override
+    public String hideUserBox(String buiId, String userId, String info) {
+        UserBox userBox = getOne(Wrappers.<UserBox>lambdaQuery().eq(UserBox::getIsExist, USE_EXIST.getCode()).eq(UserBox::getUserId, userId).eq(UserBox::getId, buiId).eq(UserBox::getBoxOpen, BoxOpenType.NO_OPEN.getCode()));
+        Assert.isTrue(Objects.nonNull(userBox),"盲盒有误,请核实盲盒是否存在!");
+        userBox.setIsExist(NOT_EXIST.getCode());
+        userBox.setSourceInfo(StrUtil.join("\n", userBox.getSourceInfo(),info));
+        userBox.updateD(userId);
+        updateById(userBox);
+        return userBox.getBoxId();
     }
 }

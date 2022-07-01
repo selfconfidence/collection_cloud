@@ -30,11 +30,20 @@ public interface BusinessConstants {
      */
     interface SystemTypeConstant{
 
-        // 订单到期时间
+        /**
+         *  订单到期时间
+         */
         String ORDER_END_TIME= "ORDER_PAY_END";
 
-        // 是否开启转增
+        /**
+         * 是否开启转增
+         */
         String TRAN_ACC= "TRAN_ACC";
+
+        /**
+         * 寄售手续费
+         */
+        String  CONSIGNMENT_SERVER_CHARGE = "consignment_server_chage";
 
     }
 

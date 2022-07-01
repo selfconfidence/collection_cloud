@@ -63,6 +63,9 @@
         <if test="userId != null">
             uc.user_id = #{userId}
         </if>
+        <if test="true">
+            and   uc.is_exist = 1
+         </if>
     </where>
     order by uc.created_time desc
     </select>

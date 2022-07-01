@@ -43,6 +43,10 @@
             <if test="userId != null">
                 c.user_id = #{userId}
             </if>
+
+             <if test="true">
+                 and   c.is_exist = 1
+             </if>
         </where>
         order by c.created_time desc
     </select>

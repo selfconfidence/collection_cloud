@@ -28,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -172,6 +173,11 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
                         .aliPayEnum(BOX_ALI_PAY)
                         .wxPayEnum(BOX_WECHAT_PAY)
                         .userId(userId).build());
+        // 走这一步如果 是余额支付 那就说明扣款成功了！！！
+        if (MONEY_TAPE.getCode().equals(collectionSellForm.getPayType())){
+            // 调用完成订单
+            orderService.notifyPaySuccess(payVo.getOutHost());
+        }
         return payVo;
     }
 
@@ -311,6 +317,16 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         collectionVo.setCnfCreationdVo(initCnfCreationVo(CntCollection.getBindCreation()));
         collectionVo.setCateVo(initCateVo(CntCollection.getCateId()));
         return collectionVo;
+    }
+
+    /**
+     * 封装基础藏品信息
+     * @param collectionId
+     * @return
+     */
+    @Override
+    public CollectionVo getBaseCollectionVo(@NotNull String collectionId){
+        return providerCollectionVo(getById(collectionId));
     }
 
     /**
