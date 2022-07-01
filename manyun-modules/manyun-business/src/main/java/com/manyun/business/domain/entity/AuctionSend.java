@@ -47,6 +47,18 @@ public class AuctionSend implements Serializable {
     @ApiModelProperty("一口价")
     private BigDecimal soldPrice;
 
+    @ApiModelProperty("当前价")
+    private BigDecimal nowPrice;
+
+    @ApiModelProperty("保证金")
+    private BigDecimal margin;
+
+    @ApiModelProperty("佣金")
+    private BigDecimal commission;
+
+    @ApiModelProperty("收藏人数")
+    private Integer concernedNum;
+
     @ApiModelProperty("拍卖状态;1待开始，2竞拍中，3待支付，4已完成，5已违约，6已流拍")
     private Integer auctionStatus;
 

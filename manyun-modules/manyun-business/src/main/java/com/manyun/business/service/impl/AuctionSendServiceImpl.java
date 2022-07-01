@@ -68,6 +68,7 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
                 .with(AuctionSend::setGoodsType, auctionSendForm.getGoodsType())
                 .with(AuctionSend::setGoodsName, auctionSendForm.getGoodsName())
                 .with(AuctionSend::setStartPrice, auctionSendForm.getStartPrice())
+                .with(AuctionSend::setNowPrice, auctionSendForm.getStartPrice())
                 .with(AuctionSend::setSoldPrice, auctionSendForm.getSoldPrice())
                 .with(AuctionSend::setAuctionStatus, AuctionStatus.WAIT_START.getCode())
                 .with(AuctionSend::setCreatedTime, LocalDateTime.now()).build();
