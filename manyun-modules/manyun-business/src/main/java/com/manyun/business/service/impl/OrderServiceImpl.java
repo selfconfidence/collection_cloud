@@ -6,9 +6,11 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.manyun.business.domain.dto.OrderCreateDto;
 import com.manyun.business.domain.entity.Box;
 import com.manyun.business.domain.entity.CntCollection;
+import com.manyun.business.domain.entity.CntConsignment;
 import com.manyun.business.domain.entity.Order;
 import com.manyun.business.domain.query.OrderQuery;
 import com.manyun.business.domain.vo.OrderVo;
@@ -25,11 +27,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+import static com.manyun.common.core.enums.ConsignmentStatus.LOCK_CONSIGN;
+import static com.manyun.common.core.enums.ConsignmentStatus.OVER_CONSIGN;
+import static com.manyun.common.core.enums.ConsignmentToPayStatus.WAIT_TO_PAY;
 import static com.manyun.common.core.enums.OrderStatus.*;
 
 /**
@@ -84,6 +90,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Autowired
     private ObjectFactory<ICollectionService> collectionService;
 
+    @Autowired
+    private ObjectFactory<ICntConsignmentService> cntConsignmentServiceObjectFactory;
+
     /**
      * 创建订单 ,进行订单初始化
      * @param orderCreateDto  实际支付金额
@@ -91,6 +100,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      */
     @Override
     public String createOrder(OrderCreateDto orderCreateDto) {
+        return createOrder(orderCreateDto,systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class),(string)->{});
+    }
+
+    @Override
+    public String createConsignmentOrder(OrderCreateDto orderCreateDto, Consumer<String> consumer){
+        return createOrder(orderCreateDto,systemService.getVal(BusinessConstants.SystemTypeConstant.CONSIGNMENT_ORDER_TIME, Integer.class),consumer);
+    }
+
+    private String createOrder(OrderCreateDto orderCreateDto,Integer serviceVal, Consumer<String> consumer){
         Order order = Builder.of(Order::new).build();
         BeanUtil.copyProperties(orderCreateDto,order);
         order.createD(orderCreateDto.getUserId());
@@ -103,9 +121,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setOrderStatus(WAIT_ORDER.getCode());
         order.setPayTime(LocalDateTime.now());
         // 截止到什么是否到达付款时间 小时为单位
-        Integer serviceVal = systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class);
+       // Integer serviceVal = systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class);
         order.setEndTime(LocalDateTime.now().plusHours(serviceVal));
         save(order);
+        consumer.accept(idStr);
         return orderNo;
     }
 
@@ -152,6 +171,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     public synchronized  void timeCancel(){
         List<Order> orderList = list(Wrappers.<Order>lambdaQuery().eq(Order::getOrderStatus, WAIT_ORDER.getCode()).lt(Order::getEndTime, LocalDateTime.now()));
         if (orderList.isEmpty()) return;
+        List<CntConsignment> cntConsignments = cntConsignmentServiceObjectFactory.getObject().list(Wrappers.<CntConsignment>lambdaQuery().in(CntConsignment::getOrderId, orderList.parallelStream().map(item -> item.getId()).collect(Collectors.toSet())).eq(CntConsignment::getConsignmentStatus, LOCK_CONSIGN.getCode()));
+        Set<String> cntConsignmentOrderIds = Sets.newHashSet();
+        if (!cntConsignments.isEmpty()){
+            // 寄售相关判定
+            cntConsignmentOrderIds.addAll(cntConsignments.parallelStream().map(item -> item.getOrderId()).collect(Collectors.toSet()));
+            // 寄售信息修改
+            cntConsignmentServiceObjectFactory.getObject().reLoadConsignments(cntConsignments);
+        }
         // 批量更改订单状态
         List<Order> updateSOrder = orderList.parallelStream().map(item -> {
             item.setOrderStatus(CANCEL_ORDER.getCode());
@@ -159,12 +186,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             return item;
         }).collect(Collectors.toList());
         updateBatchById(updateSOrder);
-        // 对应的库存 +++
+        // 对应的库存 ++
         // 缓存盲盒库存
         HashMap<String, Integer> cacheBoxMap = Maps.newHashMap();
         // 缓存藏品库存
         HashMap<String, Integer> cacheCollectionMap = Maps.newHashMap();
         for (Order order : orderList) {
+            // 如果是寄售的额外计算
+            if (cntConsignmentOrderIds.contains(order.getId()))continue;
+
             if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(order.getGoodsType())){
                 // 盲盒
                 cacheBoxMap.merge(order.getBuiId(),order.getGoodsNum(),(oldVal,newVal) ->oldVal + newVal);
@@ -197,6 +227,36 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     }
 
+    /**
+     * 寄售市场 回调订单成功项
+     * @param outHost
+     */
+    @Override
+    public void notifyPayConsignmentSuccess(String outHost) {
+/*        Order order = getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, outHost));
+        Assert.isTrue(Objects.nonNull(order),"找不到对应订单编号!");
+        Assert.isTrue(WAIT_ORDER.getCode().equals(order.getOrderStatus()),"订单状态有误,请核实!");
+        // 更改订单状态, 绑定对应的 （藏品/盲盒）
+        order.setOrderStatus(OVER_ORDER.getCode());
+        order.updateD(order.getUserId());
+        updateById(order);*/
+        // 1. 修改 当前订单状态  // 绑定到 买方
+        notifyPaySuccess(outHost);
+
+        // 2. 寄售人已经解除绑定关系了 -- 无需判定
+
+        // 3. 修改当前寄售信息，等待后台审核  打款
+        ICntConsignmentService consignmentService = cntConsignmentServiceObjectFactory.getObject();
+        Order order = getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, outHost));
+        CntConsignment cntConsignment = consignmentService.getOne(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getOrderId, order.getId()));
+        Assert.isTrue(Objects.nonNull(cntConsignment), "找不到对应寄售交易信息,请核实!");
+        cntConsignment.updateD(cntConsignment.getSendUserId());
+        cntConsignment.setConsignmentStatus(OVER_CONSIGN.getCode());
+        cntConsignment.setFormInfo("买方已经支付!");
+        cntConsignment.setToPay(WAIT_TO_PAY.getCode());
+        consignmentService.updateById(cntConsignment);
+
+    }
 
 
 }

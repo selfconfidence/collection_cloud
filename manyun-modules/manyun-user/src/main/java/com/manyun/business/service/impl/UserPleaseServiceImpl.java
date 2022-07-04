@@ -120,7 +120,7 @@ public class UserPleaseServiceImpl extends ServiceImpl<UserPleaseMapper, UserPle
         save(userPlease);
         // 进行绑定
         String source = StrUtil.format("推荐人数满{}领取获得盲盒", userRealCount);
-        R<String> stringR = remoteBoxService.openPleaseBox(OpenPleaseBoxDto.builder().goodsNum(Integer.valueOf(1)).boxId(pleaseBox.getBoxId()).sourceInfo(source).userId(userId).build());
+        R<String> stringR = remoteBoxService.openPleaseBox(OpenPleaseBoxDto.builder().goodsNum(Integer.valueOf(1)).boxId(pleaseBox.getBoxId()).sourceInfo(source).userId(userId).build(),SecurityConstants.INNER);
         if (CodeStatus.SUCCESS.getCode().equals(stringR.getCode()))
             return source;
         throw new ServiceException(stringR.getMsg());

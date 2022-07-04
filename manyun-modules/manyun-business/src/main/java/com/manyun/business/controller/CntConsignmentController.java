@@ -1,8 +1,12 @@
 package com.manyun.business.controller;
+import com.manyun.business.domain.form.ConsignmentSellForm;
 import com.manyun.business.domain.form.UserConsignmentForm;
+import com.manyun.business.domain.query.ConsignmentOrderQuery;
 import com.manyun.business.domain.query.ConsignmentQuery;
 import com.manyun.business.domain.vo.ConsignmentBoxListVo;
 import com.manyun.business.domain.vo.ConsignmentCollectionListVo;
+import com.manyun.business.domain.vo.ConsignmentOrderVo;
+import com.manyun.business.domain.vo.PayVo;
 import com.manyun.business.service.ICntConsignmentService;
 import com.manyun.business.service.ISystemService;
 import com.manyun.comm.api.model.LoginBusinessUser;
@@ -66,19 +70,20 @@ public class CntConsignmentController {
     }
 
     @PostMapping("/businessConsignment")
-    @ApiOperation("寄售市场进行交易")
-    public R businessConsignment(){
-
-        return R.ok();
+    @ApiOperation(value = "寄售市场进行交易",notes = "对某个 资产 进行购买")
+    public R<PayVo> businessConsignment(@RequestBody @Valid ConsignmentSellForm consignmentSellForm){
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        String payUserId = notNullLoginBusinessUser.getUserId();
+        PayVo payVo =  cntConsignmentService.businessConsignment(payUserId,consignmentSellForm);
+        return R.ok(payVo);
     }
 
 
     @PostMapping("/consignmentPageOrder")
     @ApiOperation(value = "寄售订单",notes = "寄售方的订单\n买方还是到我的订单流程中！！！")
-    public R consignmentPageOrder(){
-
-
-        return R.ok();
+    public R<TableDataInfo<ConsignmentOrderVo>> consignmentPageOrder(@RequestBody ConsignmentOrderQuery consignmentOrderQuery){
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return R.ok(cntConsignmentService.consignmentPageOrder(notNullLoginBusinessUser.getUserId(),consignmentOrderQuery));
     }
 
 }

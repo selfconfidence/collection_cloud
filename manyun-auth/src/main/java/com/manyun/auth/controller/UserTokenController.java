@@ -6,6 +6,7 @@ import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.domain.vo.AccTokenVo;
 import com.manyun.comm.api.model.LoginPhoneCodeForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.CodeStatus;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.security.service.UserTokenService;
@@ -41,7 +42,7 @@ public class UserTokenController {
     @ApiOperation(value = "用户登录",notes = "用户账号密码登录")
     public R<AccTokenVo> login(@RequestBody @Valid LoginPhoneForm loginPhoneForm)
     {
-        R<CntUserDto> userR = remoteBuiUserService.login(loginPhoneForm);
+        R<CntUserDto> userR = remoteBuiUserService.login(loginPhoneForm, SecurityConstants.INNER);
         Assert.isTrue(userR.getCode() == CodeStatus.SUCCESS.getCode(),userR.getMsg());
         CntUserDto userRData = userR.getData();
         // 用户登录
@@ -52,7 +53,7 @@ public class UserTokenController {
     @PostMapping("/codeLogin")
     @ApiOperation(value = "用户验证码登录",notes = "验证码登录")
     public R<AccTokenVo> codeLogin(@RequestBody LoginPhoneCodeForm loginPhoneCodeForm){
-        R<CntUserDto> cntUserR = remoteBuiUserService.codeLogin(loginPhoneCodeForm);
+        R<CntUserDto> cntUserR = remoteBuiUserService.codeLogin(loginPhoneCodeForm,SecurityConstants.INNER);
         Assert.isTrue(cntUserR.getCode() == CodeStatus.SUCCESS.getCode(),cntUserR.getMsg());
         CntUserDto userRData = cntUserR.getData();
         return R.ok(userTokenService.createToken(userRData));

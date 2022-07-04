@@ -45,6 +45,11 @@ public interface BusinessConstants {
          */
         String  CONSIGNMENT_SERVER_CHARGE = "consignment_server_chage";
 
+        /**
+         * 寄售订单到期时间
+         */
+        String  CONSIGNMENT_ORDER_TIME =  "consignment_order_time";
+
     }
 
 

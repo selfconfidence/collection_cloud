@@ -20,10 +20,10 @@ public interface RemoteBuiUserService {
      * 用户登录
      */
      @PostMapping("/cntUser/login")
-     R<CntUserDto> login(@RequestBody LoginPhoneForm loginPhoneForm);
+     R<CntUserDto> login(@RequestBody LoginPhoneForm loginPhoneForm,@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 
      @PostMapping("/cntUser/codeLogin")
-     R<CntUserDto> codeLogin(@RequestBody LoginPhoneCodeForm loginPhoneCodeForm);
+     R<CntUserDto> codeLogin(@RequestBody LoginPhoneCodeForm loginPhoneCodeForm,@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 
     @GetMapping("/cntUser/commUni/{commUni}")
     R<CntUserDto> commUni(@PathVariable(name = "commUni") String commUni, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);

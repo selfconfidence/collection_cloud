@@ -7,14 +7,21 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
+import com.manyun.business.design.pay.RootPay;
+import com.manyun.business.domain.dto.OrderCreateDto;
+import com.manyun.business.domain.dto.PayInfoDto;
 import com.manyun.business.domain.entity.Box;
 import com.manyun.business.domain.entity.CntCollection;
 import com.manyun.business.domain.entity.CntConsignment;
 import com.manyun.business.domain.entity.Order;
+import com.manyun.business.domain.form.ConsignmentSellForm;
 import com.manyun.business.domain.form.UserConsignmentForm;
+import com.manyun.business.domain.query.ConsignmentOrderQuery;
 import com.manyun.business.domain.query.ConsignmentQuery;
 import com.manyun.business.domain.vo.ConsignmentBoxListVo;
 import com.manyun.business.domain.vo.ConsignmentCollectionListVo;
+import com.manyun.business.domain.vo.ConsignmentOrderVo;
+import com.manyun.business.domain.vo.PayVo;
 import com.manyun.business.mapper.CntConsignmentMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -36,7 +43,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
+import static com.manyun.common.core.enums.AliPayEnum.CONSIGNMENT_ALI_PAY;
 import static com.manyun.common.core.enums.ConsignmentStatus.*;
+import static com.manyun.common.core.enums.PayTypeEnum.MONEY_TAPE;
+import static com.manyun.common.core.enums.WxPayEnum.BOX_WECHAT_PAY;
+import static com.manyun.common.core.enums.WxPayEnum.CONSIGNMENT_WECHAT_PAY;
 
 /**
  * <p>
@@ -70,6 +82,9 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
 
     @Autowired
     private IOrderService orderService;
+
+    @Autowired
+    private RootPay rootPay;
 
 
     /**
@@ -143,6 +158,141 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         List<CntConsignment> cntConsignments = list(lambdaQueryWrapper);
         // 组合数据
         return TableDataInfoUtil.pageTableDataInfo(encapsulationBoxListVo(cntConsignments),cntConsignments);
+    }
+
+    /**
+     * 分页查询寄售订单列表
+     * @param userId
+     * @param consignmentOrderQuery
+     * @return
+     */
+    @Override
+    public TableDataInfo<ConsignmentOrderVo> consignmentPageOrder(String userId, ConsignmentOrderQuery consignmentOrderQuery) {
+        PageHelper.startPage(consignmentOrderQuery.getPageNum(),consignmentOrderQuery.getPageSize());
+        LambdaQueryWrapper<CntConsignment> queryWrapper = Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getSendUserId, userId).eq(Objects.nonNull(consignmentOrderQuery.getConsignmentStatus()), CntConsignment::getConsignmentStatus, consignmentOrderQuery.getConsignmentStatus()).orderByDesc(CntConsignment::getCreatedTime);
+        List<CntConsignment> cntConsignments = list(queryWrapper);
+        return TableDataInfoUtil.pageTableDataInfo(cntConsignments.parallelStream().map(this::initConsignmentOrderVo).collect(Collectors.toList()), cntConsignments);
+    }
+
+    /**
+     *
+     * @param payUserId  购买者用户编号
+     * @param consignmentSellForm  寄售提交表单
+     *
+     * 对应寄售资产进行 购买操作!!!
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public synchronized PayVo businessConsignment(String payUserId, ConsignmentSellForm consignmentSellForm) {
+        CntConsignment consignment = getById(consignmentSellForm.getBuiId());
+        // 校验 购买条件是否符合！！！
+        checkBusinessConsignment(payUserId,consignment);
+
+        // 为买方新增订单！！！
+        String hostOut = orderService.createConsignmentOrder(OrderCreateDto.builder()
+                .orderAmount(consignment.getConsignmentPrice())
+                .buiId(consignment.getRealBuiId())
+                .payType(consignmentSellForm.getPayType())
+                .goodsType(consignment.getIsType())
+                .collectionName(consignment.getBuiName())
+                .goodsNum(Integer.valueOf(1))
+                .userId(payUserId).build(),(idStr)-> consignment.setOrderId(idStr));
+
+
+        /**
+         * 根据类型  发起支付订单
+         * 余额支付直接扣除 订单状态做变更即可
+         **/
+        PayVo payVo =  rootPay.execPayVo(
+                PayInfoDto.builder()
+                        .payType(consignmentSellForm.getPayType())
+                        .realPayMoney(consignment.getConsignmentPrice())
+                        .outHost(hostOut)
+                        .aliPayEnum(CONSIGNMENT_ALI_PAY)
+                        .wxPayEnum(CONSIGNMENT_WECHAT_PAY)
+                        .userId(payUserId).build());
+
+        // 修改寄售信息
+        consignment.updateD(payUserId);
+        consignment.setPayUserId(payUserId);
+        consignment.setFormInfo("资产已被锁单,等待买家付款.");
+        consignment.setConsignmentStatus(LOCK_CONSIGN.getCode());
+        updateById(consignment);
+
+
+        // 如果说是 余额支付的,并且 将对应的状态都进行修复下
+        if (MONEY_TAPE.getCode().equals(consignmentSellForm.getPayType())){
+            // 调用完成订单
+            orderService.notifyPayConsignmentSuccess(payVo.getOutHost());
+
+        }
+        return payVo;
+    }
+
+    /**
+     * 批量更改寄售状态  未支付成功,全部重置即可
+     * @param cntConsignments
+     */
+    @Override
+    public void reLoadConsignments(List<CntConsignment> cntConsignments) {
+        String format = StrUtil.format("未到支付时间支付,已经取消！");
+        for (CntConsignment cntConsignment : cntConsignments) {
+            cntConsignment.setConsignmentStatus(PUSH_CONSIGN.getCode());
+            cntConsignment.setFormInfo(format);
+            cntConsignment.updateD(cntConsignment.getPayUserId());
+
+        }
+           updateBatchById(cntConsignments);
+    }
+
+    /**
+     * 校验是否 满足购买条件
+     * @param payUserId
+     * @param consignment
+     */
+    private void checkBusinessConsignment(String payUserId, CntConsignment consignment) {
+        // 1.当前用户是否有对应未支付的订单
+        //是否有未支付订单
+        List<Order> orders = orderService.checkUnpaidOrder(payUserId);
+        Assert.isFalse(orders.size() > 0 ,"您有未支付订单，暂不可购买");
+        // 此寄售是否 状态是否正确！！！
+        Assert.isTrue(PUSH_CONSIGN.equals(consignment.getConsignmentStatus()),"当前寄售资产已被锁单,请稍后重试!");
+
+
+
+
+    }
+
+    /**
+     * 组装 寄售订单视图信息
+     * @param cntConsignment
+     * @return
+     */
+    private ConsignmentOrderVo initConsignmentOrderVo(CntConsignment cntConsignment) {
+        ConsignmentOrderVo consignmentOrderVo = Builder.of(ConsignmentOrderVo::new).build();
+        consignmentOrderVo.setCntUserDto(remoteBuiUserService.commUni(cntConsignment.getSendUserId(),  SecurityConstants.INNER).getData());
+        consignmentOrderVo.setId(cntConsignment.getId());
+        consignmentOrderVo.setConsignmentStatus(cntConsignment.getConsignmentStatus());
+        consignmentOrderVo.setCreatedTime(cntConsignment.getCreatedTime());
+        // 需要验证订单 才可以拿到此值
+        if (LOCK_CONSIGN.getCode().equals(cntConsignment.getConsignmentStatus()) && StrUtil.isNotBlank(cntConsignment.getOrderId())){
+            // 订单查询 将剩余支付时间补足即可
+            Order order = orderService.getById(cntConsignment.getOrderId());
+            consignmentOrderVo.setEndPayTime(order.getEndTime());
+        }
+        //验证是 藏品信息 还是 盲盒信息
+        if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(cntConsignment.getIsType()))
+            //藏品
+            consignmentOrderVo.setCollectionVo(collectionService.getBaseCollectionVo(cntConsignment.getRealBuiId()));
+
+        if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(cntConsignment.getIsType()))
+            // 盲盒
+            consignmentOrderVo.setBoxListVo(boxService.getBaseBoxListVo(cntConsignment.getRealBuiId()));
+
+
+
+
+        return consignmentOrderVo;
     }
 
     private List<ConsignmentBoxListVo> encapsulationBoxListVo(List<CntConsignment> cntConsignments) {

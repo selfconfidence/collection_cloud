@@ -26,12 +26,12 @@ public class RemoteBuiUserFallbackFactory implements FallbackFactory<RemoteBuiUs
         log.error("业务用户服务调用失败:{}", throwable.getMessage());
         return new RemoteBuiUserService() {
             @Override
-            public R<CntUserDto> login(LoginPhoneForm loginPhoneForm) {
+            public R<CntUserDto> login(LoginPhoneForm loginPhoneForm, String source) {
                 return R.fail("登录失败:" + throwable.getMessage());
             }
 
             @Override
-            public R<CntUserDto> codeLogin(LoginPhoneCodeForm loginPhoneCodeForm) {
+            public R<CntUserDto> codeLogin(LoginPhoneCodeForm loginPhoneCodeForm, String source) {
                 return R.fail("登录失败:" + throwable.getMessage());
             }
 

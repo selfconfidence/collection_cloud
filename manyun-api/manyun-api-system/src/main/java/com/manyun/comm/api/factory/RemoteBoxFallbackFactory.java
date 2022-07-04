@@ -24,7 +24,7 @@ public class RemoteBoxFallbackFactory implements FallbackFactory<RemoteBoxServic
         log.error("业务盲盒服务调用失败:{}", throwable.getMessage());
         return new RemoteBoxService() {
             @Override
-            public R openPleaseBox(OpenPleaseBoxDto pleaseBoxDto) {
+            public R openPleaseBox(OpenPleaseBoxDto pleaseBoxDto, String source) {
                 return R.fail("操作失败:" + throwable.getMessage());
             }
         };

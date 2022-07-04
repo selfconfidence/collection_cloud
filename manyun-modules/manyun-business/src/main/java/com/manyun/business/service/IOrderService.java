@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import java.math.BigDecimal;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * <p>
@@ -37,7 +39,11 @@ public interface IOrderService extends IService<Order> {
      */
     String createOrder(OrderCreateDto orderCreateDto);
 
+    String createConsignmentOrder(OrderCreateDto orderCreateDto, Consumer<String> consumer);
+
     void notifyPaySuccess(String outHost);
 
     void timeCancel();
+
+    void notifyPayConsignmentSuccess(String outHost);
 }

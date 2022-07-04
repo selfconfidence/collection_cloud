@@ -45,7 +45,7 @@ public class BannerController {
      * @return
      */
     @GetMapping("/list/{type}")
-    @ApiOperation(value = "查询轮播列表,最多只返回6条",notes = "无需查询轮播详情，根据返回的 jumpLink 标识符去判定流转逻辑")
+    @ApiOperation(value = "查询轮播列表,最多只返回6条",notes = "无需查询轮播详情，根据返回的 jumpLink 标识符去判定流转逻辑\n1=首页轮播,2=竞拍轮播")
     public R<List<BannerVo>> list(@PathVariable Integer type){
         //LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(bannerService.list(Wrappers.<Banner>lambdaQuery().eq(Banner::getBannerType,type).orderByDesc(Banner::getCreatedTime,Banner::getUpdatedTime).last(" limit 6")).parallelStream().map(item ->{
