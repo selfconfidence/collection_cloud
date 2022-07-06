@@ -79,8 +79,8 @@ public interface BusinessConstants {
 
     interface RedisDict{
         String PHONE_CODE = "phone:code:";
-        // 验证码过期时间 10 秒
-        Integer EXP_TIME = Integer.valueOf(10);
+        // 验证码过期时间 60 秒
+        Integer EXP_TIME = Integer.valueOf(60);
     }
 
 

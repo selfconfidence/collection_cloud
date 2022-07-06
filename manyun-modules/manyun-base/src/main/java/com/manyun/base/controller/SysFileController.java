@@ -1,5 +1,6 @@
 package com.manyun.base.controller;
 
+import com.manyun.base.utils.AliUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -32,16 +33,13 @@ public class SysFileController
      */
     @PostMapping("upload")
     @ApiOperation(value = "文件上传api",notes = "支持单文件上传")
-    public R<SysFile> upload(MultipartFile file)
+    public R<String> upload(MultipartFile file)
     {
         try
         {
             // 上传并返回访问地址
-            String url = sysFileService.uploadFile(file);
-            SysFile sysFile = new SysFile();
-            sysFile.setName(FileUtils.getName(url));
-            sysFile.setUrl(url);
-            return R.ok(sysFile);
+            String url = AliUtil.uploadImage(file.getInputStream(),file.getOriginalFilename());
+            return R.ok(url);
         }
         catch (Exception e)
         {

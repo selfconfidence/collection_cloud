@@ -36,7 +36,7 @@ public class CntUser implements Serializable {
     @ApiModelProperty("区块链地址")
     private String linkAddr;
 
-    @ApiModelProperty("是否实名;1=未实名,1=实名")
+    @ApiModelProperty("是否实名;1=未实名,2=实名")
     private Integer isReal;
 
     @ApiModelProperty("邀请码;用户初始化生成")

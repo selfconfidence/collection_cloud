@@ -18,6 +18,7 @@ import com.manyun.business.service.IUserPleaseService;
 import com.manyun.business.domain.entity.CntUser;
 import com.manyun.comm.api.model.LoginPhoneForm;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.enums.UserRealStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -149,6 +150,21 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     @Override
     public CntUser commUni(String commUni) {
         return getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getUserId, commUni).or().eq(CntUser::getLinkAddr, commUni).or().eq(CntUser::getId,commUni).or().eq(CntUser::getPhone, commUni));
+    }
+
+
+    /**
+     * 实名认证  乐观执行
+     * @param userId
+     * @return
+     */
+    public void optimisticRealUser(String userId){
+        CntUser cntUser = getById(userId);
+        cntUser.setIsReal(OK_REAL.getCode());
+        //TODO 生成链上地址
+        //cntUser.setLinkAddr();
+        cntUser.updateD(userId);
+        updateById(cntUser);
     }
 
     private UserInfoVo initUserLevelVo(CntUser cntUser) {

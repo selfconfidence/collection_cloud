@@ -2,6 +2,8 @@ package com.manyun.base.controller;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.RandomUtil;
+import com.manyun.base.utils.AliUtil;
+import com.manyun.common.core.domain.CodeStatus;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.redis.service.RedisService;
 import io.swagger.annotations.Api;
@@ -29,10 +31,12 @@ public class BaseController {
     @ApiOperation(value = "发送验证码",notes = "测试阶段返回 code 编码")
     public R<String> sendPhone(@PathVariable String phone){
         Object cacheObject = redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(phone));
-        Assert.isTrue(Objects.isNull(cacheObject),"未过期,请稍后重试!");
+        if (Objects.nonNull(cacheObject))
+            return R.fail(CodeStatus.PLEASE_WAIT.getCode().intValue(),"未过期,请稍后重试!");
         // 发送验证码
-        String code = RandomUtil.randomString(6);
-        redisService.redisTemplate.opsForValue().set(PHONE_CODE.concat(phone),code,EXP_TIME, TimeUnit.MINUTES);
-        return R.ok(code);
+        String code = RandomUtil.randomNumbers(6);
+        AliUtil.sendSms(phone,code);
+        redisService.redisTemplate.opsForValue().set(PHONE_CODE.concat(phone),code,EXP_TIME, TimeUnit.SECONDS);
+        return R.ok();
     }
 }

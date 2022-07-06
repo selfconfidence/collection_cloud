@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.RandomAccessFile;
 import java.math.BigDecimal;
 
 /**
@@ -80,7 +81,7 @@ public class CntConsignmentController {
 
 
     @PostMapping("/consignmentPageOrder")
-    @ApiOperation(value = "寄售订单",notes = "寄售方的订单\n买方还是到我的订单流程中！！！")
+    @ApiOperation(value = "寄售订单列表",notes = "寄售方的订单\n买方还是到我的订单流程中！！！")
     public R<TableDataInfo<ConsignmentOrderVo>> consignmentPageOrder(@RequestBody ConsignmentOrderQuery consignmentOrderQuery){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(cntConsignmentService.consignmentPageOrder(notNullLoginBusinessUser.getUserId(),consignmentOrderQuery));

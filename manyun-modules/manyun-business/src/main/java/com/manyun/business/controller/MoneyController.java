@@ -77,6 +77,7 @@ public class MoneyController extends BaseController {
 
     @PostMapping("/fullMoney")
     @ApiOperation("钱包充值")
+    @Deprecated
     public R fullMoney(){
         //TODO 调取第三方支付, 暂未实现
         return R.ok();

@@ -257,9 +257,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         Assert.isFalse(orders.size() > 0 ,"您有未支付订单，暂不可购买");
         // 此寄售是否 状态是否正确！！！
         Assert.isTrue(PUSH_CONSIGN.equals(consignment.getConsignmentStatus()),"当前寄售资产已被锁单,请稍后重试!");
-
-
-
+        Assert.isFalse(payUserId.equals(consignment.getSendUserId()),"自己不可购买自己寄售的产品!");
 
     }
 
@@ -288,9 +286,6 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(cntConsignment.getIsType()))
             // 盲盒
             consignmentOrderVo.setBoxListVo(boxService.getBaseBoxListVo(cntConsignment.getRealBuiId()));
-
-
-
 
         return consignmentOrderVo;
     }
