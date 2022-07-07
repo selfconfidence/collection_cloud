@@ -37,4 +37,7 @@ public class CnfCreationdVo implements Serializable {
     @ApiModelProperty("创作者简介")
     private String creationInfo;
 
+    @ApiModelProperty("创作者链地址")
+    private String linkAddr;
+
 }
