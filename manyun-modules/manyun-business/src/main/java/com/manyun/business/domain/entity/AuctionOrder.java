@@ -29,17 +29,8 @@ public class AuctionOrder implements Serializable {
     @ApiModelProperty("用户id")
     private String userId;
 
-    @ApiModelProperty("创建人")
-    private String createdBy;
-
-    @ApiModelProperty("创建时间")
-    private LocalDateTime createdTime;
-
-    @ApiModelProperty("更新人")
-    private String updatedBy;
-
-    @ApiModelProperty("更新时间")
-    private LocalDateTime updatedTime;
+    @ApiModelProperty("订单号")
+    private String orderNo;
 
     @ApiModelProperty("商品类型;1藏品，2盲盒")
     private Integer goodsType;
@@ -71,7 +62,44 @@ public class AuctionOrder implements Serializable {
     @ApiModelProperty("佣金")
     private BigDecimal commission;
 
+    @ApiModelProperty("支付方式;0平台，1支付宝，2微信，3银联")
+    private Integer payType;
+
+    @ApiModelProperty("订单金额")
+    private BigDecimal orderAmount;
+
+    @ApiModelProperty("付款截止时间")
+    private LocalDateTime endTime;
+
+    @ApiModelProperty("付款时间")
+    private LocalDateTime payTime;
+
     @ApiModelProperty("拍卖状态;1竞拍中，2待支付，3已支付，4已违约")
     private Integer auctionStatus;
+
+    @ApiModelProperty("创建人")
+    private String createdBy;
+
+    @ApiModelProperty("创建时间")
+    private LocalDateTime createdTime;
+
+    @ApiModelProperty("更新人")
+    private String updatedBy;
+
+    @ApiModelProperty("更新时间")
+    private LocalDateTime updatedTime;
+
+    public void createD(String createId){
+        this.createdBy = createId;
+        this.createdTime = LocalDateTime.now();
+        if (this.createdTime != null)
+            this.updatedTime = this.createdTime;
+        this.updatedBy = this.createdBy;
+    }
+
+    public void updateD(String updateId){
+        this.updatedBy = updateId;
+        this.updatedTime = LocalDateTime.now();
+    }
 
 }

@@ -1,10 +1,14 @@
 package com.manyun.business.service;
 
+import com.manyun.business.domain.dto.AuctionOrderCreateDto;
 import com.manyun.business.domain.entity.AuctionOrder;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.query.AuctionOrderQuery;
 import com.manyun.business.domain.vo.AuctionOrderVo;
 import com.manyun.common.core.web.page.TableDataInfo;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * <p>
@@ -22,5 +26,13 @@ public interface IAuctionOrderService extends IService<AuctionOrder> {
      * @return
      */
     TableDataInfo<AuctionOrderVo> myAuctionOrderList(AuctionOrderQuery orderQuery, String userId);
+
+    String createAuctionOrder(AuctionOrderCreateDto auctionOrderCreateDto, Consumer<String> consumer);
+
+    List<AuctionOrder> checkUnpaidOrder(String payUserId);
+
+    void notifyPaySuccess(String outHost, String userId);
+
+    void timeCancel();
 
 }
