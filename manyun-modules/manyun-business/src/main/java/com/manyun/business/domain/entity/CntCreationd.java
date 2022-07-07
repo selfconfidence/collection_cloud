@@ -32,6 +32,11 @@ public class CntCreationd implements Serializable {
     @ApiModelProperty("创作者简介")
     private String creationInfo;
 
+
+    @ApiModelProperty("创作者链地址")
+    private String linkAddr;
+
+
     @ApiModelProperty("创建人")
     private String createdBy;
 
