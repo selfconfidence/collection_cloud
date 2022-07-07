@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Maps;
@@ -123,13 +124,13 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         // 是否能够购买? 预先状态判定
         boxVo.setTarStatus(NO_TAR.getCode());
         // 低耦性校验
-        if (StrUtil.isNotBlank(box.getTarId()))
+        if (StrUtil.isNotBlank(box.getTarId()) && StringUtils.isNotBlank(userId))
             boxVo.setTarStatus(tarService.tarStatus(userId,id));
 
 
         Integer postTime = null;
         //提前购?
-        if (Objects.nonNull(box.getPostTime())){
+        if (Objects.nonNull(box.getPostTime())  && StringUtils.isNotBlank(userId)){
             // 两种验证,一种 excel , 一种 关联性 方式
             //1. excel true 可以提前购, false 不可以
             //2. 配置模板 true 可以提前购 false 不可以

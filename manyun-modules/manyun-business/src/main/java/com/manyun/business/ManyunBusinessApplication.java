@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.manyun.common.security.annotation.EnableCustomConfig;
 import com.manyun.common.security.annotation.EnableManyunFeignClients;
 import com.manyun.common.swagger.annotation.EnableCustomSwagger2;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  *
@@ -15,6 +16,7 @@ import com.manyun.common.swagger.annotation.EnableCustomSwagger2;
 @EnableCustomSwagger2    // 在线文档注册，业务模块必备
 @EnableManyunFeignClients    // 远程feign 调用注解
 @SpringBootApplication
+@EnableAsync
 public class ManyunBusinessApplication
 {
     public static void main(String[] args)

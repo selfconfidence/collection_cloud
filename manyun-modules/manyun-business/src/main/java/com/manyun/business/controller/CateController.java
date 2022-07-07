@@ -1,6 +1,8 @@
 package com.manyun.business.controller;
 
 
+import com.manyun.business.design.delay.DelayAbsAspect;
+import com.manyun.business.design.delay.DelayQueue;
 import com.manyun.business.domain.vo.CateVo;
 import com.manyun.business.service.ICateService;
 import com.manyun.common.core.domain.R;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -34,6 +37,9 @@ public class CateController extends BaseController {
     @Autowired
     private ICateService cateService;
 
+    @Autowired
+    private DelayQueue delayQueue;
+
 
     @GetMapping("/cateAll/{type}")
     @ApiOperation(value = "系列列表",notes = "无需分页,1=藏品系列，2=盲盒分类")
@@ -42,5 +48,28 @@ public class CateController extends BaseController {
         return R.ok(cateService.cateAll(type));
     }
 
+
+    @GetMapping("/msg/{id}/{time}/{name}")
+    public R msg(@PathVariable String id,@PathVariable Long time,@PathVariable String name){
+        // 分钟为单位
+        long l = TimeUnit.MINUTES.toSeconds(time);
+
+        // 转化秒
+        delayQueue.put(id,l, new DelayAbsAspect<String>() {
+            @Override
+            public void invocationSuccess(String s) {
+                logger.info(Thread.currentThread().getName());
+                logger.info("回调成功！！！{}:{}",s,name);
+            }
+
+            @Override
+            public void invocationFail(String s) {
+                logger.info(Thread.currentThread().getName());
+                logger.info("回调失败！！！{}:{}",s,name);
+            }
+        });
+
+        return R.ok();
+    }
 }
 

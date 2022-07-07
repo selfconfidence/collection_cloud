@@ -1,5 +1,6 @@
 package com.manyun.business.design.pay;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.json.JSONUtil;
 import com.manyun.business.domain.dto.PayInfoDto;
 import com.manyun.business.domain.vo.PayVo;
@@ -29,6 +30,7 @@ public class WeChatPay implements RootPayServer {
     @Override
     public PayVo execPayVo(PayInfoDto payInfoDto){
         if (WECHAT_TYPE.getCode().equals(payInfoDto.getPayType())){
+            Assert.isFalse(true,"暂未开放微信支付!");
             // 是自己执行的
             String body = wxComm.appPay(payInfoDto.getOutHost(), payInfoDto.getRealPayMoney(), payInfoDto.getWxPayEnum(), JSONUtil.toJsonStr(payInfoDto));
             return Builder.of(PayVo::new).with(PayVo::setBody, body).with(PayVo::setPayType, payInfoDto.getPayType()).with(PayVo::setOutHost, payInfoDto.getOutHost()).build();

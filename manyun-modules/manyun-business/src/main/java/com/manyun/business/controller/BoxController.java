@@ -66,8 +66,7 @@ public class BoxController extends BaseController {
     @GetMapping("/info/{id}")
     @ApiOperation("根据盲盒编号,查询盲盒的详细信息 -需登录")
     public R<BoxVo> info(@PathVariable String id){
-        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        String userId = notNullLoginBusinessUser.getUserId();
+        String userId = SecurityUtils.getBuiUserId();
         return R.ok(boxService.info(id,userId));
     }
 

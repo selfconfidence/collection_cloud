@@ -20,7 +20,7 @@ import java.math.BigDecimal;
  */
 public interface IMoneyService extends IService<Money> {
 
-    void ordePay(String outHost,String userId, BigDecimal realPayMoney, String formInfo);
+    BigDecimal ordePay(String outHost,String userId, BigDecimal realPayMoney, String formInfo);
 
     AccountInfoVo accountInfo(String userId);
 

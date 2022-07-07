@@ -51,8 +51,7 @@ public class CollectionController extends BaseController{
     @GetMapping("/info/{id}")
     @ApiOperation(value = "查询藏品详情信息",notes = "根据藏品编号查询藏品详情信息 -需登录")
     public R<CollectionAllVo> info(@PathVariable String id){
-        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        String userId = notNullLoginBusinessUser.getUserId();
+        String userId = SecurityUtils.getBuiUserId();
         return R.ok(collectionService.info(id,userId));
     }
 

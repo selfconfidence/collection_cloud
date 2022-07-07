@@ -51,21 +51,35 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
 
 
     /**
-     * 根据进行进行扣除余额操作
+     * 根据进行进行扣除余额操作 —— 组合支付使用
      * @param userId
      * @param realPayMoney
      * @param formInfo
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void ordePay(String outHost,String userId, BigDecimal realPayMoney, String formInfo) {
+    public BigDecimal ordePay(String outHost,String userId, BigDecimal realPayMoney, String formInfo) {
+        // 剩余金额
+        BigDecimal moneyPayMoney = NumberUtil.add(0D);
         Money money = getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
-        Assert.isTrue(money.getMoneyBalance().compareTo(realPayMoney)>=0,"余额不足,请核实!");
-        money.setMoneyBalance(NumberUtil.sub(money.getMoneyBalance(),realPayMoney));
+        //1. 当前钱包金额是否满足当前扣得金额?
+        // 够 - 直接扣除,记录日志
+        // 不够，钱包余额扣完，剩余得返回 交给 第三方支付
+        //Assert.isTrue(money.getMoneyBalance().compareTo(realPayMoney)>=0,"余额不足,请核实!");
+        if (money.getMoneyBalance().compareTo(realPayMoney)>=0){
+            // 够扣
+            money.setMoneyBalance(NumberUtil.sub(money.getMoneyBalance(),realPayMoney));
+            logsService.saveLogs(LogInfoDto.builder().buiId(userId).jsonTxt(formInfo).formInfo(realPayMoney.toString()).isType(POLL_SOURCE).modelType(MONEY_TYPE).build());
+        } else  {
+            // 不够扣
+            moneyPayMoney = NumberUtil.sub(realPayMoney, money.getMoneyBalance());
+            logsService.saveLogs(LogInfoDto.builder().buiId(userId).jsonTxt(formInfo).formInfo( money.getMoneyBalance().toString()).isType(POLL_SOURCE).modelType(MONEY_TYPE).build());
+            money.setMoneyBalance(NumberUtil.add(0D));
+
+        }
         money.updateD(userId);
         updateById(money);
-        logsService.saveLogs(LogInfoDto.builder().buiId(userId).jsonTxt(formInfo).formInfo(realPayMoney.toString()).isType(POLL_SOURCE).modelType(MONEY_TYPE).build());
-
+         return moneyPayMoney;
     }
 
     @Override
@@ -104,5 +118,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         BeanUtil.copyProperties(logs,moneyLogVo);
         return moneyLogVo;
     }
+
+
 
 }

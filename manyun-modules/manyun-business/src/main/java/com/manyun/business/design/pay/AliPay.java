@@ -1,5 +1,6 @@
 package com.manyun.business.design.pay;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.json.JSONUtil;
 import com.manyun.business.domain.dto.PayInfoDto;
 import com.manyun.business.domain.vo.PayVo;
@@ -34,6 +35,7 @@ public class AliPay implements RootPayServer {
     @Override
     public PayVo execPayVo(PayInfoDto payInfoDto){
         if (ALI_TYPE.getCode().equals(payInfoDto.getPayType())){
+            Assert.isFalse(true,"暂未开放支付宝支付!");
             // 是自己执行的
             String body =  aliComm.appPay(payInfoDto.getOutHost(),payInfoDto.getRealPayMoney(),payInfoDto.getAliPayEnum(), JSONUtil.toJsonStr(payInfoDto));
             return Builder.of(PayVo::new).with(PayVo::setBody, body).with(PayVo::setPayType, payInfoDto.getPayType()).with(PayVo::setOutHost, payInfoDto.getOutHost()).build();

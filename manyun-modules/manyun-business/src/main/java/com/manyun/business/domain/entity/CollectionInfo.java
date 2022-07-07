@@ -39,6 +39,10 @@ public class CollectionInfo implements Serializable {
     @ApiModelProperty("发行方")
     private String publishOther;
 
+
+    @ApiModelProperty("发行方头像")
+    private String publishAuther;
+
     @ApiModelProperty("创建人")
     private String createdBy;
 

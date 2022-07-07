@@ -41,6 +41,10 @@ public class CateVo implements Serializable {
     private String bindCreation;
 
 
+    @ApiModelProperty("创作者")
+    private CnfCreationdVo cnfCreationdVo;
+
+
     @ApiModelProperty("创建时间 yyyy-MM-dd HH:mm:ss")
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdTime;

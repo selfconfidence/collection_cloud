@@ -40,5 +40,8 @@ public class CollectionInfoVo implements Serializable {
     @ApiModelProperty("发行方")
     private String publishOther;
 
+    @ApiModelProperty("发行方头像")
+    private String publishAuther;
+
 
 }
