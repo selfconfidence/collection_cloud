@@ -11,6 +11,8 @@ import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 
+import java.util.List;
+
 /**
  * <p>
  * 拍卖表 服务类
@@ -26,5 +28,7 @@ public interface IAuctionSendService extends IService<AuctionSend> {
     TableDataInfo<MyAuctionSendVo> pageList(AuctionSendQuery sendQuery, String userId);
 
     TableDataInfo<AuctionMarketVo> auctionMarketList(AuctionMarketQuery marketQuery);
+
+    void reloadAuctionSend(List<AuctionSend> auctionSendList);
 
 }

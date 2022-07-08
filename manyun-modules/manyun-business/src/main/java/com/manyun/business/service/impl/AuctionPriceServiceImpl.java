@@ -2,32 +2,51 @@ package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.manyun.business.design.delay.DelayAbsAspect;
+import com.manyun.business.design.delay.DelayQueue;
+import com.manyun.business.design.pay.RootPay;
+import com.manyun.business.domain.dto.AuctionOrderCreateDto;
+import com.manyun.business.domain.dto.PayInfoDto;
+import com.manyun.business.domain.entity.AuctionOrder;
 import com.manyun.business.domain.entity.AuctionPrice;
 import com.manyun.business.domain.entity.AuctionSend;
+import com.manyun.business.domain.entity.Money;
+import com.manyun.business.domain.form.AuctionPayForm;
 import com.manyun.business.domain.form.AuctionPriceForm;
 import com.manyun.business.domain.query.AuctionPriceQuery;
 import com.manyun.business.domain.vo.AuctionPriceVo;
+import com.manyun.business.domain.vo.PayVo;
 import com.manyun.business.mapper.AuctionPriceMapper;
-import com.manyun.business.service.IAuctionPriceService;
+import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.manyun.business.service.IAuctionSendService;
 import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.enums.AuctionSendStatus;
 import com.manyun.common.core.enums.AuctionStatus;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static com.manyun.common.core.enums.AliPayEnum.AUCTION_ALI_PAY;
+import static com.manyun.common.core.enums.AliPayEnum.MARGIN_ALI_PAY;
+import static com.manyun.common.core.enums.WxPayEnum.AUCTION_WECHAT_PAY;
+import static com.manyun.common.core.enums.WxPayEnum.MARGIN_WECHAT_PAY;
+
 
 /**
  * <p>
@@ -41,27 +60,107 @@ import java.util.stream.Collectors;
 public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, AuctionPrice> implements IAuctionPriceService {
 
     @Autowired
-    IAuctionSendService sendService;
+    private IAuctionOrderService auctionOrderService;
+
+    @Autowired
+    private RootPay rootPay;
+
+    @Autowired
+    private ISystemService systemService;
+
+    @Autowired
+    private IAuctionSendService auctionSendService;
+
+    @Autowired
+    private IMoneyService moneyService;
+
+    @Autowired
+    private DelayQueue delayQueue;
 
     @Autowired
     private RemoteBuiUserService remoteBuiUserService;
 
+
+    //判断是否出过价
+
+    @Override
+    public R isPayMargin(AuctionPriceForm auctionPriceForm, String userId) {
+        List<AuctionPrice> priceList = list(Wrappers.<AuctionPrice>lambdaQuery().eq(AuctionPrice::getAuctionSendId, auctionPriceForm.getAuctionSendId())
+                .eq(AuctionPrice::getUserId, userId));
+
+        //判断是否出过价
+        if (priceList.isEmpty()) {
+            //支付保证金
+            return R.fail("尚未支付保证金，请先支付");
+        } else {
+            return R.ok("已支付保证金，可以出价");
+        }
+    }
+
+
     @Override
     public synchronized R myAuctionPrice(AuctionPriceForm auctionPriceForm) {
         LoginBusinessUser businessUser = SecurityUtils.getTestLoginBusinessUser();
-        AuctionSend auctionSend = sendService.getById(auctionPriceForm.getAuctionSendId());
+        AuctionSend auctionSend = auctionSendService.getById(auctionPriceForm.getAuctionSendId());
+        Integer delayTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_DELAY_TIME, Integer.class);
+        if (LocalDateTime.now().isBefore(auctionSend.getStartTime())) {
+            return R.fail("当前竞品尚未开拍，请稍后再试");
+        }
+        if (LocalDateTime.now().isAfter(auctionSend.getEndTime().plusMinutes(delayTime))) {
+            return R.fail("当前拍卖已结束");
+        }
+        if (auctionSend.getUserId().equals(businessUser.getUserId())) {
+            return R.fail("自己不可购买自己送拍的产品");
+        }
+
+        //判断是否延拍，延拍加时间
+        if (LocalDateTime.now().isAfter(auctionSend.getEndTime())) {
+            auctionSend.setEndTime(auctionSend.getEndTime().plusMinutes(delayTime));
+
+            // 分钟为单位
+            long l = TimeUnit.MINUTES.toSeconds(delayTime);
+            delayQueue.put(auctionSend.getId(),l, new DelayAbsAspect<String>() {
+                @Override
+                public void invocationSuccess(String s) {
+                    //回调成功,生成订单
+                    String auctionOrderNo = auctionOrderService.createAuctionOrder(AuctionOrderCreateDto.builder()
+                            .goodsId(auctionSend.getGoodsId())
+                            .goodsName(auctionSend.getGoodsName())
+                            .goodsType(auctionSend.getGoodsType())
+                            .nowPrice(auctionSend.getNowPrice())
+                            .sendAuctionid(s)
+                            .userId(businessUser.getUserId()).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));
+                    auctionSend.setAuctionStatus(AuctionSendStatus.WAIT_PAY.getCode());
+                }
+
+                @Override
+                public void invocationFail(String s) {
+
+                }
+            });
+
+
+            auctionSendService.updateById(auctionSend);
+        }
+        List<AuctionOrder> auctionOrders = auctionOrderService.checkUnpaidOrder(businessUser.getUserId());
+        if (auctionOrders.size() > 0 ) {
+            return R.fail("您有未支付订单，暂不可出价");
+        }
         //判断竞拍状态（竞拍中才可出价）
         if (!auctionSend.getAuctionStatus().equals(AuctionStatus.BID_BIDING.getCode())) {
             return R.fail("当前竞品不可出价");
         }
         List<AuctionPrice> list = this.list(Wrappers.<AuctionPrice>lambdaQuery()
                 .eq(AuctionPrice::getAuctionSendId, auctionPriceForm.getAuctionSendId()).orderByDesc(AuctionPrice::getBidPrice));
+
+        BigDecimal range = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_PRICE_RANGE, BigDecimal.class);
+
         AuctionPrice auctionPrice = new AuctionPrice();
         if (list.isEmpty()) {
-            auctionPrice.setBidPrice(auctionSend.getStartPrice().add(BigDecimal.TEN));
+            auctionPrice.setBidPrice(auctionSend.getStartPrice().add(range));
         }
         if (list.size() > 0) {
-            auctionPrice.setBidPrice(list.get(0).getBidPrice().add(BigDecimal.TEN));
+            auctionPrice.setBidPrice(list.get(0).getBidPrice().add(range));
         }
         auctionPrice.setUserId(businessUser.getUserId());
         auctionPrice.setAuctionSendId(auctionPriceForm.getAuctionSendId());
@@ -69,7 +168,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         auctionPrice.setCreatedTime(LocalDateTime.now());
         this.save(auctionPrice);
 
-        sendService.update(Wrappers.<AuctionSend>lambdaUpdate()
+        auctionSendService.update(Wrappers.<AuctionSend>lambdaUpdate()
                 .set(AuctionSend::getNowPrice, auctionPrice.getBidPrice()));
 
         return R.ok();
@@ -92,6 +191,72 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         BeanUtil.copyProperties(auctionPrice, auctionPriceVo);
         auctionPriceVo.setHeadImage(cntUserDtoR.getData().getHeadImage());
         return auctionPriceVo;
+    }
+
+    //倒计时结束，创建订单，发起支付
+
+    //竞拍结束后支付
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public synchronized PayVo payAuction(String payUserId, AuctionPayForm auctionPayForm) {
+        AuctionPrice auctionPrice = getById(auctionPayForm.getAuctionPriceId());
+        AuctionSend auctionSend = auctionSendService.getById(auctionPrice.getAuctionSendId());
+        AuctionOrder auctionOrder = auctionOrderService.getById(auctionSend.getAuctionOrderId());
+        /*String auctionOrderHost = auctionOrderService.createAuctionOrder(AuctionOrderCreateDto.builder()
+                .goodsId(auctionSend.getGoodsId())
+                .goodsName(auctionSend.getGoodsName())
+                .goodsType(auctionSend.getGoodsType())
+                .nowPrice(auctionSend.getNowPrice())
+                .payType(auctionPayForm.getPayType())
+                .sendAuctionid(auctionPayForm.getAuctionSendId())
+                .userId(payUserId).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));*/
+
+        PayVo payVo =  rootPay.execPayVo(
+                PayInfoDto.builder()
+                        .payType(auctionPayForm.getPayType())
+                        .realPayMoney(auctionSend.getNowPrice())
+                        .outHost(auctionOrder.getOrderNo())
+                        .aliPayEnum(AUCTION_ALI_PAY)
+                        .wxPayEnum(AUCTION_WECHAT_PAY)
+                        .userId(payUserId).build());
+
+        // 修改拍卖信息
+        //auctionSend.setAuctionStatus(AuctionStatus.PAY_SUCCESS.getCode());
+        auctionSendService.updateById(auctionSend);
+        auctionOrder.setPayType(auctionPayForm.getPayType());
+        auctionOrderService.updateById(auctionOrder);
+        // 走这一步如果 是余额支付 那就说明扣款成功了！！！
+        /*if (MONEY_TAPE.getCode().equals(auctionPayForm.getPayType())){
+            // 调用完成订单
+            auctionOrderService.notifyPaySuccess(payVo.getOutHost());
+        }*/
+
+        return payVo;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public synchronized PayVo payMargin(String payUserId, AuctionPayForm auctionPayForm) {
+
+        AuctionSend auctionSend = auctionSendService.getById(auctionPayForm.getAuctionSendId());
+        //用户余额
+        BigDecimal margin = auctionSend.getStartPrice().multiply(systemService.getVal(BusinessConstants.SystemTypeConstant.MARGIN_SCALE, BigDecimal.class)).setScale(2, RoundingMode.HALF_UP);
+        Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, payUserId));
+        BigDecimal moneyBalance = money.getMoneyBalance();
+
+        String payMarginHost ="";
+
+        PayVo payVo = rootPay.execPayVo(PayInfoDto.builder()
+                .payType(auctionPayForm.getPayType())
+                .realPayMoney(margin)
+                .aliPayEnum(MARGIN_ALI_PAY)
+                .wxPayEnum(MARGIN_WECHAT_PAY)
+                .userId(payUserId).build());
+
+        //未做完
+
+        return payVo;
+
     }
 
 }

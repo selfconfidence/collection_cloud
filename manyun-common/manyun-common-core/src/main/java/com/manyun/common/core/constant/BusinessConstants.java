@@ -52,6 +52,41 @@ public interface BusinessConstants {
 
 
         /**
+         * 拍卖订单到期时间
+         */
+        String AUCTION_ORDER_TIME = "auction_order_time";
+
+        /**
+         * 拍卖预售时间
+         */
+        String AUCTION_PRE_TIME = "auction_pre_time";
+
+        /**
+         * 拍卖时间
+         */
+        String AUCTION_BID_TIME = "auction_bid_time";
+
+        /**
+         * 延拍时间
+         */
+        String AUCTION_DELAY_TIME = "auction_delay_time";
+
+        /**
+         * 拍卖加价幅度
+         */
+        String AUCTION_PRICE_RANGE = "auction_price_range";
+
+        /**
+         * 保证金比例
+         */
+        String MARGIN_SCALE = "margin_scale";
+
+        /**
+         * 佣金比例
+         */
+        String COMMISSION_SCALE = "commission_scale";
+
+        /**
          * 购买须知
          */
         String  SELL_INFO =  "SELL_INFO";
