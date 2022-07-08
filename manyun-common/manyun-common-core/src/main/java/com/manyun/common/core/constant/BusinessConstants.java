@@ -50,6 +50,17 @@ public interface BusinessConstants {
          */
         String  CONSIGNMENT_ORDER_TIME =  "consignment_order_time";
 
+
+        /**
+         * 购买须知
+         */
+        String  SELL_INFO =  "SELL_INFO";
+
+        /**
+         * 关于藏品
+         */
+        String  COLLECTION_INFO =  "COLLECTION_INFO";
+
     }
 
 
