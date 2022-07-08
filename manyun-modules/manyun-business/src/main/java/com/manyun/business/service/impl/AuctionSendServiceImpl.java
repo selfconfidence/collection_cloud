@@ -83,7 +83,7 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         Integer bidTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_BID_TIME, Integer.class);
         AuctionSend auctionSend = Builder.of(AuctionSend::new)
                 .with(AuctionSend::setUserId, userId)
-                .with(AuctionSend::setAuctionStatus, AuctionStatus.WAIT_START.getCode())
+                .with(AuctionSend::setAuctionStatus, AuctionStatus.BID_BIDING.getCode())
                 .with(AuctionSend::setMyGoodsId, auctionSendForm.getMyGoodsId())
                 .with(AuctionSend::setGoodsId, auctionSendForm.getGoodsId())
                 .with(AuctionSend::setGoodsType, auctionSendForm.getGoodsType())
@@ -95,7 +95,6 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
                 .with(AuctionSend::setCommission, commission)
                 .with(AuctionSend::setMargin, auctionSendForm.getStartPrice()
                         .multiply(systemService.getVal(BusinessConstants.SystemTypeConstant.MARGIN_SCALE, BigDecimal.class)).setScale(2, RoundingMode.HALF_UP))
-                .with(AuctionSend::setAuctionStatus, AuctionStatus.WAIT_START.getCode())
                 .with(AuctionSend::setCreatedTime, LocalDateTime.now())
                 .with(AuctionSend::setStartTime, LocalDateTime.now().plusMinutes(preTime))
                 .with(AuctionSend::setEndTime,LocalDateTime.now().plusMinutes(preTime + bidTime)).build();
@@ -147,7 +146,7 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
     @Override
     public void reloadAuctionSend(List<AuctionSend> auctionSendList) {
         for (AuctionSend auctionSend : auctionSendList) {
-            auctionSend.setAuctionStatus(AuctionStatus.WAIT_START.getCode());
+            auctionSend.setAuctionStatus(AuctionStatus.BID_PASS.getCode());
             auctionSend.updateD(auctionSend.getUserId());
         }
         updateBatchById(auctionSendList);
@@ -167,7 +166,8 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
 
         boolean exists = this.baseMapper.exists(Wrappers.<AuctionSend>lambdaQuery()
                 .eq(AuctionSend::getMyGoodsId, auctionSendForm.getMyGoodsId())
-                .ne(AuctionSend::getAuctionStatus, AuctionStatus.BID_BREAK.getCode()));
+                .ne(AuctionSend::getAuctionStatus, AuctionStatus.BID_BREAK.getCode())
+                .ne(AuctionSend::getAuctionStatus, AuctionStatus.BID_PASS.getCode()));
         Assert.isFalse(exists, "请勿重复送拍");
     }
 

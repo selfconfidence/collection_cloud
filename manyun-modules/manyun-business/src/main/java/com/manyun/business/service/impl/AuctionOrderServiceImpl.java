@@ -14,12 +14,8 @@ import com.manyun.business.domain.vo.AuctionOrderVo;
 import com.manyun.business.mapper.AuctionOrderMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.manyun.comm.api.RemoteBuiUserService;
-import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.common.core.constant.BusinessConstants;
-import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
-import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.AuctionStatus;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
@@ -61,7 +57,6 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
 
     @Autowired
     private IMoneyService moneyService;
-
 
     @Override
     public TableDataInfo<AuctionOrderVo> myAuctionOrderList(AuctionOrderQuery orderQuery, String userId) {
@@ -160,7 +155,7 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public synchronized void timeCancel() {
+    public synchronized void timeCancelAuction() {
         List<AuctionOrder> auctionOrderList = list(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getAuctionStatus, AuctionStatus.WAIT_PAY.getCode()).lt(AuctionOrder::getEndTime, LocalDateTime.now()));
         if (auctionOrderList.isEmpty()) return;
         List<AuctionSend> auctionSendList = auctionSendService.list(Wrappers.<AuctionSend>lambdaQuery().in(AuctionSend::getAuctionOrderId, auctionOrderList.parallelStream().map(item -> item.getId()).collect(Collectors.toSet()))
@@ -178,7 +173,12 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
         }).collect(Collectors.toList());
         updateBatchById(updateOrder);
 
-        //TODO 订单取消，扣除保证金
+        // 订单取消，扣除保证金
+        /*for (AuctionOrder auctionOrder : updateOrder) {
+            Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, auctionOrder.getUserId()));
+            money.setMoneyBalance(money.getMoneyBalance().subtract(auctionOrder.getMargin()));
+        }*/
 
     }
+
 }

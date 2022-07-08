@@ -20,7 +20,7 @@ import com.manyun.common.core.web.page.TableDataInfo;
  */
 public interface IAuctionPriceService extends IService<AuctionPrice> {
 
-    R myAuctionPrice(AuctionPriceForm auctionPriceForm);
+    R myAuctionPrice(AuctionPriceForm auctionPriceForm, String userId);
 
     TableDataInfo<AuctionPriceVo> auctionPriceList(AuctionPriceQuery auctionPriceQuery);
 
@@ -28,5 +28,7 @@ public interface IAuctionPriceService extends IService<AuctionPrice> {
 
     PayVo payMargin(String payUserId, AuctionPayForm auctionPayForm);
 
-    R isPayMargin(AuctionPriceForm auctionPriceForm, String userId);
+    R checkPayMargin(AuctionPriceForm auctionPriceForm, String userId);
+
+    void checkAuctionEnd();
 }

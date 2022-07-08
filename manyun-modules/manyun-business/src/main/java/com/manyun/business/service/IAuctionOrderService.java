@@ -19,6 +19,9 @@ import java.util.function.Consumer;
  * @since 2022-06-17
  */
 public interface IAuctionOrderService extends IService<AuctionOrder> {
+
+
+
     /**
      * 我的拍卖订单
      * @param orderQuery
@@ -33,6 +36,7 @@ public interface IAuctionOrderService extends IService<AuctionOrder> {
 
     void notifyPaySuccess(String outHost, String userId);
 
-    void timeCancel();
+    void timeCancelAuction();
+
 
 }

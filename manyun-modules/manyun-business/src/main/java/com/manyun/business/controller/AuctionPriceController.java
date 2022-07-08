@@ -10,14 +10,12 @@ import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.PageUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.security.annotation.InnerAuth;
 import com.manyun.common.security.utils.SecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -39,7 +37,8 @@ public class AuctionPriceController {
     @PostMapping("/myAuctionPrice")
     @ApiOperation("我的出价")
     public R myAuctionPrice(@Valid @RequestBody AuctionPriceForm auctionPriceForm) {
-        return auctionPriceService.myAuctionPrice(auctionPriceForm);
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return auctionPriceService.myAuctionPrice(auctionPriceForm, loginBusinessUser.getUserId());
     }
 
     @PostMapping("/auctionPriceList")
@@ -68,12 +67,20 @@ public class AuctionPriceController {
         return R.ok(payVo);
     }
 
-    @PostMapping("/isPayMargin")
+    @PostMapping("/checkPayMargin")
     @ApiOperation(value = "是否支付过保证金")
-    public R isPayMargin(@RequestBody @Valid AuctionPriceForm auctionPriceForm) {
-        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+    public R checkPayMargin(@RequestBody @Valid AuctionPriceForm auctionPriceForm) {
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
         String userId = loginBusinessUser.getUserId();
-        return auctionPriceService.isPayMargin(auctionPriceForm, userId);
+        return auctionPriceService.checkPayMargin(auctionPriceForm, userId);
+    }
+
+    @GetMapping("/checkAuctionEnd")
+    @ApiOperation(value = "定时调度判断是否已流拍",hidden = true)
+    @InnerAuth
+    public R checkAuctionEnd(){
+        auctionPriceService.checkAuctionEnd();
+        return R.ok();
     }
 
 }

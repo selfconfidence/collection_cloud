@@ -122,7 +122,12 @@ public enum  CodeStatus {
          */
         AUTH_REQUEST_ERROR(400, "账号密码错误"),
         VALUE_LACK(400,"余量不足"),
-        QR_ERROR(201,"未返回");
+        QR_ERROR(201,"未返回"),
+
+        /**
+         * 拍卖
+         */
+        NO_PAY_MARGIN(801, "未支付保证金");
 
         CodeStatus(int code, String message) {
             this.code = code;
