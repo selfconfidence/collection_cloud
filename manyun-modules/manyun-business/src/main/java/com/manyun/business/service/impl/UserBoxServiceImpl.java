@@ -6,6 +6,8 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
 import com.manyun.business.domain.dto.LogInfoDto;
+import com.manyun.business.domain.dto.MsgCommDto;
+import com.manyun.business.domain.dto.MsgThisDto;
 import com.manyun.business.domain.dto.StepDto;
 import com.manyun.business.domain.entity.Box;
 import com.manyun.business.domain.entity.UserBox;
@@ -13,6 +15,7 @@ import com.manyun.business.domain.vo.UserBoxVo;
 import com.manyun.business.mapper.BoxMapper;
 import com.manyun.business.mapper.UserBoxMapper;
 import com.manyun.business.service.ILogsService;
+import com.manyun.business.service.IMsgService;
 import com.manyun.business.service.IStepService;
 import com.manyun.business.service.IUserBoxService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -58,6 +61,9 @@ public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> impl
 
     @Autowired
     private IStepService stepService;
+
+    @Autowired
+    private IMsgService msgService;
 
 
     /**
@@ -146,6 +152,11 @@ public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> impl
       stepService.saveBatch(StepDto.builder().buiId(buiId).userId(tranUserId).modelType(BOX_MODEL_TYPE).reMark("转让方").formInfo(formatTran).build()
       ,StepDto.builder().buiId(buiId).userId(toUserId).modelType(BOX_MODEL_TYPE).reMark("受让方").formInfo(format).build()
       );
+
+
+        msgService.saveMsgThis(MsgThisDto.builder().userId(tranUserId).msgForm(formatTran).msgTitle(formatTran).build());
+        msgService.saveMsgThis(MsgThisDto.builder().userId(toUserId).msgForm(format).msgTitle(format).build());
+        msgService.saveCommMsg(MsgCommDto.builder().msgTitle(format).msgForm(format).build());
 
     }
 

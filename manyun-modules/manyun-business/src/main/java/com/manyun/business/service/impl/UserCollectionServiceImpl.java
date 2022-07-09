@@ -5,13 +5,12 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
-import com.manyun.business.domain.dto.LogInfoDto;
-import com.manyun.business.domain.dto.StepDto;
-import com.manyun.business.domain.dto.UserCollectionCountDto;
+import com.manyun.business.domain.dto.*;
 import com.manyun.business.domain.entity.UserCollection;
 import com.manyun.business.domain.vo.UserCollectionVo;
 import com.manyun.business.mapper.UserCollectionMapper;
 import com.manyun.business.service.ILogsService;
+import com.manyun.business.service.IMsgService;
 import com.manyun.business.service.IStepService;
 import com.manyun.business.service.IUserCollectionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -53,6 +52,9 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
 
     @Autowired
     private IStepService stepService;
+
+    @Autowired
+    private IMsgService msgService;
 
     /**
      * 绑定用户与藏品的相关联信息
@@ -132,6 +134,9 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                 ,StepDto.builder().buiId(buiId).userId(toUserId).modelType(COLLECTION_MODEL_TYPE).reMark("受让方").formInfo(format).build()
         );
 
+        msgService.saveMsgThis(MsgThisDto.builder().userId(tranUserId).msgForm(formatTran).msgTitle(formatTran).build());
+        msgService.saveMsgThis(MsgThisDto.builder().userId(toUserId).msgForm(format).msgTitle(format).build());
+        msgService.saveCommMsg(MsgCommDto.builder().msgTitle(format).msgForm(format).build());
 
     }
 

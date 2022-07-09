@@ -32,7 +32,7 @@ public interface ICollectionService extends IService<CntCollection> {
 
     List<UserCateVo> cateCollectionByUserId(String userId);
 
-    List<String> queryDict(String keyword);
+    List<KeywordVo> queryDict(String keyword);
 
     Integer tarCollection(String id, String userId);
 

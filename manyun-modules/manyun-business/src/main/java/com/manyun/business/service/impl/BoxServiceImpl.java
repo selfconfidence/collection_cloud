@@ -10,6 +10,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Maps;
 import com.manyun.business.design.pay.RootPay;
+import com.manyun.business.domain.dto.MsgCommDto;
+import com.manyun.business.domain.dto.MsgThisDto;
 import com.manyun.business.domain.dto.OrderCreateDto;
 import com.manyun.business.domain.dto.PayInfoDto;
 import com.manyun.business.domain.entity.*;
@@ -92,6 +94,9 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
 
     @Autowired
     private  ICntTarService cntTarService;
+
+    @Autowired
+    private IMsgService msgService;
 
 
 
@@ -186,9 +191,13 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
                         .wxPayEnum(BOX_WECHAT_PAY)
                         .userId(userId).build());
         // 走这一步如果 是余额支付 那就说明扣款成功了！！！
-        if (MONEY_TAPE.getCode().equals(boxSellForm.getPayType())){
+        if (MONEY_TAPE.getCode().equals(boxSellForm.getPayType()) && StrUtil.isBlank(payVo.getBody())){
             // 调用完成订单
             orderService.notifyPaySuccess(payVo.getOutHost());
+            String title = StrUtil.format("购买了 {} 盲盒!", box.getBoxTitle());
+            String form = StrUtil.format("使用余额{};购买了 {} 盲盒!",realPayMoney.toString(), box.getBoxTitle());
+            msgService.saveMsgThis(MsgThisDto.builder().userId(userId).msgForm(form).msgTitle(title).build());
+            msgService.saveCommMsg(MsgCommDto.builder().msgTitle(title).msgForm(form).build());
         }
 
         return payVo;
@@ -237,6 +246,11 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         userCollectionService.bindCollection(userId,luckCollection.getCollectionId(),luckCollection.getCollectionName(),info,Integer.valueOf(1));
         userBox.setBoxOpen(OK_OPEN.getCode());
         userBoxService.updateById(userBox);
+        Box box = boxMapper.selectById(userBox.getBoxId());
+        String format = StrUtil.format("开启{}盲盒,得到{}藏品!",box.getBoxTitle() ,luckCollection.getCollectionName());
+
+        msgService.saveMsgThis(MsgThisDto.builder().userId(userId).msgForm(info).msgTitle(format).build());
+        msgService.saveCommMsg(MsgCommDto.builder().msgTitle(format).msgForm(format).build());
         return info;
     }
 

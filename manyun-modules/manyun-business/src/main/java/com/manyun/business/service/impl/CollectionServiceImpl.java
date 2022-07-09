@@ -10,6 +10,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.manyun.business.design.pay.RootPay;
+import com.manyun.business.domain.dto.MsgCommDto;
+import com.manyun.business.domain.dto.MsgThisDto;
 import com.manyun.business.domain.dto.OrderCreateDto;
 import com.manyun.business.domain.dto.PayInfoDto;
 import com.manyun.business.domain.entity.*;
@@ -32,14 +34,11 @@ import org.springframework.stereotype.Service;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE;
+import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.*;
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
 import static com.manyun.common.core.enums.CollectionStatus.DOWN_ACTION;
 import static com.manyun.common.core.enums.PayTypeEnum.MONEY_TAPE;
@@ -87,6 +86,10 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
 
     private final ICntPostExcelService cntPostExcelService;
     private final ICntPostConfigService postConfigService;
+
+    private final IMsgService msgService;
+
+    private final IBoxService boxService;
 
 
     @Override
@@ -156,7 +159,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
                 .orderAmount(realPayMoney)
                 .buiId(cntCollection.getId())
                 .payType(collectionSellForm.getPayType())
-                .goodsType(BusinessConstants.ModelTypeConstant.BOX_TAYPE)
+                .goodsType(BOX_TAYPE)
                 .collectionName(cntCollection.getCollectionName())
                 .goodsNum(collectionSellForm.getSellNum())
                 .userId(userId)
@@ -175,9 +178,14 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
                         .wxPayEnum(BOX_WECHAT_PAY)
                         .userId(userId).build());
         // 走这一步如果 是余额支付 那就说明扣款成功了！！！
-        if (MONEY_TAPE.getCode().equals(collectionSellForm.getPayType())){
+        if (MONEY_TAPE.getCode().equals(collectionSellForm.getPayType()) && StrUtil.isBlank(payVo.getBody())){
             // 调用完成订单
             orderService.notifyPaySuccess(payVo.getOutHost());
+
+            String title = StrUtil.format("购买了 {} 藏品!", cntCollection.getCollectionName());
+            String form = StrUtil.format("使用余额{};购买了 {} 藏品!",realPayMoney.toString(), cntCollection.getCollectionName());
+            msgService.saveMsgThis(MsgThisDto.builder().userId(userId).msgForm(form).msgTitle(title).build());
+            msgService.saveCommMsg(MsgCommDto.builder().msgTitle(title).msgForm(form).build());
         }
         return payVo;
     }
@@ -230,8 +238,30 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     }
 
     @Override
-    public List<String> queryDict(String keyword) {
-        return  list(Wrappers.<CntCollection>lambdaQuery().select(CntCollection::getCollectionName).like(CntCollection::getCollectionName,keyword).orderByDesc(CntCollection::getCreatedTime).last(" limit 10")).parallelStream().map(item -> item.getCollectionName()).collect(Collectors.toList());
+    public List<KeywordVo> queryDict(String keyword) {
+        List<String> collectIonNames = list(Wrappers.<CntCollection>lambdaQuery().select(CntCollection::getCollectionName).like(CntCollection::getCollectionName, keyword).orderByDesc(CntCollection::getCreatedTime).last(" limit 10")).parallelStream().map(item -> item.getCollectionName()).collect(Collectors.toList());
+        List<String> boxNames = boxService.list(Wrappers.<Box>lambdaQuery().select(Box::getBoxTitle).like(Box::getBoxTitle, keyword).orderByDesc(Box::getCreatedTime).last(" limit 10")).parallelStream().map(item -> item.getBoxTitle()).collect(Collectors.toList());
+        return  initKeywordVo(collectIonNames,boxNames);
+    }
+
+    private List<KeywordVo> initKeywordVo(List<String> collectIonNames,List<String> boxNames){
+        List<KeywordVo> keywordVos = Lists.newArrayList();
+        for (String collectIonName : collectIonNames) {
+            KeywordVo keywordVo = Builder.of(KeywordVo::new).build();
+            keywordVo.setCommTitle(collectIonName);
+            keywordVo.setType(COLLECTION_TAYPE);
+            keywordVos.add(keywordVo);
+
+        }
+
+        for (String boxName : boxNames) {
+            KeywordVo keywordVo = Builder.of(KeywordVo::new).build();
+            keywordVo.setCommTitle(boxName);
+            keywordVo.setType(BOX_TAYPE);
+            keywordVos.add(keywordVo);
+        }
+        Collections.shuffle(keywordVos);
+        return keywordVos;
     }
 
     /**

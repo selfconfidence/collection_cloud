@@ -221,7 +221,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
 
 
         // 如果说是 余额支付的,并且 将对应的状态都进行修复下
-        if (MONEY_TAPE.getCode().equals(consignmentSellForm.getPayType())){
+        if (MONEY_TAPE.getCode().equals(consignmentSellForm.getPayType()) && StrUtil.isBlank(payVo.getBody())){
             // 调用完成订单
             orderService.notifyPayConsignmentSuccess(payVo.getOutHost());
 

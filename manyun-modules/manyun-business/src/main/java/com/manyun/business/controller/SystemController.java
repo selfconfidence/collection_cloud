@@ -3,6 +3,7 @@ package com.manyun.business.controller;
 
 import com.manyun.business.service.ISystemService;
 import com.manyun.common.core.domain.R;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +25,7 @@ import static com.manyun.common.core.constant.BusinessConstants.SystemTypeConsta
  */
 @RestController
 @RequestMapping("/system")
-@ApiOperation("部分固定内容APis")
+@Api(tags = "部分固定内容APis")
 public class SystemController {
 
     @Autowired

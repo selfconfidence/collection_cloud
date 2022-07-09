@@ -43,7 +43,7 @@ public class MoneyPay implements RootPayServer {
             if (moneyPayMoney.compareTo(NumberUtil.add(0D)) >= 1){
                 //TODO 银联.....
             }
-            return Builder.of(PayVo::new).with(PayVo::setBody, "").with(PayVo::setPayType, payInfoDto.getPayType()).with(PayVo::setOutHost, payInfoDto.getOutHost()).build();
+            return Builder.of(PayVo::new).with(PayVo::setBody, null).with(PayVo::setPayType, payInfoDto.getPayType()).with(PayVo::setOutHost, payInfoDto.getOutHost()).build();
 
         }
         throw new IllegalArgumentException("not fount pay_type = " + payInfoDto.getPayType());

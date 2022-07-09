@@ -44,6 +44,7 @@ public class BoxController extends BaseController {
 
     @GetMapping("/queryDict/{keyword}")
     @ApiOperation(value = "/根据词条 查询盲盒完整 标题信息",notes = "返回的都是 盲盒词条完整信息 ")
+    @Deprecated
     public R<List<String>> queryDict(@PathVariable String keyword){
         return R.ok(boxService.queryDict(keyword));
     }
