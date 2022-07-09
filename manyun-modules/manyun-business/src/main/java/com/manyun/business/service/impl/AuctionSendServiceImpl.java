@@ -8,21 +8,21 @@ import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.form.AuctionSendForm;
 import com.manyun.business.domain.query.AuctionMarketQuery;
 import com.manyun.business.domain.query.AuctionSendQuery;
-import com.manyun.business.domain.vo.AuctionMarketVo;
-import com.manyun.business.domain.vo.MediaVo;
-import com.manyun.business.domain.vo.MyAuctionSendVo;
+import com.manyun.business.domain.vo.*;
 import com.manyun.business.mapper.AuctionSendMapper;
+import com.manyun.business.mapper.CollectionInfoMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
-import com.manyun.common.core.enums.AuctionStatus;
+import com.manyun.common.core.enums.AuctionSendStatus;
 import com.manyun.common.core.exception.ServiceException;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -61,6 +61,12 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
     @Autowired
     private IBoxService boxService;
 
+    @Autowired
+    private CollectionInfoMapper collectionInfoMapper;
+
+    @Autowired
+    private IBoxCollectionService boxCollectionService;
+
     @Override
     public R auctionSend(AuctionSendForm auctionSendForm, String userId) {
 
@@ -83,7 +89,7 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         Integer bidTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_BID_TIME, Integer.class);
         AuctionSend auctionSend = Builder.of(AuctionSend::new)
                 .with(AuctionSend::setUserId, userId)
-                .with(AuctionSend::setAuctionStatus, AuctionStatus.BID_BIDING.getCode())
+                .with(AuctionSend::setAuctionSendStatus, AuctionSendStatus.WAIT_START.getCode())
                 .with(AuctionSend::setMyGoodsId, auctionSendForm.getMyGoodsId())
                 .with(AuctionSend::setGoodsId, auctionSendForm.getGoodsId())
                 .with(AuctionSend::setGoodsType, auctionSendForm.getGoodsType())
@@ -104,7 +110,7 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
     @Override
     public TableDataInfo<MyAuctionSendVo> pageList(AuctionSendQuery sendQuery, String userId) {
         List<AuctionSend> auctionSendList = list(Wrappers.<AuctionSend>lambdaQuery().eq(AuctionSend::getUserId, userId)
-                .eq(sendQuery.getAuctionSendStatus() != null && sendQuery.getAuctionSendStatus() != 0, AuctionSend::getAuctionStatus, sendQuery.getAuctionSendStatus())
+                .eq(sendQuery.getAuctionSendStatus() != null && sendQuery.getAuctionSendStatus() != 0, AuctionSend::getAuctionSendStatus, sendQuery.getAuctionSendStatus())
                 .orderByDesc(AuctionSend::getCreatedTime));
         return TableDataInfoUtil.pageTableDataInfo(auctionSendList.parallelStream().map(this::providerMyAuctionSendVo).collect(Collectors.toList()), auctionSendList);
     }
@@ -130,6 +136,71 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         return TableDataInfoUtil.pageTableDataInfo(list.parallelStream().map(this::providerAuctionMarketVo).collect(Collectors.toList()), list);
     }
 
+    //查询藏品详情
+
+    @Override
+    public AuctionCollectionAllVo auctionCollectionInfo(String collectionId, String auctionSendId) {
+        //点击详情，判断时间，修改状态
+        checkStatus(auctionSendId);
+        AuctionCollectionAllVo auctionCollectionAllVo = Builder.of(AuctionCollectionAllVo::new)
+                .with(AuctionCollectionAllVo::setCollectionVo, collectionService.getBaseCollectionVo(collectionId))
+                .with(AuctionCollectionAllVo::setCollectionInfoVo,providerCollectionInfoVo(collectionId))
+                .with(AuctionCollectionAllVo::setAuctionVo,providerAuctionCollectionVo(auctionSendId)).build();
+
+        return auctionCollectionAllVo;
+    }
+
+    //查询盲盒详情
+    @Override
+    public AuctionBoxAllVo auctionBoxInfo(String boxId, String auctionSendId) {
+        //点击详情，判断时间，修改状态
+        checkStatus(auctionSendId);
+        AuctionBoxAllVo auctionBoxAllVo = Builder.of(AuctionBoxAllVo::new)
+                .with(AuctionBoxAllVo::setBoxListVo,boxService.getBaseBoxListVo(boxId))
+                .with(AuctionBoxAllVo::setBoxCollectionJoinVos,boxCollectionService.findJoinCollections(boxId))
+                .with(AuctionBoxAllVo::setAuctionVo, providerAuctionCollectionVo(auctionSendId)).build();
+
+        return auctionBoxAllVo;
+    }
+
+    //点击详情，判断时间，修改状态
+    private void checkStatus(String auctionSendId) {
+        AuctionSend auctionSend = getById(auctionSendId);
+        if (AuctionSendStatus.WAIT_START.getCode().equals(auctionSend.getAuctionSendStatus())) {
+            if (LocalDateTime.now().isAfter(auctionSend.getStartTime())) {
+                auctionSend.setAuctionSendStatus(AuctionSendStatus.BID_BIDING.getCode());
+                updateById(auctionSend);
+            }
+        }
+    }
+
+
+    private AuctionVo providerAuctionCollectionVo(String auctionSendId) {
+        Integer delayTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_DELAY_TIME, Integer.class);
+        AuctionSend auctionSend = getById(auctionSendId);
+        AuctionVo auctionVo = Builder.of(AuctionVo::new).build();
+        auctionVo.setCommission(auctionSend.getCommission());
+        auctionVo.setMargin(auctionSend.getMargin());
+        auctionVo.setNowPrice(auctionSend.getNowPrice());
+        auctionVo.setSoldPrice(auctionSend.getSoldPrice());
+        auctionVo.setStartPrice(auctionSend.getStartPrice());
+        auctionVo.setConcernedNum(auctionSend.getConcernedNum());
+        auctionVo.setDelayTime(delayTime);
+        return auctionVo;
+    }
+
+
+    private CollectionInfoVo providerCollectionInfoVo(String collectionId) {
+        CollectionInfoVo collectionInfoVo = Builder.of(CollectionInfoVo::new).build();
+        CollectionInfo collectionInfo = collectionInfoMapper.selectOne(Wrappers.<CollectionInfo>lambdaQuery().eq(CollectionInfo::getCollectionId, collectionId));
+        BeanUtil.copyProperties(collectionInfo,collectionInfoVo);
+        return collectionInfoVo;
+    }
+
+
+
+
+
     private AuctionMarketVo providerAuctionMarketVo (AuctionSend auctionSend) {
         AuctionMarketVo marketVo = Builder.of(AuctionMarketVo::new).build();
         BeanUtil.copyProperties(auctionSend, marketVo);
@@ -146,11 +217,32 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
     @Override
     public void reloadAuctionSend(List<AuctionSend> auctionSendList) {
         for (AuctionSend auctionSend : auctionSendList) {
-            auctionSend.setAuctionStatus(AuctionStatus.BID_PASS.getCode());
+            auctionSend.setAuctionSendStatus(AuctionSendStatus.BID_BREAK.getCode());
             auctionSend.updateD(auctionSend.getUserId());
         }
         updateBatchById(auctionSendList);
 
+    }
+
+    //流拍后重新送拍
+    @Override
+    public R reAuctionSend(AuctionSendForm auctionSendForm, String auctionSendId) {
+        Integer preTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_PRE_TIME, Integer.class);
+        Integer bidTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_BID_TIME, Integer.class);
+        AuctionSend auctionSend = getById(auctionSendId);
+        auctionSend.setAuctionSendStatus(AuctionSendStatus.WAIT_START.getCode());
+        auctionSend.setStartPrice(auctionSendForm.getStartPrice());
+        auctionSend.setSoldPrice(auctionSendForm.getSoldPrice());
+        auctionSend.setNowPrice(auctionSendForm.getStartPrice());
+        auctionSend.setMargin(auctionSendForm.getStartPrice()
+                .multiply(systemService.getVal(BusinessConstants.SystemTypeConstant.MARGIN_SCALE, BigDecimal.class)).setScale(2, RoundingMode.HALF_UP));
+        auctionSend.setCommission(auctionSendForm.getStartPrice()
+                .multiply(systemService.getVal(BusinessConstants.SystemTypeConstant.COMMISSION_SCALE, BigDecimal.class)).setScale(2, RoundingMode.DOWN));
+        auctionSend.setStartTime(LocalDateTime.now().plusMinutes(preTime));
+        auctionSend.setEndTime(LocalDateTime.now().plusMinutes(preTime + bidTime));
+        auctionSend.updateD(auctionSend.getUserId());
+        updateById(auctionSend);
+        return R.ok();
     }
 
 
@@ -165,9 +257,7 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
             Assert.isTrue(userBoxService.existUserBox(userId,auctionSendForm.getMyGoodsId()),"选择的盲盒有误,请核实盲盒详细信息!");
 
         boolean exists = this.baseMapper.exists(Wrappers.<AuctionSend>lambdaQuery()
-                .eq(AuctionSend::getMyGoodsId, auctionSendForm.getMyGoodsId())
-                .ne(AuctionSend::getAuctionStatus, AuctionStatus.BID_BREAK.getCode())
-                .ne(AuctionSend::getAuctionStatus, AuctionStatus.BID_PASS.getCode()));
+                .eq(AuctionSend::getMyGoodsId, auctionSendForm.getMyGoodsId()));
         Assert.isFalse(exists, "请勿重复送拍");
     }
 
@@ -200,6 +290,20 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         }
         if (StrUtil.isBlank(info) && StrUtil.isBlank(realBuiId))
             throw new ServiceException("not fount type [0-1] now type is "+type+"");
+    }
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public synchronized void timeStartAuction() {
+        List<AuctionSend> list = list(Wrappers.<AuctionSend>lambdaQuery().eq(AuctionSend::getAuctionSendStatus, AuctionSendStatus.WAIT_START));
+        if (list.isEmpty()) return;
+        for (AuctionSend auctionSend : list) {
+            if (LocalDateTime.now().isAfter(auctionSend.getStartTime())) {
+                auctionSend.setAuctionSendStatus(AuctionSendStatus.BID_BIDING.getCode());
+            }
+        }
+        updateBatchById(list);
     }
 
 }

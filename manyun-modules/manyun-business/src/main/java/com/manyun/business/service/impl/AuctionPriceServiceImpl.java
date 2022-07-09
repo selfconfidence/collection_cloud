@@ -130,7 +130,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                             .nowPrice(auctionSend.getNowPrice())
                             .sendAuctionid(s)
                             .userId(businessUser.getUserId()).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));
-                    auctionSend.setAuctionStatus(AuctionSendStatus.WAIT_PAY.getCode());
+                    auctionSend.setAuctionSendStatus(AuctionSendStatus.WAIT_PAY.getCode());
 
                     //成功后退还未拍中者保证金
                     List<AuctionPrice> list = list(Wrappers.<AuctionPrice>lambdaQuery().eq(AuctionPrice::getAuctionSendId, s));
@@ -156,7 +156,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
             return R.fail("您有未支付订单，暂不可出价");
         }
         //判断竞拍状态（竞拍中才可出价）
-        if (!auctionSend.getAuctionStatus().equals(AuctionStatus.BID_BIDING.getCode())) {
+        if (!auctionSend.getAuctionSendStatus().equals(AuctionStatus.BID_BIDING.getCode())) {
             return R.fail("当前竞品不可出价");
         }
         List<AuctionPrice> list = this.list(Wrappers.<AuctionPrice>lambdaQuery()
@@ -267,6 +267,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
     //一口价
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public synchronized PayVo payFixed(String userId, AuctionPayForm auctionPayForm) {
 
         LoginBusinessUser businessUser = SecurityUtils.getTestLoginBusinessUser();
@@ -280,7 +282,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 "当前竞拍价已大于一口价，不可购买");
 
         //修改竞拍状态，相当于锁单
-        auctionSend.setAuctionStatus(AuctionStatus.WAIT_PAY.getCode());
+        auctionSend.setAuctionSendStatus(AuctionSendStatus.WAIT_PAY.getCode());
         auctionSendService.updateById(auctionSend);
 
         String auctionOrderHost = auctionOrderService.createAuctionOrder(AuctionOrderCreateDto.builder()
@@ -311,15 +313,15 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     @Override
     public synchronized void checkAuctionEnd() {
         List<AuctionSend> sendList = auctionSendService.list(Wrappers.<AuctionSend>lambdaQuery().le(AuctionSend::getEndTime, LocalDateTime.now())
-                .eq(AuctionSend::getAuctionStatus, AuctionStatus.BID_BIDING));
+                .eq(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_BIDING));
         if (sendList.isEmpty()) return;
         for (AuctionSend auctionSend : sendList) {
             List<AuctionPrice> priceList = list(Wrappers.<AuctionPrice>lambdaQuery().eq(AuctionPrice::getAuctionSendId, auctionSend.getId()));
             if (priceList.isEmpty()) {
-                auctionSend.setAuctionStatus(AuctionStatus.BID_PASS.getCode());
-                auctionSendService.updateById(auctionSend);
+                auctionSend.setAuctionSendStatus(AuctionSendStatus.BID_PASS.getCode());
             }
         }
+        auctionSendService.updateBatchById(sendList);
 
     }
 

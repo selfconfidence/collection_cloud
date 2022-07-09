@@ -51,7 +51,13 @@ public class BuiTask
         remoteAuctionService.timeCancelAuction(SecurityConstants.INNER);
     }
 
-    public void checkAuctionEnd() {remoteAuctionService.checkAuctionEnd(SecurityConstants.INNER);}
+    public void checkAuctionEnd() {
+        remoteAuctionService.checkAuctionEnd(SecurityConstants.INNER);
+    }
+
+    public void timeStartAuction() {
+        remoteAuctionService.timeStartAuction(SecurityConstants.INNER);
+    }
 
 
 

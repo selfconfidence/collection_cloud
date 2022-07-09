@@ -23,8 +23,6 @@ import org.apache.commons.compress.utils.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -128,12 +126,12 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
         buyerMoney.setMoneyBalance(buyerMoney.getMoneyBalance().add(auctionOrder.getMargin()));
         moneyService.updateById(buyerMoney);
 
-        //扣除佣金,剩余钱加给卖方
-        AuctionSend auctionSend = auctionSendService.getById(auctionOrder.getSendAuctionid());
+        //扣除佣金,剩余钱加给卖方   需要后台审核
+        /*AuctionSend auctionSend = auctionSendService.getById(auctionOrder.getSendAuctionid());
         Money sellerMoney = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, auctionSend.getUserId()));
         BigDecimal subtract = auctionOrder.getNowPrice().subtract(auctionOrder.getCommission());
         sellerMoney.setMoneyBalance(sellerMoney.getMoneyBalance().add(subtract));
-        moneyService.updateById(sellerMoney);
+        moneyService.updateById(sellerMoney);*/
 
         Integer goodsType = auctionOrder.getGoodsType();
 
@@ -159,7 +157,7 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
         List<AuctionOrder> auctionOrderList = list(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getAuctionStatus, AuctionStatus.WAIT_PAY.getCode()).lt(AuctionOrder::getEndTime, LocalDateTime.now()));
         if (auctionOrderList.isEmpty()) return;
         List<AuctionSend> auctionSendList = auctionSendService.list(Wrappers.<AuctionSend>lambdaQuery().in(AuctionSend::getAuctionOrderId, auctionOrderList.parallelStream().map(item -> item.getId()).collect(Collectors.toSet()))
-                .eq(AuctionSend::getAuctionStatus, AuctionStatus.WAIT_PAY.getCode()));
+                .eq(AuctionSend::getAuctionSendStatus, AuctionStatus.WAIT_PAY.getCode()));
         Set<String> auctionSendOrderIds = Sets.newHashSet();
         if (!auctionSendList.isEmpty()) {
             auctionSendOrderIds.addAll(auctionSendList.parallelStream().map(item -> item.getAuctionOrderId()).collect(Collectors.toSet()));

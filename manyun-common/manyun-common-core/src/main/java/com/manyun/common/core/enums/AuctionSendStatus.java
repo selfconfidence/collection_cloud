@@ -4,8 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum AuctionSendStatus {
-    WAIT_START(Integer.valueOf(0),"待开始"), BID_BIDING(1, "竞拍中"), WAIT_PAY(2, "待支付"),
-    BID_SUCCESS(3, "已支付"), BID_BREAK(4, "已违约"), BID_PASS(5, "已流拍");
+    WAIT_START(Integer.valueOf(1),"未开拍"), BID_BIDING(2, "竞拍中"), WAIT_PAY(3, "待支付"),
+    BID_SUCCESS(4, "已完成"), BID_BREAK(5, "已违约"), BID_PASS(6, "已流拍");
 
     private final Integer code;
     private final String info;

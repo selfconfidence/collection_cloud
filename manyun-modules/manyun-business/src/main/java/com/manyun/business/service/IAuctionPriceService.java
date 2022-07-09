@@ -31,4 +31,6 @@ public interface IAuctionPriceService extends IService<AuctionPrice> {
     R checkPayMargin(AuctionPriceForm auctionPriceForm, String userId);
 
     void checkAuctionEnd();
+
+    PayVo payFixed(String userId, AuctionPayForm auctionPayForm);
 }

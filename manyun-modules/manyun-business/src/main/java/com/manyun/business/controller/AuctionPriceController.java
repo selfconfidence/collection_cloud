@@ -75,6 +75,16 @@ public class AuctionPriceController {
         return auctionPriceService.checkPayMargin(auctionPriceForm, userId);
     }
 
+    @PostMapping
+    @ApiOperation(value = "一口价")
+    public R<PayVo> payFixed(@RequestBody @Valid AuctionPayForm auctionPayForm) {
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
+        String userId = loginBusinessUser.getUserId();
+        PayVo payVo = auctionPriceService.payFixed(userId, auctionPayForm);
+        return R.ok(payVo);
+    }
+
+
     @GetMapping("/checkAuctionEnd")
     @ApiOperation(value = "定时调度判断是否已流拍",hidden = true)
     @InnerAuth

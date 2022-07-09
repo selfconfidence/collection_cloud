@@ -22,4 +22,7 @@ public interface RemoteAuctionService {
 
     @GetMapping("/auctionOrder/checkAuctionEnd")
     R checkAuctionEnd(@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+
+    @GetMapping("/auctionSend/timeStartAuction")
+    R timeStartAuction(@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 }

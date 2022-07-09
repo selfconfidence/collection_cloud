@@ -62,8 +62,8 @@ public class AuctionSend implements Serializable {
     @ApiModelProperty("收藏人数")
     private Integer concernedNum;
 
-    @ApiModelProperty("拍卖状态;1待开始，2竞拍中，3待支付，4已完成，5已违约，6已流拍")
-    private Integer auctionStatus;
+    @ApiModelProperty("拍卖状态;1未开拍，2竞拍中，3待支付，4已完成，5已违约，6已流拍")
+    private Integer auctionSendStatus;
 
     @ApiModelProperty("开始时间")
     private LocalDateTime startTime;
