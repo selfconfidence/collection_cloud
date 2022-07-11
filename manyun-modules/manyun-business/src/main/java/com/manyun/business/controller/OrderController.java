@@ -43,7 +43,7 @@ public class OrderController extends BaseController {
     @PostMapping("/myOrderList")
     @ApiOperation("分页查询我的订单信息")
     public R<TableDataInfo<OrderVo>> myOrderList (@RequestBody OrderQuery orderQuery) {
-        LoginBusinessUser loginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         PageHelper.startPage(orderQuery.getPageNum(), orderQuery.getPageSize());
         TableDataInfo<OrderVo> orderVoTableDataInfo = orderService.pageQueryList(orderQuery, loginBusinessUser.getUserId());
         return R.ok(orderVoTableDataInfo);

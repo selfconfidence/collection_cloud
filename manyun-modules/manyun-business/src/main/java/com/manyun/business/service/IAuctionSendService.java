@@ -5,10 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.form.AuctionSendForm;
 import com.manyun.business.domain.query.AuctionMarketQuery;
 import com.manyun.business.domain.query.AuctionSendQuery;
-import com.manyun.business.domain.vo.AuctionBoxAllVo;
-import com.manyun.business.domain.vo.AuctionCollectionAllVo;
-import com.manyun.business.domain.vo.AuctionMarketVo;
-import com.manyun.business.domain.vo.MyAuctionSendVo;
+import com.manyun.business.domain.vo.*;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
@@ -40,5 +37,7 @@ public interface IAuctionSendService extends IService<AuctionSend> {
     void timeStartAuction();
 
     R reAuctionSend(AuctionSendForm auctionSendForm, String auctionSendId);
+
+    AuctionVo getAuctionSendVo(String auctionSendId);
 
 }

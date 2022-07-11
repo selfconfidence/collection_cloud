@@ -33,7 +33,7 @@ public class AuctionOrderController {
     @PostMapping("/myAuctionOrderList")
     @ApiOperation("分页查询我的订单信息")
     public R<TableDataInfo<AuctionOrderVo>> myAuctionOrderList(@RequestBody AuctionOrderQuery orderQuery) {
-        LoginBusinessUser loginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         PageHelper.startPage(orderQuery.getPageNum(), orderQuery.getPageSize());
         TableDataInfo<AuctionOrderVo> auctionOrderVoTableDataInfo = auctionOrderService.myAuctionOrderList(orderQuery, loginBusinessUser.getUserId());
         return R.ok(auctionOrderVoTableDataInfo);

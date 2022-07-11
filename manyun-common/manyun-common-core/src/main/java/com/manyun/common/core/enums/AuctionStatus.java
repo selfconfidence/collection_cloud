@@ -4,7 +4,7 @@ import lombok.Getter;
 
 /**
  * 竞拍状态
- * 1竞拍中，2未拍中，3待支付，4已支付，5已违约，6已违约，7已流拍
+ * 1竞拍中，2未拍中，3待支付，4已支付，5已违约
  */
 @Getter
 public enum AuctionStatus {

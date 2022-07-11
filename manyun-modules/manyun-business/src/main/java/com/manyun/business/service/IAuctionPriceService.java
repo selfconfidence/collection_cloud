@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.form.AuctionPayForm;
 import com.manyun.business.domain.form.AuctionPriceForm;
 import com.manyun.business.domain.query.AuctionPriceQuery;
+import com.manyun.business.domain.query.MyAuctionPriceQuery;
 import com.manyun.business.domain.vo.AuctionPriceVo;
+import com.manyun.business.domain.vo.MyAuctionPriceVo;
 import com.manyun.business.domain.vo.PayVo;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.TableDataInfo;
@@ -33,4 +35,6 @@ public interface IAuctionPriceService extends IService<AuctionPrice> {
     void checkAuctionEnd();
 
     PayVo payFixed(String userId, AuctionPayForm auctionPayForm);
+
+    TableDataInfo<MyAuctionPriceVo> myAuctionPriceList(MyAuctionPriceQuery myAuctionPriceQuery, String userId);
 }
