@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.google.common.collect.Lists;
 import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.form.AuctionSendForm;
 import com.manyun.business.domain.query.AuctionMarketQuery;
@@ -29,9 +30,11 @@ import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
 
 /**
  * <p>
@@ -123,6 +126,32 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
                 .with(AuctionSend::setEndTime,LocalDateTime.now().plusMinutes(preTime + bidTime)).build();
         auctionSend.createD(userId);
         save(auctionSend);
+    }
+
+    @Override
+    public List<KeywordVo> queryDict(String keyword) {
+        List<String> collectIonNames = list(Wrappers.<AuctionSend>lambdaQuery().eq(AuctionSend::getGoodsType,1).select(AuctionSend::getGoodsName).like(AuctionSend::getGoodsName, keyword).orderByDesc(AuctionSend::getCreatedTime).last(" limit 10")).parallelStream().map(item -> item.getGoodsName()).collect(Collectors.toList());
+        List<String> boxNames = list(Wrappers.<AuctionSend>lambdaQuery().eq(AuctionSend::getGoodsType, 2).select(AuctionSend::getGoodsName).like(AuctionSend::getGoodsName, keyword).orderByDesc(AuctionSend::getCreatedTime).last(" limit 10")).parallelStream().map(item -> item.getGoodsName()).collect(Collectors.toList());
+        return  initKeywordVo(collectIonNames,boxNames);
+    }
+
+    private List<KeywordVo> initKeywordVo(List<String> collectIonNames,List<String> boxNames){
+        List<KeywordVo> keywordVos = Lists.newArrayList();
+        for (String collectIonName : collectIonNames) {
+            KeywordVo keywordVo = Builder.of(KeywordVo::new).build();
+            keywordVo.setCommTitle(collectIonName);
+            keywordVo.setType(1);
+            keywordVos.add(keywordVo);
+
+        }
+        for (String boxName : boxNames) {
+            KeywordVo keywordVo = Builder.of(KeywordVo::new).build();
+            keywordVo.setCommTitle(boxName);
+            keywordVo.setType(2);
+            keywordVos.add(keywordVo);
+        }
+        Collections.shuffle(keywordVos);
+        return keywordVos;
     }
 
     @Override
