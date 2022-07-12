@@ -1,9 +1,8 @@
 package com.manyun.business.domain.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+
 import lombok.Builder;
 import lombok.Data;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -26,7 +25,9 @@ public class AuctionOrderCreateDto implements Serializable {
 
     private String goodsImg;
 
-    private String sendAuctionid;
+    private String sendAuctionId;
+
+    private String auctionPriceId;
 
     private BigDecimal nowPrice;
 

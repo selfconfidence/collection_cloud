@@ -45,7 +45,10 @@ public class AuctionOrder implements Serializable {
     private String goodsImg;
 
     @ApiModelProperty("送拍id")
-    private String sendAuctionid;
+    private String sendAuctionId;
+
+    @ApiModelProperty("出价id")
+    private String auctionPriceId;
 
     @ApiModelProperty("当前价")
     private BigDecimal nowPrice;
@@ -74,7 +77,7 @@ public class AuctionOrder implements Serializable {
     @ApiModelProperty("付款时间")
     private LocalDateTime payTime;
 
-    @ApiModelProperty("拍卖状态;1竞拍中，2待支付，3已支付，4已违约")
+    @ApiModelProperty("拍卖状态;1竞拍中，2,未拍中，3待支付，4已支付，5已违约")
     private Integer auctionStatus;
 
     @ApiModelProperty("创建人")

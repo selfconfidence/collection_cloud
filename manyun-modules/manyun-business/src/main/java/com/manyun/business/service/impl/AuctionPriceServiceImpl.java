@@ -15,8 +15,8 @@ import com.manyun.business.domain.entity.Money;
 import com.manyun.business.domain.form.AuctionPayForm;
 import com.manyun.business.domain.form.AuctionPriceForm;
 import com.manyun.business.domain.query.AuctionPriceQuery;
-import com.manyun.business.domain.vo.AuctionPriceVo;
-import com.manyun.business.domain.vo.PayVo;
+import com.manyun.business.domain.query.MyAuctionPriceQuery;
+import com.manyun.business.domain.vo.*;
 import com.manyun.business.mapper.AuctionPriceMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -78,6 +78,9 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     private DelayQueue delayQueue;
 
     @Autowired
+    private IMediaService mediaService;
+
+    @Autowired
     private RemoteBuiUserService remoteBuiUserService;
 
 
@@ -100,7 +103,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
     @Override
     public synchronized R myAuctionPrice(AuctionPriceForm auctionPriceForm, String userId) {
-        LoginBusinessUser businessUser = SecurityUtils.getTestLoginBusinessUser();
+        LoginBusinessUser businessUser = SecurityUtils.getNotNullLoginBusinessUser();
         AuctionSend auctionSend = auctionSendService.getById(auctionPriceForm.getAuctionSendId());
         Integer delayTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_DELAY_TIME, Integer.class);
         if (LocalDateTime.now().isBefore(auctionSend.getStartTime())) {
@@ -109,9 +112,12 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         if (LocalDateTime.now().isAfter(auctionSend.getEndTime().plusMinutes(delayTime))) {
             return R.fail("当前拍卖已结束");
         }
-        if (auctionSend.getUserId().equals(businessUser.getUserId())) {
+        if (auctionSend.getUserId().equals(userId)) {
             return R.fail("自己不可购买自己送拍的产品");
         }
+
+        AuctionPrice auctionPrice = new AuctionPrice();
+        auctionPrice.setAuctionStatus(AuctionStatus.BID_BIDING.getCode());
 
         //判断是否延拍，延拍加时间
         if (LocalDateTime.now().isAfter(auctionSend.getEndTime())) {
@@ -122,24 +128,41 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
             delayQueue.put(auctionSend.getId(),l, new DelayAbsAspect<String>() {
                 @Override
                 public void invocationSuccess(String s) {
+
+                    List<AuctionPrice> list = list(Wrappers.<AuctionPrice>lambdaQuery().eq(AuctionPrice::getAuctionSendId, s).orderByDesc(AuctionPrice::getBidPrice));
+                    //拍中者
+                    AuctionPrice winAuctionPrice = list.get(0);
+                    winAuctionPrice.setAuctionStatus(AuctionStatus.WAIT_PAY.getCode());
                     //回调成功,生成订单
                     String auctionOrderNo = auctionOrderService.createAuctionOrder(AuctionOrderCreateDto.builder()
                             .goodsId(auctionSend.getGoodsId())
                             .goodsName(auctionSend.getGoodsName())
                             .goodsType(auctionSend.getGoodsType())
                             .nowPrice(auctionSend.getNowPrice())
-                            .sendAuctionid(s)
-                            .userId(businessUser.getUserId()).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));
+                            .sendAuctionId(s)
+                            .auctionPriceId(winAuctionPrice.getId())
+                            .userId(winAuctionPrice.getUserId()).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));
                     auctionSend.setAuctionSendStatus(AuctionSendStatus.WAIT_PAY.getCode());
 
                     //成功后退还未拍中者保证金
-                    List<AuctionPrice> list = list(Wrappers.<AuctionPrice>lambdaQuery().eq(AuctionPrice::getAuctionSendId, s));
+                    //拍中者暂不退还，支付成功再退
+                    List<AuctionPrice> updateList = list.parallelStream().map(item -> {
+                        item.setAuctionStatus(AuctionStatus.BID_MISSED.getCode());
+                        return item;
+                    }).collect(Collectors.toList());
+                    //排除拍中者
+                    list.remove(winAuctionPrice);
+
                     Set<String> collect = list.parallelStream().map(item -> item.getUserId()).collect(Collectors.toSet());
+                    //退保证金
                     for (String userId : collect) {
                         Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
                         money.setMoneyBalance(money.getMoneyBalance().add(auctionSend.getMargin()));
                         moneyService.updateById(money);
                     }
+                    //拍中者加进来改状态
+                    list.add(winAuctionPrice);
+                    updateBatchById(updateList);
                 }
 
                 @Override
@@ -156,7 +179,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
             return R.fail("您有未支付订单，暂不可出价");
         }
         //判断竞拍状态（竞拍中才可出价）
-        if (!auctionSend.getAuctionSendStatus().equals(AuctionStatus.BID_BIDING.getCode())) {
+        if (!auctionSend.getAuctionSendStatus().equals(AuctionSendStatus.BID_BIDING.getCode())) {
             return R.fail("当前竞品不可出价");
         }
         List<AuctionPrice> list = this.list(Wrappers.<AuctionPrice>lambdaQuery()
@@ -164,7 +187,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
         BigDecimal range = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_PRICE_RANGE, BigDecimal.class);
 
-        AuctionPrice auctionPrice = new AuctionPrice();
+
         if (list.isEmpty()) {
             auctionPrice.setBidPrice(auctionSend.getStartPrice().add(range));
         }
@@ -202,6 +225,37 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         return auctionPriceVo;
     }
 
+    //我的出价，显示竞品信息
+    @Override
+    public TableDataInfo<MyAuctionPriceVo> myAuctionPriceList(MyAuctionPriceQuery myAuctionPriceQuery, String userId) {
+        //查询出当前用户出价过的藏品
+        Set<String> auctionSendIds = list(Wrappers.<AuctionPrice>lambdaQuery()
+                .eq(myAuctionPriceQuery.getAuctionPriceStatus() != null && myAuctionPriceQuery.getAuctionPriceStatus() != 0,AuctionPrice::getAuctionStatus, myAuctionPriceQuery.getAuctionPriceStatus())
+                .eq(AuctionPrice::getUserId, userId))
+                .parallelStream().map(item -> item.getAuctionSendId()).collect(Collectors.toSet());
+
+        List<AuctionSend> sendList = auctionSendService.list(Wrappers.<AuctionSend>lambdaQuery().in(AuctionSend::getId, auctionSendIds));
+
+        return TableDataInfoUtil.pageTableDataInfo(sendList.parallelStream().map(this::providerMyAuctionPriceVo).collect(Collectors.toList()), sendList);
+    }
+
+    private MyAuctionPriceVo providerMyAuctionPriceVo(AuctionSend auctionSend) {
+        MyAuctionPriceVo myAuctionPriceVo = Builder.of(MyAuctionPriceVo::new).build();
+        myAuctionPriceVo.setAuctionVo(auctionSendService.getAuctionSendVo(auctionSend.getId()));
+        myAuctionPriceVo.setAuctionSendId(auctionSend.getId());
+        String mediaUrl = "";
+        if (auctionSend.getGoodsType() == 1) {
+            mediaUrl = mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE).get(0).getMediaUrl();
+        } else {
+            mediaUrl = mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE).get(0).getMediaUrl();
+        }
+        myAuctionPriceVo.setGoodsName(auctionSend.getGoodsName());
+        myAuctionPriceVo.setGoodsImg(mediaUrl);
+
+        return myAuctionPriceVo;
+    }
+
+
     //倒计时结束，创建订单，发起支付
 
     //竞拍结束后支付
@@ -217,7 +271,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .goodsType(auctionSend.getGoodsType())
                 .nowPrice(auctionSend.getNowPrice())
                 .payType(auctionPayForm.getPayType())
-                .sendAuctionid(auctionPayForm.getAuctionSendId())
+                .sendAuctionId(auctionPayForm.getAuctionSendId())
                 .userId(payUserId).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));*/
 
         PayVo payVo =  rootPay.execPayVo(
@@ -271,13 +325,12 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     @Transactional(rollbackFor = Exception.class)
     public synchronized PayVo payFixed(String userId, AuctionPayForm auctionPayForm) {
 
-        LoginBusinessUser businessUser = SecurityUtils.getTestLoginBusinessUser();
         AuctionSend auctionSend = auctionSendService.getById(auctionPayForm.getAuctionSendId());
         Integer delayTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_DELAY_TIME, Integer.class);
 
         Assert.isFalse(LocalDateTime.now().isBefore(auctionSend.getStartTime()), "当前竞品尚未开拍，请稍后再试");
         Assert.isFalse(LocalDateTime.now().isAfter(auctionSend.getEndTime().plusMinutes(delayTime)),"当前拍卖已结束");
-        Assert.isFalse(auctionSend.getUserId().equals(businessUser.getUserId()), "自己不可购买自己送拍的产品");
+        Assert.isFalse(auctionSend.getUserId().equals(userId), "自己不可购买自己送拍的产品");
         Assert.isTrue(auctionSend.getSoldPrice().compareTo(auctionSend.getNowPrice()) > 0,
                 "当前竞拍价已大于一口价，不可购买");
 
@@ -291,7 +344,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .goodsType(auctionSend.getGoodsType())
                 .nowPrice(auctionSend.getSoldPrice())
                 .payType(auctionPayForm.getPayType())
-                .sendAuctionid(auctionPayForm.getAuctionSendId())
+                .sendAuctionId(auctionPayForm.getAuctionSendId())
                 .userId(userId).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));
 
         PayVo payVo = rootPay.execPayVo(PayInfoDto.builder()

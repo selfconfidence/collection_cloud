@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.domain.dto.AuctionOrderCreateDto;
 import com.manyun.business.domain.entity.AuctionOrder;
+import com.manyun.business.domain.entity.AuctionPrice;
 import com.manyun.business.domain.entity.AuctionSend;
 import com.manyun.business.domain.entity.Money;
 import com.manyun.business.domain.query.AuctionOrderQuery;
@@ -16,11 +17,13 @@ import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.enums.AuctionSendStatus;
 import com.manyun.common.core.enums.AuctionStatus;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import org.apache.commons.compress.utils.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
@@ -56,6 +59,10 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
     @Autowired
     private IMoneyService moneyService;
 
+    @Autowired
+    @Lazy
+    private IAuctionPriceService auctionPriceService;
+
     @Override
     public TableDataInfo<AuctionOrderVo> myAuctionOrderList(AuctionOrderQuery orderQuery, String userId) {
         List<AuctionOrder> list = list(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getUserId, userId)
@@ -80,7 +87,7 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
     //创建订单
     private String createOrder(AuctionOrderCreateDto auctionOrderCreateDto, Integer serviceVal, Consumer<String> consumer) {
 
-        AuctionSend auctionSend = auctionSendService.getById(auctionOrderCreateDto.getSendAuctionid());
+        AuctionSend auctionSend = auctionSendService.getById(auctionOrderCreateDto.getSendAuctionId());
 
         AuctionOrder auctionOrder = Builder.of(AuctionOrder::new).build();
         BeanUtil.copyProperties(auctionOrderCreateDto, auctionOrder);
@@ -121,13 +128,25 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
         auctionOrder.updateD(auctionOrder.getUserId());
         updateById(auctionOrder);
 
+        //更改送拍状态
+        AuctionSend auctionSend = auctionSendService.getById(auctionOrder.getSendAuctionId());
+        auctionSend.setAuctionSendStatus(AuctionSendStatus.BID_SUCCESS.getCode());
+        auctionSendService.updateById(auctionSend);
+
+        //更改出价状态
+        List<AuctionPrice> list = auctionPriceService.list(Wrappers.<AuctionPrice>lambdaQuery()
+                .eq(AuctionPrice::getAuctionSendId, auctionSend.getId()).orderByDesc(AuctionPrice::getBidPrice));
+        AuctionPrice auctionPrice = list.get(0);
+        auctionPrice.setAuctionStatus(AuctionStatus.PAY_SUCCESS.getCode());
+        auctionPriceService.updateById(auctionPrice);
+
         //退还买方保证金
         Money buyerMoney = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
         buyerMoney.setMoneyBalance(buyerMoney.getMoneyBalance().add(auctionOrder.getMargin()));
         moneyService.updateById(buyerMoney);
 
         //扣除佣金,剩余钱加给卖方   需要后台审核
-        /*AuctionSend auctionSend = auctionSendService.getById(auctionOrder.getSendAuctionid());
+        /*AuctionSend auctionSend = auctionSendService.getById(auctionOrder.getSendAuctionId());
         Money sellerMoney = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, auctionSend.getUserId()));
         BigDecimal subtract = auctionOrder.getNowPrice().subtract(auctionOrder.getCommission());
         sellerMoney.setMoneyBalance(sellerMoney.getMoneyBalance().add(subtract));
@@ -165,11 +184,15 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
         }
 
         List<AuctionOrder> updateOrder = auctionOrderList.parallelStream().map(item -> {
+            AuctionPrice auctionPrice = auctionPriceService.getById(item.getAuctionPriceId());
+            auctionPrice.setAuctionStatus(AuctionStatus.BID_BREAK.getCode());
+            auctionPriceService.updateById(auctionPrice);
             item.setAuctionStatus(AuctionStatus.BID_BREAK.getCode());
             item.updateD(item.getUserId());
             return item;
         }).collect(Collectors.toList());
         updateBatchById(updateOrder);
+
 
         // 订单取消，扣除保证金
         /*for (AuctionOrder auctionOrder : updateOrder) {
