@@ -39,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -233,9 +234,10 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .eq(myAuctionPriceQuery.getAuctionPriceStatus() != null && myAuctionPriceQuery.getAuctionPriceStatus() != 0,AuctionPrice::getAuctionStatus, myAuctionPriceQuery.getAuctionPriceStatus())
                 .eq(AuctionPrice::getUserId, userId))
                 .parallelStream().map(item -> item.getAuctionSendId()).collect(Collectors.toSet());
-
-        List<AuctionSend> sendList = auctionSendService.list(Wrappers.<AuctionSend>lambdaQuery().in(AuctionSend::getId, auctionSendIds));
-
+        List<AuctionSend> sendList = new ArrayList<>();
+        if (!auctionSendIds.isEmpty()) {
+            sendList = auctionSendService.list(Wrappers.<AuctionSend>lambdaQuery().in(AuctionSend::getId, auctionSendIds));
+        }
         return TableDataInfoUtil.pageTableDataInfo(sendList.parallelStream().map(this::providerMyAuctionPriceVo).collect(Collectors.toList()), sendList);
     }
 

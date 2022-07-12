@@ -55,7 +55,7 @@ public class AuctionPriceController {
     @ApiOperation("我的出价列表")
     public R<TableDataInfo<MyAuctionPriceVo>> myAuctionPriceList(@RequestBody MyAuctionPriceQuery auctionPriceQuery) {
         PageUtils.startPage();
-        LoginBusinessUser businessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        LoginBusinessUser businessUser = SecurityUtils.getTestLoginBusinessUser();
         TableDataInfo<MyAuctionPriceVo> myAuctionPriceVoTableDataInfo = auctionPriceService.myAuctionPriceList(auctionPriceQuery, businessUser.getUserId());
         return R.ok(myAuctionPriceVoTableDataInfo);
     }

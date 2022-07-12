@@ -26,10 +26,6 @@ public class AuctionSendForm {
     @Range(min = 1,max = 2,message = "藏品类型错误")
     private Integer goodsType;
 
-    @ApiModelProperty(value = "商品名称", required = true)
-    @NotBlank
-    private String goodsName;
-
     @ApiModelProperty(value = "起拍价", required = true)
     @Digits(integer = MoneyConstants.MoneyPrecision, fraction = MoneyConstants.MoneyScale)
     private BigDecimal startPrice;

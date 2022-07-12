@@ -3,6 +3,7 @@ package com.manyun.business.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.form.AuctionSendForm;
@@ -29,6 +30,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -67,12 +69,27 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
     @Autowired
     private IBoxCollectionService boxCollectionService;
 
+    /**
+     * 送拍到拍卖市场
+     * @param auctionSendForm
+     * @param userId
+     * @return
+     */
     @Override
     public R auctionSend(AuctionSendForm auctionSendForm, String userId) {
-
         checkAll(auctionSendForm, userId);
-
         aspect(auctionSendForm, userId);
+        return R.ok();
+    }
+
+    /**
+     * 推送到拍卖市场
+     * @param auctionSendForm
+     * @param userId
+     * @param cateId
+     * @param goodsName
+     */
+    private void pushAuctionMarket(AuctionSendForm auctionSendForm, String userId, String cateId, String goodsName) {
         //收藏人数
         int concernedNum = 0;
         if (auctionSendForm.getGoodsType() == 1) {
@@ -93,18 +110,19 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
                 .with(AuctionSend::setMyGoodsId, auctionSendForm.getMyGoodsId())
                 .with(AuctionSend::setGoodsId, auctionSendForm.getGoodsId())
                 .with(AuctionSend::setGoodsType, auctionSendForm.getGoodsType())
-                .with(AuctionSend::setGoodsName, auctionSendForm.getGoodsName())
                 .with(AuctionSend::setStartPrice, auctionSendForm.getStartPrice())
+                .with(AuctionSend::setCateId, cateId)
+                .with(AuctionSend::setGoodsName, goodsName)
                 .with(AuctionSend::setNowPrice, auctionSendForm.getStartPrice())
                 .with(AuctionSend::setSoldPrice, auctionSendForm.getSoldPrice())
                 .with(AuctionSend::setConcernedNum, concernedNum)
                 .with(AuctionSend::setCommission, commission)
                 .with(AuctionSend::setMargin, auctionSendForm.getStartPrice()
                         .multiply(systemService.getVal(BusinessConstants.SystemTypeConstant.MARGIN_SCALE, BigDecimal.class)).setScale(2, RoundingMode.HALF_UP))
-                .with(AuctionSend::setCreatedTime, LocalDateTime.now())
                 .with(AuctionSend::setStartTime, LocalDateTime.now().plusMinutes(preTime))
                 .with(AuctionSend::setEndTime,LocalDateTime.now().plusMinutes(preTime + bidTime)).build();
-        return this.save(auctionSend) ? R.ok() : R.fail();
+        auctionSend.createD(userId);
+        save(auctionSend);
     }
 
     @Override
@@ -129,12 +147,33 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         return auctionSendVo;
     }
 
+    /**
+     * 拍卖市场列表
+     * @param marketQuery
+     * @return
+     */
+
     @Override
     public TableDataInfo<AuctionMarketVo> auctionMarketList(AuctionMarketQuery marketQuery) {
-        List<AuctionSend> list = list(Wrappers.<AuctionSend>lambdaQuery().eq(AuctionSend::getGoodsType, marketQuery.getGoodsType())
-                .orderByDesc(AuctionSend::getCreatedTime));
+        List<AuctionSend> list = list(getAuctionSendQueryWrappers(marketQuery));
         return TableDataInfoUtil.pageTableDataInfo(list.parallelStream().map(this::providerAuctionMarketVo).collect(Collectors.toList()), list);
     }
+
+    //拍卖市场排序
+    private LambdaQueryWrapper<AuctionSend> getAuctionSendQueryWrappers(AuctionMarketQuery marketQuery) {
+        LambdaQueryWrapper<AuctionSend> lambdaQueryWrapper = Wrappers.<AuctionSend>lambdaQuery();
+        lambdaQueryWrapper.eq(AuctionSend::getGoodsType, marketQuery.getGoodsType());
+
+        lambdaQueryWrapper.eq(StrUtil.isNotBlank(marketQuery.getCateId()), AuctionSend::getCateId, marketQuery.getCateId());
+        lambdaQueryWrapper.like(StrUtil.isNotBlank(marketQuery.getCommName()), AuctionSend::getGoodsName, marketQuery.getCommName());
+
+        if (Objects.nonNull(marketQuery.getPriceOrder()) && Integer.valueOf(0).equals(marketQuery.getPriceOrder()))
+            lambdaQueryWrapper.orderByDesc(AuctionSend::getStartPrice);
+        if (Objects.nonNull(marketQuery.getPriceOrder()) && Integer.valueOf(1).equals(marketQuery.getPriceOrder()))
+            lambdaQueryWrapper.orderByAsc(AuctionSend::getStartPrice);
+        return lambdaQueryWrapper;
+    }
+
 
     //查询藏品详情
 
@@ -201,9 +240,6 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         BeanUtil.copyProperties(collectionInfo,collectionInfoVo);
         return collectionInfoVo;
     }
-
-
-
 
 
     private AuctionMarketVo providerAuctionMarketVo (AuctionSend auctionSend) {
@@ -295,6 +331,8 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         }
         if (StrUtil.isBlank(info) && StrUtil.isBlank(realBuiId))
             throw new ServiceException("not fount type [0-1] now type is "+type+"");
+
+        pushAuctionMarket(auctionSendForm, userId, cateId, buiName);
     }
 
 
