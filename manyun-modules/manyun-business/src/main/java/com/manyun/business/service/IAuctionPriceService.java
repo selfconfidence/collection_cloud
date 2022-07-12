@@ -2,7 +2,9 @@ package com.manyun.business.service;
 
 import com.manyun.business.domain.entity.AuctionPrice;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.manyun.business.domain.form.AuctionPayFixedForm;
 import com.manyun.business.domain.form.AuctionPayForm;
+import com.manyun.business.domain.form.AuctionPayMarginForm;
 import com.manyun.business.domain.form.AuctionPriceForm;
 import com.manyun.business.domain.query.AuctionPriceQuery;
 import com.manyun.business.domain.query.MyAuctionPriceQuery;
@@ -28,13 +30,13 @@ public interface IAuctionPriceService extends IService<AuctionPrice> {
 
     PayVo payAuction(String payUserId, AuctionPayForm auctionPayForm);
 
-    PayVo payMargin(String payUserId, AuctionPayForm auctionPayForm);
+    PayVo payMargin(String payUserId, AuctionPayMarginForm auctionPayMarginForm);
 
     R checkPayMargin(AuctionPriceForm auctionPriceForm, String userId);
 
     void checkAuctionEnd();
 
-    PayVo payFixed(String userId, AuctionPayForm auctionPayForm);
+    PayVo payFixed(String userId, AuctionPayFixedForm auctionPayFixedForm);
 
     TableDataInfo<MyAuctionPriceVo> myAuctionPriceList(MyAuctionPriceQuery myAuctionPriceQuery, String userId);
 }

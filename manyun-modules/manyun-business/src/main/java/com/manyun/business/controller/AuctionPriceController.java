@@ -1,6 +1,8 @@
 package com.manyun.business.controller;
 
+import com.manyun.business.domain.form.AuctionPayFixedForm;
 import com.manyun.business.domain.form.AuctionPayForm;
+import com.manyun.business.domain.form.AuctionPayMarginForm;
 import com.manyun.business.domain.form.AuctionPriceForm;
 import com.manyun.business.domain.query.AuctionPriceQuery;
 import com.manyun.business.domain.query.MyAuctionPriceQuery;
@@ -72,10 +74,10 @@ public class AuctionPriceController {
 
     @PostMapping("/payMargin")
     @ApiOperation(value = "拍卖市场支付保证金")
-    public R<PayVo> payMargin(@RequestBody @Valid AuctionPayForm auctionPayForm) {
+    public R<PayVo> payMargin(@RequestBody @Valid AuctionPayMarginForm auctionPayMarginForm) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         String payUserId = loginBusinessUser.getUserId();
-        PayVo payVo = auctionPriceService.payMargin(payUserId, auctionPayForm);
+        PayVo payVo = auctionPriceService.payMargin(payUserId, auctionPayMarginForm);
         return R.ok(payVo);
     }
 
@@ -87,12 +89,12 @@ public class AuctionPriceController {
         return auctionPriceService.checkPayMargin(auctionPriceForm, userId);
     }
 
-    @PostMapping
+    @PostMapping("/payFixed")
     @ApiOperation(value = "一口价")
-    public R<PayVo> payFixed(@RequestBody @Valid AuctionPayForm auctionPayForm) {
+    public R<PayVo> payFixed(@RequestBody @Valid AuctionPayFixedForm auctionPayFixedForm) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         String userId = loginBusinessUser.getUserId();
-        PayVo payVo = auctionPriceService.payFixed(userId, auctionPayForm);
+        PayVo payVo = auctionPriceService.payFixed(userId, auctionPayFixedForm);
         return R.ok(payVo);
     }
 

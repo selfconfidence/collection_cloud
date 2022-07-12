@@ -12,7 +12,9 @@ import com.manyun.business.domain.entity.AuctionOrder;
 import com.manyun.business.domain.entity.AuctionPrice;
 import com.manyun.business.domain.entity.AuctionSend;
 import com.manyun.business.domain.entity.Money;
+import com.manyun.business.domain.form.AuctionPayFixedForm;
 import com.manyun.business.domain.form.AuctionPayForm;
+import com.manyun.business.domain.form.AuctionPayMarginForm;
 import com.manyun.business.domain.form.AuctionPriceForm;
 import com.manyun.business.domain.query.AuctionPriceQuery;
 import com.manyun.business.domain.query.MyAuctionPriceQuery;
@@ -301,9 +303,9 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized PayVo payMargin(String payUserId, AuctionPayForm auctionPayForm) {
+    public synchronized PayVo payMargin(String payUserId, AuctionPayMarginForm auctionPayMarginForm) {
 
-        AuctionSend auctionSend = auctionSendService.getById(auctionPayForm.getAuctionSendId());
+        AuctionSend auctionSend = auctionSendService.getById(auctionPayMarginForm.getAuctionSendId());
         //用户余额
         BigDecimal margin = auctionSend.getStartPrice().multiply(systemService.getVal(BusinessConstants.SystemTypeConstant.MARGIN_SCALE, BigDecimal.class)).setScale(2, RoundingMode.HALF_UP);
         Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, payUserId));
@@ -312,7 +314,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         String payMarginHost ="";
 
         PayVo payVo = rootPay.execPayVo(PayInfoDto.builder()
-                .payType(auctionPayForm.getPayType())
+                .payType(auctionPayMarginForm.getPayType())
                 .realPayMoney(margin)
                 .aliPayEnum(MARGIN_ALI_PAY)
                 .wxPayEnum(MARGIN_WECHAT_PAY)
@@ -325,9 +327,9 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized PayVo payFixed(String userId, AuctionPayForm auctionPayForm) {
+    public synchronized PayVo payFixed(String userId, AuctionPayFixedForm auctionPayFixedForm) {
 
-        AuctionSend auctionSend = auctionSendService.getById(auctionPayForm.getAuctionSendId());
+        AuctionSend auctionSend = auctionSendService.getById(auctionPayFixedForm.getAuctionSendId());
         Integer delayTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_DELAY_TIME, Integer.class);
 
         Assert.isFalse(LocalDateTime.now().isBefore(auctionSend.getStartTime()), "当前竞品尚未开拍，请稍后再试");
@@ -345,12 +347,12 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .goodsName(auctionSend.getGoodsName())
                 .goodsType(auctionSend.getGoodsType())
                 .nowPrice(auctionSend.getSoldPrice())
-                .payType(auctionPayForm.getPayType())
-                .sendAuctionId(auctionPayForm.getAuctionSendId())
+                .payType(auctionPayFixedForm.getPayType())
+                .sendAuctionId(auctionPayFixedForm.getAuctionSendId())
                 .userId(userId).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));
 
         PayVo payVo = rootPay.execPayVo(PayInfoDto.builder()
-                .payType(auctionPayForm.getPayType())
+                .payType(auctionPayFixedForm.getPayType())
                 .realPayMoney(auctionSend.getSoldPrice())
                 .outHost(auctionOrderHost)
                 .aliPayEnum(FIXED_ALI_PAY)
