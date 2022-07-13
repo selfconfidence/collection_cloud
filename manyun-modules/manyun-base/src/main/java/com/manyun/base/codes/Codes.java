@@ -25,10 +25,7 @@ public class Codes {
                 })
                 .strategyConfig(builder -> {
                     builder // 设置需要生成的表名
-                            .addInclude("cnt_post_excel")
-                            .addInclude("tb_post_exist")
-                            .addInclude("tb_post_sell")
-                            .addInclude("tb_post_config");
+                            .addInclude("cnt_notice");
 
                             //.likeTable(new LikeTable("cnt_", SqlLike.RIGHT))
                             //.addTablePrefix("cnt_"); // 设置过滤表前缀

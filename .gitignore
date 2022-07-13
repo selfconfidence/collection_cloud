@@ -10,7 +10,7 @@ manyun-gen/
 manyun-job/
 logs/
 bin/
-sql/
+
 docker/
 !.mvn/wrapper/maven-wrapper.jar
 

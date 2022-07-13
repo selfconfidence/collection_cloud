@@ -2,10 +2,7 @@ package com.manyun.business.controller;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.manyun.business.domain.entity.CntUser;
-import com.manyun.business.domain.form.UserChangeForm;
-import com.manyun.business.domain.form.UserChangeLoginForm;
-import com.manyun.business.domain.form.UserChangePayPass;
-import com.manyun.business.domain.form.UserRealForm;
+import com.manyun.business.domain.form.*;
 import com.manyun.business.domain.vo.UserInfoVo;
 import com.manyun.business.domain.vo.UserLevelVo;
 import com.manyun.business.domain.vo.UserPleaseBoxVo;
@@ -59,6 +56,16 @@ public class CntUserController extends BaseController {
         CntUserDto cntUserDto = Builder.of(CntUserDto::new).build();
         BeanUtil.copyProperties(cntUser,cntUserDto);
         return R.ok(cntUserDto);
+    }
+
+
+    @PostMapping("/regUser")
+    @ApiOperation("用户注册 - 手机号验证码的方式")
+    public R regUser(@RequestBody UserRegForm userRegForm){
+        String phoneCode = (String) redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(userRegForm.getPhone()));
+        Assert.isTrue(userRegForm.getPhoneCode().equals(phoneCode),"验证码输入错误,请核实!");
+        userService.regUser(userRegForm);
+        return R.ok();
     }
 
 

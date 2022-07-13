@@ -28,4 +28,5 @@ public interface IMoneyService extends IService<Money> {
 
     TableDataInfo<MoneyLogVo> pageMoneyLog(String userId, MoneyLogQuery moneyLogQuery);
 
+    void initUserMoney(String userId);
 }

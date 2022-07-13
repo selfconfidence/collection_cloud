@@ -194,6 +194,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         if (MONEY_TAPE.getCode().equals(boxSellForm.getPayType()) && StrUtil.isBlank(payVo.getBody())){
             // 调用完成订单
             orderService.notifyPaySuccess(payVo.getOutHost());
+            // 没有用户信息的记录
             String title = StrUtil.format("购买了 {} 盲盒!", box.getBoxTitle());
             String form = StrUtil.format("使用余额{};购买了 {} 盲盒!",realPayMoney.toString(), box.getBoxTitle());
             msgService.saveMsgThis(MsgThisDto.builder().userId(userId).msgForm(form).msgTitle(title).build());

@@ -10,6 +10,7 @@ import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.security.annotation.InnerAuth;
 import com.manyun.common.security.utils.SecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -83,6 +84,13 @@ public class MoneyController extends BaseController {
         return R.ok();
     }
 
+    @GetMapping("/initUserMoney/{userId}")
+    @ApiOperation(value = "初始化钱包",hidden = true)
+    @InnerAuth
+    public R initUserMoney(@PathVariable String userId){
+        moneyService.initUserMoney(userId);
+       return R.ok();
+    }
 
 
 

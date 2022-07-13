@@ -3,11 +3,14 @@ package com.manyun.business.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.DesensitizedUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.domain.form.UserChangeForm;
 import com.manyun.business.domain.form.UserChangeLoginForm;
 import com.manyun.business.domain.form.UserChangePayPass;
+import com.manyun.business.domain.form.UserRegForm;
 import com.manyun.business.domain.vo.UserInfoVo;
 import com.manyun.business.domain.vo.UserLevelVo;
 import com.manyun.business.domain.vo.UserPleaseBoxVo;
@@ -16,7 +19,9 @@ import com.manyun.business.service.ICntUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.business.service.IUserPleaseService;
 import com.manyun.business.domain.entity.CntUser;
+import com.manyun.comm.api.RemoteBuiMoneyService;
 import com.manyun.comm.api.model.LoginPhoneForm;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.enums.UserRealStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +31,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.manyun.common.core.enums.UserRealStatus.NO_REAL;
 import static com.manyun.common.core.enums.UserRealStatus.OK_REAL;
 
 /**
@@ -41,6 +47,9 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
 
     @Autowired
     private IUserPleaseService userPleaseService;
+
+    @Autowired
+    private RemoteBuiMoneyService remoteBuiMoneyService;
 
 
     @Override
@@ -150,6 +159,54 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     @Override
     public CntUser commUni(String commUni) {
         return getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getUserId, commUni).or().eq(CntUser::getLinkAddr, commUni).or().eq(CntUser::getId,commUni).or().eq(CntUser::getPhone, commUni));
+    }
+
+    /**
+     * 用户注册 手机号验证码的方式
+     * @param userRegForm
+     */
+    @Override
+    public void regUser(UserRegForm userRegForm) {
+        CntUser cntUser = Builder.of(CntUser::new).build();
+        initUser(cntUser);
+        bindParentCode(cntUser,userRegForm.getPleaseCode());
+        // 初始化钱包
+        remoteBuiMoneyService.initUserMoney(cntUser.getId(),SecurityConstants.INNER);
+        save(cntUser);
+
+    }
+
+    /*
+    绑定用户上级
+     */
+    private void bindParentCode(CntUser cntUser, String pleaseCode) {
+        CntUser parentUser= null;
+        if (StrUtil.isNotBlank(pleaseCode) && (parentUser = getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPleaseCode, pleaseCode))) != null){
+            cntUser.setParentId(parentUser.getId());
+        }
+
+    }
+
+    /**
+     * 初始化用户信息
+     * @param cntUser
+     */
+    private void initUser(CntUser cntUser) {
+        String userId = IdUtil.getSnowflakeNextIdStr();
+        cntUser.setId(userId);
+        cntUser.setPleaseCode(genderPleaseCode());
+        cntUser.createD(userId);
+        // 就是做展示，无需复杂
+        cntUser.setUserId(RandomUtil.randomNumbers(8));
+        cntUser.setIsReal(NO_REAL.getCode());
+        // 默认头像
+        cntUser.setHeadImage("https://cnt-images.oss-cn-chengdu.aliyuncs.com/user/images/b10f979228a54471b0fcce36b513cbd6");
+    }
+
+    private String genderPleaseCode(){
+        String randomNumbers = RandomUtil.randomNumbers(6);
+        long count = count(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPleaseCode, randomNumbers));
+        return count == 0 ? randomNumbers: genderPleaseCode();
     }
 
 

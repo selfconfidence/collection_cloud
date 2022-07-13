@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.form.UserChangeForm;
 import com.manyun.business.domain.form.UserChangeLoginForm;
 import com.manyun.business.domain.form.UserChangePayPass;
+import com.manyun.business.domain.form.UserRegForm;
 import com.manyun.business.domain.vo.UserInfoVo;
 import com.manyun.business.domain.vo.UserLevelVo;
 import com.manyun.business.domain.vo.UserPleaseBoxVo;
@@ -41,4 +42,6 @@ public interface ICntUserService extends IService<CntUser> {
     String openPleaseBox(String userId, String pleaseId);
 
     CntUser commUni(String commUni);
+
+    void regUser(UserRegForm userRegForm);
 }

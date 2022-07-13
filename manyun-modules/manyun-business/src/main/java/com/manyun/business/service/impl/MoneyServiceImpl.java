@@ -2,6 +2,7 @@ package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
@@ -111,6 +112,20 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         List<Logs> logsList = logsService.list(Wrappers.<Logs>lambdaQuery().eq(Logs::getBuiId, userId).eq(Logs::getModelType, MONEY_TYPE).eq(Objects.nonNull(moneyLogQuery.getIsType()), Logs::getIsType, moneyLogQuery.getIsType()).last(Objects.nonNull(moneyLogQuery.getCreatedTime()), " and DATE_FORMAT(created_time,'%Y-%m-%d') = " + DateUtils.getDate() + " ").orderByDesc(Logs::getCreatedTime));
         List<MoneyLogVo> moneyLogVos = logsList.parallelStream().map(this::initMoneyLogVo).collect(Collectors.toList());
         return TableDataInfoUtil.pageTableDataInfo(moneyLogVos,logsList);
+    }
+
+    @Override
+    public void initUserMoney(String userId) {
+        // 乐观执行
+        long isExist = count(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
+        if (isExist >=1)
+            return;
+        Money money = Builder.of(Money::new).build();
+        money.setUserId(userId);
+        money.setId(IdUtil.getSnowflakeNextIdStr());
+        money.setMoneyBalance(NumberUtil.add(0D));
+        money.createD(userId);
+        saveOrUpdate(money);
     }
 
     private MoneyLogVo initMoneyLogVo(Logs logs) {
