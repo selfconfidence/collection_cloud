@@ -5,10 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.manyun.business.domain.form.AuctionSendForm;
 import com.manyun.business.domain.query.AuctionMarketQuery;
 import com.manyun.business.domain.query.AuctionSendQuery;
-import com.manyun.business.domain.vo.AuctionBoxAllVo;
-import com.manyun.business.domain.vo.AuctionCollectionAllVo;
-import com.manyun.business.domain.vo.AuctionMarketVo;
-import com.manyun.business.domain.vo.MyAuctionSendVo;
+import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.IAuctionSendService;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.domain.R;
@@ -21,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * <p>
@@ -51,13 +49,18 @@ public class AuctionSendController {
         return auctionSendService.reAuctionSend(auctionSendForm, auctionSendId);
     }
 
-
     @PostMapping("/mySend")
     @ApiOperation("我的送拍列表")
     public R<TableDataInfo<MyAuctionSendVo>> mySend(@RequestBody AuctionSendQuery sendQuery) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         PageHelper.startPage(sendQuery.getPageNum(), sendQuery.getPageSize());
         return R.ok(auctionSendService.pageList(sendQuery,loginBusinessUser.getUserId()));
+    }
+
+    @GetMapping("/queryDict/{keyword}")
+    @ApiOperation(value = "/根据词条 查询藏品完整 标题信息",notes = "返回的都是 盲盒词条完整信息 ")
+    public R<List<KeywordVo>> queryDict(@PathVariable String keyword){
+        return R.ok(auctionSendService.queryDict(keyword));
     }
 
     @PostMapping("/auctionMarketList")

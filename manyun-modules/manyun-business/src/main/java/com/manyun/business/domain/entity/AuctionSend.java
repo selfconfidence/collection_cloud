@@ -44,6 +44,9 @@ public class AuctionSend implements Serializable {
     @ApiModelProperty("商品名称")
     private String goodsName;
 
+    @ApiModelProperty("系列编号 | 分类编号")
+    private String cateId;
+
     @ApiModelProperty("起拍价")
     private BigDecimal startPrice;
 
