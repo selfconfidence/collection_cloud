@@ -90,6 +90,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     public void changeLogin(String userId, UserChangeLoginForm userChangeLoginForm) {
         CntUser cntUser = getById(userId);
         Assert.isTrue(userChangeLoginForm.getOldPass().equals(cntUser.getLoginPass()),"旧密码输出错误,请核实!");
+        cntUser.setLoginPass(userChangeLoginForm.getNewPass());
         cntUser.updateD(userId);
         updateById(cntUser);
 
