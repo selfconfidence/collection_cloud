@@ -19,5 +19,5 @@ import org.springframework.web.bind.annotation.*;
 public interface RemoteBuiMoneyService {
 
     @GetMapping("/money/initUserMoney/{userId}")
-     R initUserMoney(@PathVariable String userId,@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+     R initUserMoney(@PathVariable("userId") String userId,@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 }
