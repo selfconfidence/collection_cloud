@@ -8,10 +8,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.manyun.business.domain.dto.OrderCreateDto;
-import com.manyun.business.domain.entity.Box;
-import com.manyun.business.domain.entity.CntCollection;
-import com.manyun.business.domain.entity.CntConsignment;
-import com.manyun.business.domain.entity.Order;
+import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.query.OrderQuery;
 import com.manyun.business.domain.vo.OrderVo;
 import com.manyun.business.mapper.OrderMapper;
@@ -59,6 +56,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private IUserCollectionService userCollectionService;
 
     @Autowired
+    private ICntCreationdService creationdService;
+
+    @Autowired
     private ObjectFactory<IBoxService> boxService;
 
     @Autowired
@@ -82,8 +82,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         BeanUtil.copyProperties(order, orderVo);
         if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(order.getGoodsType())) {
             CntCollection collection = collectionService.getObject().getById(order.getBuiId());
-            String bindCreation = collection.getBindCreation();
-            orderVo.setBindCreation(bindCreation);
+            CntCreationd creation = creationdService.getById(collection.getBindCreation());
+            orderVo.setBindCreation(creation.getCreationName());
+            orderVo.setCreationImg(creation.getHeadImage());
         }
         return orderVo;
     }

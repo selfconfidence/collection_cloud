@@ -60,4 +60,7 @@ public class OrderVo implements Serializable {
 
     @ApiModelProperty("创作者")
     private String bindCreation;
+
+    @ApiModelProperty("创作者头像")
+    private String creationImg;
 }
