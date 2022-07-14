@@ -71,7 +71,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     public TableDataInfo<OrderVo> pageQueryList(OrderQuery orderQuery, String userId) {
         List<Order> orderList = list(Wrappers.<Order>lambdaQuery()
                 .eq(StringUtils.isNotBlank(userId), Order::getUserId, userId)
-                .eq(orderQuery.getOrderStatus() != null && orderQuery.getOrderStatus() != 0, Order::getOrderStatus, orderQuery.getOrderStatus())
+                .eq(orderQuery.getOrderStatus() != null, Order::getOrderStatus, orderQuery.getOrderStatus())
                 .orderByDesc(Order::getCreatedTime));
         return TableDataInfoUtil.pageTableDataInfo(orderList.parallelStream().map(this::providerOrderVo).collect(Collectors.toList()),orderList);
 
