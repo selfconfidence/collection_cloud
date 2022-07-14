@@ -49,32 +49,6 @@ import static com.manyun.common.core.enums.OrderStatus.*;
 @Service
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements IOrderService {
 
-    @Override
-    public TableDataInfo<OrderVo> pageQueryList(OrderQuery orderQuery, String userId) {
-        List<Order> orderList = list(Wrappers.<Order>lambdaQuery()
-                .eq(StringUtils.isNotBlank(userId), Order::getUserId, userId)
-                .eq(orderQuery.getOrderStatus() != null && orderQuery.getOrderStatus() != 0, Order::getOrderStatus, orderQuery.getOrderStatus())
-                .orderByDesc(Order::getCreatedTime));
-        return TableDataInfoUtil.pageTableDataInfo(orderList.parallelStream().map(this::providerOrderVo).collect(Collectors.toList()),orderList);
-
-    }
-
-    private OrderVo providerOrderVo(Order order) {
-        OrderVo orderVo = Builder.of(OrderVo::new).build();
-        BeanUtil.copyProperties(order, orderVo);
-        return orderVo;
-    }
-
-    @Override
-    public List<Order> checkUnpaidOrder(String userId) {
-        return list(Wrappers.<Order>lambdaQuery()
-                .eq(StringUtils.isNotBlank(userId), Order::getUserId, userId)
-                .eq(Order::getOrderStatus, WAIT_ORDER.getCode()));
-    }
-
-
-
-
     @Autowired
     private ISystemService systemService;
 
@@ -92,6 +66,35 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Autowired
     private ObjectFactory<ICntConsignmentService> cntConsignmentServiceObjectFactory;
+
+    @Override
+    public TableDataInfo<OrderVo> pageQueryList(OrderQuery orderQuery, String userId) {
+        List<Order> orderList = list(Wrappers.<Order>lambdaQuery()
+                .eq(StringUtils.isNotBlank(userId), Order::getUserId, userId)
+                .eq(orderQuery.getOrderStatus() != null && orderQuery.getOrderStatus() != 0, Order::getOrderStatus, orderQuery.getOrderStatus())
+                .orderByDesc(Order::getCreatedTime));
+        return TableDataInfoUtil.pageTableDataInfo(orderList.parallelStream().map(this::providerOrderVo).collect(Collectors.toList()),orderList);
+
+    }
+
+    private OrderVo providerOrderVo(Order order) {
+        OrderVo orderVo = Builder.of(OrderVo::new).build();
+        BeanUtil.copyProperties(order, orderVo);
+        if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(order.getGoodsType())) {
+            CntCollection collection = collectionService.getObject().getById(order.getBuiId());
+            String bindCreation = collection.getBindCreation();
+            orderVo.setBindCreation(bindCreation);
+        }
+        return orderVo;
+    }
+
+    @Override
+    public List<Order> checkUnpaidOrder(String userId) {
+        return list(Wrappers.<Order>lambdaQuery()
+                .eq(StringUtils.isNotBlank(userId), Order::getUserId, userId)
+                .eq(Order::getOrderStatus, WAIT_ORDER.getCode()));
+    }
+
 
     /**
      * 创建订单 ,进行订单初始化
