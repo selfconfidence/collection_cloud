@@ -57,4 +57,7 @@ public class OrderVo implements Serializable {
 
     @ApiModelProperty("藏品名称")
     private String collectionName;
+
+    @ApiModelProperty("创作者")
+    private String bindCreation;
 }
