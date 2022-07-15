@@ -1,6 +1,7 @@
 package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.business.domain.entity.CustomerService;
@@ -84,6 +85,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerServiceMapper, Cust
         CntUserDto cntUser = loginBusinessUser.getCntUser();
         Opinion opinion = Builder
                 .of(Opinion::new)
+                .with(Opinion::setId, IdUtil.getSnowflake().nextIdStr())
                 .with(Opinion::setOpinionUserId, cntUser.getUserId())
                 .with(Opinion::setOpinionUserName,loginBusinessUser.getUsername())
                 .with(Opinion::setOpinionUserPhone,cntUser.getPhone())
@@ -93,6 +95,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerServiceMapper, Cust
                 .with(Opinion::setCreatedTime, LocalDateTime.now()).build();
         return opinionService.save(opinion)==true?1:0;
     }
+
 
     /**
      * 保存反馈举报信息
@@ -105,6 +108,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerServiceMapper, Cust
         CntUserDto cntUser = loginBusinessUser.getCntUser();
         Feedback feedback = Builder
                 .of(Feedback::new)
+                .with(Feedback::setId, IdUtil.getSnowflake().nextIdStr())
                 .with(Feedback::setFeedbackUserId, cntUser.getUserId())
                 .with(Feedback::setFeedbackUserName,loginBusinessUser.getUsername())
                 .with(Feedback::setFeedbackUserPhone,cntUser.getPhone())

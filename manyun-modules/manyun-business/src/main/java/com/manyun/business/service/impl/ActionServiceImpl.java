@@ -2,6 +2,7 @@ package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.domain.dto.UserCollectionCountDto;
 import com.manyun.business.domain.entity.*;
@@ -195,6 +196,7 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
         //增加用户收藏
         LocalDateTime now = LocalDateTime.now();
         UserCollection userCollection=new UserCollection();
+        userCollection.setId(IdUtil.getSnowflake().nextIdStr());
         userCollection.setUserId(userId);
         userCollection.setCollectionId(action.getCollectionId());
         userCollection.setCollectionName(collection.getCollectionName());
@@ -206,6 +208,7 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
             actionRecordService.save(
                     Builder
                         .of(ActionRecord::new)
+                        .with(ActionRecord::setId,IdUtil.getSnowflake().nextIdStr())
                         .with(ActionRecord::setActionId,action.getId())
                         .with(ActionRecord::setCollectionId,action.getCollectionId())
                         .with(ActionRecord::setCollectionName,collection.getCollectionName())
