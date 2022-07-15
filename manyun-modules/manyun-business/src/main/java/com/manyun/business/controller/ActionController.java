@@ -47,17 +47,17 @@ public class ActionController {
         return R.ok(actionService.syntheticRecordList());
     }
 
-    @PostMapping("/synthesisInfo")
+    @GetMapping("/synthesisInfo/{id}")
     @ApiOperation("查询合成详情")
-    public R<SynthesisVo> synthesisInfo(String id) {
+    public R<SynthesisVo> synthesisInfo(@PathVariable String id) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return actionService.synthesisInfo(loginBusinessUser.getUserId(),id);
     }
 
-    @PostMapping("/SynthesizeNow")
+    @PostMapping("/synthesizeNow")
     @ApiOperation("立即合成")
-    public R<SynthesizeNowVo> synthesizeNow(String id) {
-        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+    public R<SynthesizeNowVo> synthesizeNow(@ModelAttribute(name = "id") String id) {
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
         return actionService.synthesizeNow(loginBusinessUser.getUserId(),id);
     }
 
