@@ -84,6 +84,15 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     private IMediaService mediaService;
 
     @Autowired
+    private ICollectionService collectionService;
+
+    @Autowired
+    private IBoxService boxService;
+
+    @Autowired
+    private IBoxCollectionService boxCollectionService;
+
+    @Autowired
     private RemoteBuiUserService remoteBuiUserService;
 
 
@@ -257,6 +266,39 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         myAuctionPriceVo.setGoodsImg(mediaUrl);
 
         return myAuctionPriceVo;
+    }
+
+    /**
+     * 我的出价，查询藏品详情
+     * @param collectionId
+     * @param auctionSendId
+     * @return
+     */
+    @Override
+    public AuctionCollectionAllVo priceCollectionInfo(String collectionId, String auctionSendId) {
+        AuctionCollectionAllVo auctionCollectionAllVo = Builder.of(AuctionCollectionAllVo::new)
+                .with(AuctionCollectionAllVo::setCollectionVo, collectionService.getBaseCollectionVo(collectionId))
+                .with(AuctionCollectionAllVo::setCollectionInfoVo,auctionSendService.getBaseCollectionInfoVo(collectionId))
+                .with(AuctionCollectionAllVo::setAuctionVo,auctionSendService.getAuctionSendVo(auctionSendId)).build();
+
+        return auctionCollectionAllVo;
+    }
+
+    /**
+     * 我的出价，查询盲盒详情
+     * @param boxId
+     * @param auctionSendId
+     * @return
+     */
+    @Override
+    public AuctionBoxAllVo priceBoxInfo(String boxId, String auctionSendId) {
+        //点击详情，判断时间，修改状态
+        AuctionBoxAllVo auctionBoxAllVo = Builder.of(AuctionBoxAllVo::new)
+                .with(AuctionBoxAllVo::setBoxListVo,boxService.getBaseBoxListVo(boxId))
+                .with(AuctionBoxAllVo::setBoxCollectionJoinVos,boxCollectionService.findJoinCollections(boxId))
+                .with(AuctionBoxAllVo::setAuctionVo, auctionSendService.getAuctionSendVo(auctionSendId)).build();
+
+        return auctionBoxAllVo;
     }
 
 

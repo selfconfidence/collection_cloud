@@ -270,6 +270,11 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         return collectionInfoVo;
     }
 
+    @Override
+    public CollectionInfoVo getBaseCollectionInfoVo(String collectionId) {
+        return providerCollectionInfoVo(collectionId);
+    }
+
 
     private AuctionMarketVo providerAuctionMarketVo (AuctionSend auctionSend) {
         AuctionMarketVo marketVo = Builder.of(AuctionMarketVo::new).build();

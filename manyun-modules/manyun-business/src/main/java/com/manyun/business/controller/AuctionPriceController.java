@@ -6,9 +6,7 @@ import com.manyun.business.domain.form.AuctionPayMarginForm;
 import com.manyun.business.domain.form.AuctionPriceForm;
 import com.manyun.business.domain.query.AuctionPriceQuery;
 import com.manyun.business.domain.query.MyAuctionPriceQuery;
-import com.manyun.business.domain.vo.AuctionPriceVo;
-import com.manyun.business.domain.vo.MyAuctionPriceVo;
-import com.manyun.business.domain.vo.PayVo;
+import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.IAuctionPriceService;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.domain.R;
@@ -62,6 +60,17 @@ public class AuctionPriceController {
         return R.ok(myAuctionPriceVoTableDataInfo);
     }
 
+    @GetMapping("/priceCollectionInfo/{collectionId}/{auctionSendId}")
+    @ApiOperation(value = "出价藏品详情", notes = "根据藏品id和送拍id查询")
+    public R<AuctionCollectionAllVo> priceCollectionInfo(@PathVariable String collectionId, @PathVariable String auctionSendId) {
+        return R.ok(auctionPriceService.priceCollectionInfo(collectionId, auctionSendId));
+    }
+
+    @GetMapping("/priceBoxInfo/{boxId}/{auctionSendId}")
+    @ApiOperation(value = "出价盲盒详情", notes = "根据盲盒id和送拍id查询")
+    public R<AuctionBoxAllVo> priceBoxInfo(@PathVariable String boxId, @PathVariable String auctionSendId) {
+        return R.ok(auctionPriceService.priceBoxInfo(boxId, auctionSendId));
+    }
 
     @PostMapping("/payAuction")
     @ApiOperation(value = "拍卖市场支付")

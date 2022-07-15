@@ -176,7 +176,7 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
         List<AuctionOrder> auctionOrderList = list(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getAuctionStatus, AuctionStatus.WAIT_PAY.getCode()).lt(AuctionOrder::getEndTime, LocalDateTime.now()));
         if (auctionOrderList.isEmpty()) return;
         List<AuctionSend> auctionSendList = auctionSendService.list(Wrappers.<AuctionSend>lambdaQuery().in(AuctionSend::getAuctionOrderId, auctionOrderList.parallelStream().map(item -> item.getId()).collect(Collectors.toSet()))
-                .eq(AuctionSend::getAuctionSendStatus, AuctionStatus.WAIT_PAY.getCode()));
+                .eq(AuctionSend::getAuctionSendStatus, AuctionSendStatus.WAIT_PAY.getCode()));
         Set<String> auctionSendOrderIds = Sets.newHashSet();
         if (!auctionSendList.isEmpty()) {
             auctionSendOrderIds.addAll(auctionSendList.parallelStream().map(item -> item.getAuctionOrderId()).collect(Collectors.toSet()));

@@ -42,4 +42,6 @@ public interface IAuctionSendService extends IService<AuctionSend> {
 
     List<KeywordVo> queryDict(String keyword);
 
+    CollectionInfoVo getBaseCollectionInfoVo(String collectionId);
+
 }
