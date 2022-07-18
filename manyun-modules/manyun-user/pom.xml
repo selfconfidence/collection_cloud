@@ -40,6 +40,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+
+        <!-- 阿里云 人脸sdk  https://help.aliyun.com/document_detail/209616.html -->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>cloudauth20200618</artifactId>
+            <version>1.0.5</version>
+        </dependency>
 		
         <!-- Swagger UI -->
         <dependency>
@@ -88,7 +95,13 @@
             <groupId>com.manyun</groupId>
             <artifactId>manyun-common-swagger</artifactId>
         </dependency>
-        
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
 
     <build>

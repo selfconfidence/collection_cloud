@@ -101,13 +101,29 @@ public class CntUserController extends BaseController {
 
     // 实名认证
     @PostMapping("/realUser")
-    @ApiOperation("实名认证")
+    @ApiOperation("实名认证 -- 银联 -- 未完善")
     public R realUser(@RequestBody @Valid UserRealForm userRealForm){
         //TODO 实名认证未完善
 
 
         return R.ok();
     }
+
+    //调起认证
+   @PostMapping("/getCertifyId")
+   @ApiOperation("获取认证ID")
+   public R<String> getCertifyId(@RequestBody UserAliyunRealForm userAliyunRealForm){
+       LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
+       return R.ok(userService.getCertifyId(notNullLoginBusinessUser.getCntUser(),userAliyunRealForm));
+   }
+
+   @GetMapping("/checkCertifyIdStatus/{certifyId}")
+   @ApiOperation("查询阿里云刷脸实名认证信息")
+   public R checkCertifyIdStatus(@PathVariable String certifyId){
+       LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
+       userService.checkCertifyIdStatus(certifyId,notNullLoginBusinessUser.getCntUser());
+        return R.ok();
+   }
 
     // 修改登录密码
     @PostMapping("/changeLogin")

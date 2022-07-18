@@ -7,10 +7,8 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.manyun.business.domain.form.UserChangeForm;
-import com.manyun.business.domain.form.UserChangeLoginForm;
-import com.manyun.business.domain.form.UserChangePayPass;
-import com.manyun.business.domain.form.UserRegForm;
+import com.manyun.business.config.AliRealConfig;
+import com.manyun.business.domain.form.*;
 import com.manyun.business.domain.vo.UserInfoVo;
 import com.manyun.business.domain.vo.UserLevelVo;
 import com.manyun.business.domain.vo.UserPleaseBoxVo;
@@ -20,6 +18,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.business.service.IUserPleaseService;
 import com.manyun.business.domain.entity.CntUser;
 import com.manyun.comm.api.RemoteBuiMoneyService;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.model.LoginPhoneForm;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
@@ -50,6 +49,9 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
 
     @Autowired
     private RemoteBuiMoneyService remoteBuiMoneyService;
+
+    @Autowired
+    private AliRealConfig aliRealConfig;
 
 
     @Override
@@ -175,6 +177,23 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         remoteBuiMoneyService.initUserMoney(cntUser.getId(),SecurityConstants.INNER);
         save(cntUser);
 
+    }
+
+    /**
+     * 获取认证ID
+     * @param cntUser
+     * @return
+     */
+    @Override
+    public String getCertifyId(CntUserDto cntUser, UserAliyunRealForm userAliyunRealForm) {
+        return aliRealConfig.getCertifyId(userAliyunRealForm);
+    }
+
+
+    @Override
+    public void checkCertifyIdStatus(String certifyId, CntUserDto cntUser) {
+        aliRealConfig.checkCertifyIdStatus(certifyId);
+        optimisticRealUser(cntUser.getId());
     }
 
     /*

@@ -26,6 +26,7 @@ import com.manyun.business.mapper.CntConsignmentMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.comm.api.RemoteBuiUserService;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
@@ -154,6 +155,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
      */
     @Override
     public TableDataInfo<ConsignmentBoxListVo> pageConsignmentBoxList(ConsignmentQuery consignmentQuery) {
+        PageHelper.startPage(consignmentQuery.getPageNum(),consignmentQuery.getPageSize());
         LambdaQueryWrapper<CntConsignment> lambdaQueryWrapper = getCntConsignmentLambdaQueryWrapper(consignmentQuery,BusinessConstants.ModelTypeConstant.BOX_TAYPE);
         List<CntConsignment> cntConsignments = list(lambdaQueryWrapper);
         // 组合数据
@@ -324,7 +326,16 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
     private ConsignmentCollectionListVo initCollectionListVo(CntConsignment cntConsignment) {
         ConsignmentCollectionListVo collectionListVo = Builder.of(ConsignmentCollectionListVo::new).build();
         collectionListVo.setCollectionVo(collectionService.getBaseCollectionVo(cntConsignment.getRealBuiId()));
-        collectionListVo.setCntUserDto(remoteBuiUserService.commUni(cntConsignment.getSendUserId(),  SecurityConstants.INNER).getData());
+        // 脱敏
+        CntUserDto cntUserDto = remoteBuiUserService.commUni(cntConsignment.getSendUserId(), SecurityConstants.INNER).getData();
+        CntUserDto newCntUserDto = new CntUserDto();
+        newCntUserDto.setId(cntUserDto.getId());
+        newCntUserDto.setHeadImage(cntUserDto.getHeadImage());
+        newCntUserDto.setNickName(cntUserDto.getNickName());
+        newCntUserDto.setPhone(cntUserDto.getPhone());
+        newCntUserDto.setLinkAddr(cntUserDto.getLinkAddr());
+
+        collectionListVo.setCntUserDto(newCntUserDto);
         collectionListVo.setId(cntConsignment.getId());
         collectionListVo.setConsignmentStatus(cntConsignment.getConsignmentStatus());
         collectionListVo.setCreatedTime(cntConsignment.getCreatedTime());

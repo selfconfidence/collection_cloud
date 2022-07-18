@@ -1,14 +1,12 @@
 package com.manyun.business.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.manyun.business.domain.form.UserChangeForm;
-import com.manyun.business.domain.form.UserChangeLoginForm;
-import com.manyun.business.domain.form.UserChangePayPass;
-import com.manyun.business.domain.form.UserRegForm;
+import com.manyun.business.domain.form.*;
 import com.manyun.business.domain.vo.UserInfoVo;
 import com.manyun.business.domain.vo.UserLevelVo;
 import com.manyun.business.domain.vo.UserPleaseBoxVo;
 import com.manyun.business.domain.entity.CntUser;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.model.LoginPhoneForm;
 
 import java.util.List;
@@ -44,4 +42,8 @@ public interface ICntUserService extends IService<CntUser> {
     CntUser commUni(String commUni);
 
     void regUser(UserRegForm userRegForm);
+
+    String getCertifyId(CntUserDto cntUser, UserAliyunRealForm userAliyunRealForm);
+
+    void checkCertifyIdStatus(String certifyId, CntUserDto cntUser);
 }
