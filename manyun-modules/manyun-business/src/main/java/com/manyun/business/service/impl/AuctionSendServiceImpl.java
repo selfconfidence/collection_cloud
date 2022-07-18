@@ -2,6 +2,7 @@ package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -108,6 +109,7 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         Integer preTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_PRE_TIME, Integer.class);
         Integer bidTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_BID_TIME, Integer.class);
         AuctionSend auctionSend = Builder.of(AuctionSend::new)
+                .with(AuctionSend::setId, IdUtil.getSnowflakeNextIdStr())
                 .with(AuctionSend::setUserId, userId)
                 .with(AuctionSend::setAuctionSendStatus, AuctionSendStatus.WAIT_START.getCode())
                 .with(AuctionSend::setMyGoodsId, auctionSendForm.getMyGoodsId())

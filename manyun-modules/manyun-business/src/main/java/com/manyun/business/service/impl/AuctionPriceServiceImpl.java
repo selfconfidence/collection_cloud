@@ -1,6 +1,7 @@
 package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.design.delay.DelayAbsAspect;
@@ -129,6 +130,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         }
 
         AuctionPrice auctionPrice = new AuctionPrice();
+        auctionPrice.setId(IdUtil.getSnowflakeNextIdStr());
         auctionPrice.setAuctionStatus(AuctionStatus.BID_BIDING.getCode());
 
         //判断是否延拍，延拍加时间
