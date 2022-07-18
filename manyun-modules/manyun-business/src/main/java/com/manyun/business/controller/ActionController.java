@@ -1,7 +1,7 @@
 package com.manyun.business.controller;
 
-
 import com.github.pagehelper.PageHelper;
+import com.manyun.business.domain.form.SynthesizeForm;
 import com.manyun.business.domain.vo.SynthesisVo;
 import com.manyun.business.domain.vo.SynthesizeNowVo;
 import com.manyun.business.domain.vo.SyntheticActivityVo;
@@ -16,6 +16,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * <p>
@@ -56,9 +58,9 @@ public class ActionController {
 
     @PostMapping("/synthesizeNow")
     @ApiOperation("立即合成")
-    public R<SynthesizeNowVo> synthesizeNow(@ModelAttribute(name = "id") String id) {
+    public R<SynthesizeNowVo> synthesizeNow(@RequestBody @Valid SynthesizeForm synthesizeForm) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
-        return actionService.synthesizeNow(loginBusinessUser.getUserId(),id);
+        return actionService.synthesizeNow(loginBusinessUser.getUserId(),synthesizeForm.getId());
     }
 
 }
