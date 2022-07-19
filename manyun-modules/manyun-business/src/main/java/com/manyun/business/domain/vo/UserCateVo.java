@@ -34,6 +34,13 @@ public class UserCateVo implements Serializable {
     @ApiModelProperty("系列主图")
     private String cateImage;
 
+    @ApiModelProperty("创作者头像")
+    private String headImage;
+
+    @ApiModelProperty("创作者名称")
+    private String creationName;
+
+
     @ApiModelProperty("系列下藏品列表")
     private List<UserCateCollectionVo> userCateCollectionVos;
 

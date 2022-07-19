@@ -21,6 +21,8 @@ public interface IUserCollectionService extends IService<UserCollection> {
 
     List<UserCollectionVo> userCollectionPageList(String userId);
 
+    UserCollectionVo userCollectionById(String id);
+
     Boolean existUserCollection(String userId, String id);
 
     void tranCollection(String tranUserId, String toUserId, String buiId);

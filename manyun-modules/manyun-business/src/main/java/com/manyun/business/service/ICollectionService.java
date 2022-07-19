@@ -37,4 +37,6 @@ public interface ICollectionService extends IService<CntCollection> {
     Integer tarCollection(String id, String userId);
 
     CollectionVo getBaseCollectionVo(@NotNull String collectionId);
+
+    UserCollectionForVo userCollectionInfo(String id);
 }

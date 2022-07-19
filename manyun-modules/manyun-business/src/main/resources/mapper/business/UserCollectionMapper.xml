@@ -69,6 +69,43 @@
     </where>
     order by uc.created_time desc
     </select>
+    <select id="userCollectionById" resultMap="baseMap">
+        SELECT
+        uc.id,
+        uc.collection_id,
+        uc.collection_number,
+        uc.collection_hash,
+        uc.link_addr,
+        uc.is_link,
+        uc.source_info,
+        uc.real_company,
+        uc.collection_name,
+        uc.created_time,
+        cr.id c_id,
+        cr.head_image,
+        cr.creation_name,
+        cr.creation_info,
+        ca.id ct_id,
+        ca.cate_name,
+        ca.cate_image,
+        ca.cate_info,
+        ca.bind_creation,
+        ca.created_time ct_created_time
+        FROM
+        cnt_user_collection AS uc
+        LEFT JOIN cnt_collection AS co ON uc.collection_id = co.id
+        LEFT JOIN cnf_creationd AS cr ON cr.id = co.bind_creation
+        LEFT JOIN cnt_cate AS ca ON ca.id = co.cate_id
+        <where>
+            <if test="id != null">
+                uc.id = #{id}
+            </if>
+            <if test="true">
+                and   uc.is_exist = 1
+            </if>
+        </where>
+        order by uc.created_time desc
+    </select>
 
 
     <select id="selectUserCollectionCount" resultType="com.manyun.business.domain.dto.UserCollectionCountDto">

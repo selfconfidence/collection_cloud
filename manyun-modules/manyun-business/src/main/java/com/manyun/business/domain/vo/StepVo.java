@@ -1,6 +1,6 @@
-package com.manyun.business.domain.dto;
+package com.manyun.business.domain.vo;
 
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -20,8 +20,8 @@ import java.time.LocalDateTime;
  */
 @Data
 @ToString
-@Builder
-public class StepDto implements Serializable {
+@ApiModel("资产流转信息")
+public class StepVo implements Serializable {
 
 
 
@@ -31,6 +31,14 @@ public class StepDto implements Serializable {
     @ApiModelProperty("用户编号")
     private String userId;
 
+    @ApiModelProperty("用户昵称")
+    private String nickName;
+
+    @ApiModelProperty("用户头像")
+    private String headImage;
+
+    @ApiModelProperty("用户id;平台内部生成,短编号")
+    private String userHostId;
 
     @ApiModelProperty("业务编号")
     private String buiId;
@@ -43,5 +51,9 @@ public class StepDto implements Serializable {
 
     @ApiModelProperty("流转哈希")
     private String formHash;
+
+    @ApiModelProperty("流转时间")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdTime;
 
 }

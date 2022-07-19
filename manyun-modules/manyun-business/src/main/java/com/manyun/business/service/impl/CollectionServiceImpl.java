@@ -21,7 +21,11 @@ import com.manyun.business.domain.vo.*;
 import com.manyun.business.mapper.*;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.comm.api.RemoteBuiUserService;
+import com.manyun.comm.api.RemoteUserService;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.common.core.constant.BusinessConstants;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.enums.CollectionStatus;
 import com.manyun.common.core.web.page.PageQuery;
@@ -91,6 +95,9 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
 
     private final IBoxService boxService;
 
+    private final IStepService stepService;
+
+    private final RemoteBuiUserService userService;
 
     @Override
     public TableDataInfo<CollectionVo> pageQueryList(CollectionQuery collectionQuery) {
@@ -227,11 +234,20 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         Map<String, List<CntCollection>> cateLists = cateCollectionList.parallelStream().collect(Collectors.groupingBy(CntCollection::getCateId));
         List<Cate> cates = cateMapper.selectBatchIds(cateIds);
         Map<String, Cate> cateMap = cates.parallelStream().collect(Collectors.toMap(Cate::getId, Function.identity()));
+        // 创作者
+        List<CntCreationd> cntCreationds = cntCreationdService.list(Wrappers.<CntCreationd>lambdaQuery().in(CntCreationd::getId, cates.parallelStream().map(item -> item.getBindCreation()).collect(Collectors.toList())));
+        Map<String, CntCreationd> creationdMap = cntCreationds.parallelStream().collect(Collectors.toMap(CntCreationd::getId, Function.identity()));
         cateLists.forEach((cateId,cntCollections)->{
             Cate cate = cateMap.get(cateId);
             UserCateVo userCateVo = Builder.of(UserCateVo::new).build();
             BeanUtil.copyProperties(cate,userCateVo,"userCateCollectionVos");
             userCateVo.setUserCateCollectionVos(cntCollections.parallelStream().map(this::initUserCateCollectionVo).collect(Collectors.toList()));
+            CntCreationd cntCreationd = creationdMap.get(cate.getBindCreation());
+            if (Objects.nonNull(cntCreationd)){
+                userCateVo.setHeadImage(cntCreationd.getHeadImage());
+                userCateVo.setCreationName(cntCreationd.getCreationName());
+            }
+
             userCateVoList.add(userCateVo);
         });
         return userCateVoList;
@@ -358,6 +374,31 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     @Override
     public CollectionVo getBaseCollectionVo(@NotNull String collectionId){
         return providerCollectionVo(getById(collectionId));
+    }
+
+    @Override
+    public UserCollectionForVo userCollectionInfo(String id) {
+        UserCollectionForVo userCollectionForVo = Builder.of(UserCollectionForVo::new).build();
+        UserCollectionVo userCollectionVo = userCollectionService.userCollectionById(id);
+        userCollectionVo.setMediaVos(initMediaVos(userCollectionVo.getCollectionId()));
+        // 增加流转记录信息
+        userCollectionForVo.setUserCollectionVo(userCollectionVo);
+        userCollectionForVo.setStepVos(initStepVo(userCollectionVo.getCollectionId(),COLLECTION_MODEL_TYPE));
+        return userCollectionForVo;
+    }
+
+    private List<StepVo> initStepVo(String collectionId, String collectionModelType) {
+        List<Step> stepList = stepService.list(Wrappers.<Step>lambdaQuery().eq(Step::getBuiId, collectionId).eq(Step::getModelType, collectionModelType));
+       return stepList.parallelStream().map(item ->{
+           StepVo stepVo = Builder.of(StepVo::new).build();
+           BeanUtil.copyProperties(item, stepVo );
+           CntUserDto cntUserDto = userService.commUni(item.getUserId(), SecurityConstants.INNER).getData();
+           stepVo.setHeadImage(cntUserDto.getHeadImage());
+           stepVo.setUserHostId(cntUserDto.getUserId());
+           stepVo.setHeadImage(cntUserDto.getHeadImage());
+           return stepVo;
+       } ).collect(Collectors.toList());
+
     }
 
     /**

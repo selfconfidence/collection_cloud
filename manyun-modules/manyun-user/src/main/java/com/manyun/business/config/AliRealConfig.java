@@ -149,9 +149,9 @@ public class AliRealConfig {
 //                response.getResultObject() == null ? null : response.getResultObject().getSubCode());
 //        System.out.println(response.getResultObject() == null ? null
 //                : response.getResultObject().getMaterialInfo());
-        Assert.isTrue(response.getCode().equals("200"),response.getMessage());
+        Assert.isTrue("200".equals(response.getCode()),response.getMessage());
 
-        Assert.isTrue(response.getResultObject().getSubCode().equals("200"),response.getResultObject().getMaterialInfo());
+        Assert.isTrue("200".equals(response.getResultObject().getSubCode()),response.getResultObject().getMaterialInfo());
     }
 
 

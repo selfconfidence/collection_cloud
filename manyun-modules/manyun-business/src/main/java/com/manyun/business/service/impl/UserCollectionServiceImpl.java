@@ -25,7 +25,6 @@ import java.util.Objects;
 
 import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.POLL_SOURCE;
 import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.PULL_SOURCE;
-import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE;
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE;
 import static com.manyun.common.core.enums.CollectionLink.NOT_LINK;
 import static com.manyun.common.core.enums.CollectionLink.OK_LINK;
@@ -86,7 +85,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
     }
 
     /**
-     * 绑定盲盒
+     * 查询拥有拥有得藏品
      * @param userId
      * @return
      */
@@ -94,6 +93,19 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
     @Override
     public List<UserCollectionVo> userCollectionPageList(String userId) {
         return userCollectionMapper.userCollectionPageList(userId);
+    }
+
+
+
+    /**
+     * 根据中间表编号查询 用户得藏品详情
+     * @param id
+     * @return
+     */
+
+    @Override
+    public UserCollectionVo userCollectionById(String id) {
+        return userCollectionMapper.userCollectionById(id);
     }
 
     /**

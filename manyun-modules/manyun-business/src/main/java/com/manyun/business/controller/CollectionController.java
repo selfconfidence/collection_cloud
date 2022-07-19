@@ -83,5 +83,12 @@ public class CollectionController extends BaseController{
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(collectionService.cateCollectionByUserId(notNullLoginBusinessUser.getUserId()));
     }
+
+    @GetMapping("/userCollectionInfo/{id}")
+    @ApiOperation(value = "用户查询自己得藏品详情信息",notes = "用户拥有藏品得编号,不是藏品编号")
+    public R<UserCollectionForVo> userCollectionInfo(@PathVariable String id){
+        return R.ok(collectionService.userCollectionInfo(id));
+    }
+
 }
 
