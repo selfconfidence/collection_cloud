@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CnfCreationdMapper">
+    
+    <resultMap type="CnfCreationd" id="CnfCreationdResult">
+        <result property="id"    column="id"    />
+        <result property="headImage"    column="head_image"    />
+        <result property="creationName"    column="creation_name"    />
+        <result property="linkAddr"    column="link_addr"    />
+        <result property="creationInfo"    column="creation_info"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCnfCreationdVo">
+        select id, head_image, creation_name, link_addr, creation_info, created_by, created_time, updated_by, updated_time from cnf_creationd
+    </sql>
+
+    <select id="selectCnfCreationdList" parameterType="CnfCreationd" resultMap="CnfCreationdResult">
+        <include refid="selectCnfCreationdVo"/>
+        <where>  
+            <if test="headImage != null  and headImage != ''"> and head_image = #{headImage}</if>
+            <if test="creationName != null  and creationName != ''"> and creation_name like concat('%', #{creationName}, '%')</if>
+            <if test="linkAddr != null  and linkAddr != ''"> and link_addr = #{linkAddr}</if>
+            <if test="creationInfo != null  and creationInfo != ''"> and creation_info = #{creationInfo}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdTime != null "> and created_time = #{createdTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
+            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectCnfCreationdById" parameterType="String" resultMap="CnfCreationdResult">
+        <include refid="selectCnfCreationdVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertCnfCreationd" parameterType="CnfCreationd">
+        insert into cnf_creationd
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="headImage != null">head_image,</if>
+            <if test="creationName != null and creationName != ''">creation_name,</if>
+            <if test="linkAddr != null">link_addr,</if>
+            <if test="creationInfo != null">creation_info,</if>
+            <if test="createdBy != null">created_by,</if>
+            <if test="createdTime != null">created_time,</if>
+            <if test="updatedBy != null">updated_by,</if>
+            <if test="updatedTime != null">updated_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="headImage != null">#{headImage},</if>
+            <if test="creationName != null and creationName != ''">#{creationName},</if>
+            <if test="linkAddr != null">#{linkAddr},</if>
+            <if test="creationInfo != null">#{creationInfo},</if>
+            <if test="createdBy != null">#{createdBy},</if>
+            <if test="createdTime != null">#{createdTime},</if>
+            <if test="updatedBy != null">#{updatedBy},</if>
+            <if test="updatedTime != null">#{updatedTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCnfCreationd" parameterType="CnfCreationd">
+        update cnf_creationd
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="headImage != null">head_image = #{headImage},</if>
+            <if test="creationName != null and creationName != ''">creation_name = #{creationName},</if>
+            <if test="linkAddr != null">link_addr = #{linkAddr},</if>
+            <if test="creationInfo != null">creation_info = #{creationInfo},</if>
+            <if test="createdBy != null">created_by = #{createdBy},</if>
+            <if test="createdTime != null">created_time = #{createdTime},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
+            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCnfCreationdById" parameterType="String">
+        delete from cnf_creationd where id = #{id}
+    </delete>
+
+    <delete id="deleteCnfCreationdByIds" parameterType="String">
+        delete from cnf_creationd where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

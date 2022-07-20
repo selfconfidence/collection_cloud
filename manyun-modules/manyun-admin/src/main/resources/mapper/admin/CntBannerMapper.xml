@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntBannerMapper">
+    
+    <resultMap type="CntBanner" id="CntBannerResult">
+        <result property="id"    column="id"    />
+        <result property="bannerTitle"    column="banner_title"    />
+        <result property="bannerImage"    column="banner_image"    />
+        <result property="bannerInfo"    column="banner_info"    />
+        <result property="bannerType"    column="banner_type"    />
+        <result property="jumpLink"    column="jump_link"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCntBannerVo">
+        select id, banner_title, banner_image, banner_info, banner_type, jump_link, created_by, created_time, updated_by, updated_time from cnt_banner
+    </sql>
+
+    <select id="selectCntBannerList" parameterType="CntBanner" resultMap="CntBannerResult">
+        <include refid="selectCntBannerVo"/>
+        <where>  
+            <if test="bannerTitle != null  and bannerTitle != ''"> and banner_title = #{bannerTitle}</if>
+            <if test="bannerImage != null  and bannerImage != ''"> and banner_image = #{bannerImage}</if>
+            <if test="bannerInfo != null  and bannerInfo != ''"> and banner_info = #{bannerInfo}</if>
+            <if test="bannerType != null "> and banner_type = #{bannerType}</if>
+            <if test="jumpLink != null  and jumpLink != ''"> and jump_link = #{jumpLink}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdTime != null "> and created_time = #{createdTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
+            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectCntBannerById" parameterType="String" resultMap="CntBannerResult">
+        <include refid="selectCntBannerVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertCntBanner" parameterType="CntBanner">
+        insert into cnt_banner
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="bannerTitle != null">banner_title,</if>
+            <if test="bannerImage != null">banner_image,</if>
+            <if test="bannerInfo != null">banner_info,</if>
+            <if test="bannerType != null">banner_type,</if>
+            <if test="jumpLink != null">jump_link,</if>
+            <if test="createdBy != null">created_by,</if>
+            <if test="createdTime != null">created_time,</if>
+            <if test="updatedBy != null">updated_by,</if>
+            <if test="updatedTime != null">updated_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="bannerTitle != null">#{bannerTitle},</if>
+            <if test="bannerImage != null">#{bannerImage},</if>
+            <if test="bannerInfo != null">#{bannerInfo},</if>
+            <if test="bannerType != null">#{bannerType},</if>
+            <if test="jumpLink != null">#{jumpLink},</if>
+            <if test="createdBy != null">#{createdBy},</if>
+            <if test="createdTime != null">#{createdTime},</if>
+            <if test="updatedBy != null">#{updatedBy},</if>
+            <if test="updatedTime != null">#{updatedTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCntBanner" parameterType="CntBanner">
+        update cnt_banner
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="bannerTitle != null">banner_title = #{bannerTitle},</if>
+            <if test="bannerImage != null">banner_image = #{bannerImage},</if>
+            <if test="bannerInfo != null">banner_info = #{bannerInfo},</if>
+            <if test="bannerType != null">banner_type = #{bannerType},</if>
+            <if test="jumpLink != null">jump_link = #{jumpLink},</if>
+            <if test="createdBy != null">created_by = #{createdBy},</if>
+            <if test="createdTime != null">created_time = #{createdTime},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
+            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCntBannerById" parameterType="String">
+        delete from cnt_banner where id = #{id}
+    </delete>
+
+    <delete id="deleteCntBannerByIds" parameterType="String">
+        delete from cnt_banner where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

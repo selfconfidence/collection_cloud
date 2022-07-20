@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntAgreementMapper">
+    
+    <resultMap type="CntAgreement" id="CntAgreementResult">
+        <result property="id"    column="id"    />
+        <result property="agreementType"    column="agreement_type"    />
+        <result property="agreementTitle"    column="agreement_title"    />
+        <result property="agreementInfo"    column="agreement_info"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCntAgreementVo">
+        select id, agreement_type, agreement_title, agreement_info, created_by, created_time, updated_by, updated_time from cnt_agreement
+    </sql>
+
+    <select id="selectCntAgreementList" parameterType="CntAgreement" resultMap="CntAgreementResult">
+        <include refid="selectCntAgreementVo"/>
+        <where>  
+            <if test="agreementType != null "> and agreement_type = #{agreementType}</if>
+            <if test="agreementTitle != null  and agreementTitle != ''"> and agreement_title = #{agreementTitle}</if>
+            <if test="agreementInfo != null  and agreementInfo != ''"> and agreement_info = #{agreementInfo}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdTime != null "> and created_time = #{createdTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
+            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectCntAgreementById" parameterType="String" resultMap="CntAgreementResult">
+        <include refid="selectCntAgreementVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertCntAgreement" parameterType="CntAgreement">
+        insert into cnt_agreement
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="agreementType != null">agreement_type,</if>
+            <if test="agreementTitle != null">agreement_title,</if>
+            <if test="agreementInfo != null">agreement_info,</if>
+            <if test="createdBy != null">created_by,</if>
+            <if test="createdTime != null">created_time,</if>
+            <if test="updatedBy != null">updated_by,</if>
+            <if test="updatedTime != null">updated_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="agreementType != null">#{agreementType},</if>
+            <if test="agreementTitle != null">#{agreementTitle},</if>
+            <if test="agreementInfo != null">#{agreementInfo},</if>
+            <if test="createdBy != null">#{createdBy},</if>
+            <if test="createdTime != null">#{createdTime},</if>
+            <if test="updatedBy != null">#{updatedBy},</if>
+            <if test="updatedTime != null">#{updatedTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCntAgreement" parameterType="CntAgreement">
+        update cnt_agreement
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="agreementType != null">agreement_type = #{agreementType},</if>
+            <if test="agreementTitle != null">agreement_title = #{agreementTitle},</if>
+            <if test="agreementInfo != null">agreement_info = #{agreementInfo},</if>
+            <if test="createdBy != null">created_by = #{createdBy},</if>
+            <if test="createdTime != null">created_time = #{createdTime},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
+            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCntAgreementById" parameterType="String">
+        delete from cnt_agreement where id = #{id}
+    </delete>
+
+    <delete id="deleteCntAgreementByIds" parameterType="String">
+        delete from cnt_agreement where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

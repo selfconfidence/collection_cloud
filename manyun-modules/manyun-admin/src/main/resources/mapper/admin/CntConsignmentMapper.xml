@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntConsignmentMapper">
+
+    <resultMap type="CntConsignment" id="CntConsignmentResult">
+        <result property="id"    column="id"    />
+        <result property="buiName"    column="bui_name"    />
+        <result property="buiId"    column="bui_id"    />
+        <result property="cateId"    column="cate_id"    />
+        <result property="realBuiId"    column="real_bui_id"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="isType"    column="is_type"    />
+        <result property="serverCharge"    column="server_charge"    />
+        <result property="consignmentPrice"    column="consignment_price"    />
+        <result property="sendUserId"    column="send_user_id"    />
+        <result property="payUserId"    column="pay_user_id"    />
+        <result property="toPay"    column="to_pay"    />
+        <result property="consignmentStatus"    column="consignment_status"    />
+        <result property="formInfo"    column="form_info"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCntConsignmentVo">
+        select id, bui_name, bui_id, cate_id, real_bui_id, order_id, is_type, server_charge, consignment_price, send_user_id, pay_user_id, to_pay, consignment_status, form_info, created_by, created_time, updated_by, updated_time from cnt_consignment
+    </sql>
+
+    <select id="selectCntConsignmentList" parameterType="CntConsignment" resultMap="CntConsignmentResult">
+        <include refid="selectCntConsignmentVo"/>
+        <where>
+            <if test="buiName != null  and buiName != ''"> and bui_name like concat('%', #{buiName}, '%')</if>
+            <if test="buiId != null  and buiId != ''"> and bui_id = #{buiId}</if>
+            <if test="cateId != null  and cateId != ''"> and cate_id = #{cateId}</if>
+            <if test="realBuiId != null  and realBuiId != ''"> and real_bui_id = #{realBuiId}</if>
+            <if test="orderId != null  and orderId != ''"> and order_id = #{orderId}</if>
+            <if test="isType != null "> and is_type = #{isType}</if>
+            <if test="serverCharge != null "> and server_charge = #{serverCharge}</if>
+            <if test="consignmentPrice != null "> and consignment_price = #{consignmentPrice}</if>
+            <if test="sendUserId != null  and sendUserId != ''"> and send_user_id = #{sendUserId}</if>
+            <if test="payUserId != null  and payUserId != ''"> and pay_user_id = #{payUserId}</if>
+            <if test="toPay != null "> and to_pay = #{toPay}</if>
+            <if test="consignmentStatus != null "> and consignment_status = #{consignmentStatus}</if>
+            <if test="formInfo != null  and formInfo != ''"> and form_info = #{formInfo}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdTime != null "> and created_time = #{createdTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
+            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
+        </where>
+    </select>
+
+    <select id="selectCntConsignmentById" parameterType="String" resultMap="CntConsignmentResult">
+        <include refid="selectCntConsignmentVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectOrderList" resultType="com.manyun.admin.domain.vo.CntConsignmentVo">
+        select
+            js.id,
+            js.consignment_status consignmentStatus,
+            js.is_type isType,
+            cs.nick_name collectorName,
+            cs.phone collectorPhone,
+            mr.nick_name sellerName,
+            mr.phone sellerPhone,
+            o.pay_type payType,
+            o.order_amount orderAmount,
+            o.created_time createOrderTime,
+            o.pay_time payTime
+        from
+	        cnt_consignment js
+        left join
+	        cnt_user cs
+        on js.send_user_id=cs.user_id
+        left join
+	        cnt_user mr
+        on js.pay_user_id=mr.user_id
+        left join
+	        cnt_order o
+        on js.order_id=o.order_no
+        <where>
+            <if test="id != null  and id != ''"> and js.id = #{id}</if>
+            <if test="collectorPhone != null  and collectorPhone != ''"> and cs.phone = #{collectorPhone}</if>
+            <if test="collectorUserId != null and  collectorUserId != ''"> and cs.user_id = #{collectorUserId}</if>
+            <if test="collectorName != null  and collectorName != ''"> and cs.nick_name like concat('%', #{collectorName}, '%')</if>
+            <if test="buiName != null  and buiName != ''"> and js.bui_name like concat('%', #{buiName}, '%')</if>
+            <if test="isType != null  and isType != ''"> and js.is_type = #{isType}</if>
+            <if test="consignmentStatus != null  and consignmentStatus != ''"> and js.consignment_status = #{consignmentStatus}</if>
+            <if test="sellerName != null  and sellerName != ''"> and mr.nick_name like concat('%', #{sellerName}, '%')</if>
+            <if test="payType != null  and payType != ''"> and o.pay_type = #{payType}</if>
+            <if test="createOrderTime != null  and createOrderTime != ''"> and o.created_time = #{createOrderTime}</if>
+        </where>
+    </select>
+
+    <insert id="insertCntConsignment" parameterType="CntConsignment">
+        insert into cnt_consignment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="buiName != null">bui_name,</if>
+            <if test="buiId != null">bui_id,</if>
+            <if test="cateId != null">cate_id,</if>
+            <if test="realBuiId != null">real_bui_id,</if>
+            <if test="orderId != null">order_id,</if>
+            <if test="isType != null">is_type,</if>
+            <if test="serverCharge != null">server_charge,</if>
+            <if test="consignmentPrice != null">consignment_price,</if>
+            <if test="sendUserId != null">send_user_id,</if>
+            <if test="payUserId != null">pay_user_id,</if>
+            <if test="toPay != null">to_pay,</if>
+            <if test="consignmentStatus != null">consignment_status,</if>
+            <if test="formInfo != null">form_info,</if>
+            <if test="createdBy != null">created_by,</if>
+            <if test="createdTime != null">created_time,</if>
+            <if test="updatedBy != null">updated_by,</if>
+            <if test="updatedTime != null">updated_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="buiName != null">#{buiName},</if>
+            <if test="buiId != null">#{buiId},</if>
+            <if test="cateId != null">#{cateId},</if>
+            <if test="realBuiId != null">#{realBuiId},</if>
+            <if test="orderId != null">#{orderId},</if>
+            <if test="isType != null">#{isType},</if>
+            <if test="serverCharge != null">#{serverCharge},</if>
+            <if test="consignmentPrice != null">#{consignmentPrice},</if>
+            <if test="sendUserId != null">#{sendUserId},</if>
+            <if test="payUserId != null">#{payUserId},</if>
+            <if test="toPay != null">#{toPay},</if>
+            <if test="consignmentStatus != null">#{consignmentStatus},</if>
+            <if test="formInfo != null">#{formInfo},</if>
+            <if test="createdBy != null">#{createdBy},</if>
+            <if test="createdTime != null">#{createdTime},</if>
+            <if test="updatedBy != null">#{updatedBy},</if>
+            <if test="updatedTime != null">#{updatedTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCntConsignment" parameterType="CntConsignment">
+        update cnt_consignment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="buiName != null">bui_name = #{buiName},</if>
+            <if test="buiId != null">bui_id = #{buiId},</if>
+            <if test="cateId != null">cate_id = #{cateId},</if>
+            <if test="realBuiId != null">real_bui_id = #{realBuiId},</if>
+            <if test="orderId != null">order_id = #{orderId},</if>
+            <if test="isType != null">is_type = #{isType},</if>
+            <if test="serverCharge != null">server_charge = #{serverCharge},</if>
+            <if test="consignmentPrice != null">consignment_price = #{consignmentPrice},</if>
+            <if test="sendUserId != null">send_user_id = #{sendUserId},</if>
+            <if test="payUserId != null">pay_user_id = #{payUserId},</if>
+            <if test="toPay != null">to_pay = #{toPay},</if>
+            <if test="consignmentStatus != null">consignment_status = #{consignmentStatus},</if>
+            <if test="formInfo != null">form_info = #{formInfo},</if>
+            <if test="createdBy != null">created_by = #{createdBy},</if>
+            <if test="createdTime != null">created_time = #{createdTime},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
+            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCntConsignmentById" parameterType="String">
+        delete from cnt_consignment where id = #{id}
+    </delete>
+
+    <delete id="deleteCntConsignmentByIds" parameterType="String">
+        delete from cnt_consignment where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

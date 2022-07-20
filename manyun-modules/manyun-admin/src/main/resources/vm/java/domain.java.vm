@@ -3,33 +3,29 @@ package ${packageName}.domain;
 #foreach ($import in $importList)
 import ${import};
 #end
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import com.manyun.common.core.annotation.Excel;
 #if($table.crud || $table.sub)
 import com.manyun.common.core.web.domain.BaseEntity;
 #elseif($table.tree)
 import com.manyun.common.core.web.domain.TreeEntity;
 #end
 
-/**
- * ${functionName}对象 ${tableName}
- * 
- * @author ${author}
- * @date ${datetime}
- */
 #if($table.crud || $table.sub)
 #set($Entity="BaseEntity")
 #elseif($table.tree)
 #set($Entity="TreeEntity")
 #end
+@ApiModel("${functionName}对象")
 public class ${ClassName} extends ${Entity}
 {
     private static final long serialVersionUID = 1L;
 
 #foreach ($column in $columns)
 #if(!$table.isSuperColumn($column.javaField))
-    /** $column.columnComment */
+    @ApiModelProperty("$column.columnComment")
 #if($column.list)
 #set($parentheseIndex=$column.columnComment.indexOf("（"))
 #if($parentheseIndex != -1)
@@ -37,13 +33,8 @@ public class ${ClassName} extends ${Entity}
 #else
 #set($comment=$column.columnComment)
 #end
-#if($parentheseIndex != -1)
-    @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
-#elseif($column.javaType == 'Date')
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "${comment}", width = 30, dateFormat = "yyyy-MM-dd")
-#else
-    @Excel(name = "${comment}")
+#if($column.javaType == 'Date')
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 #end
 #end
     private $column.javaType $column.javaField;
@@ -51,7 +42,6 @@ public class ${ClassName} extends ${Entity}
 #end
 #end
 #if($table.sub)
-    /** $table.subTable.functionName信息 */
     private List<${subClassName}> ${subclassName}List;
 
 #end
@@ -62,12 +52,12 @@ public class ${ClassName} extends ${Entity}
 #else
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
 #end
-    public void set${AttrName}($column.javaType $column.javaField) 
+    public void set${AttrName}($column.javaType $column.javaField)
     {
         this.$column.javaField = $column.javaField;
     }
 
-    public $column.javaType get${AttrName}() 
+    public $column.javaType get${AttrName}()
     {
         return $column.javaField;
     }
