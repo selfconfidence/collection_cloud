@@ -96,6 +96,11 @@ public interface BusinessConstants {
          */
         String  COLLECTION_INFO =  "COLLECTION_INFO";
 
+        /**
+         *  用户默认头像地址
+         */
+        String  USER_DEFAULT_LINK = "USER_DEFAULT_LINK";
+
     }
 
 

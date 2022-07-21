@@ -30,9 +30,9 @@ public class JpushUtil {
         return jpushClient;
     }
 
-    public  void sendMsg(String title,String msgConteng, List<String> alias) {
+    public  void sendMsg(String title,String msgContent, List<String> alias) {
         // For push, all you need do is to build PushPayload object.
-        List<PushPayload> payloadList = buildPushAlias(title,msgConteng,alias);
+        List<PushPayload> payloadList = buildPushAlias(title,msgContent,alias);
         for (PushPayload pushPayload : payloadList) {
             try {
                 PushResult result = jpushClient.sendPush(pushPayload);
@@ -61,7 +61,7 @@ public class JpushUtil {
     public  List<PushPayload> buildPushAlias(String title,String msgContent, List<String> alias){
         // 全平台
         List<PushPayload> pushPayloads = Lists.newArrayList();
-        List<List<String>> aliasList = ListUtil.split(alias, 999);
+        List<List<String>> aliasList = ListUtil.split(alias, 0B1111100111);
         for (List<String> alia : aliasList) {
             pushPayloads.add(PushPayload.newBuilder().setPlatform(Platform.all())
                     // 别名 一次推送最多 1000 个。
@@ -72,5 +72,6 @@ public class JpushUtil {
         }
        return pushPayloads;
     }
+
 
 }

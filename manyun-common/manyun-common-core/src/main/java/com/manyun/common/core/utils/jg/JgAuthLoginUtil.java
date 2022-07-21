@@ -32,7 +32,8 @@ public class JgAuthLoginUtil {
     public JgAuthLoginUtil(String masterSecret, String appKey,String priKey) {
         this.masterSecret = masterSecret;
         this.appKey = appKey;
-        this.priRsa = new RSA(priKey, null);
+        this.priKey = priKey;
+        this.priRsa = new RSA(this.priKey, null);
     }
     //private static String priKey = "MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBALzMUtKOBCt6R5UeZHEbhHKcPmdPyHE2JGYtn0bZ9ZQxThgyda9zI0k8C2kd2mExA8W4Fp0zzVpnKHVlmrU2uJGfTbpedSXL31Dih4CbbCr38j6l8qXaSkLS07MmtohtGC/wAx8FhFC7LeoyGO8A0x1a76vgvrMSK9D++HAQfPsnAgMBAAECgYBnlCWANL/e5ogtLG5oi3M/ua6W2XObgNu5XyA6K8wKkH5K0iw0pJNgU1vjQKiVl+F88QEfH9Ny3JOazLJy5uGcuVEqTA4KHP2PqOoPlkgzvxhXQYnI/YD0W6WYbyO8wvxiJyoaFEiGZRrlAt63e1puiIJXZeIvVC3gMXRkKjXNMQJBAOiAUd35+E48dgqsxq6o8fKQAoWEvQhLT3bGkndPW41HoQYKjcoikxUugoM/9XYeH/hCBIBit8G8JMQ9xVvyNJ8CQQDP4T19AuXtZOf4FrOg2bxrMTCSXt5EMbP65ijGf8aPyrY0lGpeQiii59DKT7ZzD+J45McQ44J03/7TiOEZDGR5AkEAmL1kCv3i4BLcQVsME0Yt3Ho7DdgMD1zaUV9WbUcXEBNUd5GLYJWiJrItT2g/K1/TBNbp+iXgLkgZp0olU6gkZQJBAIYElUqh8q/wjOhRYm8B0MpehQzoYm0eigToG0OVnuKW8o7FXCn2hxI3V1EGwP4/MGd2PqwxsKo+up+PsGcgqSkCQEXKmhIr+n/oodL6fmKuAGLf6hJB2gO9IjBdyfw+bQRISWWQ/2F5JDlSaCMGc9bJCAZ/CJM7K15nuOfkF1J4iEw=";
     //private static String pubKey = "????";
@@ -63,7 +64,7 @@ public class JgAuthLoginUtil {
         // Map bean = JSONUtil.toBean(httpResponse.body(), Map.class);
         Assert.isTrue(Integer.valueOf(8000).equals(responseJson.getInt("code")),responseJson.getStr("content"));
         // 解析密钥
-        return SecureUtil.rsa(Base64.encode(priKey, StandardCharsets.UTF_8), null).decryptStr(responseJson.getStr("phone"), KeyType.PrivateKey, StandardCharsets.UTF_8);
+        return priRsa.decryptStr(responseJson.getStr("phone"), KeyType.PrivateKey, StandardCharsets.UTF_8);
     }
 
 }

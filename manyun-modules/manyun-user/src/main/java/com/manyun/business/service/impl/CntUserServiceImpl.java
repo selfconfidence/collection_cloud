@@ -18,6 +18,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.business.service.IUserPleaseService;
 import com.manyun.business.domain.entity.CntUser;
 import com.manyun.comm.api.RemoteBuiMoneyService;
+import com.manyun.comm.api.RemoteSystemService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.model.LoginPhoneForm;
 import com.manyun.common.core.constant.SecurityConstants;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.manyun.common.core.constant.BusinessConstants.SystemTypeConstant.USER_DEFAULT_LINK;
 import static com.manyun.common.core.enums.UserRealStatus.NO_REAL;
 import static com.manyun.common.core.enums.UserRealStatus.OK_REAL;
 
@@ -52,6 +54,9 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
 
     @Autowired
     private AliRealConfig aliRealConfig;
+
+    @Autowired
+    private RemoteSystemService remoteSystemService;
 
 
     @Override
@@ -220,7 +225,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         cntUser.setUserId(RandomUtil.randomNumbers(8));
         cntUser.setIsReal(NO_REAL.getCode());
         // 默认头像
-        cntUser.setHeadImage("https://cnt-images.oss-cn-chengdu.aliyuncs.com/user/images/b10f979228a54471b0fcce36b513cbd6");
+        cntUser.setHeadImage(remoteSystemService.findType(USER_DEFAULT_LINK, SecurityConstants.INNER).getData());
     }
 
     private String genderPleaseCode(){

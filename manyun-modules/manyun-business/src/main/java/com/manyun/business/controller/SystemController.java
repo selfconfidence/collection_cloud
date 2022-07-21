@@ -3,10 +3,12 @@ package com.manyun.business.controller;
 
 import com.manyun.business.service.ISystemService;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.security.annotation.InnerAuth;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.stereotype.Controller;
@@ -44,6 +46,13 @@ public class SystemController {
     @ApiOperation("关于藏品")
     public R<String>  collectionInfo(){
         return R.ok(systemService.getVal(COLLECTION_INFO,String.class));
+    }
+
+    @GetMapping("/findType/{type}")
+    @ApiOperation(value = "根据类型查询对应得业务规则",hidden = true)
+    @InnerAuth
+    public R<String> findType(@PathVariable String type){
+        return R.ok(systemService.getVal(type,String.class));
     }
 }
 
