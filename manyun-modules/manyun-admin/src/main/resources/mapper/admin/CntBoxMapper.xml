@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntBoxMapper">
+
+    <resultMap type="CntBox" id="CntBoxResult">
+        <result property="id"    column="id"    />
+        <result property="cateId"    column="cate_id"    />
+        <result property="postTime"    column="post_time"    />
+        <result property="tarId"    column="tar_id"    />
+        <result property="boxTitle"    column="box_title"    />
+        <result property="selfBalance"    column="self_balance"    />
+        <result property="balance"    column="balance"    />
+        <result property="boxOpen"    column="box_open"    />
+        <result property="statusBy"    column="status_by"    />
+        <result property="boxInfo"    column="box_info"    />
+        <result property="publishTime"    column="publish_time"    />
+        <result property="sourcePrice"    column="source_price"    />
+        <result property="realPrice"    column="real_price"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCntBoxVo">
+        select id, cate_id, post_time, tar_id, box_title, self_balance, balance, box_open, status_by, box_info, publish_time, source_price, real_price, created_by, created_time, updated_by, updated_time from cnt_box
+    </sql>
+
+    <select id="selectCntBoxList" parameterType="CntBox" resultMap="CntBoxResult">
+        <include refid="selectCntBoxVo"/>
+        <where>
+            <if test="cateId != null  and cateId != ''"> and cate_id = #{cateId}</if>
+            <if test="postTime != null "> and post_time = #{postTime}</if>
+            <if test="tarId != null  and tarId != ''"> and tar_id = #{tarId}</if>
+            <if test="boxTitle != null  and boxTitle != ''"> and box_title = #{boxTitle}</if>
+            <if test="selfBalance != null "> and self_balance = #{selfBalance}</if>
+            <if test="balance != null "> and balance = #{balance}</if>
+            <if test="boxOpen != null "> and box_open = #{boxOpen}</if>
+            <if test="statusBy != null "> and status_by = #{statusBy}</if>
+            <if test="boxInfo != null  and boxInfo != ''"> and box_info = #{boxInfo}</if>
+            <if test="publishTime != null "> and publish_time = #{publishTime}</if>
+            <if test="sourcePrice != null "> and source_price = #{sourcePrice}</if>
+            <if test="realPrice != null "> and real_price = #{realPrice}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdTime != null "> and created_time = #{createdTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
+            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
+        </where>
+    </select>
+
+    <select id="selectCntBoxById" parameterType="String" resultMap="CntBoxResult">
+        <include refid="selectCntBoxVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="boxOrderList" resultType="com.manyun.admin.domain.vo.CntBoxOrderVo">
+        select
+            o.id,
+            o.user_id userId,
+            o.order_no orderNo,
+            o.bui_id buiId,
+            b.source_price sourcePrice,
+            b.real_price realPrice,
+            o.order_amount orderAmount,
+            o.created_time createdTime,
+            o.updated_time updatedTime
+        from
+	        cnt_order o
+	    left join
+	        cnt_box b
+	    on o.bui_id = b.id
+	    where o.goods_type=1
+    </select>
+
+    <insert id="insertCntBox" parameterType="CntBox">
+        insert into cnt_box
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="cateId != null">cate_id,</if>
+            <if test="postTime != null">post_time,</if>
+            <if test="tarId != null">tar_id,</if>
+            <if test="boxTitle != null and boxTitle != ''">box_title,</if>
+            <if test="selfBalance != null">self_balance,</if>
+            <if test="balance != null">balance,</if>
+            <if test="boxOpen != null">box_open,</if>
+            <if test="statusBy != null">status_by,</if>
+            <if test="boxInfo != null">box_info,</if>
+            <if test="publishTime != null">publish_time,</if>
+            <if test="sourcePrice != null">source_price,</if>
+            <if test="realPrice != null">real_price,</if>
+            <if test="createdBy != null">created_by,</if>
+            <if test="createdTime != null">created_time,</if>
+            <if test="updatedBy != null">updated_by,</if>
+            <if test="updatedTime != null">updated_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="cateId != null">#{cateId},</if>
+            <if test="postTime != null">#{postTime},</if>
+            <if test="tarId != null">#{tarId},</if>
+            <if test="boxTitle != null and boxTitle != ''">#{boxTitle},</if>
+            <if test="selfBalance != null">#{selfBalance},</if>
+            <if test="balance != null">#{balance},</if>
+            <if test="boxOpen != null">#{boxOpen},</if>
+            <if test="statusBy != null">#{statusBy},</if>
+            <if test="boxInfo != null">#{boxInfo},</if>
+            <if test="publishTime != null">#{publishTime},</if>
+            <if test="sourcePrice != null">#{sourcePrice},</if>
+            <if test="realPrice != null">#{realPrice},</if>
+            <if test="createdBy != null">#{createdBy},</if>
+            <if test="createdTime != null">#{createdTime},</if>
+            <if test="updatedBy != null">#{updatedBy},</if>
+            <if test="updatedTime != null">#{updatedTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCntBox" parameterType="CntBox">
+        update cnt_box
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="cateId != null">cate_id = #{cateId},</if>
+            <if test="postTime != null">post_time = #{postTime},</if>
+            <if test="tarId != null">tar_id = #{tarId},</if>
+            <if test="boxTitle != null and boxTitle != ''">box_title = #{boxTitle},</if>
+            <if test="selfBalance != null">self_balance = #{selfBalance},</if>
+            <if test="balance != null">balance = #{balance},</if>
+            <if test="boxOpen != null">box_open = #{boxOpen},</if>
+            <if test="statusBy != null">status_by = #{statusBy},</if>
+            <if test="boxInfo != null">box_info = #{boxInfo},</if>
+            <if test="publishTime != null">publish_time = #{publishTime},</if>
+            <if test="sourcePrice != null">source_price = #{sourcePrice},</if>
+            <if test="realPrice != null">real_price = #{realPrice},</if>
+            <if test="createdBy != null">created_by = #{createdBy},</if>
+            <if test="createdTime != null">created_time = #{createdTime},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
+            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCntBoxById" parameterType="String">
+        delete from cnt_box where id = #{id}
+    </delete>
+
+    <delete id="deleteCntBoxByIds" parameterType="String">
+        delete from cnt_box where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

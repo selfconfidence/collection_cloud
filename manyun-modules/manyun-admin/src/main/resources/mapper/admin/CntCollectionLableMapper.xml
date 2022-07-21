@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntCollectionLableMapper">
+
+    <resultMap type="CntCollectionLable" id="CntCollectionLableResult">
+        <result property="id"    column="id"    />
+        <result property="collectionId"    column="collection_id"    />
+        <result property="lableId"    column="lable_id"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCntCollectionLableVo">
+        select id, collection_id, lable_id, created_by, created_time, updated_by, updated_time from cnt_collection_lable
+    </sql>
+
+    <select id="selectCntCollectionLableList" parameterType="CntCollectionLable" resultMap="CntCollectionLableResult">
+        <include refid="selectCntCollectionLableVo"/>
+        <where>
+            <if test="collectionId != null  and collectionId != ''"> and collection_id = #{collectionId}</if>
+            <if test="lableId != null  and lableId != ''"> and lable_id = #{lableId}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdTime != null "> and created_time = #{createdTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
+            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
+        </where>
+    </select>
+
+    <select id="selectCntCollectionLableById" parameterType="String" resultMap="CntCollectionLableResult">
+        <include refid="selectCntCollectionLableVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertCntCollectionLable" parameterType="CntCollectionLable">
+        insert into cnt_collection_lable
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="collectionId != null and collectionId != ''">collection_id,</if>
+            <if test="lableId != null and lableId != ''">lable_id,</if>
+            <if test="createdBy != null">created_by,</if>
+            <if test="createdTime != null">created_time,</if>
+            <if test="updatedBy != null">updated_by,</if>
+            <if test="updatedTime != null">updated_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="collectionId != null and collectionId != ''">#{collectionId},</if>
+            <if test="lableId != null and lableId != ''">#{lableId},</if>
+            <if test="createdBy != null">#{createdBy},</if>
+            <if test="createdTime != null">#{createdTime},</if>
+            <if test="updatedBy != null">#{updatedBy},</if>
+            <if test="updatedTime != null">#{updatedTime},</if>
+         </trim>
+    </insert>
+
+    <insert id="insertCntCollectionLables">
+        insert into cnt_collection_lable
+        (
+            id,
+            collection_id,
+            lable_id,
+            created_by,
+            created_time
+        )
+        values
+        <foreach collection="cntCollectionLables" item="item" separator=",">
+            (
+                #{item.id},
+                #{item.collectionId},
+                #{item.lableId},
+                #{item.createdBy},
+                #{item.createdTime}
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateCntCollectionLable" parameterType="CntCollectionLable">
+        update cnt_collection_lable
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="collectionId != null and collectionId != ''">collection_id = #{collectionId},</if>
+            <if test="lableId != null and lableId != ''">lable_id = #{lableId},</if>
+            <if test="createdBy != null">created_by = #{createdBy},</if>
+            <if test="createdTime != null">created_time = #{createdTime},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
+            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCntCollectionLableById">
+        delete from cnt_collection_lable
+        <where>
+            <if test="id != null  and id != ''"> and id = #{id}</if>
+            <if test="collectionId != null  and collectionId != ''"> and collection_id = #{collectionId}</if>
+        </where>
+    </delete>
+
+    <delete id="deleteCntCollectionLableByIds" parameterType="String">
+        delete from cnt_collection_lable where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteCntCollectionLableByCollectionIds">
+        delete from cnt_collection_lable where collection_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

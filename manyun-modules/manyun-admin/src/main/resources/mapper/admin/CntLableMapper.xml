@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntLableMapper">
+    
+    <resultMap type="CntLable" id="CntLableResult">
+        <result property="id"    column="id"    />
+        <result property="lableName"    column="lable_name"    />
+        <result property="content"    column="content"    />
+        <result property="isType"    column="is_type"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+        <result property="orderNum"    column="order_num"    />
+    </resultMap>
+
+    <sql id="selectCntLableVo">
+        select id, lable_name, content, is_type, created_by, created_time, updated_by, updated_time, order_num from cnt_lable
+    </sql>
+
+    <select id="selectCntLableList" parameterType="CntLable" resultMap="CntLableResult">
+        <include refid="selectCntLableVo"/>
+        <where>  
+            <if test="lableName != null  and lableName != ''"> and lable_name like concat('%', #{lableName}, '%')</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="isType != null "> and is_type = #{isType}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdTime != null "> and created_time = #{createdTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
+            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
+            <if test="orderNum != null "> and order_num = #{orderNum}</if>
+        </where>
+    </select>
+    
+    <select id="selectCntLableById" parameterType="String" resultMap="CntLableResult">
+        <include refid="selectCntLableVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertCntLable" parameterType="CntLable">
+        insert into cnt_lable
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="lableName != null">lable_name,</if>
+            <if test="content != null">content,</if>
+            <if test="isType != null">is_type,</if>
+            <if test="createdBy != null">created_by,</if>
+            <if test="createdTime != null">created_time,</if>
+            <if test="updatedBy != null">updated_by,</if>
+            <if test="updatedTime != null">updated_time,</if>
+            <if test="orderNum != null">order_num,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="lableName != null">#{lableName},</if>
+            <if test="content != null">#{content},</if>
+            <if test="isType != null">#{isType},</if>
+            <if test="createdBy != null">#{createdBy},</if>
+            <if test="createdTime != null">#{createdTime},</if>
+            <if test="updatedBy != null">#{updatedBy},</if>
+            <if test="updatedTime != null">#{updatedTime},</if>
+            <if test="orderNum != null">#{orderNum},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCntLable" parameterType="CntLable">
+        update cnt_lable
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="lableName != null">lable_name = #{lableName},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="isType != null">is_type = #{isType},</if>
+            <if test="createdBy != null">created_by = #{createdBy},</if>
+            <if test="createdTime != null">created_time = #{createdTime},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
+            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCntLableById" parameterType="String">
+        delete from cnt_lable where id = #{id}
+    </delete>
+
+    <delete id="deleteCntLableByIds" parameterType="String">
+        delete from cnt_lable where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

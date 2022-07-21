@@ -2,11 +2,13 @@ package ${packageName}.service.impl;
 
 import java.util.List;
 #foreach ($column in $columns)
-#if($column.javaField == 'createTime' || $column.javaField == 'updateTime')
+#if($column.javaField == 'createdTime' || $column.javaField == 'updatedTime')
 import com.manyun.common.core.utils.DateUtils;
 #break
 #end
 #end
+import com.manyun.common.core.utils.uuid.IdUtils;
+import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 #if($table.sub)
@@ -21,19 +23,19 @@ import ${packageName}.service.I${ClassName}Service;
 
 /**
  * ${functionName}Service业务层处理
- * 
+ *
  * @author ${author}
  * @date ${datetime}
  */
 @Service
-public class ${ClassName}ServiceImpl implements I${ClassName}Service 
+public class ${ClassName}ServiceImpl implements I${ClassName}Service
 {
     @Autowired
     private ${ClassName}Mapper ${className}Mapper;
 
     /**
      * 查询${functionName}
-     * 
+     *
      * @param ${pkColumn.javaField} ${functionName}主键
      * @return ${functionName}
      */
@@ -45,7 +47,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service
 
     /**
      * 查询${functionName}列表
-     * 
+     *
      * @param ${className} ${functionName}
      * @return ${functionName}
      */
@@ -57,7 +59,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service
 
     /**
      * 新增${functionName}
-     * 
+     *
      * @param ${className} ${functionName}
      * @return 结果
      */
@@ -68,8 +70,14 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service
     public int insert${ClassName}(${ClassName} ${className})
     {
 #foreach ($column in $columns)
-#if($column.javaField == 'createTime')
-        ${className}.setCreateTime(DateUtils.getNowDate());
+#if($column.javaField == 'id')
+        ${className}.setId(IdUtils.getSnowflakeNextIdStr());
+#end
+#if($column.javaField == 'createdBy')
+        ${className}.setCreatedBy(SecurityUtils.getUsername());
+#end
+#if($column.javaField == 'createdTime')
+        ${className}.setCreatedTime(DateUtils.getNowDate());
 #end
 #end
 #if($table.sub)
@@ -83,7 +91,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service
 
     /**
      * 修改${functionName}
-     * 
+     *
      * @param ${className} ${functionName}
      * @return 结果
      */
@@ -94,8 +102,11 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service
     public int update${ClassName}(${ClassName} ${className})
     {
 #foreach ($column in $columns)
-#if($column.javaField == 'updateTime')
-        ${className}.setUpdateTime(DateUtils.getNowDate());
+#if($column.javaField == 'updatedBy')
+        ${className}.setUpdatedBy(SecurityUtils.getUsername());
+#end
+#if($column.javaField == 'updatedTime')
+        ${className}.setUpdatedTime(DateUtils.getNowDate());
 #end
 #end
 #if($table.sub)
@@ -107,7 +118,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service
 
     /**
      * 批量删除${functionName}
-     * 
+     *
      * @param ${pkColumn.javaField}s 需要删除的${functionName}主键
      * @return 结果
      */
@@ -125,7 +136,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service
 
     /**
      * 删除${functionName}信息
-     * 
+     *
      * @param ${pkColumn.javaField} ${functionName}主键
      * @return 结果
      */
@@ -144,7 +155,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service
 
     /**
      * 新增${subTable.functionName}信息
-     * 
+     *
      * @param ${className} ${functionName}对象
      */
     public void insert${subClassName}(${ClassName} ${className})
