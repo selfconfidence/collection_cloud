@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @ApiModel("用户管理列表筛选视图")
-public class QueryUserMoneyVo {
+public class UserMoneyQuery {
 
     @ApiModelProperty("真实姓名")
     private String realName;

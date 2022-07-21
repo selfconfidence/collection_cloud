@@ -63,6 +63,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </select>
 
+    <select id="selectCntCollectionByIds" resultType="com.manyun.admin.domain.CntCollection">
+        <include refid="selectCntCollectionVo"/>
+        where id in
+        <foreach item="id" collection="collectionIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
     <select id="selectCntCollectionDetailsById" resultType="com.manyun.admin.domain.vo.CntCollectionDetailsVo">
         select
             cp.id,

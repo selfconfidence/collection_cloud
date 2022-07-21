@@ -2,6 +2,7 @@ package com.manyun.admin.controller;
 
 import java.util.List;
 
+import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
@@ -17,12 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
-import com.manyun.common.security.annotation.RequiresPermissions;
 import com.manyun.admin.domain.CntCollection;
 import com.manyun.admin.service.ICntCollectionService;
 import com.manyun.common.core.web.controller.BaseController;
-import com.manyun.common.core.web.domain.AjaxResult;
-import com.manyun.common.core.utils.poi.ExcelUtil;
 import com.manyun.common.core.web.page.TableDataInfo;
 
 @RestController
@@ -55,18 +53,18 @@ public class CntCollectionController extends BaseController
     @Log(title = "新增藏品管理", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增藏品管理")
-    public R add(@RequestBody CntCollectionAlterCombineVo collectionAlterCombineVo)
+    public R add(@RequestBody CntCollectionAlterCombineDto collectionAlterCombineDto)
     {
-        return toResult(cntCollectionService.insertCntCollection(collectionAlterCombineVo));
+        return toResult(cntCollectionService.insertCntCollection(collectionAlterCombineDto));
     }
 
     //@RequiresPermissions("admin:collection:edit")
     @Log(title = "修改藏品管理", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("修改藏品管理")
-    public R edit(@RequestBody CntCollectionAlterCombineVo collectionAlterCombineVo)
+    public R edit(@RequestBody CntCollectionAlterCombineDto collectionAlterCombineDto)
     {
-        return toResult(cntCollectionService.updateCntCollection(collectionAlterCombineVo));
+        return toResult(cntCollectionService.updateCntCollection(collectionAlterCombineDto));
     }
 
     //@RequiresPermissions("admin:collection:remove")
@@ -76,34 +74,6 @@ public class CntCollectionController extends BaseController
     public R remove(@PathVariable String[] ids)
     {
         return toResult(cntCollectionService.deleteCntCollectionByIds(ids));
-    }
-
-
-    @GetMapping("/collectionCateDict")
-    @ApiOperation("查询藏品分类下拉框")
-    public TableDataInfo<CollectionCateDictVo> collectionCateDict()
-    {
-        startPage();
-        List<CollectionCateDictVo> list = cntCollectionService.collectionCateDict();
-        return getDataTable(list);
-    }
-
-    @GetMapping("/collectionCreationdDict")
-    @ApiOperation("查询藏品创作者下拉框")
-    public TableDataInfo<CollectionCreationdDictVo> collectionCreationdDict()
-    {
-        startPage();
-        List<CollectionCreationdDictVo> list = cntCollectionService.collectionCreationdDict();
-        return getDataTable(list);
-    }
-
-    @GetMapping("/collectionLableDict")
-    @ApiOperation("查询藏品标签下拉框")
-    public TableDataInfo<CollectionLableDictVo> collectionLableDict()
-    {
-        startPage();
-        List<CollectionLableDictVo> list = cntCollectionService.collectionLableDict();
-        return getDataTable(list);
     }
 
 }

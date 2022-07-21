@@ -1,20 +1,18 @@
 package com.manyun.admin.service.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.manyun.admin.domain.*;
+import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.mapper.*;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
-import com.manyun.common.core.enums.CateType;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
@@ -38,15 +36,6 @@ public class CntCollectionServiceImpl implements ICntCollectionService
 
     @Autowired
     private CntMediaMapper cntMediaMapper;
-
-    @Autowired
-    private CntCateMapper cntCateMapper;
-
-    @Autowired
-    private CnfCreationdMapper cnfCreationdMapper;
-
-    @Autowired
-    private CntLableMapper cntLableMapper;
 
     @Autowired
     private CntCollectionInfoMapper collectionInfoMapper;
@@ -91,16 +80,16 @@ public class CntCollectionServiceImpl implements ICntCollectionService
     /**
      * 新增藏品
      *
-     * @param collectionAlterCombineVo 藏品
+     * @param collectionAlterCombineDto
      * @return 结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int insertCntCollection(CntCollectionAlterCombineVo collectionAlterCombineVo)
+    public int insertCntCollection(CntCollectionAlterCombineDto collectionAlterCombineDto)
     {
         //藏品
         String idStr = IdUtils.getSnowflakeNextIdStr();
-        CntCollectionAlterVo collectionAlterVo = collectionAlterCombineVo.getCntCollectionAlterVo();
+        CntCollectionAlterVo collectionAlterVo = collectionAlterCombineDto.getCntCollectionAlterVo();
         Assert.isTrue(Objects.nonNull(collectionAlterVo),"新增藏品失败");
         CntCollection cntCollection=new CntCollection();
         BeanUtil.copyProperties(collectionAlterVo,cntCollection);
@@ -112,7 +101,7 @@ public class CntCollectionServiceImpl implements ICntCollectionService
             return 0;
         }
         //藏品详情
-        CntCollectionInfoAlterVo collectionInfoAlterVo = collectionAlterCombineVo.getCntCollectionInfoAlterVo();
+        CntCollectionInfoAlterVo collectionInfoAlterVo = collectionAlterCombineDto.getCntCollectionInfoAlterVo();
         if(Objects.nonNull(collectionInfoAlterVo)){
             CntCollectionInfo cntCollectionInfo=new CntCollectionInfo();
             BeanUtil.copyProperties(collectionInfoAlterVo,cntCollectionInfo);
@@ -123,7 +112,7 @@ public class CntCollectionServiceImpl implements ICntCollectionService
             collectionInfoMapper.insertCntCollectionInfo(cntCollectionInfo);
         }
         //标签
-        CntLableAlterVo cntLableAlterVo = collectionAlterCombineVo.getCntLableAlterVo();
+        CntLableAlterVo cntLableAlterVo = collectionAlterCombineDto.getCntLableAlterVo();
         if(Objects.nonNull(cntLableAlterVo)){
             String lableIds = cntLableAlterVo.getLableIds();
             if(StringUtils.isNotBlank(lableIds)){
@@ -141,7 +130,7 @@ public class CntCollectionServiceImpl implements ICntCollectionService
             }
         }
         //图片
-        MediaAlterVo mediaAlterVo = collectionAlterCombineVo.getMediaAlterVo();
+        MediaAlterVo mediaAlterVo = collectionAlterCombineDto.getMediaAlterVo();
         if(Objects.nonNull(mediaAlterVo)){
             CntMedia cntMedia=new CntMedia();
             cntMedia.setId(IdUtils.getSnowflakeNextIdStr());
@@ -159,15 +148,15 @@ public class CntCollectionServiceImpl implements ICntCollectionService
     /**
      * 修改藏品
      *
-     * @param collectionAlterCombineVo 藏品
+     * @param collectionAlterCombineDto
      * @return 结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateCntCollection(CntCollectionAlterCombineVo collectionAlterCombineVo)
+    public int updateCntCollection(CntCollectionAlterCombineDto collectionAlterCombineDto)
     {
         //藏品
-        CntCollectionAlterVo collectionAlterVo = collectionAlterCombineVo.getCntCollectionAlterVo();
+        CntCollectionAlterVo collectionAlterVo = collectionAlterCombineDto.getCntCollectionAlterVo();
         Assert.isTrue(Objects.nonNull(collectionAlterVo),"修改藏品失败");
         String collectionId = collectionAlterVo.getId();
         Assert.isTrue(StringUtils.isNotBlank(collectionId),"缺失必要参数");
@@ -180,7 +169,7 @@ public class CntCollectionServiceImpl implements ICntCollectionService
             return 0;
         }
         //藏品详情
-        CntCollectionInfoAlterVo collectionInfoAlterVo = collectionAlterCombineVo.getCntCollectionInfoAlterVo();
+        CntCollectionInfoAlterVo collectionInfoAlterVo = collectionAlterCombineDto.getCntCollectionInfoAlterVo();
         if(Objects.nonNull(collectionInfoAlterVo)){
             List<CntCollectionInfo> cntCollectionInfos = collectionInfoMapper.selectCntCollectionInfoList(Builder.of(CntCollectionInfo::new).with(CntCollectionInfo::setCollectionId, collectionId).build());
             if(cntCollectionInfos.size()==0){
@@ -205,7 +194,7 @@ public class CntCollectionServiceImpl implements ICntCollectionService
             }
         }
         //标签
-        CntLableAlterVo cntLableAlterVo = collectionAlterCombineVo.getCntLableAlterVo();
+        CntLableAlterVo cntLableAlterVo = collectionAlterCombineDto.getCntLableAlterVo();
         String lableIds = cntLableAlterVo.getLableIds();
         if(Objects.nonNull(collectionInfoAlterVo)){
             if( StringUtils.isNotBlank(lableIds)){
@@ -226,7 +215,7 @@ public class CntCollectionServiceImpl implements ICntCollectionService
             }
         }
         //图片
-        MediaAlterVo mediaAlterVo = collectionAlterCombineVo.getMediaAlterVo();
+        MediaAlterVo mediaAlterVo = collectionAlterCombineDto.getMediaAlterVo();
         if(Objects.nonNull(mediaAlterVo)){
             List<MediaVo> mediaVos = cntMediaMapper.initMediaVos(collectionId, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
             if(mediaVos.size()==0){
@@ -275,47 +264,6 @@ public class CntCollectionServiceImpl implements ICntCollectionService
             cntMediaMapper.deleteCntMediaByCollectionIds(ids);
         }
         return 1;
-    }
-
-    /***
-     *  查询藏品分类下拉框
-     * @return
-     */
-    @Override
-    public List<CollectionCateDictVo> collectionCateDict() {
-        CntCate cntCate=new CntCate();
-        cntCate.setCateType(Long.valueOf(CateType.COLLECTION_CATE.getCode()));
-        return cntCateMapper.selectCntCateList(cntCate).stream().map(m ->{
-            CollectionCateDictVo collectionCateDictVo=new CollectionCateDictVo();
-            BeanUtil.copyProperties(m,collectionCateDictVo);
-            return collectionCateDictVo;
-        }).collect(Collectors.toList());
-    }
-
-    /***
-     *  查询创作者下拉框
-     * @return
-     */
-    @Override
-    public List<CollectionCreationdDictVo> collectionCreationdDict() {
-        return cnfCreationdMapper.selectCnfCreationdList(new CnfCreationd()).stream().map(m ->{
-            CollectionCreationdDictVo collectionCreationdDictVo=new CollectionCreationdDictVo();
-            BeanUtil.copyProperties(m,collectionCreationdDictVo);
-            return collectionCreationdDictVo;
-        }).collect(Collectors.toList());
-    }
-
-    /***
-     *  查询标签下拉框
-     * @return
-     */
-    @Override
-    public List<CollectionLableDictVo> collectionLableDict() {
-        return cntLableMapper.selectCntLableList(new CntLable()).stream().map(m ->{
-            CollectionLableDictVo collectionLableDictVo=new CollectionLableDictVo();
-            BeanUtil.copyProperties(m,collectionLableDictVo);
-            return collectionLableDictVo;
-        }).collect(Collectors.toList());
     }
 
 }

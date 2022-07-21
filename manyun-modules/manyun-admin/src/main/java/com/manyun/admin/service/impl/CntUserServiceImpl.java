@@ -1,7 +1,7 @@
 package com.manyun.admin.service.impl;
 
 import com.manyun.admin.domain.CntOrder;
-import com.manyun.admin.domain.query.QueryUserMoneyVo;
+import com.manyun.admin.domain.query.UserMoneyQuery;
 import com.manyun.admin.domain.vo.UserCollectionVo;
 import com.manyun.admin.domain.vo.UserMoneyVo;
 import com.manyun.admin.mapper.CntMediaMapper;
@@ -40,13 +40,13 @@ public class CntUserServiceImpl implements ICntUserService
     /**
      * 用户和钱包信息
      *
-     * @param queryUserMoneyVo 用户和钱包信息
+     * @param userMoneyQuery 用户和钱包信息
      * @return 结果
      */
     @Override
-    public List<UserMoneyVo> selectUserMoneyList(QueryUserMoneyVo queryUserMoneyVo)
+    public List<UserMoneyVo> selectUserMoneyList(UserMoneyQuery userMoneyQuery)
     {
-        return cntUserMapper.selectUserMoneyList(queryUserMoneyVo);
+        return cntUserMapper.selectUserMoneyList(userMoneyQuery);
     }
 
     /**

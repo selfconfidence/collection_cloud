@@ -5,8 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-@ApiModel("藏品标签下拉框")
-public class CollectionLableDictVo {
+@ApiModel("藏品标签字典")
+public class LableDictVo {
 
     @ApiModelProperty("藏品标签id")
     private String id;

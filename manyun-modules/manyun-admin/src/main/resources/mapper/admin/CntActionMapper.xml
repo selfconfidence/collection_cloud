@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntActionMapper">
+    
+    <resultMap type="CntAction" id="CntActionResult">
+        <result property="id"    column="id"    />
+        <result property="actionTitle"    column="action_title"    />
+        <result property="actionImage"    column="action_image"    />
+        <result property="actionStatus"    column="action_status"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="collectionId"    column="collection_id"    />
+        <result property="ruleContent"    column="rule_content"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCntActionVo">
+        select id, action_title, action_image, action_status, start_time, end_time, collection_id, rule_content, created_by, created_time, updated_by, updated_time from cnt_action
+    </sql>
+
+    <select id="selectCntActionList" parameterType="CntAction" resultMap="CntActionResult">
+        <include refid="selectCntActionVo"/>
+        <where>  
+            <if test="actionTitle != null  and actionTitle != ''"> and action_title = #{actionTitle}</if>
+            <if test="actionImage != null  and actionImage != ''"> and action_image = #{actionImage}</if>
+            <if test="actionStatus != null "> and action_status = #{actionStatus}</if>
+            <if test="startTime != null "> and start_time = #{startTime}</if>
+            <if test="endTime != null "> and end_time = #{endTime}</if>
+            <if test="collectionId != null  and collectionId != ''"> and collection_id = #{collectionId}</if>
+            <if test="ruleContent != null  and ruleContent != ''"> and rule_content = #{ruleContent}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdTime != null "> and created_time = #{createdTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
+            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectCntActionById" parameterType="String" resultMap="CntActionResult">
+        <include refid="selectCntActionVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertCntAction" parameterType="CntAction">
+        insert into cnt_action
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="actionTitle != null">action_title,</if>
+            <if test="actionImage != null">action_image,</if>
+            <if test="actionStatus != null">action_status,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="collectionId != null">collection_id,</if>
+            <if test="ruleContent != null">rule_content,</if>
+            <if test="createdBy != null">created_by,</if>
+            <if test="createdTime != null">created_time,</if>
+            <if test="updatedBy != null">updated_by,</if>
+            <if test="updatedTime != null">updated_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="actionTitle != null">#{actionTitle},</if>
+            <if test="actionImage != null">#{actionImage},</if>
+            <if test="actionStatus != null">#{actionStatus},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="collectionId != null">#{collectionId},</if>
+            <if test="ruleContent != null">#{ruleContent},</if>
+            <if test="createdBy != null">#{createdBy},</if>
+            <if test="createdTime != null">#{createdTime},</if>
+            <if test="updatedBy != null">#{updatedBy},</if>
+            <if test="updatedTime != null">#{updatedTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCntAction" parameterType="CntAction">
+        update cnt_action
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="actionTitle != null">action_title = #{actionTitle},</if>
+            <if test="actionImage != null">action_image = #{actionImage},</if>
+            <if test="actionStatus != null">action_status = #{actionStatus},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="collectionId != null">collection_id = #{collectionId},</if>
+            <if test="ruleContent != null">rule_content = #{ruleContent},</if>
+            <if test="createdBy != null">created_by = #{createdBy},</if>
+            <if test="createdTime != null">created_time = #{createdTime},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
+            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCntActionById" parameterType="String">
+        delete from cnt_action where id = #{id}
+    </delete>
+
+    <delete id="deleteCntActionByIds" parameterType="String">
+        delete from cnt_action where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

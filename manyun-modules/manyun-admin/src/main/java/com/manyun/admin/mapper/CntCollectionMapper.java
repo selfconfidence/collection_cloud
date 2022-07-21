@@ -2,8 +2,8 @@ package com.manyun.admin.mapper;
 
 import java.util.List;
 import com.manyun.admin.domain.CntCollection;
-import com.manyun.admin.domain.CntCollectionLable;
 import com.manyun.admin.domain.vo.CntCollectionDetailsVo;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 藏品Mapper接口
@@ -76,4 +76,14 @@ public interface CntCollectionMapper
      * @return 藏品
      */
     CntCollectionDetailsVo selectCntCollectionDetailsById(String id);
+
+    /**
+     * 查询藏品列表
+     *
+     * @param collectionIds 藏品主键集合
+     * @return 藏品集合
+     */
+    List<CntCollection> selectCntCollectionByIds(@Param("collectionIds") List<String> collectionIds);
+
+
 }

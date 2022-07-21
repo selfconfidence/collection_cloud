@@ -71,4 +71,12 @@ public interface CntMediaMapper
      * @return 结果
      */
     public int deleteCntMediaByCollectionIds(String[] ids);
+
+    /**
+     * 查询媒体存储器列表
+     *
+     * @param collectionIds 藏品ids
+     * @return 媒体存储器集合
+     */
+    List<MediaVo> selectCntMediaByCollectionIds(@Param("collectionIds") List<String> collectionIds);
 }

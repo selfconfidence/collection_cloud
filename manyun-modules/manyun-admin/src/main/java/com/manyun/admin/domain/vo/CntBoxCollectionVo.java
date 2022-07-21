@@ -11,12 +11,6 @@ import java.math.BigDecimal;
 public class CntBoxCollectionVo
 {
 
-    @ApiModelProperty("主键")
-    private String id;
-
-    @ApiModelProperty("盲盒编号")
-    private String boxId;
-
     @ApiModelProperty("藏品编号")
     private String collectionId;
 

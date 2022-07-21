@@ -2,7 +2,7 @@ package com.manyun.admin.mapper;
 
 import java.util.List;
 import com.manyun.admin.domain.CntConsignment;
-import com.manyun.admin.domain.query.QueryConsignmentVo;
+import com.manyun.admin.domain.query.ConsignmentQuery;
 import com.manyun.admin.domain.vo.CntConsignmentVo;
 
 /**
@@ -63,9 +63,9 @@ public interface CntConsignmentMapper
 
     /***
      * 查询订单管理列表
-     * @param queryConsignmentVo
+     * @param consignmentQuery
      * @return
      */
-    List<CntConsignmentVo> selectOrderList(QueryConsignmentVo queryConsignmentVo);
+    List<CntConsignmentVo> selectOrderList(ConsignmentQuery consignmentQuery);
 
 }

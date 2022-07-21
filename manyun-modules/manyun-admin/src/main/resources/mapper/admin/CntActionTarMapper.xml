@@ -2,35 +2,35 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.manyun.admin.mapper.CntBoxCollectionMapper">
+<mapper namespace="com.manyun.admin.mapper.CntActionTarMapper">
 
-    <resultMap type="CntBoxCollection" id="CntBoxCollectionResult">
+    <resultMap type="CntActionTar" id="CntActionTarResult">
         <result property="id"    column="id"    />
-        <result property="boxId"    column="box_id"    />
+        <result property="actionId"    column="action_id"    />
+        <result property="releaseNum"    column="release_num"    />
+        <result property="deleteNum"    column="delete_num"    />
         <result property="collectionId"    column="collection_id"    />
+        <result property="collectionImage"    column="collection_image"    />
         <result property="collectionName"    column="collection_name"    />
-        <result property="sourcePrice"    column="source_price"    />
-        <result property="tranSvg"    column="tran_svg"    />
-        <result property="flagScore"    column="flag_score"    />
         <result property="createdBy"    column="created_by"    />
         <result property="createdTime"    column="created_time"    />
         <result property="updatedBy"    column="updated_by"    />
         <result property="updatedTime"    column="updated_time"    />
     </resultMap>
 
-    <sql id="selectCntBoxCollectionVo">
-        select id, box_id, collection_id, collection_name, source_price, tran_svg, flag_score, created_by, created_time, updated_by, updated_time from cnt_box_collection
+    <sql id="selectCntActionTarVo">
+        select id, action_id, release_num, delete_num, collection_id, collection_image, collection_name, created_by, created_time, updated_by, updated_time from cnt_action_tar
     </sql>
 
-    <select id="selectCntBoxCollectionList" parameterType="CntBoxCollection" resultMap="CntBoxCollectionResult">
-        <include refid="selectCntBoxCollectionVo"/>
+    <select id="selectCntActionTarList" parameterType="CntActionTar" resultMap="CntActionTarResult">
+        <include refid="selectCntActionTarVo"/>
         <where>
-            <if test="boxId != null  and boxId != ''"> and box_id = #{boxId}</if>
+            <if test="actionId != null  and actionId != ''"> and action_id = #{actionId}</if>
+            <if test="releaseNum != null "> and release_num = #{releaseNum}</if>
+            <if test="deleteNum != null "> and delete_num = #{deleteNum}</if>
             <if test="collectionId != null  and collectionId != ''"> and collection_id = #{collectionId}</if>
+            <if test="collectionImage != null  and collectionImage != ''"> and collection_image = #{collectionImage}</if>
             <if test="collectionName != null  and collectionName != ''"> and collection_name like concat('%', #{collectionName}, '%')</if>
-            <if test="sourcePrice != null "> and source_price = #{sourcePrice}</if>
-            <if test="tranSvg != null "> and tran_svg = #{tranSvg}</if>
-            <if test="flagScore != null  and flagScore != ''"> and flag_score = #{flagScore}</if>
             <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
             <if test="createdTime != null "> and created_time = #{createdTime}</if>
             <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
@@ -38,21 +38,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
 
-    <select id="selectCntBoxCollectionById" parameterType="String" resultMap="CntBoxCollectionResult">
-        <include refid="selectCntBoxCollectionVo"/>
+    <select id="selectCntActionTarById" parameterType="String" resultMap="CntActionTarResult">
+        <include refid="selectCntActionTarVo"/>
         where id = #{id}
     </select>
 
-    <insert id="insertCntBoxCollection" parameterType="CntBoxCollection">
-        insert into cnt_box_collection
+    <insert id="insertCntActionTar" parameterType="CntActionTar">
+        insert into cnt_action_tar
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
-            <if test="boxId != null">box_id,</if>
+            <if test="actionId != null">action_id,</if>
+            <if test="releaseNum != null">release_num,</if>
+            <if test="deleteNum != null">delete_num,</if>
             <if test="collectionId != null">collection_id,</if>
+            <if test="collectionImage != null">collection_image,</if>
             <if test="collectionName != null">collection_name,</if>
-            <if test="sourcePrice != null">source_price,</if>
-            <if test="tranSvg != null">tran_svg,</if>
-            <if test="flagScore != null">flag_score,</if>
             <if test="createdBy != null">created_by,</if>
             <if test="createdTime != null">created_time,</if>
             <if test="updatedBy != null">updated_by,</if>
@@ -60,12 +60,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
-            <if test="boxId != null">#{boxId},</if>
+            <if test="actionId != null">#{actionId},</if>
+            <if test="releaseNum != null">#{releaseNum},</if>
+            <if test="deleteNum != null">#{deleteNum},</if>
             <if test="collectionId != null">#{collectionId},</if>
+            <if test="collectionImage != null">#{collectionImage},</if>
             <if test="collectionName != null">#{collectionName},</if>
-            <if test="sourcePrice != null">#{sourcePrice},</if>
-            <if test="tranSvg != null">#{tranSvg},</if>
-            <if test="flagScore != null">#{flagScore},</if>
             <if test="createdBy != null">#{createdBy},</if>
             <if test="createdTime != null">#{createdTime},</if>
             <if test="updatedBy != null">#{updatedBy},</if>
@@ -73,44 +73,44 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
     </insert>
 
-    <insert id="insertCntBoxCollectionList">
-        insert into cnt_box_collection
+    <insert id="insertCntActionTars">
+        insert into cnt_action_tar
         (
-        id,
-        box_id,
-        collection_id,
-        collection_name,
-        source_price,
-        tran_svg,
-        flag_score,
-        created_by,
-        created_time
+            id,
+            action_id,
+            release_num,
+            delete_num,
+            collection_id,
+            collection_name,
+            collection_image,
+            created_by,
+            created_time
         )
         values
-        <foreach collection="cntBoxCollectionList" item="item" separator=",">
+        <foreach collection="list" item="item" separator=",">
             (
-                #{item.id},
-                #{item.boxId},
-                #{item.collectionId},
-                #{item.collectionName},
-                #{item.sourcePrice},
-                #{item.tranSvg},
-                #{item.flagScore},
-                #{item.createdBy},
-                #{item.createdTime}
+            #{item.id},
+            #{item.actionId},
+            #{item.releaseNum},
+            #{item.deleteNum},
+            #{item.collectionId},
+            #{item.collectionName},
+            #{item.collectionImage},
+            #{item.createdBy},
+            #{item.createdTime}
             )
         </foreach>
     </insert>
 
-    <update id="updateCntBoxCollection" parameterType="CntBoxCollection">
-        update cnt_box_collection
+    <update id="updateCntActionTar" parameterType="CntActionTar">
+        update cnt_action_tar
         <trim prefix="SET" suffixOverrides=",">
-            <if test="boxId != null">box_id = #{boxId},</if>
+            <if test="actionId != null">action_id = #{actionId},</if>
+            <if test="releaseNum != null">release_num = #{releaseNum},</if>
+            <if test="deleteNum != null">delete_num = #{deleteNum},</if>
             <if test="collectionId != null">collection_id = #{collectionId},</if>
+            <if test="collectionImage != null">collection_image = #{collectionImage},</if>
             <if test="collectionName != null">collection_name = #{collectionName},</if>
-            <if test="sourcePrice != null">source_price = #{sourcePrice},</if>
-            <if test="tranSvg != null">tran_svg = #{tranSvg},</if>
-            <if test="flagScore != null">flag_score = #{flagScore},</if>
             <if test="createdBy != null">created_by = #{createdBy},</if>
             <if test="createdTime != null">created_time = #{createdTime},</if>
             <if test="updatedBy != null">updated_by = #{updatedBy},</if>
@@ -119,16 +119,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </update>
 
-    <delete id="deleteCntBoxCollectionById">
-        delete from cnt_box_collection
+    <delete id="deleteCntActionTarById">
+        delete from cnt_action_tar
         <where>
             <if test="id != null  and id != ''"> and id = #{id}</if>
-            <if test="boxId != null  and boxId != ''"> and box_id = #{boxId}</if>
+            <if test="actionId != null  and actionId != ''"> and action_id = #{actionId}</if>
         </where>
     </delete>
 
-    <delete id="deleteCntBoxCollectionByIds" parameterType="String">
-        delete from cnt_box_collection where id in
+    <delete id="deleteCntActionTarByIds" parameterType="String">
+        delete from cnt_action_tar where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>

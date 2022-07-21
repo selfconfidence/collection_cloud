@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-@ApiModel("藏品分类下拉框")
+@ApiModel("藏品分类字典")
 public class CollectionCateDictVo {
 
     @ApiModelProperty("分类id")

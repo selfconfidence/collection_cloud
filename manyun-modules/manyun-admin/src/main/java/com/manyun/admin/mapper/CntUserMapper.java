@@ -2,7 +2,7 @@ package com.manyun.admin.mapper;
 
 import java.util.List;
 import com.manyun.admin.domain.CntUser;
-import com.manyun.admin.domain.query.QueryUserMoneyVo;
+import com.manyun.admin.domain.query.UserMoneyQuery;
 import com.manyun.admin.domain.vo.UserCollectionVo;
 import com.manyun.admin.domain.vo.UserMoneyVo;
 
@@ -65,10 +65,10 @@ public interface CntUserMapper
     /**
      * 用户和钱包信息
      *
-     * @param queryUserMoneyVo 用户和钱包信息
+     * @param userMoneyQuery 用户和钱包信息
      * @return 结果
      */
-    List<UserMoneyVo> selectUserMoneyList(QueryUserMoneyVo queryUserMoneyVo);
+    List<UserMoneyVo> selectUserMoneyList(UserMoneyQuery userMoneyQuery);
 
     /**
      * 我的藏品

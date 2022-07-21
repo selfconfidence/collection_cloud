@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Data
 @ApiModel("订单管理列表筛选查询视图")
-public class QueryConsignmentVo
+public class ConsignmentQuery
 {
 
     @ApiModelProperty("寄售单号")

@@ -3,7 +3,7 @@ package com.manyun.admin.controller;
 import java.util.List;
 
 import com.manyun.admin.domain.CntOrder;
-import com.manyun.admin.domain.query.QueryUserMoneyVo;
+import com.manyun.admin.domain.query.UserMoneyQuery;
 import com.manyun.admin.domain.vo.UserCollectionVo;
 import com.manyun.admin.domain.vo.UserMoneyVo;
 import com.manyun.common.core.domain.R;
@@ -17,11 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
-import com.manyun.common.security.annotation.RequiresPermissions;
 import com.manyun.admin.domain.CntUser;
 import com.manyun.admin.service.ICntUserService;
 import com.manyun.common.core.web.controller.BaseController;
-import com.manyun.common.core.web.domain.AjaxResult;
 import com.manyun.common.core.web.page.TableDataInfo;
 
 @RestController
@@ -35,10 +33,10 @@ public class CntUserController extends BaseController
     //@RequiresPermissions("admin:user:list")
     @GetMapping("/list")
     @ApiOperation("用户管理列表")
-    public TableDataInfo<UserMoneyVo> list(QueryUserMoneyVo queryUserMoneyVo)
+    public TableDataInfo<UserMoneyVo> list(UserMoneyQuery userMoneyQuery)
     {
         startPage();
-        List<UserMoneyVo> list = cntUserService.selectUserMoneyList(queryUserMoneyVo);
+        List<UserMoneyVo> list = cntUserService.selectUserMoneyList(userMoneyQuery);
         return getDataTable(list);
     }
 

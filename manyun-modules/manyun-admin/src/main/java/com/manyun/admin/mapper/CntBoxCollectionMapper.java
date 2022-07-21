@@ -60,7 +60,7 @@ public interface CntBoxCollectionMapper
      * @param id 盲盒与藏品中间主键
      * @return 结果
      */
-    public int deleteCntBoxCollectionById(String id);
+    public int deleteCntBoxCollectionById(@Param("id") String id,@Param("boxId") String boxId);
 
     /**
      * 批量删除盲盒与藏品中间

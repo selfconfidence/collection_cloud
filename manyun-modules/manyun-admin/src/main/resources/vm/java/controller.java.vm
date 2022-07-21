@@ -1,8 +1,6 @@
 package ${packageName}.controller;
 
 import java.util.List;
-import java.io.IOException;
-import javax.servlet.http.HttpServletResponse;
 
 import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
@@ -22,8 +20,6 @@ import com.manyun.common.security.annotation.RequiresPermissions;
 import ${packageName}.domain.${ClassName};
 import ${packageName}.service.I${ClassName}Service;
 import com.manyun.common.core.web.controller.BaseController;
-import com.manyun.common.core.web.domain.AjaxResult;
-import com.manyun.common.core.utils.poi.ExcelUtil;
 #if($table.crud || $table.sub)
 import com.manyun.common.core.web.page.TableDataInfo;
 #elseif($table.tree)
