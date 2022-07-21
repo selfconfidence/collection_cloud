@@ -3,6 +3,8 @@ package com.manyun.admin.controller;
 import java.util.List;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
+
+import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +37,7 @@ public class CntMarketingController extends BaseController
     //@RequiresPermissions("admin:marketing:list")
     @GetMapping("/list")
     @ApiOperation("查询营销配置列表")
-    public TableDataInfo list(CntMarketing cntMarketing)
+    public TableDataInfo<CntMarketing> list(CntMarketing cntMarketing)
     {
         startPage();
         List<CntMarketing> list = cntMarketingService.selectCntMarketingList(cntMarketing);
@@ -45,35 +47,35 @@ public class CntMarketingController extends BaseController
     //@RequiresPermissions("admin:marketing:query")
     @GetMapping(value = "/{id}")
     @ApiOperation("获取营销配置详细信息")
-    public AjaxResult getInfo(@PathVariable("id") String id)
+    public R<CntMarketing> getInfo(@PathVariable("id") String id)
     {
-        return AjaxResult.success(cntMarketingService.selectCntMarketingById(id));
+        return R.ok(cntMarketingService.selectCntMarketingById(id));
     }
 
     //@RequiresPermissions("admin:marketing:add")
     @Log(title = "营销配置", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增营销配置")
-    public AjaxResult add(@RequestBody CntMarketing cntMarketing)
+    public R add(@RequestBody CntMarketing cntMarketing)
     {
-        return toAjax(cntMarketingService.insertCntMarketing(cntMarketing));
+        return toResult(cntMarketingService.insertCntMarketing(cntMarketing));
     }
 
     //@RequiresPermissions("admin:marketing:edit")
     @Log(title = "营销配置", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("修改营销配置")
-    public AjaxResult edit(@RequestBody CntMarketing cntMarketing)
+    public R edit(@RequestBody CntMarketing cntMarketing)
     {
-        return toAjax(cntMarketingService.updateCntMarketing(cntMarketing));
+        return toResult(cntMarketingService.updateCntMarketing(cntMarketing));
     }
 
     //@RequiresPermissions("admin:marketing:remove")
     @Log(title = "营销配置", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     @ApiOperation("删除营销配置")
-    public AjaxResult remove(@PathVariable String[] ids)
+    public R remove(@PathVariable String[] ids)
     {
-        return toAjax(cntMarketingService.deleteCntMarketingByIds(ids));
+        return toResult(cntMarketingService.deleteCntMarketingByIds(ids));
     }
 }

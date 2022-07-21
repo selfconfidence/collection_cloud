@@ -3,6 +3,9 @@ package com.manyun.common.core.web.controller;
 import java.beans.PropertyEditorSupport;
 import java.util.Date;
 import java.util.List;
+
+import com.manyun.common.core.domain.R;
+import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.WebDataBinder;
@@ -16,7 +19,7 @@ import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * web层通用数据处理
- * 
+ *
  * @author ruoyi
  */
 public class BaseController
@@ -72,7 +75,7 @@ public class BaseController
 
     /**
      * 响应返回结果
-     * 
+     *
      * @param rows 影响行数
      * @return 操作结果
      */
@@ -83,7 +86,18 @@ public class BaseController
 
     /**
      * 响应返回结果
-     * 
+     *
+     * @param rows 影响行数
+     * @return 操作结果
+     */
+    protected R toResult(int rows)
+    {
+        return rows > 0 ? R.ok() : R.fail();
+    }
+
+    /**
+     * 响应返回结果
+     *
      * @param result 结果
      * @return 操作结果
      */

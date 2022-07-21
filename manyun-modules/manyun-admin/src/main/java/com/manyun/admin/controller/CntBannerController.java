@@ -3,6 +3,7 @@ package com.manyun.admin.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
+import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class CntBannerController extends BaseController
     //@RequiresPermissions("admin:banner:list")
     @GetMapping("/list")
     @ApiOperation("查询轮播列表")
-    public TableDataInfo list(CntBanner cntBanner)
+    public TableDataInfo<CntBanner> list(CntBanner cntBanner)
     {
         startPage();
         List<CntBanner> list = cntBannerService.selectCntBannerList(cntBanner);
@@ -45,35 +46,35 @@ public class CntBannerController extends BaseController
     //@RequiresPermissions("admin:banner:query")
     @GetMapping(value = "/{id}")
     @ApiOperation("获取轮播详细信息")
-    public AjaxResult getInfo(@PathVariable("id") String id)
+    public R<CntBanner> getInfo(@PathVariable("id") String id)
     {
-        return AjaxResult.success(cntBannerService.selectCntBannerById(id));
+        return R.ok(cntBannerService.selectCntBannerById(id));
     }
 
     //@RequiresPermissions("admin:banner:add")
     @Log(title = "轮播", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增轮播")
-    public AjaxResult add(@RequestBody CntBanner cntBanner)
+    public R add(@RequestBody CntBanner cntBanner)
     {
-        return toAjax(cntBannerService.insertCntBanner(cntBanner));
+        return toResult(cntBannerService.insertCntBanner(cntBanner));
     }
 
     //@RequiresPermissions("admin:banner:edit")
     @Log(title = "轮播", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("修改轮播")
-    public AjaxResult edit(@RequestBody CntBanner cntBanner)
+    public R edit(@RequestBody CntBanner cntBanner)
     {
-        return toAjax(cntBannerService.updateCntBanner(cntBanner));
+        return toResult(cntBannerService.updateCntBanner(cntBanner));
     }
 
     //@RequiresPermissions("admin:banner:remove")
     @Log(title = "轮播", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     @ApiOperation("删除轮播")
-    public AjaxResult remove(@PathVariable String[] ids)
+    public R remove(@PathVariable String[] ids)
     {
-        return toAjax(cntBannerService.deleteCntBannerByIds(ids));
+        return toResult(cntBannerService.deleteCntBannerByIds(ids));
     }
 }

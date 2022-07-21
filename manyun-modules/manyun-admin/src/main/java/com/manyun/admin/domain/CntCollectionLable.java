@@ -1,5 +1,6 @@
 package com.manyun.admin.domain;
 
+import java.io.Serializable;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -9,8 +10,9 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import com.manyun.common.core.web.domain.BaseEntity;
 
 @ApiModel("藏品和标签中间（必须选定个标签,最多为三个）对象")
-public class CntCollectionLable extends BaseEntity
+public class CntCollectionLable implements Serializable
 {
+
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键")

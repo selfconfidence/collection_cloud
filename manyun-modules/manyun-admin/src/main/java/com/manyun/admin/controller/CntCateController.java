@@ -3,6 +3,7 @@ package com.manyun.admin.controller;
 import java.util.List;
 
 import com.manyun.admin.domain.vo.CntCateVo;
+import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class CntCateController extends BaseController
     //@RequiresPermissions("admin:cate:list")
     @GetMapping("/list")
     @ApiOperation("藏品分类列表")
-    public TableDataInfo list(CntCate cntCate)
+    public TableDataInfo<CntCateVo> list(CntCate cntCate)
     {
         startPage();
         List<CntCateVo> list = cntCateService.selectCntCateList(cntCate);
@@ -44,34 +45,34 @@ public class CntCateController extends BaseController
     //@RequiresPermissions("admin:cate:query")
     @GetMapping(value = "/{id}")
     @ApiOperation("藏品分类详细信息")
-    public AjaxResult getInfo(@PathVariable("id") String id)
+    public R<CntCate> getInfo(@PathVariable("id") String id)
     {
-        return AjaxResult.success(cntCateService.selectCntCateById(id));
+        return R.ok(cntCateService.selectCntCateById(id));
     }
 
     //@RequiresPermissions("admin:cate:add")
     @Log(title = "新增藏品分类", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增藏品分类")
-    public AjaxResult add(@RequestBody CntCate cntCate)
+    public R add(@RequestBody CntCate cntCate)
     {
-        return toAjax(cntCateService.insertCntCate(cntCate));
+        return toResult(cntCateService.insertCntCate(cntCate));
     }
 
     //@RequiresPermissions("admin:cate:edit")
     @Log(title = "修改藏品分类", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("修改藏品分类")
-    public AjaxResult edit(@RequestBody CntCate cntCate)
+    public R edit(@RequestBody CntCate cntCate)
     {
-        return toAjax(cntCateService.updateCntCate(cntCate));
+        return toResult(cntCateService.updateCntCate(cntCate));
     }
 
     //@RequiresPermissions("admin:cate:remove")
     @Log(title = "删除藏品分类", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     @ApiOperation("删除藏品分类")
-    public AjaxResult remove(@PathVariable String[] ids)
+    public R remove(@PathVariable String[] ids)
     {
         return cntCateService.deleteCntCateByIds(ids);
     }

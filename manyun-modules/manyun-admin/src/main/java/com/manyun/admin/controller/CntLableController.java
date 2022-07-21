@@ -3,6 +3,7 @@ package com.manyun.admin.controller;
 import java.util.List;
 
 import com.manyun.admin.domain.vo.CntLableVo;
+import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class CntLableController extends BaseController
     //@RequiresPermissions("admin:lable:list")
     @GetMapping("/list")
     @ApiOperation("查询标签管理列表")
-    public TableDataInfo list(CntLable cntLable)
+    public TableDataInfo<CntLableVo> list(CntLable cntLable)
     {
         startPage();
         List<CntLableVo> list = cntLableService.selectCntLableList(cntLable);
@@ -44,35 +45,35 @@ public class CntLableController extends BaseController
     //@RequiresPermissions("admin:lable:query")
     @GetMapping(value = "/{id}")
     @ApiOperation("获取标签管理详细信息")
-    public AjaxResult getInfo(@PathVariable("id") String id)
+    public R<CntLable> getInfo(@PathVariable("id") String id)
     {
-        return AjaxResult.success(cntLableService.selectCntLableById(id));
+        return R.ok(cntLableService.selectCntLableById(id));
     }
 
     //@RequiresPermissions("admin:lable:add")
     @Log(title = "新增标签管理", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增标签管理")
-    public AjaxResult add(@RequestBody CntLable cntLable)
+    public R add(@RequestBody CntLable cntLable)
     {
-        return toAjax(cntLableService.insertCntLable(cntLable));
+        return toResult(cntLableService.insertCntLable(cntLable));
     }
 
     //@RequiresPermissions("admin:lable:edit")
     @Log(title = "修改标签管理", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("修改标签管理")
-    public AjaxResult edit(@RequestBody CntLable cntLable)
+    public R edit(@RequestBody CntLable cntLable)
     {
-        return toAjax(cntLableService.updateCntLable(cntLable));
+        return toResult(cntLableService.updateCntLable(cntLable));
     }
 
     //@RequiresPermissions("admin:lable:remove")
     @Log(title = "删除标签管理", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     @ApiOperation("删除标签管理")
-    public AjaxResult remove(@PathVariable String[] ids)
+    public R remove(@PathVariable String[] ids)
     {
-        return toAjax(cntLableService.deleteCntLableByIds(ids));
+        return toResult(cntLableService.deleteCntLableByIds(ids));
     }
 }

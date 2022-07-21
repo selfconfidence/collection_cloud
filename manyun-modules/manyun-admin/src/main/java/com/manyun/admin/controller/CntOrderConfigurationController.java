@@ -2,6 +2,8 @@ package com.manyun.admin.controller;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +36,7 @@ public class CntOrderConfigurationController extends BaseController
     //@RequiresPermissions("admin:configuration:list")
     @GetMapping("/list")
     @ApiOperation("查询订单配置列表")
-    public TableDataInfo list(CntOrderConfiguration cntOrderConfiguration)
+    public TableDataInfo<CntOrderConfiguration> list(CntOrderConfiguration cntOrderConfiguration)
     {
         startPage();
         List<CntOrderConfiguration> list = cntOrderConfigurationService.selectCntOrderConfigurationList(cntOrderConfiguration);
@@ -45,35 +47,35 @@ public class CntOrderConfigurationController extends BaseController
     //@RequiresPermissions("admin:configuration:query")
     @GetMapping(value = "/{id}")
     @ApiOperation("获取订单配置详细信息")
-    public AjaxResult getInfo(@PathVariable("id") String id)
+    public R<CntOrderConfiguration> getInfo(@PathVariable("id") String id)
     {
-        return AjaxResult.success(cntOrderConfigurationService.selectCntOrderConfigurationById(id));
+        return R.ok(cntOrderConfigurationService.selectCntOrderConfigurationById(id));
     }
 
     //@RequiresPermissions("admin:configuration:add")
     @Log(title = "订单配置", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增订单配置")
-    public AjaxResult add(@RequestBody CntOrderConfiguration cntOrderConfiguration)
+    public R add(@RequestBody CntOrderConfiguration cntOrderConfiguration)
     {
-        return toAjax(cntOrderConfigurationService.insertCntOrderConfiguration(cntOrderConfiguration));
+        return toResult(cntOrderConfigurationService.insertCntOrderConfiguration(cntOrderConfiguration));
     }
 
     //@RequiresPermissions("admin:configuration:edit")
     @Log(title = "订单配置", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("修改订单配置")
-    public AjaxResult edit(@RequestBody CntOrderConfiguration cntOrderConfiguration)
+    public R edit(@RequestBody CntOrderConfiguration cntOrderConfiguration)
     {
-        return toAjax(cntOrderConfigurationService.updateCntOrderConfiguration(cntOrderConfiguration));
+        return toResult(cntOrderConfigurationService.updateCntOrderConfiguration(cntOrderConfiguration));
     }
 
     //@RequiresPermissions("admin:configuration:remove")
     @Log(title = "订单配置", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     @ApiOperation("删除订单配置")
-    public AjaxResult remove(@PathVariable String[] ids)
+    public R remove(@PathVariable String[] ids)
     {
-        return toAjax(cntOrderConfigurationService.deleteCntOrderConfigurationByIds(ids));
+        return toResult(cntOrderConfigurationService.deleteCntOrderConfigurationByIds(ids));
     }
 }

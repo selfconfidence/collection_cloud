@@ -1,5 +1,6 @@
 package com.manyun.admin.domain;
 
+import java.io.Serializable;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -16,8 +17,9 @@ import com.manyun.common.core.web.domain.BaseEntity;
  * @date 2022-07-19
  */
 @ApiModel("协议相关对象")
-public class CntAgreement extends BaseEntity
+public class CntAgreement implements Serializable
 {
+
     private static final long serialVersionUID = 1L;
 
     /** 主键 */

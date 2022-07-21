@@ -3,6 +3,7 @@ package com.manyun.admin.controller;
 import java.util.List;
 import com.manyun.admin.domain.vo.CntBoxCollectionVo;
 import com.manyun.admin.domain.vo.BoxCollectionDictVo;
+import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class CntBoxCollectionController extends BaseController
     //@RequiresPermissions("admin:collection:list")
     @GetMapping("/list")
     @ApiOperation("查询盲盒中的物品对象")
-    public TableDataInfo list(CntBoxCollection cntBoxCollection)
+    public TableDataInfo<CntBoxCollectionVo> list(CntBoxCollection cntBoxCollection)
     {
         startPage();
         List<CntBoxCollectionVo> list = cntBoxCollectionService.selectCntBoxCollectionList(cntBoxCollection);
@@ -45,33 +46,33 @@ public class CntBoxCollectionController extends BaseController
     @Log(title = "新增盲盒中的物品对象", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增盲盒中的物品对象")
-    public AjaxResult add(@RequestBody List<CntBoxCollection> cntBoxCollectionList)
+    public R add(@RequestBody List<CntBoxCollection> cntBoxCollectionList)
     {
-        return toAjax(cntBoxCollectionService.insertCntBoxCollection(cntBoxCollectionList));
+        return toResult(cntBoxCollectionService.insertCntBoxCollection(cntBoxCollectionList));
     }
 
     //@RequiresPermissions("admin:collection:edit")
     @Log(title = "修改盲盒中的物品对象", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("修改盲盒中的物品对象")
-    public AjaxResult edit(@RequestBody List<CntBoxCollection> cntBoxCollectionList)
+    public R edit(@RequestBody List<CntBoxCollection> cntBoxCollectionList)
     {
-        return toAjax(cntBoxCollectionService.updateCntBoxCollection(cntBoxCollectionList));
+        return toResult(cntBoxCollectionService.updateCntBoxCollection(cntBoxCollectionList));
     }
 
     //@RequiresPermissions("admin:collection:remove")
     @Log(title = "删除盲盒中的物品对象", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     @ApiOperation("删除盲盒中的物品对象")
-    public AjaxResult remove(@PathVariable String[] ids)
+    public R remove(@PathVariable String[] ids)
     {
-        return toAjax(cntBoxCollectionService.deleteCntBoxCollectionByIds(ids));
+        return toResult(cntBoxCollectionService.deleteCntBoxCollectionByIds(ids));
     }
 
 
     @GetMapping("/boxCollectionDict")
     @ApiOperation("查询藏品下拉框")
-    public TableDataInfo boxCollectionDict()
+    public TableDataInfo<BoxCollectionDictVo> boxCollectionDict()
     {
         startPage();
         List<BoxCollectionDictVo> list = cntBoxCollectionService.boxCollectionDict();

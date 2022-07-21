@@ -1,5 +1,6 @@
 package com.manyun.admin.domain;
 
+import java.io.Serializable;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -11,8 +12,9 @@ import com.manyun.common.core.web.domain.BaseEntity;
 
 
 @ApiModel("藏品系列分类对象")
-public class CntCate extends BaseEntity
+public class CntCate implements Serializable
 {
+
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键")

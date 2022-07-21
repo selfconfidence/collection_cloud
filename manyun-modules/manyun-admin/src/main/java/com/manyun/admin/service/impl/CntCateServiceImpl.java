@@ -11,6 +11,7 @@ import com.manyun.admin.domain.vo.CntBoxVo;
 import com.manyun.admin.domain.vo.CntCateVo;
 import com.manyun.admin.mapper.CntBoxMapper;
 import com.manyun.admin.mapper.CntCollectionMapper;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
@@ -108,14 +109,14 @@ public class CntCateServiceImpl implements ICntCateService
      * @return 结果
      */
     @Override
-    public AjaxResult deleteCntCateByIds(String[] ids)
+    public R deleteCntCateByIds(String[] ids)
     {
         List<CntCollection> cntCollectionList = cntCollectionMapper.selectCntCollectionByCateIds(ids);
         if(cntCollectionList.size()>0){
             List<String> cateIdList = cntCollectionList.stream().map(CntCollection::getCateId).collect(Collectors.toList());
-            return AjaxResult.success("藏品系列id为: "+ StringUtils.join(cateIdList,",")+" 的已被引用,不允许删除!");
+            return R.fail("藏品系列id为: "+ StringUtils.join(cateIdList,",")+" 的已被引用,不允许删除!");
         }
-        return cntCateMapper.deleteCntCateByIds(ids)==0?AjaxResult.error():AjaxResult.success();
+        return cntCateMapper.deleteCntCateByIds(ids)==0?R.fail():R.ok();
     }
 
     /**
@@ -125,12 +126,12 @@ public class CntCateServiceImpl implements ICntCateService
      * @return 结果
      */
     @Override
-    public AjaxResult deleteCntCateById(String id)
+    public R deleteCntCateById(String id)
     {
         CntCollection cntCollection = cntCollectionMapper.selectCntCollectionById(id);
         if(cntCollection!=null){
-            return AjaxResult.success("藏品系列id为: "+ cntCollection.getCateId() +" 的已被引用,不允许删除!");
+            return R.fail("藏品系列id为: "+ cntCollection.getCateId() +" 的已被引用,不允许删除!");
         }
-        return cntCateMapper.deleteCntCateById(id)==0?AjaxResult.error():AjaxResult.success();
+        return cntCateMapper.deleteCntCateById(id)==0?R.fail():R.ok();
     }
 }

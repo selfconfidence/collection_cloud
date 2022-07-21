@@ -14,12 +14,12 @@ import com.manyun.common.core.web.domain.TreeEntity;
 #end
 
 #if($table.crud || $table.sub)
-#set($Entity="BaseEntity")
+#set($Entity="implements Serializable")
 #elseif($table.tree)
-#set($Entity="TreeEntity")
+#set($Entity="extends TreeEntity")
 #end
 @ApiModel("${functionName}对象")
-public class ${ClassName} extends ${Entity}
+public class ${ClassName} ${Entity}
 {
     private static final long serialVersionUID = 1L;
 

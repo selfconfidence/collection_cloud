@@ -3,6 +3,7 @@ package com.manyun.admin.service;
 import java.util.List;
 import com.manyun.admin.domain.CntCate;
 import com.manyun.admin.domain.vo.CntCateVo;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.domain.AjaxResult;
 
 /**
@@ -51,7 +52,7 @@ public interface ICntCateService
      * @param ids 需要删除的藏品系列_分类主键集合
      * @return 结果
      */
-    public AjaxResult deleteCntCateByIds(String[] ids);
+    public R deleteCntCateByIds(String[] ids);
 
     /**
      * 删除藏品系列_分类信息
@@ -59,5 +60,5 @@ public interface ICntCateService
      * @param id 藏品系列_分类主键
      * @return 结果
      */
-    public AjaxResult deleteCntCateById(String id);
+    public R deleteCntCateById(String id);
 }

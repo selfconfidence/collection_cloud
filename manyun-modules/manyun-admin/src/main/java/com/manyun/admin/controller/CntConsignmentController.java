@@ -22,7 +22,7 @@ public class CntConsignmentController extends BaseController
 
     @GetMapping("/list")
     @ApiOperation("订单管理列表")
-    public TableDataInfo list(QueryConsignmentVo queryConsignmentVo)
+    public TableDataInfo<CntConsignmentVo> list(QueryConsignmentVo queryConsignmentVo)
     {
         startPage();
         List<CntConsignmentVo> list = cntConsignmentService.selectCntConsignmentList(queryConsignmentVo);

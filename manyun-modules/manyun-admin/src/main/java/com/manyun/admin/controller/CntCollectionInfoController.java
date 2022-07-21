@@ -3,6 +3,7 @@ package com.manyun.admin.controller;
 import java.util.List;
 
 import com.manyun.admin.domain.vo.CntCollectionInfoVo;
+import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class CntCollectionInfoController extends BaseController
     //@RequiresPermissions("admin:info:list")
     @GetMapping("/list")
     @ApiOperation("查询发行方列表")
-    public TableDataInfo list(CntCollectionInfo cntCollectionInfo)
+    public TableDataInfo<CntCollectionInfoVo> list(CntCollectionInfo cntCollectionInfo)
     {
         startPage();
         List<CntCollectionInfoVo> list = cntCollectionInfoService.selectCntCollectionInfoList(cntCollectionInfo);
@@ -45,35 +46,35 @@ public class CntCollectionInfoController extends BaseController
     //@RequiresPermissions("admin:info:query")
     @GetMapping(value = "/{id}")
     @ApiOperation("获取发行方详细信息")
-    public AjaxResult getInfo(@PathVariable("id") String id)
+    public R<CntCollectionInfo> getInfo(@PathVariable("id") String id)
     {
-        return AjaxResult.success(cntCollectionInfoService.selectCntCollectionInfoById(id));
+        return R.ok(cntCollectionInfoService.selectCntCollectionInfoById(id));
     }
 
     //@RequiresPermissions("admin:info:add")
     @Log(title = "新增发行方详情", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增发行方详情")
-    public AjaxResult add(@RequestBody CntCollectionInfo cntCollectionInfo)
+    public R add(@RequestBody CntCollectionInfo cntCollectionInfo)
     {
-        return toAjax(cntCollectionInfoService.insertCntCollectionInfo(cntCollectionInfo));
+        return toResult(cntCollectionInfoService.insertCntCollectionInfo(cntCollectionInfo));
     }
 
     //@RequiresPermissions("admin:info:edit")
     @Log(title = "修改发行方详情", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("修改发行方详情")
-    public AjaxResult edit(@RequestBody CntCollectionInfo cntCollectionInfo)
+    public R edit(@RequestBody CntCollectionInfo cntCollectionInfo)
     {
-        return toAjax(cntCollectionInfoService.updateCntCollectionInfo(cntCollectionInfo));
+        return toResult(cntCollectionInfoService.updateCntCollectionInfo(cntCollectionInfo));
     }
 
    //@RequiresPermissions("admin:info:remove")
     @Log(title = "删除发行方详情", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     @ApiOperation("删除发行方详情")
-    public AjaxResult remove(@PathVariable String[] ids)
+    public R remove(@PathVariable String[] ids)
     {
-        return toAjax(cntCollectionInfoService.deleteCntCollectionInfoByIds(ids));
+        return toResult(cntCollectionInfoService.deleteCntCollectionInfoByIds(ids));
     }
 }

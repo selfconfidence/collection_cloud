@@ -3,6 +3,7 @@ package com.manyun.admin.controller;
 import java.util.List;
 
 import com.manyun.admin.domain.vo.*;
+import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class CntCollectionController extends BaseController
     //@RequiresPermissions("admin:collection:list")
     @GetMapping("/list")
     @ApiOperation("查询藏品管理列表")
-    public TableDataInfo list(CntCollection cntCollection)
+    public TableDataInfo<CntCollectionVo> list(CntCollection cntCollection)
     {
         startPage();
         List<CntCollectionVo> list = cntCollectionService.selectCntCollectionList(cntCollection);
@@ -45,42 +46,42 @@ public class CntCollectionController extends BaseController
     //@RequiresPermissions("admin:collection:query")
     @GetMapping(value = "/{id}")
     @ApiOperation("获取藏品管理详细信息")
-    public AjaxResult getInfo(@PathVariable("id")  String id)
+    public R<CntCollectionDetailsVo> getInfo(@PathVariable("id")  String id)
     {
-        return AjaxResult.success(cntCollectionService.selectCntCollectionById(id));
+        return R.ok(cntCollectionService.selectCntCollectionById(id));
     }
 
     //@RequiresPermissions("admin:collection:add")
     @Log(title = "新增藏品管理", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增藏品管理")
-    public AjaxResult add(@RequestBody CntCollectionAlterCombineVo collectionAlterCombineVo)
+    public R add(@RequestBody CntCollectionAlterCombineVo collectionAlterCombineVo)
     {
-        return toAjax(cntCollectionService.insertCntCollection(collectionAlterCombineVo));
+        return toResult(cntCollectionService.insertCntCollection(collectionAlterCombineVo));
     }
 
     //@RequiresPermissions("admin:collection:edit")
     @Log(title = "修改藏品管理", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("修改藏品管理")
-    public AjaxResult edit(@RequestBody CntCollectionAlterCombineVo collectionAlterCombineVo)
+    public R edit(@RequestBody CntCollectionAlterCombineVo collectionAlterCombineVo)
     {
-        return toAjax(cntCollectionService.updateCntCollection(collectionAlterCombineVo));
+        return toResult(cntCollectionService.updateCntCollection(collectionAlterCombineVo));
     }
 
     //@RequiresPermissions("admin:collection:remove")
     @Log(title = "删除藏品管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     @ApiOperation("删除藏品管理")
-    public AjaxResult remove(@PathVariable String[] ids)
+    public R remove(@PathVariable String[] ids)
     {
-        return toAjax(cntCollectionService.deleteCntCollectionByIds(ids));
+        return toResult(cntCollectionService.deleteCntCollectionByIds(ids));
     }
 
 
     @GetMapping("/collectionCateDict")
     @ApiOperation("查询藏品分类下拉框")
-    public TableDataInfo collectionCateDict()
+    public TableDataInfo<CollectionCateDictVo> collectionCateDict()
     {
         startPage();
         List<CollectionCateDictVo> list = cntCollectionService.collectionCateDict();
@@ -89,7 +90,7 @@ public class CntCollectionController extends BaseController
 
     @GetMapping("/collectionCreationdDict")
     @ApiOperation("查询藏品创作者下拉框")
-    public TableDataInfo collectionCreationdDict()
+    public TableDataInfo<CollectionCreationdDictVo> collectionCreationdDict()
     {
         startPage();
         List<CollectionCreationdDictVo> list = cntCollectionService.collectionCreationdDict();
@@ -98,7 +99,7 @@ public class CntCollectionController extends BaseController
 
     @GetMapping("/collectionLableDict")
     @ApiOperation("查询藏品标签下拉框")
-    public TableDataInfo collectionLableDict()
+    public TableDataInfo<CollectionLableDictVo> collectionLableDict()
     {
         startPage();
         List<CollectionLableDictVo> list = cntCollectionService.collectionLableDict();

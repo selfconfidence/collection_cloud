@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.manyun.admin.domain.vo.CntBoxOrderVo;
 import com.manyun.admin.domain.vo.CntBoxVo;
+import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class CntBoxController extends BaseController
     //@RequiresPermissions("admin:box:list")
     @GetMapping("/list")
     @ApiOperation("盲盒列表")
-    public TableDataInfo list(CntBox cntBox)
+    public TableDataInfo<CntBoxVo> list(CntBox cntBox)
     {
         startPage();
         List<CntBoxVo> list = cntBoxService.selectCntBoxList(cntBox);
@@ -45,41 +46,41 @@ public class CntBoxController extends BaseController
     //@RequiresPermissions("admin:box:query")
     @GetMapping(value = "/{id}")
     @ApiOperation("盲盒详细信息")
-    public AjaxResult getInfo(@PathVariable("id") String id)
+    public R<CntBox> getInfo(@PathVariable("id") String id)
     {
-        return AjaxResult.success(cntBoxService.selectCntBoxById(id));
+        return R.ok(cntBoxService.selectCntBoxById(id));
     }
 
     //@RequiresPermissions("admin:box:add")
     @Log(title = "新增盲盒", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增盲盒")
-    public AjaxResult add(@RequestBody CntBox cntBox)
+    public R add(@RequestBody CntBox cntBox)
     {
-        return toAjax(cntBoxService.insertCntBox(cntBox));
+        return toResult(cntBoxService.insertCntBox(cntBox));
     }
 
     //@RequiresPermissions("admin:box:edit")
     @Log(title = "修改盲盒", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("修改盲盒")
-    public AjaxResult edit(@RequestBody CntBox cntBox)
+    public R edit(@RequestBody CntBox cntBox)
     {
-        return toAjax(cntBoxService.updateCntBox(cntBox));
+        return toResult(cntBoxService.updateCntBox(cntBox));
     }
 
     //@RequiresPermissions("admin:box:remove")
     @Log(title = "删除盲盒", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     @ApiOperation("删除盲盒")
-    public AjaxResult remove(@PathVariable String[] ids)
+    public R remove(@PathVariable String[] ids)
     {
-        return toAjax(cntBoxService.deleteCntBoxByIds(ids));
+        return toResult(cntBoxService.deleteCntBoxByIds(ids));
     }
 
     @GetMapping("/boxOrderList")
     @ApiOperation("盲盒订单列表")
-    public TableDataInfo boxOrderList()
+    public TableDataInfo<CntBoxOrderVo> boxOrderList()
     {
         startPage();
         List<CntBoxOrderVo> list = cntBoxService.boxOrderList();
