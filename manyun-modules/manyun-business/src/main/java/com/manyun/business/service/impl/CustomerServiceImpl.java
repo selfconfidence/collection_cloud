@@ -67,7 +67,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerServiceMapper, Cust
         ArticleVo articleVo = Builder.of(ArticleVo::new).build();
         CustomerService customerService = customerServiceMapper.selectOne(Wrappers.
                 <CustomerService>lambdaQuery()
-                .eq(CustomerService::getArticleStatus,0)
+                .ne(CustomerService::getParentId,0)
                 .eq(CustomerService::getMenuStatus,0)
                 .eq(CustomerService::getMenuId,id));
         BeanUtil.copyProperties(customerService,articleVo);

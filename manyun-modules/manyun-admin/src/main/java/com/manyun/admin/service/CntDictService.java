@@ -1,9 +1,6 @@
 package com.manyun.admin.service;
 
-import com.manyun.admin.domain.vo.CntCollectionDictVo;
-import com.manyun.admin.domain.vo.CollectionCateDictVo;
-import com.manyun.admin.domain.vo.CreationdDictVo;
-import com.manyun.admin.domain.vo.LableDictVo;
+import com.manyun.admin.domain.vo.*;
 
 import java.util.List;
 
@@ -34,4 +31,9 @@ public interface CntDictService
      * 查询标签字典
      */
     List<LableDictVo> lableDict();
+
+    /***
+     * 查询客服字典
+     */
+    List<CustomerServiceDictVo> customerServiceDict();
 }

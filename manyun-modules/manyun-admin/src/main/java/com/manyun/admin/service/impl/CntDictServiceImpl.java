@@ -1,23 +1,17 @@
 package com.manyun.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.manyun.admin.domain.CnfCreationd;
-import com.manyun.admin.domain.CntCate;
-import com.manyun.admin.domain.CntCollection;
-import com.manyun.admin.domain.CntLable;
-import com.manyun.admin.domain.vo.CntCollectionDictVo;
-import com.manyun.admin.domain.vo.CollectionCateDictVo;
-import com.manyun.admin.domain.vo.CreationdDictVo;
-import com.manyun.admin.domain.vo.LableDictVo;
-import com.manyun.admin.mapper.CnfCreationdMapper;
-import com.manyun.admin.mapper.CntCateMapper;
-import com.manyun.admin.mapper.CntCollectionMapper;
-import com.manyun.admin.mapper.CntLableMapper;
+import com.manyun.admin.domain.*;
+import com.manyun.admin.domain.vo.*;
+import com.manyun.admin.mapper.*;
 import com.manyun.admin.service.CntDictService;
+import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.enums.CateType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,6 +36,9 @@ public class CntDictServiceImpl implements CntDictService
 
     @Autowired
     private CntLableMapper cntLableMapper;
+
+    @Autowired
+    private CntCustomerServiceMapper cntCustomerServiceMapper;
 
     /***
      * 查询藏品字典
@@ -92,6 +89,20 @@ public class CntDictServiceImpl implements CntDictService
             BeanUtil.copyProperties(m,lableDictVo);
             return lableDictVo;
         }).collect(Collectors.toList());
+    }
+
+    /***
+     * 查询客服字典
+     */
+    @Override
+    public List<CustomerServiceDictVo> customerServiceDict() {
+        List<CustomerServiceDictVo> customerServiceDictVos=cntCustomerServiceMapper.selectCntCustomerServiceList(Builder.of(CntCustomerService::new).build()).stream().filter(f -> (f.getMenuStatus().equals("0") && f.getParentId()==0)).map(m ->{
+            CustomerServiceDictVo customerServiceDictVo=new CustomerServiceDictVo();
+            BeanUtil.copyProperties(m,customerServiceDictVo);
+            return customerServiceDictVo;
+        }).collect(Collectors.toList());
+        customerServiceDictVos.add(Builder.of(CustomerServiceDictVo::new).with(CustomerServiceDictVo::setMenuId,Long.valueOf(0)).with(CustomerServiceDictVo::setMenuName,"父菜单").build());
+        return customerServiceDictVos.stream().sorted(Comparator.comparing(CustomerServiceDictVo::getMenuId)).collect(Collectors.toList());
     }
 
 

@@ -1,10 +1,7 @@
 package com.manyun.admin.controller;
 
 
-import com.manyun.admin.domain.vo.CntCollectionDictVo;
-import com.manyun.admin.domain.vo.CollectionCateDictVo;
-import com.manyun.admin.domain.vo.CreationdDictVo;
-import com.manyun.admin.domain.vo.LableDictVo;
+import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.service.CntDictService;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.TableDataInfo;
@@ -59,6 +56,15 @@ public class CntDictController extends BaseController
     {
         startPage();
         List<LableDictVo> list = cntDictService.lableDict();
+        return getDataTable(list);
+    }
+
+    @GetMapping("/customerServiceDict")
+    @ApiOperation("客服字典")
+    public TableDataInfo<CustomerServiceDictVo> customerServiceDict()
+    {
+        startPage();
+        List<CustomerServiceDictVo> list = cntDictService.customerServiceDict();
         return getDataTable(list);
     }
 
