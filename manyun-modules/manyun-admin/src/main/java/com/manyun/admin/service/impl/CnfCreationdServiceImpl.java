@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.manyun.admin.domain.query.CreationdQuery;
 import com.manyun.admin.domain.vo.CnfCreationdVo;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
@@ -41,13 +42,13 @@ public class CnfCreationdServiceImpl implements ICnfCreationdService
     /**
      * 查询创作者列表
      *
-     * @param cnfCreationd 创作者
+     * @param creationdQuery
      * @return 创作者
      */
     @Override
-    public List<CnfCreationdVo> selectCnfCreationdList(CnfCreationd cnfCreationd)
+    public List<CnfCreationdVo> selectCnfCreationdList(CreationdQuery creationdQuery)
     {
-        return cnfCreationdMapper.selectCnfCreationdList(cnfCreationd).stream().map(m ->{
+        return cnfCreationdMapper.selectSerachCreationdList(creationdQuery).stream().map(m ->{
             CnfCreationdVo cnfCreationdVo=new CnfCreationdVo();
             BeanUtil.copyProperties(m,cnfCreationdVo);
             return cnfCreationdVo;

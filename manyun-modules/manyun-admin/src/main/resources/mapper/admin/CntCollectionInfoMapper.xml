@@ -41,7 +41,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </select>
 
-    <select id="selectCollectionRelatedInfoList" parameterType="CntCollectionInfo" resultType="com.manyun.admin.domain.vo.CntCollectionInfoVo">
+    <select id="selectCollectionRelatedInfoList" parameterType="CollectionInfoQuery" resultType="com.manyun.admin.domain.vo.CntCollectionInfoVo">
         select
             ci.id,
             c.collection_name collectionName,
@@ -55,15 +55,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             cnt_collection c
         on ci.collection_id=c.id
         <where>
-            <if test="collectionId != null  and collectionId != ''"> and ci.collection_id = #{collectionId}</if>
-            <if test="publishAuther != null  and publishAuther != ''"> and ci.publish_auther = #{publishAuther}</if>
-            <if test="publishOther != null  and publishOther != ''"> and ci.publish_other = #{publishOther}</if>
-            <if test="customerTail != null  and customerTail != ''"> and ci.customer_tail = #{customerTail}</if>
-            <if test="lookInfo != null  and lookInfo != ''"> and ci.look_info = #{lookInfo}</if>
-            <if test="createdBy != null  and createdBy != ''"> and ci.created_by = #{createdBy}</if>
-            <if test="createdTime != null "> and ci.created_time = #{createdTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''"> and ci.updated_by = #{updatedBy}</if>
-            <if test="updatedTime != null "> and ci.updated_time = #{updatedTime}</if>
+            <if test="publishOther != null  and publishOther != ''"> and ci.publish_other like concat('%', #{publishOther}, '%')</if>
         </where>
     </select>
 

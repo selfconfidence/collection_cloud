@@ -2,6 +2,7 @@ package com.manyun.admin.controller;
 
 import java.util.List;
 
+import com.manyun.admin.domain.query.ActionQuery;
 import com.manyun.admin.domain.vo.CntActionVo;
 import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
@@ -43,10 +44,10 @@ public class CntActionController extends BaseController
     //@RequiresPermissions("admin:action:list")
     @GetMapping("/list")
     @ApiOperation("查询活动列表")
-    public TableDataInfo<CntActionVo> list(CntAction cntAction)
+    public TableDataInfo<CntActionVo> list(ActionQuery actionQuery)
     {
         startPage();
-        List<CntActionVo> list = cntActionService.selectCntActionList(cntAction);
+        List<CntActionVo> list = cntActionService.selectCntActionList(actionQuery);
         return getDataTable(list);
     }
 

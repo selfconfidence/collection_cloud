@@ -38,6 +38,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
 
+    <select id="selectSearchBoxCollectionList" parameterType="BoxCollectionQuery" resultMap="CntBoxCollectionResult">
+        <include refid="selectCntBoxCollectionVo"/>
+        <where>
+            <if test="boxId != null  and boxId != ''"> and box_id = #{boxId}</if>
+        </where>
+    </select>
+
     <select id="selectCntBoxCollectionById" parameterType="String" resultMap="CntBoxCollectionResult">
         <include refid="selectCntBoxCollectionVo"/>
         where id = #{id}
@@ -131,6 +138,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         delete from cnt_box_collection where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteCntBoxCollectionByBoxIds" parameterType="String">
+        delete from cnt_box_collection where box_id in
+        <foreach item="boxId" collection="boxIds" open="(" separator="," close=")">
+            #{boxId}
         </foreach>
     </delete>
 </mapper>

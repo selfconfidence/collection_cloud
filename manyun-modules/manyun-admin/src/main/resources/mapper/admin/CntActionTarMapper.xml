@@ -38,6 +38,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
 
+    <select id="selectSearchActionTarList" parameterType="ActionTarQuery" resultMap="CntActionTarResult">
+        <include refid="selectCntActionTarVo"/>
+        <where>
+            <if test="actionId != null  and actionId != ''"> and action_id = #{actionId}</if>
+        </where>
+    </select>
+
     <select id="selectCntActionTarById" parameterType="String" resultMap="CntActionTarResult">
         <include refid="selectCntActionTarVo"/>
         where id = #{id}
@@ -131,6 +138,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         delete from cnt_action_tar where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteCntActionTarByActionIds" parameterType="String">
+        delete from cnt_action_tar where action_id in
+        <foreach item="actionId" collection="actionIds" open="(" separator="," close=")">
+            #{actionId}
         </foreach>
     </delete>
 </mapper>

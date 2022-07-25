@@ -2,7 +2,9 @@ package com.manyun.admin.controller;
 
 import java.util.List;
 
+import com.manyun.admin.domain.dto.AirdropDto;
 import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
+import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
@@ -34,10 +36,10 @@ public class CntCollectionController extends BaseController
     //@RequiresPermissions("admin:collection:list")
     @GetMapping("/list")
     @ApiOperation("查询藏品管理列表")
-    public TableDataInfo<CntCollectionVo> list(CntCollection cntCollection)
+    public TableDataInfo<CntCollectionVo> list(CollectionQuery collectionQuery)
     {
         startPage();
-        List<CntCollectionVo> list = cntCollectionService.selectCntCollectionList(cntCollection);
+        List<CntCollectionVo> list = cntCollectionService.selectCntCollectionList(collectionQuery);
         return getDataTable(list);
     }
 
@@ -74,6 +76,13 @@ public class CntCollectionController extends BaseController
     public R remove(@PathVariable String[] ids)
     {
         return toResult(cntCollectionService.deleteCntCollectionByIds(ids));
+    }
+
+    @PostMapping("/airdrop")
+    @ApiOperation("空投")
+    public R airdrop(@RequestBody AirdropDto airdropDto)
+    {
+        return toResult(cntCollectionService.airdrop(airdropDto));
     }
 
 }

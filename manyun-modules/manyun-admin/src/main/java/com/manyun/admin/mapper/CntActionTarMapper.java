@@ -2,6 +2,7 @@ package com.manyun.admin.mapper;
 
 import java.util.List;
 import com.manyun.admin.domain.CntActionTar;
+import com.manyun.admin.domain.query.ActionTarQuery;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -27,6 +28,14 @@ public interface CntActionTarMapper
      * @return 活动合成附属信息集合
      */
     public List<CntActionTar> selectCntActionTarList(CntActionTar cntActionTar);
+
+    /**
+     * 根据条件查询活动合成附属信息列表
+     *
+     * @param actionTarQuery 活动合成附属信息
+     * @return 活动合成附属信息集合
+     */
+    public List<CntActionTar> selectSearchActionTarList(ActionTarQuery actionTarQuery);
 
     /**
      * 新增活动合成附属信息
@@ -67,5 +76,13 @@ public interface CntActionTarMapper
      * @return 结果
      */
     public int deleteCntActionTarByIds(String[] ids);
+
+    /**
+     * 批量删除活动合成附属信息
+     *
+     * @param actionIds 需要删除的活动id集合
+     * @return 结果
+     */
+    public int deleteCntActionTarByActionIds(String[] actionIds);
 
 }

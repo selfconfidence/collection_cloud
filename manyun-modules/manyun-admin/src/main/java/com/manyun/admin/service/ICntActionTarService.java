@@ -3,6 +3,7 @@ package com.manyun.admin.service;
 import java.util.List;
 import com.manyun.admin.domain.CntActionTar;
 import com.manyun.admin.domain.dto.SaveActionTarDto;
+import com.manyun.admin.domain.query.ActionTarQuery;
 import com.manyun.admin.domain.vo.CntActionTarVo;
 
 /**
@@ -17,10 +18,10 @@ public interface ICntActionTarService
     /**
      * 查询活动合成附属信息列表
      *
-     * @param cntActionTar 活动合成附属信息
+     * @param actionTarQuery 活动合成附属信息
      * @return 活动合成附属信息集合
      */
-    public List<CntActionTarVo> selectCntActionTarList(CntActionTar cntActionTar);
+    public List<CntActionTarVo> selectCntActionTarList(ActionTarQuery actionTarQuery);
 
     /**
      * 新增活动合成附属信息

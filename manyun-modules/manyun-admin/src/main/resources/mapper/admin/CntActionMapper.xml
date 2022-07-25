@@ -3,7 +3,7 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.manyun.admin.mapper.CntActionMapper">
-    
+
     <resultMap type="CntAction" id="CntActionResult">
         <result property="id"    column="id"    />
         <result property="actionTitle"    column="action_title"    />
@@ -25,7 +25,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectCntActionList" parameterType="CntAction" resultMap="CntActionResult">
         <include refid="selectCntActionVo"/>
-        <where>  
+        <where>
             <if test="actionTitle != null  and actionTitle != ''"> and action_title = #{actionTitle}</if>
             <if test="actionImage != null  and actionImage != ''"> and action_image = #{actionImage}</if>
             <if test="actionStatus != null "> and action_status = #{actionStatus}</if>
@@ -39,12 +39,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
         </where>
     </select>
-    
+
+    <select id="selectSearchActionList" parameterType="ActionQuery" resultMap="CntActionResult">
+        <include refid="selectCntActionVo"/>
+        <where>
+            <if test="actionTitle != null  and actionTitle != ''"> and action_title like concat('%', #{actionTitle}, '%')</if>
+            <if test="actionStatus != null "> and action_status = #{actionStatus}</if>
+        </where>
+    </select>
+
+
     <select id="selectCntActionById" parameterType="String" resultMap="CntActionResult">
         <include refid="selectCntActionVo"/>
         where id = #{id}
     </select>
-        
+
     <insert id="insertCntAction" parameterType="CntAction">
         insert into cnt_action
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -100,7 +109,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteCntActionByIds" parameterType="String">
-        delete from cnt_action where id in 
+        delete from cnt_action where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>

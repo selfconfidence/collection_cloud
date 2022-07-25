@@ -2,6 +2,7 @@ package com.manyun.admin.mapper;
 
 import java.util.List;
 import com.manyun.admin.domain.CntCollectionInfo;
+import com.manyun.admin.domain.query.CollectionInfoQuery;
 import com.manyun.admin.domain.vo.CntCollectionInfoVo;
 
 /**
@@ -63,10 +64,10 @@ public interface CntCollectionInfoMapper
     /**
      * 查询藏品相关信息列表
      *
-     * @param cntCollectionInfo 藏品详情
+     * @param collectionInfoQuery
      * @return 发行方返回视图
      */
-    List<CntCollectionInfoVo> selectCollectionRelatedInfoList(CntCollectionInfo cntCollectionInfo);
+    List<CntCollectionInfoVo> selectCollectionRelatedInfoList(CollectionInfoQuery collectionInfoQuery);
 
     /**
      * 批量删除藏品详情

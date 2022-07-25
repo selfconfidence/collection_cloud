@@ -2,7 +2,9 @@ package com.manyun.admin.service;
 
 import java.util.List;
 import com.manyun.admin.domain.CntCollection;
+import com.manyun.admin.domain.dto.AirdropDto;
 import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
+import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.*;
 
 /**
@@ -24,10 +26,10 @@ public interface ICntCollectionService
     /**
      * 查询藏品列表
      *
-     * @param cntCollection 藏品
+     * @param collectionQuery
      * @return 藏品集合
      */
-    public List<CntCollectionVo> selectCntCollectionList(CntCollection cntCollection);
+    public List<CntCollectionVo> selectCntCollectionList(CollectionQuery collectionQuery);
 
     /**
      * 新增藏品
@@ -53,4 +55,10 @@ public interface ICntCollectionService
      */
     public int deleteCntCollectionByIds(String[] ids);
 
+    /***
+     * 空投
+     * @param airdropDto 空投请求参数
+     * @return
+     */
+    int airdrop(AirdropDto airdropDto);
 }

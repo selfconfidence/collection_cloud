@@ -1,7 +1,6 @@
 package com.manyun.admin.controller;
 
 import java.util.List;
-import javax.servlet.http.HttpServletResponse;
 
 import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
@@ -17,12 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
-import com.manyun.common.security.annotation.RequiresPermissions;
 import com.manyun.admin.domain.CntBanner;
 import com.manyun.admin.service.ICntBannerService;
 import com.manyun.common.core.web.controller.BaseController;
-import com.manyun.common.core.web.domain.AjaxResult;
-import com.manyun.common.core.utils.poi.ExcelUtil;
 import com.manyun.common.core.web.page.TableDataInfo;
 
 @RestController
@@ -36,10 +32,10 @@ public class CntBannerController extends BaseController
     //@RequiresPermissions("admin:banner:list")
     @GetMapping("/list")
     @ApiOperation("查询轮播列表")
-    public TableDataInfo<CntBanner> list(CntBanner cntBanner)
+    public TableDataInfo<CntBanner> list()
     {
         startPage();
-        List<CntBanner> list = cntBannerService.selectCntBannerList(cntBanner);
+        List<CntBanner> list = cntBannerService.selectCntBannerList(new CntBanner());
         return getDataTable(list);
     }
 

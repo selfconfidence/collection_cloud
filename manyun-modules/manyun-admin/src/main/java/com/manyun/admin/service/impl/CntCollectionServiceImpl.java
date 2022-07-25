@@ -8,7 +8,10 @@ import java.util.stream.Collectors;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.manyun.admin.domain.*;
+import com.manyun.admin.domain.dto.AirdropDto;
 import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
+import com.manyun.admin.domain.query.CollectionQuery;
+import com.manyun.admin.domain.query.UserMoneyQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.mapper.*;
 import com.manyun.common.core.constant.BusinessConstants;
@@ -43,6 +46,12 @@ public class CntCollectionServiceImpl implements ICntCollectionService
     @Autowired
     private CntCollectionLableMapper cntCollectionLableMapper;
 
+    @Autowired
+    private CntUserMapper cntUserMapper;
+
+    @Autowired
+    private CntUserCollectionMapper userCollectionMapper;
+
     /**
      * 查询藏品
      *
@@ -63,13 +72,13 @@ public class CntCollectionServiceImpl implements ICntCollectionService
     /**
      * 查询藏品列表
      *
-     * @param cntCollection 藏品
+     * @param collectionQuery
      * @return 藏品
      */
     @Override
-    public List<CntCollectionVo> selectCntCollectionList(CntCollection cntCollection)
+    public List<CntCollectionVo> selectCntCollectionList(CollectionQuery collectionQuery)
     {
-        return cntCollectionMapper.selectCntCollectionList(cntCollection).stream().map(m ->{
+        return cntCollectionMapper.selectSearchCollectionList(collectionQuery).stream().map(m ->{
             CntCollectionVo cntCollectionVo=new CntCollectionVo();
             BeanUtil.copyProperties(m,cntCollectionVo);
             cntCollectionVo.setMediaVos(cntMediaMapper.initMediaVos(m.getId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
@@ -264,6 +273,44 @@ public class CntCollectionServiceImpl implements ICntCollectionService
             cntMediaMapper.deleteCntMediaByCollectionIds(ids);
         }
         return 1;
+    }
+
+    /***
+     * 空投
+     * @param airdropDto 空投请求参数
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int airdrop(AirdropDto airdropDto) {
+        //验证用户
+        List<CntUser> cntUsers = cntUserMapper.selectCntUserList(Builder.of(CntUser::new).with(CntUser::setPhone, airdropDto.getPhone()).build());
+        Assert.isTrue(cntUsers.size()>0,"用户不存在!");
+        CntCollection collection = cntCollectionMapper.selectCntCollectionById(airdropDto.getCollectionId());
+        Assert.isTrue(Objects.nonNull(collection),"藏品不存在!");
+        String collectionId = collection.getId();
+        Long selfBalance = collection.getSelfBalance();
+        Long balance = collection.getBalance();
+        Assert.isFalse(selfBalance>=balance,"已售空!");
+        //扣减库存
+        cntCollectionMapper.updateCntCollection(
+                Builder
+                        .of(CntCollection::new)
+                        .with(CntCollection::setId,collectionId)
+                        .with(CntCollection::setSelfBalance,(selfBalance+1))
+                        .with(CntCollection::setBalance,(balance-1))
+                        .build()
+        );
+        //用户藏品信息未完善 待上链
+        return userCollectionMapper.insertCntUserCollection(
+                Builder
+                        .of(CntUserCollection::new)
+                        .with(CntUserCollection::setId,IdUtils.getSnowflakeNextIdStr())
+                        .with(CntUserCollection::setUserId,cntUsers.get(0).getUserId())
+                        .with(CntUserCollection::setCollectionId,collection.getId())
+                        .with(CntUserCollection::setCollectionName,collection.getCollectionName())
+                        .build()
+        );
     }
 
 }

@@ -37,10 +37,10 @@ public class CntAgreementController extends BaseController
     //@RequiresPermissions("admin:agreement:list")
     @GetMapping("/list")
     @ApiOperation("查询协议相关列表")
-    public TableDataInfo<CntAgreement> list(CntAgreement cntAgreement)
+    public TableDataInfo<CntAgreement> list()
     {
         startPage();
-        List<CntAgreement> list = cntAgreementService.selectCntAgreementList(cntAgreement);
+        List<CntAgreement> list = cntAgreementService.selectCntAgreementList(new CntAgreement());
         return getDataTable(list);
     }
 

@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.manyun.admin.domain.query.BoxQuery;
+import com.manyun.admin.domain.query.OrderQuery;
 import com.manyun.admin.domain.vo.CntBoxOrderVo;
 import com.manyun.admin.domain.vo.CntBoxVo;
+import com.manyun.admin.mapper.CntBoxCollectionMapper;
 import com.manyun.admin.mapper.CntMediaMapper;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.utils.DateUtils;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.manyun.admin.mapper.CntBoxMapper;
 import com.manyun.admin.domain.CntBox;
 import com.manyun.admin.service.ICntBoxService;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 盲盒;盲盒主体Service业务层处理
@@ -32,6 +36,9 @@ public class CntBoxServiceImpl implements ICntBoxService
     @Autowired
     private CntMediaMapper cntMediaMapper;
 
+    @Autowired
+    private CntBoxCollectionMapper boxCollectionMapper;
+
     /**
      * 查询盲盒;盲盒主体
      *
@@ -47,13 +54,13 @@ public class CntBoxServiceImpl implements ICntBoxService
     /**
      * 查询盲盒;盲盒主体列表
      *
-     * @param cntBox 盲盒;盲盒主体
+     * @param boxQuery 盲盒;盲盒主体
      * @return 盲盒;盲盒主体
      */
     @Override
-    public List<CntBoxVo> selectCntBoxList(CntBox cntBox)
+    public List<CntBoxVo> selectCntBoxList(BoxQuery boxQuery)
     {
-        List<CntBox> cntBoxList = cntBoxMapper.selectCntBoxList(cntBox);
+        List<CntBox> cntBoxList = cntBoxMapper.selectSearchBoxList(boxQuery);
         return cntBoxList
                 .parallelStream()
                 .map(item ->
@@ -101,17 +108,20 @@ public class CntBoxServiceImpl implements ICntBoxService
      * @return 结果
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int deleteCntBoxByIds(String[] ids)
     {
-        return cntBoxMapper.deleteCntBoxByIds(ids);
+        cntBoxMapper.deleteCntBoxByIds(ids);
+        boxCollectionMapper.deleteCntBoxCollectionByBoxIds(ids);
+        return 1;
     }
 
     /**
      * 查询盲盒订单列表
      */
     @Override
-    public List<CntBoxOrderVo> boxOrderList() {
-        return cntBoxMapper.boxOrderList();
+    public List<CntBoxOrderVo> boxOrderList(OrderQuery orderQuery) {
+        return cntBoxMapper.boxOrderList(orderQuery);
     }
 
 }

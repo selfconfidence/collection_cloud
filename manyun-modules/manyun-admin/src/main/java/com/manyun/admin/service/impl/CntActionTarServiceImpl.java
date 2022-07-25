@@ -9,6 +9,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.manyun.admin.domain.CntCollection;
 import com.manyun.admin.domain.dto.SaveActionTarDto;
+import com.manyun.admin.domain.query.ActionTarQuery;
 import com.manyun.admin.domain.vo.CntActionTarVo;
 import com.manyun.admin.domain.vo.MediaVo;
 import com.manyun.admin.mapper.CntCollectionMapper;
@@ -44,13 +45,13 @@ public class CntActionTarServiceImpl implements ICntActionTarService
     /**
      * 查询活动合成附属信息列表
      *
-     * @param cntActionTar 活动合成附属信息
+     * @param actionTarQuery
      * @return 活动合成附属信息
      */
     @Override
-    public List<CntActionTarVo> selectCntActionTarList(CntActionTar cntActionTar)
+    public List<CntActionTarVo> selectCntActionTarList(ActionTarQuery actionTarQuery)
     {
-        return cntActionTarMapper.selectCntActionTarList(cntActionTar).stream().map(m ->{
+        return cntActionTarMapper.selectSearchActionTarList(actionTarQuery).stream().map(m ->{
             CntActionTarVo cntActionTarVo=new CntActionTarVo();
             BeanUtil.copyProperties(m,cntActionTarVo);
             return cntActionTarVo;

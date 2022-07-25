@@ -2,6 +2,7 @@ package com.manyun.admin.service;
 
 import java.util.List;
 import com.manyun.admin.domain.CntCollectionInfo;
+import com.manyun.admin.domain.query.CollectionInfoQuery;
 import com.manyun.admin.domain.vo.CntCollectionInfoVo;
 
 /**
@@ -23,10 +24,10 @@ public interface ICntCollectionInfoService
     /**
      * 查询藏品详情列表
      *
-     * @param cntCollectionInfo 藏品详情
+     * @param collectionInfoQuery
      * @return 藏品详情集合
      */
-    public List<CntCollectionInfoVo> selectCntCollectionInfoList(CntCollectionInfo cntCollectionInfo);
+    public List<CntCollectionInfoVo> selectCntCollectionInfoList(CollectionInfoQuery collectionInfoQuery);
 
     /**
      * 新增藏品详情

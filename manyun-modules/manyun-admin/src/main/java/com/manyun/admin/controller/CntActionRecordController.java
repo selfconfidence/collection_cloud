@@ -43,10 +43,10 @@ public class CntActionRecordController extends BaseController
     //@RequiresPermissions("admin:record:list")
     @GetMapping("/list")
     @ApiOperation("查询活动合成记录列表")
-    public TableDataInfo<CntActionRecordVo> list(CntActionRecord cntActionRecord)
+    public TableDataInfo<CntActionRecordVo> list()
     {
         startPage();
-        List<CntActionRecordVo> list = cntActionRecordService.selectCntActionRecordList(cntActionRecord);
+        List<CntActionRecordVo> list = cntActionRecordService.selectCntActionRecordList(new CntActionRecord());
         return getDataTable(list);
     }
 

@@ -2,6 +2,7 @@ package com.manyun.admin.controller;
 
 import java.util.List;
 
+import com.manyun.admin.domain.query.CateQuery;
 import com.manyun.admin.domain.vo.CntCateVo;
 import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
@@ -17,11 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
-import com.manyun.common.security.annotation.RequiresPermissions;
 import com.manyun.admin.domain.CntCate;
 import com.manyun.admin.service.ICntCateService;
 import com.manyun.common.core.web.controller.BaseController;
-import com.manyun.common.core.web.domain.AjaxResult;
 import com.manyun.common.core.web.page.TableDataInfo;
 
 @RestController
@@ -35,10 +34,10 @@ public class CntCateController extends BaseController
     //@RequiresPermissions("admin:cate:list")
     @GetMapping("/list")
     @ApiOperation("藏品分类列表")
-    public TableDataInfo<CntCateVo> list(CntCate cntCate)
+    public TableDataInfo<CntCateVo> list(CateQuery cateQuery)
     {
         startPage();
-        List<CntCateVo> list = cntCateService.selectCntCateList(cntCate);
+        List<CntCateVo> list = cntCateService.selectCntCateList(cateQuery);
         return getDataTable(list);
     }
 

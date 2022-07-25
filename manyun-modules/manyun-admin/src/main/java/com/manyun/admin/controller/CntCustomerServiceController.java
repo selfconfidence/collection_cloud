@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
-import com.manyun.common.security.annotation.RequiresPermissions;
 import com.manyun.admin.domain.CntCustomerService;
 import com.manyun.admin.service.ICntCustomerServiceService;
 import com.manyun.common.core.web.controller.BaseController;
@@ -43,10 +42,10 @@ public class CntCustomerServiceController extends BaseController
     //@RequiresPermissions("admin:service:list")
     @GetMapping("/list")
     @ApiOperation("查询客服列表")
-    public TableDataInfo<CntCustomerServiceVo> list(CntCustomerService cntCustomerService)
+    public TableDataInfo<CntCustomerServiceVo> list()
     {
         startPage();
-        List<CntCustomerServiceVo> list = cntCustomerServiceService.selectCntCustomerServiceList(cntCustomerService);
+        List<CntCustomerServiceVo> list = cntCustomerServiceService.selectCntCustomerServiceList(new CntCustomerService());
         return getDataTable(list);
     }
 

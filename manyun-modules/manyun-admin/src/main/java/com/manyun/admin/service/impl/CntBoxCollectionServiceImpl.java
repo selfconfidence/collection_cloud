@@ -9,6 +9,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.manyun.admin.domain.CntCollection;
 import com.manyun.admin.domain.dto.SaveBoxCollectionDto;
+import com.manyun.admin.domain.query.BoxCollectionQuery;
 import com.manyun.admin.domain.vo.CntBoxCollectionVo;
 import com.manyun.admin.mapper.CntCollectionMapper;
 import com.manyun.common.core.utils.DateUtils;
@@ -39,13 +40,13 @@ public class CntBoxCollectionServiceImpl implements ICntBoxCollectionService
     /**
      * 查询盲盒与藏品中间列表
      *
-     * @param cntBoxCollection 盲盒与藏品中间
+     * @param boxCollectionQuery 盲盒与藏品中间
      * @return 盲盒与藏品中间
      */
     @Override
-    public List<CntBoxCollectionVo> selectCntBoxCollectionList(CntBoxCollection cntBoxCollection)
+    public List<CntBoxCollectionVo> selectCntBoxCollectionList(BoxCollectionQuery boxCollectionQuery)
     {
-        return cntBoxCollectionMapper.selectCntBoxCollectionList(cntBoxCollection).stream().map(m ->{
+        return cntBoxCollectionMapper.selectSearchBoxCollectionList(boxCollectionQuery).stream().map(m ->{
             CntBoxCollectionVo cntBoxCollectionVo=new CntBoxCollectionVo();
             BeanUtil.copyProperties(m,cntBoxCollectionVo);
             return cntBoxCollectionVo;

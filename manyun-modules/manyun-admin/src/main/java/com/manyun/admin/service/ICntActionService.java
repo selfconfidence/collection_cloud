@@ -2,6 +2,7 @@ package com.manyun.admin.service;
 
 import java.util.List;
 import com.manyun.admin.domain.CntAction;
+import com.manyun.admin.domain.query.ActionQuery;
 import com.manyun.admin.domain.vo.CntActionVo;
 
 /**
@@ -23,10 +24,10 @@ public interface ICntActionService
     /**
      * 查询活动列表
      *
-     * @param cntAction 活动
+     * @param actionQuery 活动
      * @return 活动集合
      */
-    public List<CntActionVo> selectCntActionList(CntAction cntAction);
+    public List<CntActionVo> selectCntActionList(ActionQuery actionQuery);
 
     /**
      * 新增活动
@@ -51,12 +52,4 @@ public interface ICntActionService
      * @return 结果
      */
     public int deleteCntActionByIds(String[] ids);
-
-    /**
-     * 删除活动信息
-     *
-     * @param id 活动主键
-     * @return 结果
-     */
-    public int deleteCntActionById(String id);
 }

@@ -2,6 +2,7 @@ package com.manyun.admin.controller;
 
 import java.util.List;
 
+import com.manyun.admin.domain.query.CollectionInfoQuery;
 import com.manyun.admin.domain.vo.CntCollectionInfoVo;
 import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
@@ -35,10 +36,10 @@ public class CntCollectionInfoController extends BaseController
     //@RequiresPermissions("admin:info:list")
     @GetMapping("/list")
     @ApiOperation("查询发行方列表")
-    public TableDataInfo<CntCollectionInfoVo> list(CntCollectionInfo cntCollectionInfo)
+    public TableDataInfo<CntCollectionInfoVo> list(CollectionInfoQuery collectionInfoQuery)
     {
         startPage();
-        List<CntCollectionInfoVo> list = cntCollectionInfoService.selectCntCollectionInfoList(cntCollectionInfo);
+        List<CntCollectionInfoVo> list = cntCollectionInfoService.selectCntCollectionInfoList(collectionInfoQuery);
         return getDataTable(list);
     }
 

@@ -2,6 +2,7 @@ package com.manyun.admin.mapper;
 
 import java.util.List;
 import com.manyun.admin.domain.CntBoxCollection;
+import com.manyun.admin.domain.query.BoxCollectionQuery;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -27,6 +28,14 @@ public interface CntBoxCollectionMapper
      * @return 盲盒与藏品中间集合
      */
     public List<CntBoxCollection> selectCntBoxCollectionList(CntBoxCollection cntBoxCollection);
+
+    /**
+     * 查询盲盒与藏品中间列表
+     *
+     * @param boxCollectionQuery 盲盒与藏品中间
+     * @return 盲盒与藏品中间集合
+     */
+    public List<CntBoxCollection> selectSearchBoxCollectionList(BoxCollectionQuery boxCollectionQuery);
 
     /**
      * 新增盲盒与藏品中间
@@ -70,4 +79,11 @@ public interface CntBoxCollectionMapper
      */
     public int deleteCntBoxCollectionByIds(String[] ids);
 
+    /**
+     * 批量删除盲盒与藏品中间
+     *
+     * @param boxIds 需要删除的盲盒ids
+     * @return 结果
+     */
+    public int deleteCntBoxCollectionByBoxIds(String[] boxIds);
 }

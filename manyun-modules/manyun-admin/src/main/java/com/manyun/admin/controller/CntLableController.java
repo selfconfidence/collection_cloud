@@ -35,10 +35,10 @@ public class CntLableController extends BaseController
     //@RequiresPermissions("admin:lable:list")
     @GetMapping("/list")
     @ApiOperation("查询标签管理列表")
-    public TableDataInfo<CntLableVo> list(CntLable cntLable)
+    public TableDataInfo<CntLableVo> list()
     {
         startPage();
-        List<CntLableVo> list = cntLableService.selectCntLableList(cntLable);
+        List<CntLableVo> list = cntLableService.selectCntLableList(new CntLable());
         return getDataTable(list);
     }
 

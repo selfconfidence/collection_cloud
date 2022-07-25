@@ -2,6 +2,8 @@ package com.manyun.admin.controller;
 
 import java.util.List;
 
+import com.manyun.admin.domain.query.BoxQuery;
+import com.manyun.admin.domain.query.OrderQuery;
 import com.manyun.admin.domain.vo.CntBoxOrderVo;
 import com.manyun.admin.domain.vo.CntBoxVo;
 import com.manyun.common.core.domain.R;
@@ -18,11 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
-import com.manyun.common.security.annotation.RequiresPermissions;
 import com.manyun.admin.domain.CntBox;
 import com.manyun.admin.service.ICntBoxService;
 import com.manyun.common.core.web.controller.BaseController;
-import com.manyun.common.core.web.domain.AjaxResult;
 import com.manyun.common.core.web.page.TableDataInfo;
 
 @RestController
@@ -36,12 +36,12 @@ public class CntBoxController extends BaseController
     //@RequiresPermissions("admin:box:list")
     @GetMapping("/list")
     @ApiOperation("盲盒列表")
-    public TableDataInfo<CntBoxVo> list(CntBox cntBox)
+    public TableDataInfo<CntBoxVo> list(BoxQuery boxQuery)
     {
         startPage();
-        List<CntBoxVo> list = cntBoxService.selectCntBoxList(cntBox);
+        List<CntBoxVo> list = cntBoxService.selectCntBoxList(boxQuery);
         return getDataTable(list);
-    }
+     }
 
     //@RequiresPermissions("admin:box:query")
     @GetMapping(value = "/{id}")
@@ -80,10 +80,10 @@ public class CntBoxController extends BaseController
 
     @GetMapping("/boxOrderList")
     @ApiOperation("盲盒订单列表")
-    public TableDataInfo<CntBoxOrderVo> boxOrderList()
+    public TableDataInfo<CntBoxOrderVo> boxOrderList(OrderQuery orderQuery)
     {
         startPage();
-        List<CntBoxOrderVo> list = cntBoxService.boxOrderList();
+        List<CntBoxOrderVo> list = cntBoxService.boxOrderList(orderQuery);
         return getDataTable(list);
     }
 

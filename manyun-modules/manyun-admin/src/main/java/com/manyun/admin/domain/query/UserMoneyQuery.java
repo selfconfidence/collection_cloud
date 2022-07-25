@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-@ApiModel("用户管理列表筛选视图")
+@ApiModel("用户管理条件查询对象")
 public class UserMoneyQuery {
 
     @ApiModelProperty("真实姓名")

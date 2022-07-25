@@ -2,6 +2,8 @@ package com.manyun.admin.mapper;
 
 import java.util.List;
 import com.manyun.admin.domain.CntBox;
+import com.manyun.admin.domain.query.BoxQuery;
+import com.manyun.admin.domain.query.OrderQuery;
 import com.manyun.admin.domain.vo.CntBoxOrderVo;
 
 /**
@@ -27,6 +29,14 @@ public interface CntBoxMapper
      * @return 盲盒;盲盒主体集合
      */
     public List<CntBox> selectCntBoxList(CntBox cntBox);
+
+    /**
+     * 查询盲盒;盲盒主体列表
+     *
+     * @param boxQuery
+     * @return 盲盒;盲盒主体集合
+     */
+    public List<CntBox> selectSearchBoxList(BoxQuery boxQuery);
 
     /**
      * 新增盲盒;盲盒主体
@@ -63,5 +73,5 @@ public interface CntBoxMapper
     /**
      * 查询盲盒订单列表
      */
-    List<CntBoxOrderVo> boxOrderList();
+    List<CntBoxOrderVo> boxOrderList(OrderQuery orderQuery);
 }

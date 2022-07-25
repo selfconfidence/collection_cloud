@@ -3,6 +3,7 @@ package com.manyun.admin.controller;
 import java.util.List;
 
 import com.manyun.admin.domain.dto.SaveActionTarDto;
+import com.manyun.admin.domain.query.ActionTarQuery;
 import com.manyun.admin.domain.vo.CntActionTarVo;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.StringUtils;
@@ -42,10 +43,10 @@ public class CntActionTarController extends BaseController
     //@RequiresPermissions("admin:tar:list")
     @GetMapping("/list")
     @ApiOperation("查询活动合成附属信息列表")
-    public TableDataInfo<CntActionTarVo> list(CntActionTar cntActionTar)
+    public TableDataInfo<CntActionTarVo> list(ActionTarQuery actionTarQuery)
     {
         startPage();
-        List<CntActionTarVo> list = cntActionTarService.selectCntActionTarList(cntActionTar);
+        List<CntActionTarVo> list = cntActionTarService.selectCntActionTarList(actionTarQuery);
         return getDataTable(list);
     }
 

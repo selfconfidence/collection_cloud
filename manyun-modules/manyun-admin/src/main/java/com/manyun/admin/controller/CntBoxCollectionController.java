@@ -3,6 +3,7 @@ package com.manyun.admin.controller;
 import java.util.List;
 
 import com.manyun.admin.domain.dto.SaveBoxCollectionDto;
+import com.manyun.admin.domain.query.BoxCollectionQuery;
 import com.manyun.admin.domain.vo.CntBoxCollectionVo;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.StringUtils;
@@ -32,10 +33,10 @@ public class CntBoxCollectionController extends BaseController
     //@RequiresPermissions("admin:collection:list")
     @GetMapping("/list")
     @ApiOperation("查询盲盒中的物品对象")
-    public TableDataInfo<CntBoxCollectionVo> list(CntBoxCollection cntBoxCollection)
+    public TableDataInfo<CntBoxCollectionVo> list(BoxCollectionQuery boxCollectionQuery)
     {
         startPage();
-        List<CntBoxCollectionVo> list = cntBoxCollectionService.selectCntBoxCollectionList(cntBoxCollection);
+        List<CntBoxCollectionVo> list = cntBoxCollectionService.selectCntBoxCollectionList(boxCollectionQuery);
         return getDataTable(list);
     }
 
