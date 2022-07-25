@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 /**
  * 业务系统配置参数服务降级处理
  * 
- * @author ruoyi
+ * @author yanwei
  */
 @Component
 public class RemoteSystemFallbackFactory implements FallbackFactory<RemoteSystemService>

@@ -8,6 +8,8 @@ import com.manyun.business.domain.vo.UserLevelVo;
 import com.manyun.business.domain.vo.UserPleaseBoxVo;
 import com.manyun.business.service.ICntUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
+import com.manyun.comm.api.domain.form.JgLoginTokenForm;
+import com.manyun.comm.api.domain.vo.AccTokenVo;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.comm.api.model.LoginPhoneCodeForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
@@ -183,6 +185,16 @@ public class CntUserController extends BaseController {
         CntUserDto cntUserDto = Builder.of(CntUserDto::new).build();
         BeanUtil.copyProperties(cntUser,cntUserDto);
         return R.ok(cntUserDto);
+    }
+
+    @PostMapping("/jgPhoneLogin")
+    @ApiOperation(value = "激光 一键 登录/注册",notes = "成功返回业务token",hidden = true)
+    @InnerAuth
+    public R<CntUserDto> jgPhoneLogin(@RequestBody JgLoginTokenForm jgLoginTokenForm){
+        CntUser cntUser = userService.jgPhoneLogin(jgLoginTokenForm);
+        CntUserDto cntUserDto = Builder.of(CntUserDto::new).build();
+        BeanUtil.copyProperties(cntUser,cntUserDto);
+          return   R.ok(cntUserDto);
     }
 
 

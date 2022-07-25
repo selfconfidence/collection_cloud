@@ -12,7 +12,7 @@ import com.manyun.comm.api.model.LoginUser;
 /**
  * 用户服务降级处理
  * 
- * @author ruoyi
+ * @author yanwei
  */
 @Component
 public class RemoteUserFallbackFactory implements FallbackFactory<RemoteUserService>

@@ -9,9 +9,9 @@ import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * 文件服务降级处理
+ * 业务盲盒服务降级处理
  * 
- * @author ruoyi
+ * @author yanwei
  */
 @Component
 public class RemoteBoxFallbackFactory implements FallbackFactory<RemoteBoxService>

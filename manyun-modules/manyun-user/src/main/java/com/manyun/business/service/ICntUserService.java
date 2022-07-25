@@ -7,6 +7,7 @@ import com.manyun.business.domain.vo.UserLevelVo;
 import com.manyun.business.domain.vo.UserPleaseBoxVo;
 import com.manyun.business.domain.entity.CntUser;
 import com.manyun.comm.api.domain.dto.CntUserDto;
+import com.manyun.comm.api.domain.form.JgLoginTokenForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
 
 import java.util.List;
@@ -46,4 +47,6 @@ public interface ICntUserService extends IService<CntUser> {
     String getCertifyId(CntUserDto cntUser, UserAliyunRealForm userAliyunRealForm);
 
     void checkCertifyIdStatus(String certifyId, CntUserDto cntUser);
+
+    CntUser jgPhoneLogin(JgLoginTokenForm jgLoginTokenForm);
 }

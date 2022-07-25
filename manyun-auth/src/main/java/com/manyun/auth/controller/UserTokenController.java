@@ -3,6 +3,7 @@ package com.manyun.auth.controller;
 import cn.hutool.core.lang.Assert;
 import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
+import com.manyun.comm.api.domain.form.JgLoginTokenForm;
 import com.manyun.comm.api.domain.vo.AccTokenVo;
 import com.manyun.comm.api.model.LoginPhoneCodeForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
@@ -54,6 +55,18 @@ public class UserTokenController {
     @ApiOperation(value = "用户验证码登录",notes = "验证码登录")
     public R<AccTokenVo> codeLogin(@RequestBody LoginPhoneCodeForm loginPhoneCodeForm){
         R<CntUserDto> cntUserR = remoteBuiUserService.codeLogin(loginPhoneCodeForm,SecurityConstants.INNER);
+        Assert.isTrue(cntUserR.getCode() == CodeStatus.SUCCESS.getCode(),cntUserR.getMsg());
+        CntUserDto userRData = cntUserR.getData();
+        return R.ok(userTokenService.createToken(userRData));
+    }
+
+    /**
+     * 激光 一键 登录/注册
+     */
+    @PostMapping("/jgAuthPhoneLogin")
+    @ApiOperation(value = "激光 一键 登录/注册",notes = "成功返回业务token")
+    public R<AccTokenVo> jgPhoneLogin(@RequestBody JgLoginTokenForm jgLoginTokenForm){
+        R<CntUserDto> cntUserR = remoteBuiUserService.jgPhoneLogin(jgLoginTokenForm,SecurityConstants.INNER);
         Assert.isTrue(cntUserR.getCode() == CodeStatus.SUCCESS.getCode(),cntUserR.getMsg());
         CntUserDto userRData = cntUserR.getData();
         return R.ok(userTokenService.createToken(userRData));

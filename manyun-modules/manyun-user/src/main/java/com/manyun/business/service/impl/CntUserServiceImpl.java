@@ -20,10 +20,12 @@ import com.manyun.business.domain.entity.CntUser;
 import com.manyun.comm.api.RemoteBuiMoneyService;
 import com.manyun.comm.api.RemoteSystemService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
+import com.manyun.comm.api.domain.form.JgLoginTokenForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.enums.UserRealStatus;
+import com.manyun.common.core.utils.jg.JgAuthLoginUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,6 +59,9 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
 
     @Autowired
     private RemoteSystemService remoteSystemService;
+
+    @Autowired
+    private JgAuthLoginUtil jgAuthLoginUtil;
 
 
     @Override
@@ -177,6 +182,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     public void regUser(UserRegForm userRegForm) {
         CntUser cntUser = Builder.of(CntUser::new).build();
         initUser(cntUser);
+        cntUser.setPhone(userRegForm.getPhone());
         bindParentCode(cntUser,userRegForm.getPleaseCode());
         // 初始化钱包
         remoteBuiMoneyService.initUserMoney(cntUser.getId(),SecurityConstants.INNER);
@@ -199,6 +205,18 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     public void checkCertifyIdStatus(String certifyId, CntUserDto cntUser) {
         aliRealConfig.checkCertifyIdStatus(certifyId);
         optimisticRealUser(cntUser.getId());
+    }
+
+    @Override
+    public CntUser jgPhoneLogin(JgLoginTokenForm jgLoginTokenForm) {
+        String phone = jgAuthLoginUtil.jgAuthAllPhone(jgLoginTokenForm.getLoginToken());
+        CntUser cntUser = getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPhone, phone));
+        if (Objects.nonNull(cntUser))return cntUser;
+        // 新用户 /开始注册 没有上级！！！
+        UserRegForm userRegForm = Builder.of(UserRegForm::new).build();
+        userRegForm.setPhone(phone);
+        regUser(userRegForm);
+        return getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPhone, phone));
     }
 
     /*

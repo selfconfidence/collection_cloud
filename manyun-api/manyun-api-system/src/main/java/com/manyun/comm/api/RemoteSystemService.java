@@ -20,7 +20,7 @@ public interface RemoteSystemService {
     /**
      * 根据TYPE 查询指定规则值
      */
-    @GetMapping("/findType/{type}")
-    R<String> findType(@PathVariable String type,@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+    @GetMapping("/system/findType/{type}")
+    R<String> findType(@PathVariable(name = "type") String type,@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 
 }

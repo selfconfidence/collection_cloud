@@ -10,8 +10,7 @@ import org.springframework.stereotype.Controller;
  * 藏品标签 前端控制器
  * </p>
  *
- * @author yanwei
- * @since 2022-06-17
+ * @author yanwei * @since 2022-06-17
  */
 @Controller
 @RequestMapping("/lable")

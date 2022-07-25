@@ -12,9 +12,9 @@ import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * 文件服务降级处理
+ * 业务钱包服务降级处理
  * 
- * @author ruoyi
+ * @author yanwei
  */
 @Component
 public class RemoteBuiMoneyFallbackFactory implements FallbackFactory<RemoteBuiMoneyService>

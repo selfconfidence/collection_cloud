@@ -44,6 +44,7 @@
          <huto-version>5.8.3</huto-version>
         <kun-version>1.9.6</kun-version>
         <pays-version>2.7.4</pays-version>
+        <starter-zipkin-version>2.2.8.RELEASE</starter-zipkin-version>
 
     </properties>
 
@@ -76,6 +77,9 @@
                 <version>${alibaba.nacos.version}</version>
             </dependency>
 
+
+
+
             <!-- SpringBoot 依赖配置 -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -105,6 +109,7 @@
                 <artifactId>mybatis-spring-boot-starter</artifactId>
                 <version></version>
             </dependency>-->
+
 
 
             <!-- Swagger 依赖配置 -->
@@ -288,6 +293,18 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- 链路追踪 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-sleuth</artifactId>
+        </dependency>
+        <!-- 链路追踪产生的日志,进行UI页面展示 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-zipkin</artifactId>
+            <version>${starter-zipkin-version}</version>
+        </dependency>
+
         <!-- 工具包 -->
         <dependency>
             <groupId>cn.hutool</groupId>
@@ -301,6 +318,20 @@
         </dependency>
     </dependencies>
 
+
+    <repositories>
+        <repository>
+            <id>tencent</id>
+            <name>Nexus tencentyun</name>
+            <url>http://mirrors.cloud.tencent.com/nexus/repository/maven-public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
     <build>
         <plugins>
             <plugin>

@@ -21,7 +21,6 @@ import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.web.domain.AjaxResult;
 
 import static com.manyun.common.core.constant.HttpStatus.NOT_LOGIN;
-import static com.manyun.common.core.constant.HttpStatus.UNAUTHORIZED;
 
 /**
  * 全局异常处理器
@@ -108,7 +107,7 @@ public class GlobalExceptionHandler
     {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',发生未知异常.", requestURI, e);
-        return AjaxResult.error(UNAUTHORIZED,e.getMessage());
+        return AjaxResult.error(NOT_LOGIN,e.getMessage());
     }
 
     /**
