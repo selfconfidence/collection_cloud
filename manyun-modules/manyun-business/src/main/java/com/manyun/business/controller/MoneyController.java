@@ -6,6 +6,7 @@ import com.manyun.business.domain.query.MoneyLogQuery;
 import com.manyun.business.domain.vo.AccountInfoVo;
 import com.manyun.business.domain.vo.MoneyLogVo;
 import com.manyun.business.service.IMoneyService;
+import com.manyun.comm.api.domain.form.UserRealMoneyForm;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
@@ -92,6 +93,12 @@ public class MoneyController extends BaseController {
        return R.ok();
     }
 
+    @PostMapping("/updateUserMoney")
+    @ApiOperation(value = "实名认证绑定数据",hidden = true)
+    @InnerAuth
+    public void updateUserMoney(@RequestBody UserRealMoneyForm userRealMoneyForm) {
+        moneyService.updateUserMoney(userRealMoneyForm);
+    }
 
 
 

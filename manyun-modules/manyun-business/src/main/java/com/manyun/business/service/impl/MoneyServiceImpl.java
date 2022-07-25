@@ -1,7 +1,6 @@
 package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -17,10 +16,13 @@ import com.manyun.business.mapper.MoneyMapper;
 import com.manyun.business.service.ILogsService;
 import com.manyun.business.service.IMoneyService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.comm.api.domain.form.UserRealMoneyForm;
+import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -134,6 +136,12 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         return moneyLogVo;
     }
 
-
+    public void updateUserMoney(UserRealMoneyForm userRealMoneyForm) {
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        Money moneyUser = getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, loginBusinessUser.getUserId()));
+        moneyUser.setBankCart(userRealMoneyForm.getBankcard());
+        moneyUser.updateD(loginBusinessUser.getUserId());
+        updateById(moneyUser);
+    }
 
 }

@@ -9,6 +9,7 @@ import com.manyun.business.domain.entity.CntUser;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.domain.form.JgLoginTokenForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
+import com.manyun.common.core.domain.R;
 
 import java.util.List;
 
@@ -49,4 +50,6 @@ public interface ICntUserService extends IService<CntUser> {
     void checkCertifyIdStatus(String certifyId, CntUserDto cntUser);
 
     CntUser jgPhoneLogin(JgLoginTokenForm jgLoginTokenForm);
+
+    R userRealName(UserRealForm userRealForm);
 }

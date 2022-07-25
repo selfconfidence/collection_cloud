@@ -1,10 +1,7 @@
 package com.manyun.comm.api.factory;
 
 import com.manyun.comm.api.RemoteBuiMoneyService;
-import com.manyun.comm.api.RemoteBuiUserService;
-import com.manyun.comm.api.domain.dto.CntUserDto;
-import com.manyun.comm.api.model.LoginPhoneCodeForm;
-import com.manyun.comm.api.model.LoginPhoneForm;
+import com.manyun.comm.api.domain.form.UserRealMoneyForm;
 import com.manyun.common.core.domain.R;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +25,11 @@ public class RemoteBuiMoneyFallbackFactory implements FallbackFactory<RemoteBuiM
         return new RemoteBuiMoneyService() {
             @Override
             public R initUserMoney(String userId,String source) {
+                return R.fail("操作失败:" + throwable.getMessage());
+            }
+
+            @Override
+            public R updateUserMoney(UserRealMoneyForm userRealMoneyForm, String source) {
                 return R.fail("操作失败:" + throwable.getMessage());
             }
         };

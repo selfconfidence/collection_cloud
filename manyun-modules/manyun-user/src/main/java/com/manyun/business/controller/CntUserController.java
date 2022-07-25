@@ -94,7 +94,6 @@ public class CntUserController extends BaseController {
     @GetMapping("/info")
     @ApiOperation("查询用户的详细信息")
     public R<UserInfoVo> info(){
-
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         // 详细信息
         UserInfoVo userInfoVo = userService.info(notNullLoginBusinessUser.getUserId());
@@ -103,12 +102,11 @@ public class CntUserController extends BaseController {
 
     // 实名认证
     @PostMapping("/realUser")
-    @ApiOperation("实名认证 -- 银联 -- 未完善")
+    @ApiOperation("实名认证 -- 银联")
     public R realUser(@RequestBody @Valid UserRealForm userRealForm){
-        //TODO 实名认证未完善
-
-
-        return R.ok();
+        String phoneCode = (String) redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(userRealForm.getPhone()));
+        //Assert.isTrue(userRealForm.getPhoneCode().equals(phoneCode),"验证码输入错误,请核实!");
+        return userService.userRealName(userRealForm);
     }
 
     //调起认证

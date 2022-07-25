@@ -8,6 +8,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.config.AliRealConfig;
+import com.manyun.business.config.UnionRealConfig;
 import com.manyun.business.domain.form.*;
 import com.manyun.business.domain.vo.UserInfoVo;
 import com.manyun.business.domain.vo.UserLevelVo;
@@ -21,10 +22,11 @@ import com.manyun.comm.api.RemoteBuiMoneyService;
 import com.manyun.comm.api.RemoteSystemService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.domain.form.JgLoginTokenForm;
+import com.manyun.comm.api.domain.form.UserRealMoneyForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
-import com.manyun.common.core.enums.UserRealStatus;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.jg.JgAuthLoginUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,6 +58,9 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
 
     @Autowired
     private AliRealConfig aliRealConfig;
+
+    @Autowired
+    private UnionRealConfig unionRealConfig;
 
     @Autowired
     private RemoteSystemService remoteSystemService;
@@ -191,6 +196,23 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     }
 
     /**
+     * 实名认证
+     * @param userRealForm
+     * @return
+     */
+    @Override
+    public R userRealName(UserRealForm userRealForm) {
+        R r = unionRealConfig.unionReal(userRealForm);
+        if (200 != r.getCode()) {
+            return R.fail();
+        }
+        UserRealMoneyForm userRealMoneyForm = Builder.of(UserRealMoneyForm::new).build();
+        userRealMoneyForm.setBankcard(userRealForm.getBankCart());
+        remoteBuiMoneyService.updateUserMoney(userRealMoneyForm, SecurityConstants.INNER);
+        return r;
+    }
+
+    /**
      * 获取认证ID
      * @param cntUser
      * @return
@@ -204,7 +226,6 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     @Override
     public void checkCertifyIdStatus(String certifyId, CntUserDto cntUser) {
         aliRealConfig.checkCertifyIdStatus(certifyId);
-        optimisticRealUser(cntUser.getId());
     }
 
     @Override

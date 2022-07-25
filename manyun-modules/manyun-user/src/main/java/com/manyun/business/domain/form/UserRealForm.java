@@ -27,4 +27,8 @@ public class UserRealForm implements Serializable {
     @NotBlank(message = "银行卡号不可为空")
     private String bankCart;
 
+    @ApiModelProperty(required = true,value = "验证码")
+    @NotBlank(message = "验证码不可为空")
+    private String phoneCode;
+
 }
