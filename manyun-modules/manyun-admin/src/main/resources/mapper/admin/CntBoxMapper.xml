@@ -50,12 +50,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
 
+    <select id="selectSearchBoxList" parameterType="BoxQuery" resultMap="CntBoxResult">
+        <include refid="selectCntBoxVo"/>
+        <where>
+            <if test="boxOpen != null "> and box_open = #{boxOpen}</if>
+            <if test="statusBy != null "> and status_by = #{statusBy}</if>
+            <if test="publishTime != null "> and publish_time = #{publishTime}</if>
+        </where>
+    </select>
+
     <select id="selectCntBoxById" parameterType="String" resultMap="CntBoxResult">
         <include refid="selectCntBoxVo"/>
         where id = #{id}
     </select>
 
-    <select id="boxOrderList" resultType="com.manyun.admin.domain.vo.CntBoxOrderVo">
+    <select id="boxOrderList" parameterType="OrderQuery" resultType="com.manyun.admin.domain.vo.CntBoxOrderVo">
         select
             o.id,
             o.user_id userId,
@@ -72,6 +81,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	        cnt_box b
 	    on o.bui_id = b.id
 	    where o.goods_type=1
+        <if test="orderNo != null  and orderNo != ''"> and o.order_no = #{orderNo}</if>
+        <if test="userId != null  and userId != ''"> and o.user_id = #{userId}</if>
+        <if test="orderStatus != null "> and o.order_status = #{orderStatus}</if>
     </select>
 
     <insert id="insertCntBox" parameterType="CntBox">

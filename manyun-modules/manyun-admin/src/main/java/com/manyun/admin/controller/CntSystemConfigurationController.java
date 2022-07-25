@@ -3,6 +3,7 @@ package com.manyun.admin.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
+import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class CntSystemConfigurationController extends BaseController
     //@RequiresPermissions("admin:configuration:list")
     @GetMapping("/list")
     @ApiOperation("查询系统配置列表")
-    public TableDataInfo list(CntSystemConfiguration cntSystemConfiguration)
+    public TableDataInfo<CntSystemConfiguration> list(CntSystemConfiguration cntSystemConfiguration)
     {
         startPage();
         List<CntSystemConfiguration> list = cntSystemConfigurationService.selectCntSystemConfigurationList(cntSystemConfiguration);
@@ -45,35 +46,35 @@ public class CntSystemConfigurationController extends BaseController
     //@RequiresPermissions("admin:configuration:query")
     @GetMapping(value = "/{id}")
     @ApiOperation("获取系统配置详细信息")
-    public AjaxResult getInfo(@PathVariable("id") String id)
+    public R<CntSystemConfiguration> getInfo(@PathVariable("id") String id)
     {
-        return AjaxResult.success(cntSystemConfigurationService.selectCntSystemConfigurationById(id));
+        return R.ok(cntSystemConfigurationService.selectCntSystemConfigurationById(id));
     }
 
     //@RequiresPermissions("admin:configuration:add")
     @Log(title = "系统配置", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增系统配置")
-    public AjaxResult add(@RequestBody CntSystemConfiguration cntSystemConfiguration)
+    public R add(@RequestBody CntSystemConfiguration cntSystemConfiguration)
     {
-        return toAjax(cntSystemConfigurationService.insertCntSystemConfiguration(cntSystemConfiguration));
+        return toResult(cntSystemConfigurationService.insertCntSystemConfiguration(cntSystemConfiguration));
     }
 
     //@RequiresPermissions("admin:configuration:edit")
     @Log(title = "系统配置", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("修改系统配置")
-    public AjaxResult edit(@RequestBody CntSystemConfiguration cntSystemConfiguration)
+    public R edit(@RequestBody CntSystemConfiguration cntSystemConfiguration)
     {
-        return toAjax(cntSystemConfigurationService.updateCntSystemConfiguration(cntSystemConfiguration));
+        return toResult(cntSystemConfigurationService.updateCntSystemConfiguration(cntSystemConfiguration));
     }
 
     //@RequiresPermissions("admin:configuration:remove")
     @Log(title = "系统配置", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     @ApiOperation("删除系统配置")
-    public AjaxResult remove(@PathVariable String[] ids)
+    public R remove(@PathVariable String[] ids)
     {
-        return toAjax(cntSystemConfigurationService.deleteCntSystemConfigurationByIds(ids));
+        return toResult(cntSystemConfigurationService.deleteCntSystemConfigurationByIds(ids));
     }
 }

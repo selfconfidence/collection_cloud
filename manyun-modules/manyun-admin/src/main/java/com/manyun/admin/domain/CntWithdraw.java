@@ -1,5 +1,6 @@
 package com.manyun.admin.domain;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -7,11 +8,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import com.manyun.common.core.annotation.Excel;
-import com.manyun.common.core.web.domain.BaseEntity;
 
 @ApiModel("提现配置对象")
-public class CntWithdraw extends BaseEntity
+public class CntWithdraw implements Serializable
 {
     private static final long serialVersionUID = 1L;
 

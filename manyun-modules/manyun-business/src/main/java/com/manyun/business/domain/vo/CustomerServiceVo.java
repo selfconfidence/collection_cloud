@@ -17,9 +17,6 @@ public class CustomerServiceVo {
     @ApiModelProperty("菜单名称")
     private String menuName;
 
-    @ApiModelProperty("菜单名称详情")
-    private String menuNameDetails;
-
     @ApiModelProperty("父菜单Id")
     private Long parentId;
 

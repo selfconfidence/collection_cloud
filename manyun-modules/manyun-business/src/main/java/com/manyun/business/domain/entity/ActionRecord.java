@@ -27,6 +27,12 @@ public class ActionRecord implements Serializable {
     @ApiModelProperty("活动编号")
     private String actionId;
 
+    @ApiModelProperty("用户编号")
+    private String userId;
+
+    @ApiModelProperty("用户昵称")
+    private String nickName;
+
     @ApiModelProperty("藏品编号")
     private String collectionId;
 

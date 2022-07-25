@@ -2,7 +2,9 @@ package com.manyun.admin.controller;
 
 import java.util.List;
 
+import com.manyun.admin.domain.query.CreationdQuery;
 import com.manyun.admin.domain.vo.CnfCreationdVo;
+import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,6 @@ import com.manyun.common.log.enums.BusinessType;
 import com.manyun.admin.domain.CnfCreationd;
 import com.manyun.admin.service.ICnfCreationdService;
 import com.manyun.common.core.web.controller.BaseController;
-import com.manyun.common.core.web.domain.AjaxResult;
 import com.manyun.common.core.web.page.TableDataInfo;
 
 @RestController
@@ -33,45 +34,45 @@ public class CnfCreationdController extends BaseController
     //@RequiresPermissions("admin:creationd:list")
     @GetMapping("/list")
     @ApiOperation("查询创作者列表")
-    public TableDataInfo<CnfCreationdVo> list(CnfCreationd cnfCreationd)
+    public TableDataInfo<CnfCreationdVo> list(CreationdQuery creationdQuery)
     {
         startPage();
-        List<CnfCreationdVo> list = cnfCreationdService.selectCnfCreationdList(cnfCreationd);
+        List<CnfCreationdVo> list = cnfCreationdService.selectCnfCreationdList(creationdQuery);
         return getDataTable(list);
     }
 
     //@RequiresPermissions("admin:creationd:query")
     @GetMapping(value = "/{id}")
     @ApiOperation("获取创作者详细信息")
-    public AjaxResult getInfo(@PathVariable("id") String id)
+    public R<CnfCreationd> getInfo(@PathVariable("id") String id)
     {
-        return AjaxResult.success(cnfCreationdService.selectCnfCreationdById(id));
+        return R.ok(cnfCreationdService.selectCnfCreationdById(id));
     }
 
     //@RequiresPermissions("admin:creationd:add")
     @Log(title = "创作者", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增创作者")
-    public AjaxResult add(@RequestBody CnfCreationd cnfCreationd)
+    public R add(@RequestBody CnfCreationd cnfCreationd)
     {
-        return toAjax(cnfCreationdService.insertCnfCreationd(cnfCreationd));
+        return toResult(cnfCreationdService.insertCnfCreationd(cnfCreationd));
     }
 
     //@RequiresPermissions("admin:creationd:edit")
     @Log(title = "创作者", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("修改创作者")
-    public AjaxResult edit(@RequestBody CnfCreationd cnfCreationd)
+    public R edit(@RequestBody CnfCreationd cnfCreationd)
     {
-        return toAjax(cnfCreationdService.updateCnfCreationd(cnfCreationd));
+        return toResult(cnfCreationdService.updateCnfCreationd(cnfCreationd));
     }
 
     //@RequiresPermissions("admin:creationd:remove")
     @Log(title = "创作者", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     @ApiOperation("删除创作者")
-    public AjaxResult remove(@PathVariable String[] ids)
+    public R remove(@PathVariable String[] ids)
     {
-        return toAjax(cnfCreationdService.deleteCnfCreationdByIds(ids));
+        return toResult(cnfCreationdService.deleteCnfCreationdByIds(ids));
     }
 }

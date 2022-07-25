@@ -26,6 +26,6 @@ public interface IActionService extends IService<Action> {
 
     R<SynthesisVo> synthesisInfo(String userId, String id);
 
-    R<SynthesizeNowVo> synthesizeNow(String userId, String id);
+    R<SynthesizeNowVo> synthesizeNow(String userId, String userName, String id);
 
 }

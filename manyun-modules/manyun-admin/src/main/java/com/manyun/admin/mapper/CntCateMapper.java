@@ -2,6 +2,7 @@ package com.manyun.admin.mapper;
 
 import java.util.List;
 import com.manyun.admin.domain.CntCate;
+import com.manyun.admin.domain.query.CateQuery;
 
 /**
  * 藏品系列_分类Mapper接口
@@ -22,10 +23,18 @@ public interface CntCateMapper
     /**
      * 查询藏品系列_分类列表
      *
-     * @param cntCate 藏品系列_分类
+     * @param cntCate
      * @return 藏品系列_分类集合
      */
     public List<CntCate> selectCntCateList(CntCate cntCate);
+
+    /**
+     * 根据条件查询藏品系列_分类列表
+     *
+     * @param cateQuery
+     * @return 藏品系列_分类集合
+     */
+    List<CntCate> selectSearchCateList(CateQuery cateQuery);
 
     /**
      * 新增藏品系列_分类
@@ -58,5 +67,6 @@ public interface CntCateMapper
      * @return 结果
      */
     public int deleteCntCateByIds(String[] ids);
+
 
 }

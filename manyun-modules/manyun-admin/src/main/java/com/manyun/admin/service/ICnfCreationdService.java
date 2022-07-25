@@ -2,6 +2,7 @@ package com.manyun.admin.service;
 
 import java.util.List;
 import com.manyun.admin.domain.CnfCreationd;
+import com.manyun.admin.domain.query.CreationdQuery;
 import com.manyun.admin.domain.vo.CnfCreationdVo;
 
 /**
@@ -23,10 +24,10 @@ public interface ICnfCreationdService
     /**
      * 查询创作者列表
      *
-     * @param cnfCreationd 创作者
+     * @param creationdQuery
      * @return 创作者集合
      */
-    public List<CnfCreationdVo> selectCnfCreationdList(CnfCreationd cnfCreationd);
+    public List<CnfCreationdVo> selectCnfCreationdList(CreationdQuery creationdQuery);
 
     /**
      * 新增创作者

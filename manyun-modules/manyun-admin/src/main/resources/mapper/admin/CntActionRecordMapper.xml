@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntActionRecordMapper">
+    
+    <resultMap type="CntActionRecord" id="CntActionRecordResult">
+        <result property="id"    column="id"    />
+        <result property="actionId"    column="action_id"    />
+        <result property="collectionId"    column="collection_id"    />
+        <result property="collectionName"    column="collection_name"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCntActionRecordVo">
+        select id, action_id, collection_id, collection_name, created_by, created_time, updated_by, updated_time from cnt_action_record
+    </sql>
+
+    <select id="selectCntActionRecordList" parameterType="CntActionRecord" resultMap="CntActionRecordResult">
+        <include refid="selectCntActionRecordVo"/>
+        <where>  
+            <if test="actionId != null  and actionId != ''"> and action_id = #{actionId}</if>
+            <if test="collectionId != null  and collectionId != ''"> and collection_id = #{collectionId}</if>
+            <if test="collectionName != null  and collectionName != ''"> and collection_name like concat('%', #{collectionName}, '%')</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdTime != null "> and created_time = #{createdTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
+            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectCntActionRecordById" parameterType="String" resultMap="CntActionRecordResult">
+        <include refid="selectCntActionRecordVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertCntActionRecord" parameterType="CntActionRecord">
+        insert into cnt_action_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="actionId != null">action_id,</if>
+            <if test="collectionId != null">collection_id,</if>
+            <if test="collectionName != null">collection_name,</if>
+            <if test="createdBy != null">created_by,</if>
+            <if test="createdTime != null">created_time,</if>
+            <if test="updatedBy != null">updated_by,</if>
+            <if test="updatedTime != null">updated_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="actionId != null">#{actionId},</if>
+            <if test="collectionId != null">#{collectionId},</if>
+            <if test="collectionName != null">#{collectionName},</if>
+            <if test="createdBy != null">#{createdBy},</if>
+            <if test="createdTime != null">#{createdTime},</if>
+            <if test="updatedBy != null">#{updatedBy},</if>
+            <if test="updatedTime != null">#{updatedTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCntActionRecord" parameterType="CntActionRecord">
+        update cnt_action_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="actionId != null">action_id = #{actionId},</if>
+            <if test="collectionId != null">collection_id = #{collectionId},</if>
+            <if test="collectionName != null">collection_name = #{collectionName},</if>
+            <if test="createdBy != null">created_by = #{createdBy},</if>
+            <if test="createdTime != null">created_time = #{createdTime},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
+            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCntActionRecordById" parameterType="String">
+        delete from cnt_action_record where id = #{id}
+    </delete>
+
+    <delete id="deleteCntActionRecordByIds" parameterType="String">
+        delete from cnt_action_record where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

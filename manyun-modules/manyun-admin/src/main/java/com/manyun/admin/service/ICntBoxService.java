@@ -2,6 +2,8 @@ package com.manyun.admin.service;
 
 import java.util.List;
 import com.manyun.admin.domain.CntBox;
+import com.manyun.admin.domain.query.BoxQuery;
+import com.manyun.admin.domain.query.OrderQuery;
 import com.manyun.admin.domain.vo.CntBoxOrderVo;
 import com.manyun.admin.domain.vo.CntBoxVo;
 
@@ -24,10 +26,10 @@ public interface ICntBoxService
     /**
      * 查询盲盒;盲盒主体列表
      *
-     * @param cntBox 盲盒;盲盒主体
+     * @param boxQuery 盲盒;盲盒主体
      * @return 盲盒;盲盒主体集合
      */
-    public List<CntBoxVo> selectCntBoxList(CntBox cntBox);
+    public List<CntBoxVo> selectCntBoxList(BoxQuery boxQuery);
 
     /**
      * 新增盲盒;盲盒主体
@@ -56,6 +58,6 @@ public interface ICntBoxService
     /**
      * 查询盲盒订单列表
      */
-    List<CntBoxOrderVo> boxOrderList();
+    List<CntBoxOrderVo> boxOrderList(OrderQuery orderQuery);
 
 }

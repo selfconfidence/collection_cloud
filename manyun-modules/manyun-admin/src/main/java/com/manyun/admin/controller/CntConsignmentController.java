@@ -2,7 +2,7 @@ package com.manyun.admin.controller;
 
 import java.util.List;
 
-import com.manyun.admin.domain.query.QueryConsignmentVo;
+import com.manyun.admin.domain.query.ConsignmentQuery;
 import com.manyun.admin.domain.vo.CntConsignmentVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,10 +22,10 @@ public class CntConsignmentController extends BaseController
 
     @GetMapping("/list")
     @ApiOperation("订单管理列表")
-    public TableDataInfo list(QueryConsignmentVo queryConsignmentVo)
+    public TableDataInfo<CntConsignmentVo> list(ConsignmentQuery consignmentQuery)
     {
         startPage();
-        List<CntConsignmentVo> list = cntConsignmentService.selectCntConsignmentList(queryConsignmentVo);
+        List<CntConsignmentVo> list = cntConsignmentService.selectCntConsignmentList(consignmentQuery);
         return getDataTable(list);
     }
 

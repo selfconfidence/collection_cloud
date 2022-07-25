@@ -2,6 +2,9 @@ package com.manyun.admin.service;
 
 import java.util.List;
 import com.manyun.admin.domain.CntCollection;
+import com.manyun.admin.domain.dto.AirdropDto;
+import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
+import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.*;
 
 /**
@@ -23,26 +26,26 @@ public interface ICntCollectionService
     /**
      * 查询藏品列表
      *
-     * @param cntCollection 藏品
+     * @param collectionQuery
      * @return 藏品集合
      */
-    public List<CntCollectionVo> selectCntCollectionList(CntCollection cntCollection);
+    public List<CntCollectionVo> selectCntCollectionList(CollectionQuery collectionQuery);
 
     /**
      * 新增藏品
      *
-     * @param collectionAlterCombineVo 藏品
+     * @param collectionAlterCombineDto
      * @return 结果
      */
-    public int insertCntCollection(CntCollectionAlterCombineVo collectionAlterCombineVo);
+    public int insertCntCollection(CntCollectionAlterCombineDto collectionAlterCombineDto);
 
     /**
      * 修改藏品
      *
-     * @param collectionAlterCombineVo 藏品
+     * @param collectionAlterCombineDto
      * @return 结果
      */
-    public int updateCntCollection(CntCollectionAlterCombineVo collectionAlterCombineVo);
+    public int updateCntCollection(CntCollectionAlterCombineDto collectionAlterCombineDto);
 
     /**
      * 批量删除藏品
@@ -53,20 +56,9 @@ public interface ICntCollectionService
     public int deleteCntCollectionByIds(String[] ids);
 
     /***
-     *  查询藏品分类下拉框
+     * 空投
+     * @param airdropDto 空投请求参数
      * @return
      */
-    List<CollectionCateDictVo> collectionCateDict();
-
-    /***
-     *  查询创作者下拉框
-     * @return
-     */
-    List<CollectionCreationdDictVo> collectionCreationdDict();
-
-    /***
-     *  查询藏品标签下拉框
-     * @return
-     */
-    List<CollectionLableDictVo> collectionLableDict();
+    int airdrop(AirdropDto airdropDto);
 }

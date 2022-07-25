@@ -50,15 +50,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
 
+    <select id="selectSearchCollectionList" parameterType="CollectionQuery" resultMap="CntCollectionResult">
+        <include refid="selectCntCollectionVo"/>
+        <where>
+            <if test="id != null and id != ''"> and id = #{id}</if>
+            <if test="collectionName != null  and collectionName != ''"> and collection_name like concat('%', #{collectionName}, '%')</if>
+            <if test="statusBy != null "> and status_by = #{statusBy}</if>
+        </where>
+    </select>
+
     <select id="selectCntCollectionById" parameterType="String" resultMap="CntCollectionResult">
         <include refid="selectCntCollectionVo"/>
         where id = #{id}
     </select>
 
-    <select id="selectCntCollectionByCateIds" resultType="com.manyun.admin.domain.CntCollection">
-        select distinct cate_id from cnt_collection
-        where cate_id in
-        <foreach item="id" collection="array" open="(" separator="," close=")">
+    <select id="selectCntCollectionByIds" resultType="com.manyun.admin.domain.CntCollection">
+        <include refid="selectCntCollectionVo"/>
+        where id in
+        <foreach item="id" collection="collectionIds" open="(" separator="," close=")">
             #{id}
         </foreach>
     </select>

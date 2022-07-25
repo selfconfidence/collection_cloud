@@ -60,7 +60,7 @@ public class ActionController {
     @ApiOperation("立即合成")
     public R<SynthesizeNowVo> synthesizeNow(@RequestBody @Valid SynthesizeForm synthesizeForm) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
-        return actionService.synthesizeNow(loginBusinessUser.getUserId(),synthesizeForm.getId());
+        return actionService.synthesizeNow(loginBusinessUser.getUserId(),loginBusinessUser.getUsername(),synthesizeForm.getId());
     }
 
 }

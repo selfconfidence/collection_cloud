@@ -54,6 +54,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
 
+    <select id="selectCntMediaByCollectionIds" resultType="com.manyun.admin.domain.vo.MediaVo">
+        <include refid="selectCntMediaVo"/>
+        where bui_id in
+        <foreach item="id" collection="collectionIds" open="(" separator="," close=")">
+            #{id}
+        </foreach> and model_type='collection_model_type'
+    </select>
+
     <insert id="insertCntMedia" parameterType="CntMedia">
         insert into cnt_media
         <trim prefix="(" suffix=")" suffixOverrides=",">

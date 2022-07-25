@@ -1,5 +1,6 @@
 package com.manyun.admin.domain;
 
+import java.io.Serializable;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -10,8 +11,9 @@ import com.manyun.common.core.web.domain.BaseEntity;
 
 
 @ApiModel("创作者对象")
-public class CnfCreationd extends BaseEntity
+public class CnfCreationd implements Serializable
 {
+
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键")

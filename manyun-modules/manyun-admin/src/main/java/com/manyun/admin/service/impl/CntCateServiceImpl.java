@@ -5,16 +5,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.google.common.collect.Lists;
+import com.manyun.admin.domain.CntBox;
 import com.manyun.admin.domain.CntCollection;
-import com.manyun.admin.domain.vo.CntBoxVo;
+import com.manyun.admin.domain.query.CateQuery;
 import com.manyun.admin.domain.vo.CntCateVo;
 import com.manyun.admin.mapper.CntBoxMapper;
 import com.manyun.admin.mapper.CntCollectionMapper;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
-import com.manyun.common.core.web.domain.AjaxResult;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,16 +55,13 @@ public class CntCateServiceImpl implements ICntCateService
     /**
      * 查询藏品系列_分类列表
      *
-     * @param cntCate 藏品系列_分类
+     * @param cateQuery
      * @return 藏品系列_分类
      */
     @Override
-    public List<CntCateVo> selectCntCateList(CntCate cntCate)
+    public List<CntCateVo> selectCntCateList(CateQuery cateQuery)
     {
-        List<CntCate> cntCates = cntCateMapper.selectCntCateList(cntCate);
-        return cntCates
-                .parallelStream()
-                .filter(f -> f.getCateType()==1)
+        return cntCateMapper.selectSearchCateList(cateQuery).parallelStream()
                 .map( e -> {
                     CntCateVo cntCateVo=new CntCateVo();
                     BeanUtil.copyProperties(e,cntCateVo);
@@ -108,29 +105,27 @@ public class CntCateServiceImpl implements ICntCateService
      * @return 结果
      */
     @Override
-    public AjaxResult deleteCntCateByIds(String[] ids)
+    public R deleteCntCateByIds(String[] ids)
     {
-        List<CntCollection> cntCollectionList = cntCollectionMapper.selectCntCollectionByCateIds(ids);
-        if(cntCollectionList.size()>0){
-            List<String> cateIdList = cntCollectionList.stream().map(CntCollection::getCateId).collect(Collectors.toList());
-            return AjaxResult.success("藏品系列id为: "+ StringUtils.join(cateIdList,",")+" 的已被引用,不允许删除!");
-        }
-        return cntCateMapper.deleteCntCateByIds(ids)==0?AjaxResult.error():AjaxResult.success();
+        List<String> collectionCateIdList = cntCollectionMapper.selectCntCollectionList(new CntCollection())
+                .stream()
+                .filter(f -> Arrays.asList(ids).contains(f.getCateId()))
+                .map(CntCollection::getCateId)
+                .distinct()
+                .collect(Collectors.toList());
+        List<String> cntBoxCateIdList = cntBoxMapper.selectCntBoxList(new CntBox())
+                .stream()
+                .filter(f -> Arrays.asList(ids).contains(f.getCateId()))
+                .map(CntBox::getCateId)
+                .distinct()
+                .collect(Collectors.toList());
+            if(collectionCateIdList.size()>0 && cntBoxCateIdList.size()>0){
+                collectionCateIdList.addAll(cntBoxCateIdList);
+                return R.fail("分类id为: "+ StringUtils.join(collectionCateIdList,",")+" 的已被引用,不允许删除!");
+            }else if(collectionCateIdList.size()>0 || cntBoxCateIdList.size()>0){
+                return R.fail("分类id为: "+ StringUtils.join((collectionCateIdList.size()>0?collectionCateIdList:cntBoxCateIdList),",")+" 的已被引用,不允许删除!");
+            }
+        return cntCateMapper.deleteCntCateByIds(ids)==0?R.fail():R.ok();
     }
 
-    /**
-     * 删除藏品系列_分类信息
-     *
-     * @param id 藏品系列_分类主键
-     * @return 结果
-     */
-    @Override
-    public AjaxResult deleteCntCateById(String id)
-    {
-        CntCollection cntCollection = cntCollectionMapper.selectCntCollectionById(id);
-        if(cntCollection!=null){
-            return AjaxResult.success("藏品系列id为: "+ cntCollection.getCateId() +" 的已被引用,不允许删除!");
-        }
-        return cntCateMapper.deleteCntCateById(id)==0?AjaxResult.error():AjaxResult.success();
-    }
 }

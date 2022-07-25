@@ -1,5 +1,6 @@
 package com.manyun.admin.domain;
 
+import java.io.Serializable;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -10,8 +11,9 @@ import com.manyun.common.core.annotation.Excel;
 import com.manyun.common.core.web.domain.BaseEntity;
 
 @ApiModel("藏品标签对象")
-public class CntLable extends BaseEntity
+public class CntLable implements Serializable
 {
+
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键")

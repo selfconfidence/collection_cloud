@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.manyun.admin.domain.query.CollectionInfoQuery;
 import com.manyun.admin.domain.vo.CnfCreationdVo;
 import com.manyun.admin.domain.vo.CntCollectionInfoVo;
 import com.manyun.common.core.utils.DateUtils;
@@ -42,13 +43,13 @@ public class CntCollectionInfoServiceImpl implements ICntCollectionInfoService
     /**
      * 查询藏品详情列表
      *
-     * @param cntCollectionInfo 藏品详情
+     * @param collectionInfoQuery
      * @return 藏品详情
      */
     @Override
-    public List<CntCollectionInfoVo> selectCntCollectionInfoList(CntCollectionInfo cntCollectionInfo)
+    public List<CntCollectionInfoVo> selectCntCollectionInfoList(CollectionInfoQuery collectionInfoQuery)
     {
-        return cntCollectionInfoMapper.selectCollectionRelatedInfoList(cntCollectionInfo);
+        return cntCollectionInfoMapper.selectCollectionRelatedInfoList(collectionInfoQuery);
     }
 
     /**

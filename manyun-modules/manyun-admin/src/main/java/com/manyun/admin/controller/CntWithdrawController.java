@@ -3,6 +3,8 @@ package com.manyun.admin.controller;
 import java.util.List;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
+
+import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +37,7 @@ public class CntWithdrawController extends BaseController
     //@RequiresPermissions("admin:withdraw:list")
     @GetMapping("/list")
     @ApiOperation("查询提现配置列表")
-    public TableDataInfo list(CntWithdraw cntWithdraw)
+    public TableDataInfo<CntWithdraw> list(CntWithdraw cntWithdraw)
     {
         startPage();
         List<CntWithdraw> list = cntWithdrawService.selectCntWithdrawList(cntWithdraw);
@@ -45,35 +47,35 @@ public class CntWithdrawController extends BaseController
     //@RequiresPermissions("admin:withdraw:query")
     @GetMapping(value = "/{id}")
     @ApiOperation("获取提现配置详细信息")
-    public AjaxResult getInfo(@PathVariable("id") String id)
+    public R<CntWithdraw> getInfo(@PathVariable("id") String id)
     {
-        return AjaxResult.success(cntWithdrawService.selectCntWithdrawById(id));
+        return R.ok(cntWithdrawService.selectCntWithdrawById(id));
     }
 
     //@RequiresPermissions("admin:withdraw:add")
     @Log(title = "提现配置", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增提现配置")
-    public AjaxResult add(@RequestBody CntWithdraw cntWithdraw)
+    public R add(@RequestBody CntWithdraw cntWithdraw)
     {
-        return toAjax(cntWithdrawService.insertCntWithdraw(cntWithdraw));
+        return toResult(cntWithdrawService.insertCntWithdraw(cntWithdraw));
     }
 
     //@RequiresPermissions("admin:withdraw:edit")
     @Log(title = "提现配置", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("修改提现配置")
-    public AjaxResult edit(@RequestBody CntWithdraw cntWithdraw)
+    public R edit(@RequestBody CntWithdraw cntWithdraw)
     {
-        return toAjax(cntWithdrawService.updateCntWithdraw(cntWithdraw));
+        return toResult(cntWithdrawService.updateCntWithdraw(cntWithdraw));
     }
 
     //@RequiresPermissions("admin:withdraw:remove")
     @Log(title = "提现配置", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     @ApiOperation("删除提现配置")
-    public AjaxResult remove(@PathVariable String[] ids)
+    public R remove(@PathVariable String[] ids)
     {
-        return toAjax(cntWithdrawService.deleteCntWithdrawByIds(ids));
+        return toResult(cntWithdrawService.deleteCntWithdrawByIds(ids));
     }
 }

@@ -55,7 +55,7 @@
         where id = #{id}
     </select>
 
-    <select id="selectUserMoneyList" resultType="com.manyun.admin.domain.vo.UserMoneyVo">
+    <select id="selectUserMoneyList" parameterType="UserMoneyQuery" resultType="com.manyun.admin.domain.vo.UserMoneyVo">
         select
             u.id,
             u.status,

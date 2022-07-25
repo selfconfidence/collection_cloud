@@ -36,6 +36,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
 
+    <select id="selectSearchCateList" parameterType="CateQuery" resultMap="CntCateResult">
+        <include refid="selectCntCateVo"/>
+        <where>
+            <if test="cateName != null  and cateName != ''"> and cate_name like concat('%', #{cateName}, '%')</if>
+        </where>
+    </select>
+
     <select id="selectCntCateById" parameterType="String" resultMap="CntCateResult">
         <include refid="selectCntCateVo"/>
         where id = #{id}

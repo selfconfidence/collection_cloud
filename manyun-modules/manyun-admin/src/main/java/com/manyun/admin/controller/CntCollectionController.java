@@ -2,7 +2,11 @@ package com.manyun.admin.controller;
 
 import java.util.List;
 
+import com.manyun.admin.domain.dto.AirdropDto;
+import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
+import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.*;
+import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
-import com.manyun.common.security.annotation.RequiresPermissions;
 import com.manyun.admin.domain.CntCollection;
 import com.manyun.admin.service.ICntCollectionService;
 import com.manyun.common.core.web.controller.BaseController;
-import com.manyun.common.core.web.domain.AjaxResult;
-import com.manyun.common.core.utils.poi.ExcelUtil;
 import com.manyun.common.core.web.page.TableDataInfo;
 
 @RestController
@@ -35,74 +36,53 @@ public class CntCollectionController extends BaseController
     //@RequiresPermissions("admin:collection:list")
     @GetMapping("/list")
     @ApiOperation("查询藏品管理列表")
-    public TableDataInfo list(CntCollection cntCollection)
+    public TableDataInfo<CntCollectionVo> list(CollectionQuery collectionQuery)
     {
         startPage();
-        List<CntCollectionVo> list = cntCollectionService.selectCntCollectionList(cntCollection);
+        List<CntCollectionVo> list = cntCollectionService.selectCntCollectionList(collectionQuery);
         return getDataTable(list);
     }
 
     //@RequiresPermissions("admin:collection:query")
     @GetMapping(value = "/{id}")
     @ApiOperation("获取藏品管理详细信息")
-    public AjaxResult getInfo(@PathVariable("id")  String id)
+    public R<CntCollectionDetailsVo> getInfo(@PathVariable("id")  String id)
     {
-        return AjaxResult.success(cntCollectionService.selectCntCollectionById(id));
+        return R.ok(cntCollectionService.selectCntCollectionById(id));
     }
 
     //@RequiresPermissions("admin:collection:add")
     @Log(title = "新增藏品管理", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增藏品管理")
-    public AjaxResult add(@RequestBody CntCollectionAlterCombineVo collectionAlterCombineVo)
+    public R add(@RequestBody CntCollectionAlterCombineDto collectionAlterCombineDto)
     {
-        return toAjax(cntCollectionService.insertCntCollection(collectionAlterCombineVo));
+        return toResult(cntCollectionService.insertCntCollection(collectionAlterCombineDto));
     }
 
     //@RequiresPermissions("admin:collection:edit")
     @Log(title = "修改藏品管理", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("修改藏品管理")
-    public AjaxResult edit(@RequestBody CntCollectionAlterCombineVo collectionAlterCombineVo)
+    public R edit(@RequestBody CntCollectionAlterCombineDto collectionAlterCombineDto)
     {
-        return toAjax(cntCollectionService.updateCntCollection(collectionAlterCombineVo));
+        return toResult(cntCollectionService.updateCntCollection(collectionAlterCombineDto));
     }
 
     //@RequiresPermissions("admin:collection:remove")
     @Log(title = "删除藏品管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     @ApiOperation("删除藏品管理")
-    public AjaxResult remove(@PathVariable String[] ids)
+    public R remove(@PathVariable String[] ids)
     {
-        return toAjax(cntCollectionService.deleteCntCollectionByIds(ids));
+        return toResult(cntCollectionService.deleteCntCollectionByIds(ids));
     }
 
-
-    @GetMapping("/collectionCateDict")
-    @ApiOperation("查询藏品分类下拉框")
-    public TableDataInfo collectionCateDict()
+    @PostMapping("/airdrop")
+    @ApiOperation("空投")
+    public R airdrop(@RequestBody AirdropDto airdropDto)
     {
-        startPage();
-        List<CollectionCateDictVo> list = cntCollectionService.collectionCateDict();
-        return getDataTable(list);
-    }
-
-    @GetMapping("/collectionCreationdDict")
-    @ApiOperation("查询藏品创作者下拉框")
-    public TableDataInfo collectionCreationdDict()
-    {
-        startPage();
-        List<CollectionCreationdDictVo> list = cntCollectionService.collectionCreationdDict();
-        return getDataTable(list);
-    }
-
-    @GetMapping("/collectionLableDict")
-    @ApiOperation("查询藏品标签下拉框")
-    public TableDataInfo collectionLableDict()
-    {
-        startPage();
-        List<CollectionLableDictVo> list = cntCollectionService.collectionLableDict();
-        return getDataTable(list);
+        return toResult(cntCollectionService.airdrop(airdropDto));
     }
 
 }

@@ -2,8 +2,9 @@ package com.manyun.admin.service;
 
 import java.util.List;
 import com.manyun.admin.domain.CntCate;
+import com.manyun.admin.domain.query.CateQuery;
 import com.manyun.admin.domain.vo.CntCateVo;
-import com.manyun.common.core.web.domain.AjaxResult;
+import com.manyun.common.core.domain.R;
 
 /**
  * 藏品系列_分类Service接口
@@ -24,10 +25,10 @@ public interface ICntCateService
     /**
      * 查询藏品系列_分类列表
      *
-     * @param cntCate 藏品系列_分类
+     * @param cateQuery
      * @return 藏品系列_分类集合
      */
-    public List<CntCateVo> selectCntCateList(CntCate cntCate);
+    public List<CntCateVo> selectCntCateList(CateQuery cateQuery);
 
     /**
      * 新增藏品系列_分类
@@ -51,13 +52,5 @@ public interface ICntCateService
      * @param ids 需要删除的藏品系列_分类主键集合
      * @return 结果
      */
-    public AjaxResult deleteCntCateByIds(String[] ids);
-
-    /**
-     * 删除藏品系列_分类信息
-     *
-     * @param id 藏品系列_分类主键
-     * @return 结果
-     */
-    public AjaxResult deleteCntCateById(String id);
+    public R deleteCntCateByIds(String[] ids);
 }

@@ -27,9 +27,6 @@ public class CustomerService implements Serializable {
     @ApiModelProperty("菜单名称")
     private String menuName;
 
-    @ApiModelProperty("菜单名称详情")
-    private String menuNameDetails;
-
     @ApiModelProperty("父菜单Id")
     private Long parentId;
 
@@ -38,9 +35,6 @@ public class CustomerService implements Serializable {
 
     @ApiModelProperty("菜单状态 0正常 1停用")
     private String menuStatus;
-
-    @ApiModelProperty("文章状态 0需要 1不需要")
-    private String articleStatus;
 
     @ApiModelProperty("文章标题")
     private String articleTitle;

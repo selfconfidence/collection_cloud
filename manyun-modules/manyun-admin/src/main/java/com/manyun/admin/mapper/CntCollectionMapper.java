@@ -2,8 +2,9 @@ package com.manyun.admin.mapper;
 
 import java.util.List;
 import com.manyun.admin.domain.CntCollection;
-import com.manyun.admin.domain.CntCollectionLable;
+import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.CntCollectionDetailsVo;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 藏品Mapper接口
@@ -28,6 +29,14 @@ public interface CntCollectionMapper
      * @return 藏品集合
      */
     public List<CntCollection> selectCntCollectionList(CntCollection cntCollection);
+
+    /**
+     * 根据条件查询藏品列表
+     *
+     * @param collectionQuery
+     * @return 藏品集合
+     */
+    public List<CntCollection> selectSearchCollectionList(CollectionQuery collectionQuery);
 
     /**
      * 新增藏品
@@ -62,18 +71,20 @@ public interface CntCollectionMapper
     public int deleteCntCollectionByIds(String[] ids);
 
     /**
-     * 查询藏品列表
-     *
-     * @param ids 藏品系列id集合
-     * @return 藏品集合
-     */
-    List<CntCollection> selectCntCollectionByCateIds(String[] ids);
-
-    /**
      * 查询藏品详情
      *
      * @param id 藏品主键
      * @return 藏品
      */
     CntCollectionDetailsVo selectCntCollectionDetailsById(String id);
+
+    /**
+     * 查询藏品列表
+     *
+     * @param collectionIds 藏品主键集合
+     * @return 藏品集合
+     */
+    List<CntCollection> selectCntCollectionByIds(@Param("collectionIds") List<String> collectionIds);
+
+
 }

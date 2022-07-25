@@ -147,7 +147,7 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public R<SynthesizeNowVo> synthesizeNow(String userId, String id) {
+    public R<SynthesizeNowVo> synthesizeNow(String userId, String userName, String id) {
         //查询相关数据
         R<Map> relatedData = getRelatedData(id, userId);
         if(200!=relatedData.getCode()){
@@ -210,6 +210,8 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
                         .of(ActionRecord::new)
                         .with(ActionRecord::setId,IdUtil.getSnowflake().nextIdStr())
                         .with(ActionRecord::setActionId,action.getId())
+                        .with(ActionRecord::setUserId,userId)
+                        .with(ActionRecord::setNickName,userName)
                         .with(ActionRecord::setCollectionId,action.getCollectionId())
                         .with(ActionRecord::setCollectionName,collection.getCollectionName())
                         .with(ActionRecord::setCreatedBy,userId)

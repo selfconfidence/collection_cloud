@@ -3,6 +3,8 @@ package com.manyun.admin.controller;
 import java.util.List;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
+
+import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,45 +37,45 @@ public class CntAgreementController extends BaseController
     //@RequiresPermissions("admin:agreement:list")
     @GetMapping("/list")
     @ApiOperation("查询协议相关列表")
-    public TableDataInfo list(CntAgreement cntAgreement)
+    public TableDataInfo<CntAgreement> list()
     {
         startPage();
-        List<CntAgreement> list = cntAgreementService.selectCntAgreementList(cntAgreement);
+        List<CntAgreement> list = cntAgreementService.selectCntAgreementList(new CntAgreement());
         return getDataTable(list);
     }
 
     //@RequiresPermissions("admin:agreement:query")
     @GetMapping(value = "/{id}")
     @ApiOperation("获取协议相关详细信息")
-    public AjaxResult getInfo(@PathVariable("id") String id)
+    public R<CntAgreement> getInfo(@PathVariable("id") String id)
     {
-        return AjaxResult.success(cntAgreementService.selectCntAgreementById(id));
+        return R.ok(cntAgreementService.selectCntAgreementById(id));
     }
 
     //@RequiresPermissions("admin:agreement:add")
     @Log(title = "协议相关", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增协议相关")
-    public AjaxResult add(@RequestBody CntAgreement cntAgreement)
+    public R add(@RequestBody CntAgreement cntAgreement)
     {
-        return toAjax(cntAgreementService.insertCntAgreement(cntAgreement));
+        return toResult(cntAgreementService.insertCntAgreement(cntAgreement));
     }
 
     //@RequiresPermissions("admin:agreement:edit")
     @Log(title = "协议相关", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("修改协议相关")
-    public AjaxResult edit(@RequestBody CntAgreement cntAgreement)
+    public R edit(@RequestBody CntAgreement cntAgreement)
     {
-        return toAjax(cntAgreementService.updateCntAgreement(cntAgreement));
+        return toResult(cntAgreementService.updateCntAgreement(cntAgreement));
     }
 
     //@RequiresPermissions("admin:agreement:remove")
     @Log(title = "协议相关", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     @ApiOperation("删除协议相关")
-    public AjaxResult remove(@PathVariable String[] ids)
+    public R remove(@PathVariable String[] ids)
     {
-        return toAjax(cntAgreementService.deleteCntAgreementByIds(ids));
+        return toResult(cntAgreementService.deleteCntAgreementByIds(ids));
     }
 }

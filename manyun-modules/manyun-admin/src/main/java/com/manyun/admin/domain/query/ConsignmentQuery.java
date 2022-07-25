@@ -8,8 +8,8 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@ApiModel("订单管理列表筛选查询视图")
-public class QueryConsignmentVo
+@ApiModel("订单管理条件查询对象")
+public class ConsignmentQuery
 {
 
     @ApiModelProperty("寄售单号")

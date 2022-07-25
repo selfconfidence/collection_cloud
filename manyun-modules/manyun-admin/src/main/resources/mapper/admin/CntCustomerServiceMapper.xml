@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntCustomerServiceMapper">
+
+    <resultMap type="CntCustomerService" id="CntCustomerServiceResult">
+        <result property="menuId"    column="menu_id"    />
+        <result property="menuName"    column="menu_name"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="orderNum"    column="order_num"    />
+        <result property="menuStatus"    column="menu_status"    />
+        <result property="articleTitle"    column="article_title"    />
+        <result property="articleContent"    column="article_content"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectCntCustomerServiceVo">
+        select menu_id, menu_name, parent_id, order_num, menu_status, article_title, article_content, create_by, create_time, update_by, update_time from cnt_customer_service
+    </sql>
+
+    <select id="selectCntCustomerServiceList" parameterType="CntCustomerService" resultMap="CntCustomerServiceResult">
+        <include refid="selectCntCustomerServiceVo"/>
+        <where>
+            <if test="menuName != null  and menuName != ''"> and menu_name like concat('%', #{menuName}, '%')</if>
+            <if test="parentId != null "> and parent_id = #{parentId}</if>
+            <if test="orderNum != null "> and order_num = #{orderNum}</if>
+            <if test="menuStatus != null  and menuStatus != ''"> and menu_status = #{menuStatus}</if>
+            <if test="articleTitle != null  and articleTitle != ''"> and article_title = #{articleTitle}</if>
+            <if test="articleContent != null  and articleContent != ''"> and article_content = #{articleContent}</if>
+        </where>
+    </select>
+
+    <select id="selectCntCustomerServiceByMenuId" parameterType="Long" resultMap="CntCustomerServiceResult">
+        <include refid="selectCntCustomerServiceVo"/>
+        where menu_id = #{menuId}
+    </select>
+
+    <select id="selectParentIdByMenuIds" resultType="java.lang.Long">
+        select distinct parent_id from cnt_customer_service
+        where parent_id in
+        <foreach collection="menuIds" item="menuId" open="(" separator="," close=")">
+            #{menuId}
+        </foreach>
+    </select>
+
+    <insert id="insertCntCustomerService" parameterType="CntCustomerService" useGeneratedKeys="true" keyProperty="menuId">
+        insert into cnt_customer_service
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="menuName != null and menuName != ''">menu_name,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="orderNum != null">order_num,</if>
+            <if test="menuStatus != null">menu_status,</if>
+            <if test="articleTitle != null">article_title,</if>
+            <if test="articleContent != null">article_content,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="menuName != null and menuName != ''">#{menuName},</if>
+            <if test="parentId != null">#{parentId},</if>
+            <if test="orderNum != null">#{orderNum},</if>
+            <if test="menuStatus != null">#{menuStatus},</if>
+            <if test="articleTitle != null">#{articleTitle},</if>
+            <if test="articleContent != null">#{articleContent},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCntCustomerService" parameterType="CntCustomerService">
+        update cnt_customer_service
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="menuName != null and menuName != ''">menu_name = #{menuName},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+            <if test="menuStatus != null">menu_status = #{menuStatus},</if>
+            <if test="articleTitle != null">article_title = #{articleTitle},</if>
+            <if test="articleContent != null">article_content = #{articleContent},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where menu_id = #{menuId}
+    </update>
+
+    <delete id="deleteCntCustomerServiceByMenuId" parameterType="Long">
+        delete from cnt_customer_service where menu_id = #{menuId}
+    </delete>
+
+    <delete id="deleteCntCustomerServiceByMenuIds" parameterType="String">
+        delete from cnt_customer_service where menu_id in
+        <foreach item="menuId" collection="array" open="(" separator="," close=")">
+            #{menuId}
+        </foreach>
+    </delete>
+</mapper>
