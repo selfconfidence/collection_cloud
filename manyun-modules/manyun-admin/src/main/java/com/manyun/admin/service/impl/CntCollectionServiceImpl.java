@@ -7,13 +7,15 @@ import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.admin.domain.*;
 import com.manyun.admin.domain.dto.AirdropDto;
 import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
 import com.manyun.admin.domain.query.CollectionQuery;
-import com.manyun.admin.domain.query.UserMoneyQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.mapper.*;
+import com.manyun.admin.service.*;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.utils.DateUtils;
@@ -22,7 +24,6 @@ import com.manyun.common.core.utils.uuid.IdUtils;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.manyun.admin.service.ICntCollectionService;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -32,28 +33,28 @@ import org.springframework.transaction.annotation.Transactional;
  * @date 2022-07-14
  */
 @Service
-public class CntCollectionServiceImpl implements ICntCollectionService
+public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,CntCollection> implements ICntCollectionService
 {
     @Autowired
     private CntCollectionMapper cntCollectionMapper;
 
     @Autowired
-    private CntMediaMapper cntMediaMapper;
+    private ICntMediaService mediaService;
 
     @Autowired
-    private CntCollectionInfoMapper collectionInfoMapper;
+    private ICntCollectionInfoService collectionInfoService;
 
     @Autowired
-    private CntCollectionLableMapper cntCollectionLableMapper;
+    private ICntCollectionLableService collectionLableService;
 
     @Autowired
-    private CntUserMapper cntUserMapper;
+    private ICntUserService userService;
 
     @Autowired
-    private CntUserCollectionMapper userCollectionMapper;
+    private ICntUserCollectionService userCollectionService;
 
     /**
-     * 查询藏品
+     * 查询藏品详情
      *
      * @param id 藏品主键
      * @return 藏品
@@ -62,10 +63,8 @@ public class CntCollectionServiceImpl implements ICntCollectionService
     public CntCollectionDetailsVo selectCntCollectionById(String id)
     {
         CntCollectionDetailsVo cntCollectionDetailsVo = cntCollectionMapper.selectCntCollectionDetailsById(id);
-        CntCollectionLable cntCollectionLable=new CntCollectionLable();
-        cntCollectionLable.setCollectionId(id);
-        cntCollectionDetailsVo.setLableIds( cntCollectionLableMapper.selectCntCollectionLableList(cntCollectionLable).stream().map(CntCollectionLable::getLableId).collect(Collectors.toList()));
-        cntCollectionDetailsVo.setMediaVos(cntMediaMapper.initMediaVos(id,BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
+        cntCollectionDetailsVo.setLableIds( collectionLableService.list(Wrappers.<CntCollectionLable>lambdaQuery().eq(CntCollectionLable::getCollectionId,id)).stream().map(CntCollectionLable::getLableId).collect(Collectors.toList()));
+        cntCollectionDetailsVo.setMediaVos(mediaService.initMediaVos(id,BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
         return cntCollectionDetailsVo;
     }
 
@@ -81,7 +80,7 @@ public class CntCollectionServiceImpl implements ICntCollectionService
         return cntCollectionMapper.selectSearchCollectionList(collectionQuery).stream().map(m ->{
             CntCollectionVo cntCollectionVo=new CntCollectionVo();
             BeanUtil.copyProperties(m,cntCollectionVo);
-            cntCollectionVo.setMediaVos(cntMediaMapper.initMediaVos(m.getId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
+            cntCollectionVo.setMediaVos(mediaService.initMediaVos(m.getId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
             return cntCollectionVo;
         }).collect(Collectors.toList());
     }
@@ -105,8 +104,8 @@ public class CntCollectionServiceImpl implements ICntCollectionService
         cntCollection.setId(idStr);
         cntCollection.setCreatedBy(SecurityUtils.getUsername());
         cntCollection.setCreatedTime(DateUtils.getNowDate());
-        int collection = cntCollectionMapper.insertCntCollection(cntCollection);
-        if(collection==0){
+        boolean save = save(cntCollection);
+        if(!save){
             return 0;
         }
         //藏品详情
@@ -118,7 +117,7 @@ public class CntCollectionServiceImpl implements ICntCollectionService
             cntCollectionInfo.setCollectionId(idStr);
             cntCollectionInfo.setCreatedBy(SecurityUtils.getUsername());
             cntCollectionInfo.setCreatedTime(DateUtils.getNowDate());
-            collectionInfoMapper.insertCntCollectionInfo(cntCollectionInfo);
+            collectionInfoService.save(cntCollectionInfo);
         }
         //标签
         CntLableAlterVo cntLableAlterVo = collectionAlterCombineDto.getCntLableAlterVo();
@@ -135,7 +134,7 @@ public class CntCollectionServiceImpl implements ICntCollectionService
                     cntCollectionLable.setCreatedTime(DateUtils.getNowDate());
                     return cntCollectionLable;
                 }).collect(Collectors.toList());
-                cntCollectionLableMapper.insertCntCollectionLables(cntCollectionLables);
+                collectionLableService.saveBatch(cntCollectionLables);
             }
         }
         //图片
@@ -149,7 +148,7 @@ public class CntCollectionServiceImpl implements ICntCollectionService
             cntMedia.setMediaType(BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.toString());
             cntMedia.setCreatedBy(SecurityUtils.getUsername());
             cntMedia.setCreatedTime(DateUtils.getNowDate());
-            cntMediaMapper.insertCntMedia(cntMedia);
+            mediaService.save(cntMedia);
         }
         return 1;
      }
@@ -173,14 +172,14 @@ public class CntCollectionServiceImpl implements ICntCollectionService
         BeanUtil.copyProperties(collectionAlterVo,cntCollection);
         cntCollection.setUpdatedBy(SecurityUtils.getUsername());
         cntCollection.setUpdatedTime(DateUtils.getNowDate());
-        int collection = cntCollectionMapper.updateCntCollection(cntCollection);
-        if(collection==0){
+        boolean update = updateById(cntCollection);
+        if(!update){
             return 0;
         }
         //藏品详情
         CntCollectionInfoAlterVo collectionInfoAlterVo = collectionAlterCombineDto.getCntCollectionInfoAlterVo();
         if(Objects.nonNull(collectionInfoAlterVo)){
-            List<CntCollectionInfo> cntCollectionInfos = collectionInfoMapper.selectCntCollectionInfoList(Builder.of(CntCollectionInfo::new).with(CntCollectionInfo::setCollectionId, collectionId).build());
+            List<CntCollectionInfo> cntCollectionInfos = collectionInfoService.list(Wrappers.<CntCollectionInfo>lambdaQuery().eq(CntCollectionInfo::getCollectionId,collectionId));
             if(cntCollectionInfos.size()==0){
                 CntCollectionInfo cntCollectionInfo=new CntCollectionInfo();
                 BeanUtil.copyProperties(collectionInfoAlterVo,cntCollectionInfo);
@@ -188,9 +187,9 @@ public class CntCollectionServiceImpl implements ICntCollectionService
                 cntCollectionInfo.setCollectionId(collectionId);
                 cntCollectionInfo.setCreatedBy(SecurityUtils.getUsername());
                 cntCollectionInfo.setCreatedTime(DateUtils.getNowDate());
-                collectionInfoMapper.insertCntCollectionInfo(cntCollectionInfo);
+                collectionInfoService.save(cntCollectionInfo);
             }else {
-                collectionInfoMapper.updateCntCollectionInfo(
+                collectionInfoService.updateById(
                         Builder
                                 .of(CntCollectionInfo::new)
                                 .with(CntCollectionInfo::setId,cntCollectionInfos.get(0).getId())
@@ -207,7 +206,7 @@ public class CntCollectionServiceImpl implements ICntCollectionService
         String lableIds = cntLableAlterVo.getLableIds();
         if(Objects.nonNull(collectionInfoAlterVo)){
             if( StringUtils.isNotBlank(lableIds)){
-                cntCollectionLableMapper.deleteCntCollectionLableById(null,collectionId);
+                collectionLableService.remove(Wrappers.<CntCollectionLable>lambdaQuery().eq(CntCollectionLable::getCollectionId,collectionId));
                 String[] arr = lableIds.split(",");
                 List<CntCollectionLable> cntCollectionLables =  Arrays.asList(arr).stream().map(m -> {
                     CntCollectionLable cntCollectionLable=new CntCollectionLable();
@@ -218,15 +217,15 @@ public class CntCollectionServiceImpl implements ICntCollectionService
                     cntCollectionLable.setCreatedTime(DateUtils.getNowDate());
                     return cntCollectionLable;
                 }).collect(Collectors.toList());
-                cntCollectionLableMapper.insertCntCollectionLables(cntCollectionLables);
+                collectionLableService.saveBatch(cntCollectionLables);
             }else {
-                cntCollectionLableMapper.deleteCntCollectionLableById(null,collectionId);
+                collectionLableService.remove(Wrappers.<CntCollectionLable>lambdaQuery().eq(CntCollectionLable::getCollectionId,collectionId));
             }
         }
         //图片
         MediaAlterVo mediaAlterVo = collectionAlterCombineDto.getMediaAlterVo();
         if(Objects.nonNull(mediaAlterVo)){
-            List<MediaVo> mediaVos = cntMediaMapper.initMediaVos(collectionId, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
+            List<MediaVo> mediaVos = mediaService.initMediaVos(collectionId, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
             if(mediaVos.size()==0){
                 CntMedia cntMedia=new CntMedia();
                 cntMedia.setId(IdUtils.getSnowflakeNextIdStr());
@@ -236,9 +235,9 @@ public class CntCollectionServiceImpl implements ICntCollectionService
                 cntMedia.setMediaType(BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.toString());
                 cntMedia.setCreatedBy(SecurityUtils.getUsername());
                 cntMedia.setCreatedTime(DateUtils.getNowDate());
-                cntMediaMapper.insertCntMedia(cntMedia);
+                mediaService.save(cntMedia);
             }else {
-                cntMediaMapper.updateCntMedia(
+                mediaService.updateById(
                         Builder.of(CntMedia::new)
                         .with(CntMedia::setId,mediaVos.get(0).getId())
                         .with(CntMedia::setMediaUrl,mediaAlterVo.getImg())
@@ -264,13 +263,13 @@ public class CntCollectionServiceImpl implements ICntCollectionService
         if(ids.length==0){
             return 0;
         }
-        int collection = cntCollectionMapper.deleteCntCollectionByIds(ids);
-        if(collection==0){
+        boolean remove = removeByIds(Arrays.asList(ids));
+        if(!remove){
             return 0;
         }else {
-            collectionInfoMapper.deleteCntCollectionInfoByCollectionIds(ids);
-            cntCollectionLableMapper.deleteCntCollectionLableByCollectionIds(ids);
-            cntMediaMapper.deleteCntMediaByCollectionIds(ids);
+            collectionInfoService.remove(Wrappers.<CntCollectionInfo>lambdaQuery().in(CntCollectionInfo::getCollectionId,ids));
+            collectionLableService.remove(Wrappers.<CntCollectionLable>lambdaQuery().in(CntCollectionLable::getCollectionId,ids));
+            mediaService.remove(Wrappers.<CntMedia>lambdaQuery().in(CntMedia::getBuiId,ids).eq(CntMedia::getModelType,BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
         }
         return 1;
     }
@@ -284,16 +283,16 @@ public class CntCollectionServiceImpl implements ICntCollectionService
     @Transactional(rollbackFor = Exception.class)
     public int airdrop(AirdropDto airdropDto) {
         //验证用户
-        List<CntUser> cntUsers = cntUserMapper.selectCntUserList(Builder.of(CntUser::new).with(CntUser::setPhone, airdropDto.getPhone()).build());
+        List<CntUser> cntUsers = userService.list(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPhone,airdropDto.getPhone()));
         Assert.isTrue(cntUsers.size()>0,"用户不存在!");
-        CntCollection collection = cntCollectionMapper.selectCntCollectionById(airdropDto.getCollectionId());
+        CntCollection collection = getById(airdropDto.getCollectionId());
         Assert.isTrue(Objects.nonNull(collection),"藏品不存在!");
         String collectionId = collection.getId();
         Long selfBalance = collection.getSelfBalance();
         Long balance = collection.getBalance();
         Assert.isFalse(selfBalance>=balance,"已售空!");
         //扣减库存
-        cntCollectionMapper.updateCntCollection(
+        updateById(
                 Builder
                         .of(CntCollection::new)
                         .with(CntCollection::setId,collectionId)
@@ -302,7 +301,7 @@ public class CntCollectionServiceImpl implements ICntCollectionService
                         .build()
         );
         //用户藏品信息未完善 待上链
-        return userCollectionMapper.insertCntUserCollection(
+        return userCollectionService.save(
                 Builder
                         .of(CntUserCollection::new)
                         .with(CntUserCollection::setId,IdUtils.getSnowflakeNextIdStr())
@@ -310,7 +309,7 @@ public class CntCollectionServiceImpl implements ICntCollectionService
                         .with(CntUserCollection::setCollectionId,collection.getId())
                         .with(CntUserCollection::setCollectionName,collection.getCollectionName())
                         .build()
-        );
+        )==true?1:0;
     }
 
 }

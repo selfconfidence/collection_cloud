@@ -1,6 +1,8 @@
 package com.manyun.admin.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntCollection;
 import com.manyun.admin.domain.dto.AirdropDto;
 import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
@@ -13,7 +15,7 @@ import com.manyun.admin.domain.vo.*;
  * @author yanwei
  * @date 2022-07-14
  */
-public interface ICntCollectionService
+public interface ICntCollectionService extends IService<CntCollection>
 {
     /**
      * 查询藏品

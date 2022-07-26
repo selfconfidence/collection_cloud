@@ -1,6 +1,8 @@
 package com.manyun.admin.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntLable;
 import com.manyun.admin.domain.vo.CntLableVo;
 
@@ -10,7 +12,7 @@ import com.manyun.admin.domain.vo.CntLableVo;
  * @author yanwei
  * @date 2022-07-14
  */
-public interface ICntLableService
+public interface ICntLableService extends IService<CntLable>
 {
     /**
      * 查询藏品标签

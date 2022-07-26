@@ -2,14 +2,16 @@ package com.manyun.admin.domain;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import com.manyun.common.core.web.domain.BaseEntity;
 
 @ApiModel("藏品和标签中间（必须选定个标签,最多为三个）对象")
+@TableName("cnt_collection_lable")
 public class CntCollectionLable implements Serializable
 {
 

@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.admin.domain.CntBox;
 import com.manyun.admin.domain.CntCollection;
 import com.manyun.admin.domain.query.CateQuery;
 import com.manyun.admin.domain.vo.CntCateVo;
 import com.manyun.admin.mapper.CntBoxMapper;
-import com.manyun.admin.mapper.CntCollectionMapper;
+import com.manyun.admin.service.ICntBoxService;
+import com.manyun.admin.service.ICntCollectionService;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.StringUtils;
@@ -29,19 +31,19 @@ import com.manyun.admin.service.ICntCateService;
  * @date 2022-07-13
  */
 @Service
-public class CntCateServiceImpl implements ICntCateService
+public class CntCateServiceImpl extends ServiceImpl<CntCateMapper,CntCate> implements ICntCateService
 {
     @Autowired
     private CntCateMapper cntCateMapper;
 
     @Autowired
-    private CntCollectionMapper cntCollectionMapper;
+    private ICntCollectionService collectionService;
 
     @Autowired
-    private CntBoxMapper cntBoxMapper;
+    private ICntBoxService boxService;
 
     /**
-     * 查询藏品系列_分类
+     * 查询藏品系列_分类详情
      *
      * @param id 藏品系列_分类主键
      * @return 藏品系列_分类
@@ -49,7 +51,7 @@ public class CntCateServiceImpl implements ICntCateService
     @Override
     public CntCate selectCntCateById(String id)
     {
-        return cntCateMapper.selectCntCateById(id);
+        return getById(id);
     }
 
     /**
@@ -81,7 +83,7 @@ public class CntCateServiceImpl implements ICntCateService
         cntCate.setId(IdUtils.getSnowflakeNextIdStr());
         cntCate.setCreatedBy(SecurityUtils.getUsername());
         cntCate.setCreatedTime(DateUtils.getNowDate());
-        return cntCateMapper.insertCntCate(cntCate);
+        return save(cntCate)==true?1:0;
     }
 
     /**
@@ -95,7 +97,7 @@ public class CntCateServiceImpl implements ICntCateService
     {
         cntCate.setUpdatedBy(SecurityUtils.getUsername());
         cntCate.setUpdatedTime(DateUtils.getNowDate());
-        return cntCateMapper.updateCntCate(cntCate);
+        return updateById(cntCate)==true?1:0;
     }
 
     /**
@@ -107,13 +109,13 @@ public class CntCateServiceImpl implements ICntCateService
     @Override
     public R deleteCntCateByIds(String[] ids)
     {
-        List<String> collectionCateIdList = cntCollectionMapper.selectCntCollectionList(new CntCollection())
+        List<String> collectionCateIdList = collectionService.list()
                 .stream()
                 .filter(f -> Arrays.asList(ids).contains(f.getCateId()))
                 .map(CntCollection::getCateId)
                 .distinct()
                 .collect(Collectors.toList());
-        List<String> cntBoxCateIdList = cntBoxMapper.selectCntBoxList(new CntBox())
+        List<String> cntBoxCateIdList = boxService.list()
                 .stream()
                 .filter(f -> Arrays.asList(ids).contains(f.getCateId()))
                 .map(CntBox::getCateId)
@@ -125,7 +127,7 @@ public class CntCateServiceImpl implements ICntCateService
             }else if(collectionCateIdList.size()>0 || cntBoxCateIdList.size()>0){
                 return R.fail("分类id为: "+ StringUtils.join((collectionCateIdList.size()>0?collectionCateIdList:cntBoxCateIdList),",")+" 的已被引用,不允许删除!");
             }
-        return cntCateMapper.deleteCntCateByIds(ids)==0?R.fail():R.ok();
+        return removeByIds(Arrays.asList(ids))==true?R.ok():R.fail();
     }
 
 }

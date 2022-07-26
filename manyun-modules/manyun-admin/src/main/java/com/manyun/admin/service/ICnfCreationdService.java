@@ -1,6 +1,8 @@
 package com.manyun.admin.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CnfCreationd;
 import com.manyun.admin.domain.query.CreationdQuery;
 import com.manyun.admin.domain.vo.CnfCreationdVo;
@@ -11,7 +13,7 @@ import com.manyun.admin.domain.vo.CnfCreationdVo;
  * @author yanwei
  * @date 2022-07-13
  */
-public interface ICnfCreationdService
+public interface ICnfCreationdService extends IService<CnfCreationd>
 {
     /**
      * 查询创作者

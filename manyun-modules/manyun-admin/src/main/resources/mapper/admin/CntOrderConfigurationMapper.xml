@@ -3,7 +3,7 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.manyun.admin.mapper.CntOrderConfigurationMapper">
-    
+
     <resultMap type="CntOrderConfiguration" id="CntOrderConfigurationResult">
         <result property="id"    column="id"    />
         <result property="balancePay"    column="balance_pay"    />
@@ -22,7 +22,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectCntOrderConfigurationList" parameterType="CntOrderConfiguration" resultMap="CntOrderConfigurationResult">
         <include refid="selectCntOrderConfigurationVo"/>
-        <where>  
+        <where>
             <if test="balancePay != null  and balancePay != ''"> and balance_pay = #{balancePay}</if>
             <if test="makeGive != null "> and make_give = #{makeGive}</if>
             <if test="payLimitTime != null "> and pay_limit_time = #{payLimitTime}</if>
@@ -33,61 +33,5 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
         </where>
     </select>
-    
-    <select id="selectCntOrderConfigurationById" parameterType="String" resultMap="CntOrderConfigurationResult">
-        <include refid="selectCntOrderConfigurationVo"/>
-        where id = #{id}
-    </select>
-        
-    <insert id="insertCntOrderConfiguration" parameterType="CntOrderConfiguration">
-        insert into cnt_order_configuration
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">id,</if>
-            <if test="balancePay != null">balance_pay,</if>
-            <if test="makeGive != null">make_give,</if>
-            <if test="payLimitTime != null">pay_limit_time,</if>
-            <if test="identify != null">identify,</if>
-            <if test="createdBy != null">created_by,</if>
-            <if test="createdTime != null">created_time,</if>
-            <if test="updatedBy != null">updated_by,</if>
-            <if test="updatedTime != null">updated_time,</if>
-         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">#{id},</if>
-            <if test="balancePay != null">#{balancePay},</if>
-            <if test="makeGive != null">#{makeGive},</if>
-            <if test="payLimitTime != null">#{payLimitTime},</if>
-            <if test="identify != null">#{identify},</if>
-            <if test="createdBy != null">#{createdBy},</if>
-            <if test="createdTime != null">#{createdTime},</if>
-            <if test="updatedBy != null">#{updatedBy},</if>
-            <if test="updatedTime != null">#{updatedTime},</if>
-         </trim>
-    </insert>
 
-    <update id="updateCntOrderConfiguration" parameterType="CntOrderConfiguration">
-        update cnt_order_configuration
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="balancePay != null">balance_pay = #{balancePay},</if>
-            <if test="makeGive != null">make_give = #{makeGive},</if>
-            <if test="payLimitTime != null">pay_limit_time = #{payLimitTime},</if>
-            <if test="identify != null">identify = #{identify},</if>
-            <if test="createdBy != null">created_by = #{createdBy},</if>
-            <if test="createdTime != null">created_time = #{createdTime},</if>
-            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
-            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
-        </trim>
-        where id = #{id}
-    </update>
-
-    <delete id="deleteCntOrderConfigurationById" parameterType="String">
-        delete from cnt_order_configuration where id = #{id}
-    </delete>
-
-    <delete id="deleteCntOrderConfigurationByIds" parameterType="String">
-        delete from cnt_order_configuration where id in 
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </delete>
 </mapper>

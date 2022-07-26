@@ -2,6 +2,8 @@ package com.manyun.admin.domain;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -10,6 +12,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 
 @ApiModel("藏品系列分类对象")
+@TableName("cnt_cate")
 public class CntCate implements Serializable
 {
 

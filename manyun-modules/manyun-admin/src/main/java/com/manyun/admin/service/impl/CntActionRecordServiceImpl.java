@@ -1,9 +1,11 @@
 package com.manyun.admin.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.admin.domain.vo.CntActionRecordVo;
 import com.manyun.admin.domain.vo.CntBoxCollectionVo;
 import com.manyun.common.core.utils.DateUtils;
@@ -22,7 +24,7 @@ import com.manyun.admin.service.ICntActionRecordService;
  * @date 2022-07-21
  */
 @Service
-public class CntActionRecordServiceImpl implements ICntActionRecordService
+public class CntActionRecordServiceImpl extends ServiceImpl<CntActionRecordMapper,CntActionRecord> implements ICntActionRecordService
 {
     @Autowired
     private CntActionRecordMapper cntActionRecordMapper;
@@ -36,7 +38,7 @@ public class CntActionRecordServiceImpl implements ICntActionRecordService
     @Override
     public CntActionRecord selectCntActionRecordById(String id)
     {
-        return cntActionRecordMapper.selectCntActionRecordById(id);
+        return getById(id);
     }
 
     /**
@@ -67,7 +69,7 @@ public class CntActionRecordServiceImpl implements ICntActionRecordService
         cntActionRecord.setId(IdUtils.getSnowflakeNextIdStr());
         cntActionRecord.setCreatedBy(SecurityUtils.getUsername());
         cntActionRecord.setCreatedTime(DateUtils.getNowDate());
-        return cntActionRecordMapper.insertCntActionRecord(cntActionRecord);
+        return save(cntActionRecord)==true?1:0;
     }
 
     /**
@@ -81,7 +83,7 @@ public class CntActionRecordServiceImpl implements ICntActionRecordService
     {
         cntActionRecord.setUpdatedBy(SecurityUtils.getUsername());
         cntActionRecord.setUpdatedTime(DateUtils.getNowDate());
-        return cntActionRecordMapper.updateCntActionRecord(cntActionRecord);
+        return updateById(cntActionRecord)==true?1:0;
     }
 
     /**
@@ -93,7 +95,7 @@ public class CntActionRecordServiceImpl implements ICntActionRecordService
     @Override
     public int deleteCntActionRecordByIds(String[] ids)
     {
-        return cntActionRecordMapper.deleteCntActionRecordByIds(ids);
+        return removeByIds(Arrays.asList(ids))==true?1:0;
     }
 
     /**
@@ -105,6 +107,6 @@ public class CntActionRecordServiceImpl implements ICntActionRecordService
     @Override
     public int deleteCntActionRecordById(String id)
     {
-        return cntActionRecordMapper.deleteCntActionRecordById(id);
+        return removeById(id)==true?1:0;
     }
 }

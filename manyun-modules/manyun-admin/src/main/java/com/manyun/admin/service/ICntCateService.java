@@ -1,6 +1,8 @@
 package com.manyun.admin.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntCate;
 import com.manyun.admin.domain.query.CateQuery;
 import com.manyun.admin.domain.vo.CntCateVo;
@@ -12,7 +14,7 @@ import com.manyun.common.core.domain.R;
  * @author yanwei
  * @date 2022-07-13
  */
-public interface ICntCateService
+public interface ICntCateService extends IService<CntCate>
 {
     /**
      * 查询藏品系列_分类

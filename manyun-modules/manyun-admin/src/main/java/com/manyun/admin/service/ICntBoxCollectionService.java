@@ -1,6 +1,8 @@
 package com.manyun.admin.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntBoxCollection;
 import com.manyun.admin.domain.dto.SaveBoxCollectionDto;
 import com.manyun.admin.domain.query.BoxCollectionQuery;
@@ -12,7 +14,7 @@ import com.manyun.admin.domain.vo.CntBoxCollectionVo;
  * @author yanwei
  * @date 2022-07-15
  */
-public interface ICntBoxCollectionService
+public interface ICntBoxCollectionService extends IService<CntBoxCollection>
 {
 
     /**

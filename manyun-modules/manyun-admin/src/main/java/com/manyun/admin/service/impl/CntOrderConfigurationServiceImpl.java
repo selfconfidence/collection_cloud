@@ -1,6 +1,9 @@
 package com.manyun.admin.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.manyun.common.security.utils.SecurityUtils;
@@ -17,7 +20,7 @@ import com.manyun.admin.service.ICntOrderConfigurationService;
  * @date 2022-07-19
  */
 @Service
-public class CntOrderConfigurationServiceImpl implements ICntOrderConfigurationService
+public class CntOrderConfigurationServiceImpl extends ServiceImpl<CntOrderConfigurationMapper,CntOrderConfiguration> implements ICntOrderConfigurationService
 {
     @Autowired
     private CntOrderConfigurationMapper cntOrderConfigurationMapper;
@@ -31,7 +34,7 @@ public class CntOrderConfigurationServiceImpl implements ICntOrderConfigurationS
     @Override
     public CntOrderConfiguration selectCntOrderConfigurationById(String id)
     {
-        return cntOrderConfigurationMapper.selectCntOrderConfigurationById(id);
+        return getById(id);
     }
 
     /**
@@ -58,7 +61,7 @@ public class CntOrderConfigurationServiceImpl implements ICntOrderConfigurationS
         cntOrderConfiguration.setId(IdUtils.getSnowflakeNextIdStr());
         cntOrderConfiguration.setCreatedBy(SecurityUtils.getUsername());
         cntOrderConfiguration.setCreatedTime(DateUtils.getNowDate());
-        return cntOrderConfigurationMapper.insertCntOrderConfiguration(cntOrderConfiguration);
+        return save(cntOrderConfiguration)==true?1:0;
     }
 
     /**
@@ -72,7 +75,7 @@ public class CntOrderConfigurationServiceImpl implements ICntOrderConfigurationS
     {
         cntOrderConfiguration.setUpdatedBy(SecurityUtils.getUsername());
         cntOrderConfiguration.setUpdatedTime(DateUtils.getNowDate());
-        return cntOrderConfigurationMapper.updateCntOrderConfiguration(cntOrderConfiguration);
+        return updateById(cntOrderConfiguration)==true?1:0;
     }
 
     /**
@@ -84,7 +87,7 @@ public class CntOrderConfigurationServiceImpl implements ICntOrderConfigurationS
     @Override
     public int deleteCntOrderConfigurationByIds(String[] ids)
     {
-        return cntOrderConfigurationMapper.deleteCntOrderConfigurationByIds(ids);
+        return removeByIds(Arrays.asList(ids))==true?1:0;
     }
 
     /**
@@ -96,6 +99,6 @@ public class CntOrderConfigurationServiceImpl implements ICntOrderConfigurationS
     @Override
     public int deleteCntOrderConfigurationById(String id)
     {
-        return cntOrderConfigurationMapper.deleteCntOrderConfigurationById(id);
+        return removeById(id)==true?1:0;
     }
 }

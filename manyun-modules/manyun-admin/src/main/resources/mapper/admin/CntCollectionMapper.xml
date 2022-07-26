@@ -28,28 +28,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, collection_name, tar_id, source_price, real_price, self_balance, balance, version_flag, status_by, publish_time, bind_creation, created_by, created_time, updated_by, updated_time, cate_id, post_time from cnt_collection
     </sql>
 
-    <select id="selectCntCollectionList" parameterType="CntCollection" resultMap="CntCollectionResult">
-        <include refid="selectCntCollectionVo"/>
-        <where>
-            <if test="collectionName != null  and collectionName != ''"> and collection_name like concat('%', #{collectionName}, '%')</if>
-            <if test="tarId != null  and tarId != ''"> and tar_id = #{tarId}</if>
-            <if test="sourcePrice != null "> and source_price = #{sourcePrice}</if>
-            <if test="realPrice != null "> and real_price = #{realPrice}</if>
-            <if test="selfBalance != null "> and self_balance = #{selfBalance}</if>
-            <if test="balance != null "> and balance = #{balance}</if>
-            <if test="versionFlag != null "> and version_flag = #{versionFlag}</if>
-            <if test="statusBy != null "> and status_by = #{statusBy}</if>
-            <if test="publishTime != null "> and publish_time = #{publishTime}</if>
-            <if test="bindCreation != null  and bindCreation != ''"> and bind_creation = #{bindCreation}</if>
-            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
-            <if test="createdTime != null "> and created_time = #{createdTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
-            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
-            <if test="cateId != null  and cateId != ''"> and cate_id = #{cateId}</if>
-            <if test="postTime != null "> and post_time = #{postTime}</if>
-        </where>
-    </select>
-
     <select id="selectSearchCollectionList" parameterType="CollectionQuery" resultMap="CntCollectionResult">
         <include refid="selectCntCollectionVo"/>
         <where>
@@ -57,19 +35,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="collectionName != null  and collectionName != ''"> and collection_name like concat('%', #{collectionName}, '%')</if>
             <if test="statusBy != null "> and status_by = #{statusBy}</if>
         </where>
-    </select>
-
-    <select id="selectCntCollectionById" parameterType="String" resultMap="CntCollectionResult">
-        <include refid="selectCntCollectionVo"/>
-        where id = #{id}
-    </select>
-
-    <select id="selectCntCollectionByIds" resultType="com.manyun.admin.domain.CntCollection">
-        <include refid="selectCntCollectionVo"/>
-        where id in
-        <foreach item="id" collection="collectionIds" open="(" separator="," close=")">
-            #{id}
-        </foreach>
     </select>
 
     <select id="selectCntCollectionDetailsById" resultType="com.manyun.admin.domain.vo.CntCollectionDetailsVo">
@@ -94,79 +59,4 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	    where cp.id = #{id}
     </select>
 
-    <insert id="insertCntCollection" parameterType="CntCollection">
-        insert into cnt_collection
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">id,</if>
-            <if test="collectionName != null and collectionName != ''">collection_name,</if>
-            <if test="tarId != null">tar_id,</if>
-            <if test="sourcePrice != null">source_price,</if>
-            <if test="realPrice != null">real_price,</if>
-            <if test="selfBalance != null">self_balance,</if>
-            <if test="balance != null">balance,</if>
-            <if test="versionFlag != null">version_flag,</if>
-            <if test="statusBy != null">status_by,</if>
-            <if test="publishTime != null">publish_time,</if>
-            <if test="bindCreation != null">bind_creation,</if>
-            <if test="createdBy != null">created_by,</if>
-            <if test="createdTime != null">created_time,</if>
-            <if test="updatedBy != null">updated_by,</if>
-            <if test="updatedTime != null">updated_time,</if>
-            <if test="cateId != null">cate_id,</if>
-            <if test="postTime != null">post_time,</if>
-         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">#{id},</if>
-            <if test="collectionName != null and collectionName != ''">#{collectionName},</if>
-            <if test="tarId != null">#{tarId},</if>
-            <if test="sourcePrice != null">#{sourcePrice},</if>
-            <if test="realPrice != null">#{realPrice},</if>
-            <if test="selfBalance != null">#{selfBalance},</if>
-            <if test="balance != null">#{balance},</if>
-            <if test="versionFlag != null">#{versionFlag},</if>
-            <if test="statusBy != null">#{statusBy},</if>
-            <if test="publishTime != null">#{publishTime},</if>
-            <if test="bindCreation != null">#{bindCreation},</if>
-            <if test="createdBy != null">#{createdBy},</if>
-            <if test="createdTime != null">#{createdTime},</if>
-            <if test="updatedBy != null">#{updatedBy},</if>
-            <if test="updatedTime != null">#{updatedTime},</if>
-            <if test="cateId != null">#{cateId},</if>
-            <if test="postTime != null">#{postTime},</if>
-         </trim>
-    </insert>
-
-    <update id="updateCntCollection" parameterType="CntCollection">
-        update cnt_collection
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="collectionName != null and collectionName != ''">collection_name = #{collectionName},</if>
-            <if test="tarId != null">tar_id = #{tarId},</if>
-            <if test="sourcePrice != null">source_price = #{sourcePrice},</if>
-            <if test="realPrice != null">real_price = #{realPrice},</if>
-            <if test="selfBalance != null">self_balance = #{selfBalance},</if>
-            <if test="balance != null">balance = #{balance},</if>
-            <if test="versionFlag != null">version_flag = #{versionFlag},</if>
-            <if test="statusBy != null">status_by = #{statusBy},</if>
-            <if test="publishTime != null">publish_time = #{publishTime},</if>
-            <if test="bindCreation != null">bind_creation = #{bindCreation},</if>
-            <if test="createdBy != null">created_by = #{createdBy},</if>
-            <if test="createdTime != null">created_time = #{createdTime},</if>
-            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
-            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
-            <if test="cateId != null">cate_id = #{cateId},</if>
-            <if test="postTime != null">post_time = #{postTime},</if>
-        </trim>
-        where id = #{id}
-    </update>
-
-    <delete id="deleteCntCollectionById" parameterType="String">
-        delete from cnt_collection where id = #{id}
-    </delete>
-
-    <delete id="deleteCntCollectionByIds" parameterType="String">
-        delete from cnt_collection where id in
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </delete>
 </mapper>

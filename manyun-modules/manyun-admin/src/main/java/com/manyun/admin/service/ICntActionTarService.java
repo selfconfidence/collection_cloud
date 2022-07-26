@@ -1,6 +1,8 @@
 package com.manyun.admin.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntActionTar;
 import com.manyun.admin.domain.dto.SaveActionTarDto;
 import com.manyun.admin.domain.query.ActionTarQuery;
@@ -12,7 +14,7 @@ import com.manyun.admin.domain.vo.CntActionTarVo;
  * @author yanwei
  * @date 2022-07-21
  */
-public interface ICntActionTarService
+public interface ICntActionTarService extends IService<CntActionTar>
 {
 
     /**

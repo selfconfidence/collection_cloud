@@ -1,11 +1,18 @@
 package com.manyun.admin.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.admin.domain.CntOrder;
+import com.manyun.admin.domain.CntUserCollection;
 import com.manyun.admin.domain.query.UserMoneyQuery;
 import com.manyun.admin.domain.vo.UserCollectionVo;
 import com.manyun.admin.domain.vo.UserMoneyVo;
 import com.manyun.admin.mapper.CntMediaMapper;
 import com.manyun.admin.mapper.CntOrderMapper;
+import com.manyun.admin.service.ICntMediaService;
+import com.manyun.admin.service.ICntOrderService;
+import com.manyun.admin.service.ICntUserCollectionService;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.security.utils.SecurityUtils;
@@ -25,16 +32,19 @@ import java.util.stream.Collectors;
  * @date 2022-07-12
  */
 @Service
-public class CntUserServiceImpl implements ICntUserService
+public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> implements ICntUserService
 {
     @Autowired
     private CntUserMapper cntUserMapper;
 
     @Autowired
-    private CntOrderMapper cntOrderMapper;
+    private ICntOrderService orderService;
 
     @Autowired
-    private CntMediaMapper cntMediaMapper;
+    private ICntMediaService mediaService;
+
+    @Autowired
+    private ICntUserCollectionService userCollectionService;
 
 
     /**
@@ -60,7 +70,7 @@ public class CntUserServiceImpl implements ICntUserService
     {
         cntUser.setUpdatedBy(SecurityUtils.getUsername());
         cntUser.setUpdatedTime(DateUtils.getNowDate());
-        return cntUserMapper.updateCntUser(cntUser);
+        return updateById(cntUser)==true?1:0;
     }
 
     /**
@@ -68,9 +78,7 @@ public class CntUserServiceImpl implements ICntUserService
      */
     @Override
     public List<CntOrder> myOrderList(String userId) {
-        CntOrder cntOrder = new CntOrder();
-        cntOrder.setUserId(userId);
-        return cntOrderMapper.selectCntOrderList(cntOrder);
+        return orderService.list(Wrappers.<CntOrder>lambdaQuery().eq(CntOrder::getUserId,userId));
     }
 
     /**
@@ -78,14 +86,17 @@ public class CntUserServiceImpl implements ICntUserService
      */
     @Override
     public List<UserCollectionVo> myCollectionList(String userId) {
-        List<UserCollectionVo> userCollectionVos=cntUserMapper.myCollectionList(userId);
+        List<UserCollectionVo> userCollectionVos=userCollectionService.list(Wrappers.<CntUserCollection>lambdaQuery().eq(CntUserCollection::getUserId,userId).orderByDesc(CntUserCollection::getCreatedTime)).stream().map(m->{
+            UserCollectionVo userCollectionVo=new UserCollectionVo();
+            BeanUtil.copyProperties(userCollectionVo,m);
+            return userCollectionVo;
+        }).collect(Collectors.toList());
         return  userCollectionVos
                     .parallelStream()
                     .map(item ->
                     {
-                        item.setMediaVos(cntMediaMapper.initMediaVos(item.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)); return item;
+                        item.setMediaVos(mediaService.initMediaVos(item.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)); return item;
                     }).collect(Collectors.toList());
-
     }
 
 }

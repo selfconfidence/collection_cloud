@@ -1,12 +1,17 @@
 package com.manyun.admin.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.admin.domain.CntActionTar;
 import com.manyun.admin.domain.query.ActionQuery;
 import com.manyun.admin.domain.vo.CntActionVo;
 import com.manyun.admin.mapper.CntActionTarMapper;
+import com.manyun.admin.service.ICntActionTarService;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.manyun.common.security.utils.SecurityUtils;
@@ -24,13 +29,13 @@ import org.springframework.transaction.annotation.Transactional;
  * @date 2022-07-21
  */
 @Service
-public class CntActionServiceImpl implements ICntActionService
+public class CntActionServiceImpl extends ServiceImpl<CntActionMapper,CntAction> implements ICntActionService
 {
     @Autowired
     private CntActionMapper cntActionMapper;
 
     @Autowired
-    private CntActionTarMapper actionTarMapper;
+    private ICntActionTarService actionTarService;
 
     /**
      * 查询活动
@@ -41,7 +46,7 @@ public class CntActionServiceImpl implements ICntActionService
     @Override
     public CntAction selectCntActionById(String id)
     {
-        return cntActionMapper.selectCntActionById(id);
+        return getById(id);
     }
 
     /**
@@ -72,7 +77,7 @@ public class CntActionServiceImpl implements ICntActionService
         cntAction.setId(IdUtils.getSnowflakeNextIdStr());
         cntAction.setCreatedBy(SecurityUtils.getUsername());
         cntAction.setCreatedTime(DateUtils.getNowDate());
-        return cntActionMapper.insertCntAction(cntAction);
+        return save(cntAction)==true?1:0;
     }
 
     /**
@@ -86,7 +91,7 @@ public class CntActionServiceImpl implements ICntActionService
     {
         cntAction.setUpdatedBy(SecurityUtils.getUsername());
         cntAction.setUpdatedTime(DateUtils.getNowDate());
-        return cntActionMapper.updateCntAction(cntAction);
+        return updateById(cntAction)==true?1:0;
     }
 
     /**
@@ -99,8 +104,8 @@ public class CntActionServiceImpl implements ICntActionService
     @Transactional(rollbackFor = Exception.class)
     public int deleteCntActionByIds(String[] ids)
     {
-        cntActionMapper.deleteCntActionByIds(ids);
-        actionTarMapper.deleteCntActionTarByActionIds(ids);
+        removeByIds(Arrays.asList(ids));
+        actionTarService.remove(Wrappers.<CntActionTar>lambdaQuery().in(CntActionTar::getActionId,ids));
         return 1;
     }
 }

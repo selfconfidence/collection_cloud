@@ -1,16 +1,16 @@
 package com.manyun.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.admin.domain.*;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.mapper.*;
-import com.manyun.admin.service.CntDictService;
+import com.manyun.admin.service.*;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.enums.CateType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,26 +26,26 @@ public class CntDictServiceImpl implements CntDictService
 {
 
     @Autowired
-    private CntCollectionMapper cntCollectionMapper;
+    private ICntCollectionService collectionService;
 
     @Autowired
-    private CntCateMapper cntCateMapper;
+    private ICntCateService cateService;
 
     @Autowired
-    private CnfCreationdMapper cnfCreationdMapper;
+    private ICnfCreationdService creationdService;
 
     @Autowired
-    private CntLableMapper cntLableMapper;
+    private ICntLableService lableService;
 
     @Autowired
-    private CntCustomerServiceMapper cntCustomerServiceMapper;
+    private ICntCustomerServiceService customerServiceService;
 
     /***
      * 查询藏品字典
      */
     @Override
     public List<CntCollectionDictVo> collectionDict() {
-        return cntCollectionMapper.selectCntCollectionList(new CntCollection()).stream().map(m ->{
+        return collectionService.list().stream().map(m ->{
             CntCollectionDictVo cntCollectionDictVo=new CntCollectionDictVo();
             BeanUtil.copyProperties(m,cntCollectionDictVo);
             return cntCollectionDictVo;
@@ -58,9 +58,7 @@ public class CntDictServiceImpl implements CntDictService
      */
     @Override
     public List<CollectionCateDictVo> collectionCateDict() {
-        CntCate cntCate=new CntCate();
-        cntCate.setCateType(Long.valueOf(CateType.COLLECTION_CATE.getCode()));
-        return cntCateMapper.selectCntCateList(cntCate).stream().map(m ->{
+        return cateService.list(Wrappers.<CntCate>lambdaQuery().eq(CntCate::getCateType,Long.valueOf(CateType.COLLECTION_CATE.getCode()))).stream().map(m ->{
             CollectionCateDictVo collectionCateDictVo=new CollectionCateDictVo();
             BeanUtil.copyProperties(m,collectionCateDictVo);
             return collectionCateDictVo;
@@ -72,7 +70,7 @@ public class CntDictServiceImpl implements CntDictService
      */
     @Override
     public List<CreationdDictVo> creationdDict() {
-        return cnfCreationdMapper.selectCnfCreationdList(new CnfCreationd()).stream().map(m ->{
+        return creationdService.list().stream().map(m ->{
             CreationdDictVo creationdDictVo=new CreationdDictVo();
             BeanUtil.copyProperties(m,creationdDictVo);
             return creationdDictVo;
@@ -84,7 +82,7 @@ public class CntDictServiceImpl implements CntDictService
      */
     @Override
     public List<LableDictVo> lableDict() {
-        return cntLableMapper.selectCntLableList(new CntLable()).stream().map(m ->{
+        return lableService.list().stream().map(m ->{
             LableDictVo lableDictVo=new LableDictVo();
             BeanUtil.copyProperties(m,lableDictVo);
             return lableDictVo;
@@ -96,7 +94,7 @@ public class CntDictServiceImpl implements CntDictService
      */
     @Override
     public List<CustomerServiceDictVo> customerServiceDict() {
-        List<CustomerServiceDictVo> customerServiceDictVos=cntCustomerServiceMapper.selectCntCustomerServiceList(Builder.of(CntCustomerService::new).build()).stream().filter(f -> (f.getMenuStatus().equals("0") && f.getParentId()==0)).map(m ->{
+        List<CustomerServiceDictVo> customerServiceDictVos=customerServiceService.list(Wrappers.<CntCustomerService>lambdaQuery().eq(CntCustomerService::getMenuStatus,"0").eq(CntCustomerService::getParentId,0)).stream().map(m ->{
             CustomerServiceDictVo customerServiceDictVo=new CustomerServiceDictVo();
             BeanUtil.copyProperties(m,customerServiceDictVo);
             return customerServiceDictVo;

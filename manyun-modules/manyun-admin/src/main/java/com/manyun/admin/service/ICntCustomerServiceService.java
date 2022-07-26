@@ -1,6 +1,8 @@
 package com.manyun.admin.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntCustomerService;
 import com.manyun.admin.domain.vo.CntCustomerServiceVo;
 import com.manyun.common.core.domain.R;
@@ -11,7 +13,7 @@ import com.manyun.common.core.domain.R;
  * @author yanwei
  * @date 2022-07-21
  */
-public interface ICntCustomerServiceService
+public interface ICntCustomerServiceService extends IService<CntCustomerService>
 {
     /**
      * 查询客服
