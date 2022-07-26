@@ -3,7 +3,7 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.manyun.admin.mapper.CntOrderMapper">
-    
+
     <resultMap type="CntOrder" id="CntOrderResult">
         <result property="id"    column="id"    />
         <result property="createdBy"    column="created_by"    />
@@ -27,102 +27,4 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, created_by, created_time, updated_by, updated_time, goods_num, order_no, user_id, bui_id, goods_type, order_status, pay_type, order_amount, end_time, pay_time, collection_name from cnt_order
     </sql>
 
-    <select id="selectCntOrderList" parameterType="CntOrder" resultMap="CntOrderResult">
-        <include refid="selectCntOrderVo"/>
-        <where>  
-            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
-            <if test="createdTime != null "> and created_time = #{createdTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
-            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
-            <if test="goodsNum != null "> and goods_num = #{goodsNum}</if>
-            <if test="orderNo != null  and orderNo != ''"> and order_no = #{orderNo}</if>
-            <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
-            <if test="buiId != null  and buiId != ''"> and bui_id = #{buiId}</if>
-            <if test="goodsType != null "> and goods_type = #{goodsType}</if>
-            <if test="orderStatus != null "> and order_status = #{orderStatus}</if>
-            <if test="payType != null "> and pay_type = #{payType}</if>
-            <if test="orderAmount != null "> and order_amount = #{orderAmount}</if>
-            <if test="endTime != null "> and end_time = #{endTime}</if>
-            <if test="payTime != null "> and pay_time = #{payTime}</if>
-            <if test="collectionName != null  and collectionName != ''"> and collection_name like concat('%', #{collectionName}, '%')</if>
-        </where>
-    </select>
-    
-    <select id="selectCntOrderById" parameterType="String" resultMap="CntOrderResult">
-        <include refid="selectCntOrderVo"/>
-        where id = #{id}
-    </select>
-        
-    <insert id="insertCntOrder" parameterType="CntOrder">
-        insert into cnt_order
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">id,</if>
-            <if test="createdBy != null">created_by,</if>
-            <if test="createdTime != null">created_time,</if>
-            <if test="updatedBy != null">updated_by,</if>
-            <if test="updatedTime != null">updated_time,</if>
-            <if test="goodsNum != null">goods_num,</if>
-            <if test="orderNo != null">order_no,</if>
-            <if test="userId != null">user_id,</if>
-            <if test="buiId != null">bui_id,</if>
-            <if test="goodsType != null">goods_type,</if>
-            <if test="orderStatus != null">order_status,</if>
-            <if test="payType != null">pay_type,</if>
-            <if test="orderAmount != null">order_amount,</if>
-            <if test="endTime != null">end_time,</if>
-            <if test="payTime != null">pay_time,</if>
-            <if test="collectionName != null">collection_name,</if>
-         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">#{id},</if>
-            <if test="createdBy != null">#{createdBy},</if>
-            <if test="createdTime != null">#{createdTime},</if>
-            <if test="updatedBy != null">#{updatedBy},</if>
-            <if test="updatedTime != null">#{updatedTime},</if>
-            <if test="goodsNum != null">#{goodsNum},</if>
-            <if test="orderNo != null">#{orderNo},</if>
-            <if test="userId != null">#{userId},</if>
-            <if test="buiId != null">#{buiId},</if>
-            <if test="goodsType != null">#{goodsType},</if>
-            <if test="orderStatus != null">#{orderStatus},</if>
-            <if test="payType != null">#{payType},</if>
-            <if test="orderAmount != null">#{orderAmount},</if>
-            <if test="endTime != null">#{endTime},</if>
-            <if test="payTime != null">#{payTime},</if>
-            <if test="collectionName != null">#{collectionName},</if>
-         </trim>
-    </insert>
-
-    <update id="updateCntOrder" parameterType="CntOrder">
-        update cnt_order
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="createdBy != null">created_by = #{createdBy},</if>
-            <if test="createdTime != null">created_time = #{createdTime},</if>
-            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
-            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
-            <if test="goodsNum != null">goods_num = #{goodsNum},</if>
-            <if test="orderNo != null">order_no = #{orderNo},</if>
-            <if test="userId != null">user_id = #{userId},</if>
-            <if test="buiId != null">bui_id = #{buiId},</if>
-            <if test="goodsType != null">goods_type = #{goodsType},</if>
-            <if test="orderStatus != null">order_status = #{orderStatus},</if>
-            <if test="payType != null">pay_type = #{payType},</if>
-            <if test="orderAmount != null">order_amount = #{orderAmount},</if>
-            <if test="endTime != null">end_time = #{endTime},</if>
-            <if test="payTime != null">pay_time = #{payTime},</if>
-            <if test="collectionName != null">collection_name = #{collectionName},</if>
-        </trim>
-        where id = #{id}
-    </update>
-
-    <delete id="deleteCntOrderById" parameterType="String">
-        delete from cnt_order where id = #{id}
-    </delete>
-
-    <delete id="deleteCntOrderByIds" parameterType="String">
-        delete from cnt_order where id in 
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </delete>
 </mapper>

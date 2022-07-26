@@ -7,13 +7,17 @@ import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.admin.domain.CntCollection;
+import com.manyun.admin.domain.CntMedia;
 import com.manyun.admin.domain.dto.SaveActionTarDto;
 import com.manyun.admin.domain.query.ActionTarQuery;
 import com.manyun.admin.domain.vo.CntActionTarVo;
 import com.manyun.admin.domain.vo.MediaVo;
-import com.manyun.admin.mapper.CntCollectionMapper;
-import com.manyun.admin.mapper.CntMediaMapper;
+import com.manyun.admin.service.ICntCollectionService;
+import com.manyun.admin.service.ICntMediaService;
+import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.manyun.common.security.utils.SecurityUtils;
@@ -31,16 +35,16 @@ import org.springframework.transaction.annotation.Transactional;
  * @date 2022-07-21
  */
 @Service
-public class CntActionTarServiceImpl implements ICntActionTarService
+public class CntActionTarServiceImpl extends ServiceImpl<CntActionTarMapper,CntActionTar> implements ICntActionTarService
 {
     @Autowired
     private CntActionTarMapper cntActionTarMapper;
 
     @Autowired
-    private CntCollectionMapper cntCollectionMapper;
+    private ICntCollectionService collectionService;
 
     @Autowired
-    private CntMediaMapper cntMediaMapper;
+    private ICntMediaService mediaService;
 
     /**
      * 查询活动合成附属信息列表
@@ -71,11 +75,16 @@ public class CntActionTarServiceImpl implements ICntActionTarService
         List<CntActionTarVo> cntActionTarVos = saveActionTarDto.getCntActionTarVos();
         String actionId = saveActionTarDto.getActionId();
         Assert.isTrue(Objects.nonNull(cntActionTarVos),"新增失败!");
-        cntActionTarMapper.deleteCntActionTarById(null,actionId);
+        remove(Wrappers.<CntActionTar>lambdaQuery().eq(CntActionTar::getActionId,actionId));
         if(cntActionTarVos.size()>0){
             List<String> collectionIds = cntActionTarVos.stream().map(CntActionTarVo::getCollectionId).collect(Collectors.toList());
-            List<CntCollection> collectionList = cntCollectionMapper.selectCntCollectionByIds(collectionIds);
-            List<MediaVo> mediaVoList = cntMediaMapper.selectCntMediaByCollectionIds(collectionIds);
+            List<CntCollection> collectionList = collectionService.listByIds(collectionIds);
+            List<MediaVo> mediaVoList = mediaService.list(Wrappers.<CntMedia>lambdaQuery().in(CntMedia::getBuiId,collectionIds).eq(CntMedia::getModelType,BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE))
+                    .stream().map(m->{
+                        MediaVo mediaVo=new MediaVo();
+                        BeanUtil.copyProperties(mediaVo,m);
+                        return mediaVo;
+                    }).collect(Collectors.toList());
             List<CntActionTar> list = cntActionTarVos.stream().map(m -> {
                 CntActionTar cntActionTar = new CntActionTar();
                 BeanUtil.copyProperties(m, cntActionTar);
@@ -93,7 +102,7 @@ public class CntActionTarServiceImpl implements ICntActionTarService
                 cntActionTar.setCreatedTime(DateUtils.getNowDate());
                 return cntActionTar;
             }).collect(Collectors.toList());
-            cntActionTarMapper.insertCntActionTars(list);
+            saveBatch(list);
         }
         return 1;
     }

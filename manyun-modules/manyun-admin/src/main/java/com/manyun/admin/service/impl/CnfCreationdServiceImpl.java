@@ -1,9 +1,11 @@
 package com.manyun.admin.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.admin.domain.query.CreationdQuery;
 import com.manyun.admin.domain.vo.CnfCreationdVo;
 import com.manyun.common.core.utils.DateUtils;
@@ -22,13 +24,13 @@ import com.manyun.admin.service.ICnfCreationdService;
  * @date 2022-07-13
  */
 @Service
-public class CnfCreationdServiceImpl implements ICnfCreationdService
+public class CnfCreationdServiceImpl extends ServiceImpl<CnfCreationdMapper,CnfCreationd> implements ICnfCreationdService
 {
     @Autowired
     private CnfCreationdMapper cnfCreationdMapper;
 
     /**
-     * 查询创作者
+     * 查询创作者详情
      *
      * @param id 创作者主键
      * @return 创作者
@@ -36,7 +38,7 @@ public class CnfCreationdServiceImpl implements ICnfCreationdService
     @Override
     public CnfCreationd selectCnfCreationdById(String id)
     {
-        return cnfCreationdMapper.selectCnfCreationdById(id);
+        return getById(id);
     }
 
     /**
@@ -67,7 +69,7 @@ public class CnfCreationdServiceImpl implements ICnfCreationdService
         cnfCreationd.setId(IdUtils.getSnowflakeNextIdStr());
         cnfCreationd.setCreatedBy(SecurityUtils.getUsername());
         cnfCreationd.setCreatedTime(DateUtils.getNowDate());
-        return cnfCreationdMapper.insertCnfCreationd(cnfCreationd);
+        return save(cnfCreationd)==true?1:0;
     }
 
     /**
@@ -81,7 +83,7 @@ public class CnfCreationdServiceImpl implements ICnfCreationdService
     {
         cnfCreationd.setUpdatedBy(SecurityUtils.getUsername());
         cnfCreationd.setUpdatedTime(DateUtils.getNowDate());
-        return cnfCreationdMapper.updateCnfCreationd(cnfCreationd);
+        return updateById(cnfCreationd)==true?1:0;
     }
 
     /**
@@ -93,7 +95,7 @@ public class CnfCreationdServiceImpl implements ICnfCreationdService
     @Override
     public int deleteCnfCreationdByIds(String[] ids)
     {
-        return cnfCreationdMapper.deleteCnfCreationdByIds(ids);
+        return removeByIds(Arrays.asList(ids))==true?1:0;
     }
 
     /**
@@ -105,6 +107,6 @@ public class CnfCreationdServiceImpl implements ICnfCreationdService
     @Override
     public int deleteCnfCreationdById(String id)
     {
-        return cnfCreationdMapper.deleteCnfCreationdById(id);
+        return removeById(id)==true?1:0;
     }
 }

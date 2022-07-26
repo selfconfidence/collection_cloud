@@ -1,15 +1,19 @@
 package com.manyun.admin.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.admin.domain.CntBoxCollection;
 import com.manyun.admin.domain.query.BoxQuery;
 import com.manyun.admin.domain.query.OrderQuery;
 import com.manyun.admin.domain.vo.CntBoxOrderVo;
 import com.manyun.admin.domain.vo.CntBoxVo;
-import com.manyun.admin.mapper.CntBoxCollectionMapper;
-import com.manyun.admin.mapper.CntMediaMapper;
+import com.manyun.admin.service.ICntBoxCollectionService;
+import com.manyun.admin.service.ICntMediaService;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
@@ -28,16 +32,16 @@ import org.springframework.transaction.annotation.Transactional;
  * @date 2022-07-13
  */
 @Service
-public class CntBoxServiceImpl implements ICntBoxService
+public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implements ICntBoxService
 {
     @Autowired
     private CntBoxMapper cntBoxMapper;
 
     @Autowired
-    private CntMediaMapper cntMediaMapper;
+    private ICntMediaService mediaService;
 
     @Autowired
-    private CntBoxCollectionMapper boxCollectionMapper;
+    private ICntBoxCollectionService boxCollectionService;
 
     /**
      * 查询盲盒;盲盒主体
@@ -48,7 +52,7 @@ public class CntBoxServiceImpl implements ICntBoxService
     @Override
     public CntBox selectCntBoxById(String id)
     {
-        return cntBoxMapper.selectCntBoxById(id);
+        return getById(id);
     }
 
     /**
@@ -67,7 +71,7 @@ public class CntBoxServiceImpl implements ICntBoxService
                 {
                     CntBoxVo cntBoxVo=new CntBoxVo();
                     BeanUtil.copyProperties(item,cntBoxVo);
-                    cntBoxVo.setMediaVos(cntMediaMapper.initMediaVos(item.getId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+                    cntBoxVo.setMediaVos(mediaService.initMediaVos(item.getId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
                     return cntBoxVo;
                 }).collect(Collectors.toList());
     }
@@ -84,7 +88,7 @@ public class CntBoxServiceImpl implements ICntBoxService
         cntBox.setId(IdUtils.getSnowflakeNextIdStr());
         cntBox.setCreatedBy(SecurityUtils.getUsername());
         cntBox.setCreatedTime(DateUtils.getNowDate());
-        return cntBoxMapper.insertCntBox(cntBox);
+        return save(cntBox)==true?1:0;
     }
 
     /**
@@ -98,7 +102,7 @@ public class CntBoxServiceImpl implements ICntBoxService
     {
         cntBox.setUpdatedBy(SecurityUtils.getUsername());
         cntBox.setUpdatedTime(DateUtils.getNowDate());
-        return cntBoxMapper.updateCntBox(cntBox);
+        return updateById(cntBox)==true?1:0;
     }
 
     /**
@@ -111,8 +115,8 @@ public class CntBoxServiceImpl implements ICntBoxService
     @Transactional(rollbackFor = Exception.class)
     public int deleteCntBoxByIds(String[] ids)
     {
-        cntBoxMapper.deleteCntBoxByIds(ids);
-        boxCollectionMapper.deleteCntBoxCollectionByBoxIds(ids);
+        removeByIds(Arrays.asList(ids));
+        boxCollectionService.remove(Wrappers.<CntBoxCollection>lambdaQuery().in(CntBoxCollection::getBoxId,ids));
         return 1;
     }
 

@@ -3,7 +3,7 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.manyun.admin.mapper.CntSystemConfigurationMapper">
-    
+
     <resultMap type="CntSystemConfiguration" id="CntSystemConfigurationResult">
         <result property="id"    column="id"    />
         <result property="name"    column="name"    />
@@ -26,7 +26,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectCntSystemConfigurationList" parameterType="CntSystemConfiguration" resultMap="CntSystemConfigurationResult">
         <include refid="selectCntSystemConfigurationVo"/>
-        <where>  
+        <where>
             <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
             <if test="logo != null  and logo != ''"> and logo = #{logo}</if>
             <if test="companyMail != null  and companyMail != ''"> and company_mail = #{companyMail}</if>
@@ -41,73 +41,5 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
         </where>
     </select>
-    
-    <select id="selectCntSystemConfigurationById" parameterType="String" resultMap="CntSystemConfigurationResult">
-        <include refid="selectCntSystemConfigurationVo"/>
-        where id = #{id}
-    </select>
-        
-    <insert id="insertCntSystemConfiguration" parameterType="CntSystemConfiguration">
-        insert into cnt_system_configuration
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">id,</if>
-            <if test="name != null">name,</if>
-            <if test="logo != null">logo,</if>
-            <if test="companyMail != null">company_mail,</if>
-            <if test="telPhone != null">tel_phone,</if>
-            <if test="serviceMail != null">service_mail,</if>
-            <if test="remind != null">remind,</if>
-            <if test="workingHours != null">working_hours,</if>
-            <if test="shopQun != null">shop_qun,</if>
-            <if test="createdBy != null">created_by,</if>
-            <if test="createdTime != null">created_time,</if>
-            <if test="updatedBy != null">updated_by,</if>
-            <if test="updatedTime != null">updated_time,</if>
-         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">#{id},</if>
-            <if test="name != null">#{name},</if>
-            <if test="logo != null">#{logo},</if>
-            <if test="companyMail != null">#{companyMail},</if>
-            <if test="telPhone != null">#{telPhone},</if>
-            <if test="serviceMail != null">#{serviceMail},</if>
-            <if test="remind != null">#{remind},</if>
-            <if test="workingHours != null">#{workingHours},</if>
-            <if test="shopQun != null">#{shopQun},</if>
-            <if test="createdBy != null">#{createdBy},</if>
-            <if test="createdTime != null">#{createdTime},</if>
-            <if test="updatedBy != null">#{updatedBy},</if>
-            <if test="updatedTime != null">#{updatedTime},</if>
-         </trim>
-    </insert>
 
-    <update id="updateCntSystemConfiguration" parameterType="CntSystemConfiguration">
-        update cnt_system_configuration
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="name != null">name = #{name},</if>
-            <if test="logo != null">logo = #{logo},</if>
-            <if test="companyMail != null">company_mail = #{companyMail},</if>
-            <if test="telPhone != null">tel_phone = #{telPhone},</if>
-            <if test="serviceMail != null">service_mail = #{serviceMail},</if>
-            <if test="remind != null">remind = #{remind},</if>
-            <if test="workingHours != null">working_hours = #{workingHours},</if>
-            <if test="shopQun != null">shop_qun = #{shopQun},</if>
-            <if test="createdBy != null">created_by = #{createdBy},</if>
-            <if test="createdTime != null">created_time = #{createdTime},</if>
-            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
-            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
-        </trim>
-        where id = #{id}
-    </update>
-
-    <delete id="deleteCntSystemConfigurationById" parameterType="String">
-        delete from cnt_system_configuration where id = #{id}
-    </delete>
-
-    <delete id="deleteCntSystemConfigurationByIds" parameterType="String">
-        delete from cnt_system_configuration where id in 
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </delete>
 </mapper>

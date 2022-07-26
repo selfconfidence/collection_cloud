@@ -1,6 +1,9 @@
 package com.manyun.admin.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.manyun.common.security.utils.SecurityUtils;
@@ -17,7 +20,7 @@ import com.manyun.admin.service.ICntMarketingService;
  * @date 2022-07-19
  */
 @Service
-public class CntMarketingServiceImpl implements ICntMarketingService
+public class CntMarketingServiceImpl extends ServiceImpl<CntMarketingMapper,CntMarketing> implements ICntMarketingService
 {
     @Autowired
     private CntMarketingMapper cntMarketingMapper;
@@ -31,7 +34,7 @@ public class CntMarketingServiceImpl implements ICntMarketingService
     @Override
     public CntMarketing selectCntMarketingById(String id)
     {
-        return cntMarketingMapper.selectCntMarketingById(id);
+        return getById(id);
     }
 
     /**
@@ -58,7 +61,7 @@ public class CntMarketingServiceImpl implements ICntMarketingService
         cntMarketing.setId(IdUtils.getSnowflakeNextIdStr());
         cntMarketing.setCreatedBy(SecurityUtils.getUsername());
         cntMarketing.setCreatedTime(DateUtils.getNowDate());
-        return cntMarketingMapper.insertCntMarketing(cntMarketing);
+        return save(cntMarketing)==true?1:0;
     }
 
     /**
@@ -72,7 +75,7 @@ public class CntMarketingServiceImpl implements ICntMarketingService
     {
         cntMarketing.setUpdatedBy(SecurityUtils.getUsername());
         cntMarketing.setUpdatedTime(DateUtils.getNowDate());
-        return cntMarketingMapper.updateCntMarketing(cntMarketing);
+        return updateById(cntMarketing)==true?1:0;
     }
 
     /**
@@ -84,7 +87,7 @@ public class CntMarketingServiceImpl implements ICntMarketingService
     @Override
     public int deleteCntMarketingByIds(String[] ids)
     {
-        return cntMarketingMapper.deleteCntMarketingByIds(ids);
+        return removeByIds(Arrays.asList(ids))==true?1:0;
     }
 
     /**
@@ -96,6 +99,6 @@ public class CntMarketingServiceImpl implements ICntMarketingService
     @Override
     public int deleteCntMarketingById(String id)
     {
-        return cntMarketingMapper.deleteCntMarketingById(id);
+        return removeById(id)==true?1:0;
     }
 }

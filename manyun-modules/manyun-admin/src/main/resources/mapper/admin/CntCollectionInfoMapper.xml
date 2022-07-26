@@ -21,26 +21,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, collection_id, publish_auther, publish_other, customer_tail, look_info, created_by, created_time, updated_by, updated_time from cnt_collection_info
     </sql>
 
-    <select id="selectCntCollectionInfoList" parameterType="CntCollectionInfo" resultMap="CntCollectionInfoResult">
-        <include refid="selectCntCollectionInfoVo"/>
-        <where>
-            <if test="collectionId != null  and collectionId != ''"> and collection_id = #{collectionId}</if>
-            <if test="publishAuther != null  and publishAuther != ''"> and publish_auther = #{publishAuther}</if>
-            <if test="publishOther != null  and publishOther != ''"> and publish_other = #{publishOther}</if>
-            <if test="customerTail != null  and customerTail != ''"> and customer_tail = #{customerTail}</if>
-            <if test="lookInfo != null  and lookInfo != ''"> and look_info = #{lookInfo}</if>
-            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
-            <if test="createdTime != null "> and created_time = #{createdTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
-            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
-        </where>
-    </select>
-
-    <select id="selectCntCollectionInfoById" parameterType="String" resultMap="CntCollectionInfoResult">
-        <include refid="selectCntCollectionInfoVo"/>
-        where id = #{id}
-    </select>
-
     <select id="selectCollectionRelatedInfoList" parameterType="CollectionInfoQuery" resultType="com.manyun.admin.domain.vo.CntCollectionInfoVo">
         select
             ci.id,
@@ -59,65 +39,4 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
 
-    <insert id="insertCntCollectionInfo" parameterType="CntCollectionInfo">
-        insert into cnt_collection_info
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">id,</if>
-            <if test="collectionId != null">collection_id,</if>
-            <if test="publishAuther != null">publish_auther,</if>
-            <if test="publishOther != null">publish_other,</if>
-            <if test="customerTail != null">customer_tail,</if>
-            <if test="lookInfo != null">look_info,</if>
-            <if test="createdBy != null">created_by,</if>
-            <if test="createdTime != null">created_time,</if>
-            <if test="updatedBy != null">updated_by,</if>
-            <if test="updatedTime != null">updated_time,</if>
-         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">#{id},</if>
-            <if test="collectionId != null">#{collectionId},</if>
-            <if test="publishAuther != null">#{publishAuther},</if>
-            <if test="publishOther != null">#{publishOther},</if>
-            <if test="customerTail != null">#{customerTail},</if>
-            <if test="lookInfo != null">#{lookInfo},</if>
-            <if test="createdBy != null">#{createdBy},</if>
-            <if test="createdTime != null">#{createdTime},</if>
-            <if test="updatedBy != null">#{updatedBy},</if>
-            <if test="updatedTime != null">#{updatedTime},</if>
-         </trim>
-    </insert>
-
-    <update id="updateCntCollectionInfo" parameterType="CntCollectionInfo">
-        update cnt_collection_info
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="collectionId != null">collection_id = #{collectionId},</if>
-            <if test="publishAuther != null">publish_auther = #{publishAuther},</if>
-            <if test="publishOther != null">publish_other = #{publishOther},</if>
-            <if test="customerTail != null">customer_tail = #{customerTail},</if>
-            <if test="lookInfo != null">look_info = #{lookInfo},</if>
-            <if test="createdBy != null">created_by = #{createdBy},</if>
-            <if test="createdTime != null">created_time = #{createdTime},</if>
-            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
-            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
-        </trim>
-        where id = #{id}
-    </update>
-
-    <delete id="deleteCntCollectionInfoById" parameterType="String">
-        delete from cnt_collection_info where id = #{id}
-    </delete>
-
-    <delete id="deleteCntCollectionInfoByIds" parameterType="String">
-        delete from cnt_collection_info where id in
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </delete>
-
-    <delete id="deleteCntCollectionInfoByCollectionIds">
-        delete from cnt_collection_info where collection_id in
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </delete>
 </mapper>

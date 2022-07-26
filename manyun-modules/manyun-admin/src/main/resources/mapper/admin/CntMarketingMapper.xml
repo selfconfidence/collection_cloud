@@ -3,7 +3,7 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.manyun.admin.mapper.CntMarketingMapper">
-    
+
     <resultMap type="CntMarketing" id="CntMarketingResult">
         <result property="id"    column="id"    />
         <result property="invitationPoster"    column="invitation_poster"    />
@@ -21,7 +21,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectCntMarketingList" parameterType="CntMarketing" resultMap="CntMarketingResult">
         <include refid="selectCntMarketingVo"/>
-        <where>  
+        <where>
             <if test="invitationPoster != null  and invitationPoster != ''"> and invitation_poster = #{invitationPoster}</if>
             <if test="posterH5 != null  and posterH5 != ''"> and poster_h5 = #{posterH5}</if>
             <if test="posterText != null  and posterText != ''"> and poster_text = #{posterText}</if>
@@ -31,58 +31,5 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
         </where>
     </select>
-    
-    <select id="selectCntMarketingById" parameterType="String" resultMap="CntMarketingResult">
-        <include refid="selectCntMarketingVo"/>
-        where id = #{id}
-    </select>
-        
-    <insert id="insertCntMarketing" parameterType="CntMarketing">
-        insert into cnt_marketing
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">id,</if>
-            <if test="invitationPoster != null">invitation_poster,</if>
-            <if test="posterH5 != null">poster_h5,</if>
-            <if test="posterText != null">poster_text,</if>
-            <if test="createdBy != null">created_by,</if>
-            <if test="createdTime != null">created_time,</if>
-            <if test="updatedBy != null">updated_by,</if>
-            <if test="updatedTime != null">updated_time,</if>
-         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">#{id},</if>
-            <if test="invitationPoster != null">#{invitationPoster},</if>
-            <if test="posterH5 != null">#{posterH5},</if>
-            <if test="posterText != null">#{posterText},</if>
-            <if test="createdBy != null">#{createdBy},</if>
-            <if test="createdTime != null">#{createdTime},</if>
-            <if test="updatedBy != null">#{updatedBy},</if>
-            <if test="updatedTime != null">#{updatedTime},</if>
-         </trim>
-    </insert>
 
-    <update id="updateCntMarketing" parameterType="CntMarketing">
-        update cnt_marketing
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="invitationPoster != null">invitation_poster = #{invitationPoster},</if>
-            <if test="posterH5 != null">poster_h5 = #{posterH5},</if>
-            <if test="posterText != null">poster_text = #{posterText},</if>
-            <if test="createdBy != null">created_by = #{createdBy},</if>
-            <if test="createdTime != null">created_time = #{createdTime},</if>
-            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
-            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
-        </trim>
-        where id = #{id}
-    </update>
-
-    <delete id="deleteCntMarketingById" parameterType="String">
-        delete from cnt_marketing where id = #{id}
-    </delete>
-
-    <delete id="deleteCntMarketingByIds" parameterType="String">
-        delete from cnt_marketing where id in 
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </delete>
 </mapper>

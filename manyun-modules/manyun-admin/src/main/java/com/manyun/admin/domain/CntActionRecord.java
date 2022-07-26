@@ -1,6 +1,8 @@
 package com.manyun.admin.domain;
 
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -9,6 +11,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import java.io.Serializable;
 
 @ApiModel("活动合成记录对象")
+@TableName("cnt_action_record")
 public class CntActionRecord implements Serializable
 {
     private static final long serialVersionUID = 1L;

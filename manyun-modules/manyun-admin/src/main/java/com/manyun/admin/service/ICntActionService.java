@@ -1,6 +1,8 @@
 package com.manyun.admin.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntAction;
 import com.manyun.admin.domain.query.ActionQuery;
 import com.manyun.admin.domain.vo.CntActionVo;
@@ -11,7 +13,7 @@ import com.manyun.admin.domain.vo.CntActionVo;
  * @author yanwei
  * @date 2022-07-21
  */
-public interface ICntActionService
+public interface ICntActionService extends IService<CntAction>
 {
     /**
      * 查询活动

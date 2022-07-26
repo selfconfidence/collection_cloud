@@ -4,41 +4,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.manyun.admin.mapper.CntMediaMapper">
 
-    <resultMap type="CntMedia" id="CntMediaResult">
-        <result property="id"    column="id"    />
-        <result property="buiId"    column="bui_id"    />
-        <result property="modelType"    column="model_type"    />
-        <result property="mediaUrl"    column="media_url"    />
-        <result property="mediaType"    column="media_type"    />
-        <result property="createdBy"    column="created_by"    />
-        <result property="createdTime"    column="created_time"    />
-        <result property="updatedBy"    column="updated_by"    />
-        <result property="updatedTime"    column="updated_time"    />
-    </resultMap>
-
-    <sql id="selectCntMediaVo">
-        select id, bui_id, model_type, media_url, media_type, created_by, created_time, updated_by, updated_time from cnt_media
-    </sql>
-
-    <select id="selectCntMediaList" parameterType="CntMedia" resultMap="CntMediaResult">
-        <include refid="selectCntMediaVo"/>
-        <where>
-            <if test="buiId != null  and buiId != ''"> and bui_id = #{buiId}</if>
-            <if test="modelType != null  and modelType != ''"> and model_type = #{modelType}</if>
-            <if test="mediaUrl != null  and mediaUrl != ''"> and media_url = #{mediaUrl}</if>
-            <if test="mediaType != null  and mediaType != ''"> and media_type = #{mediaType}</if>
-            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
-            <if test="createdTime != null "> and created_time = #{createdTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
-            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
-        </where>
-    </select>
-
-    <select id="selectCntMediaById" parameterType="String" resultMap="CntMediaResult">
-        <include refid="selectCntMediaVo"/>
-        where id = #{id}
-    </select>
-
     <select id="initMediaVos" resultType="com.manyun.admin.domain.vo.MediaVo">
         select
         id,
@@ -54,69 +19,4 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
 
-    <select id="selectCntMediaByCollectionIds" resultType="com.manyun.admin.domain.vo.MediaVo">
-        <include refid="selectCntMediaVo"/>
-        where bui_id in
-        <foreach item="id" collection="collectionIds" open="(" separator="," close=")">
-            #{id}
-        </foreach> and model_type='collection_model_type'
-    </select>
-
-    <insert id="insertCntMedia" parameterType="CntMedia">
-        insert into cnt_media
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">id,</if>
-            <if test="buiId != null and buiId != ''">bui_id,</if>
-            <if test="modelType != null">model_type,</if>
-            <if test="mediaUrl != null">media_url,</if>
-            <if test="mediaType != null">media_type,</if>
-            <if test="createdBy != null">created_by,</if>
-            <if test="createdTime != null">created_time,</if>
-            <if test="updatedBy != null">updated_by,</if>
-            <if test="updatedTime != null">updated_time,</if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">#{id},</if>
-            <if test="buiId != null and buiId != ''">#{buiId},</if>
-            <if test="modelType != null">#{modelType},</if>
-            <if test="mediaUrl != null">#{mediaUrl},</if>
-            <if test="mediaType != null">#{mediaType},</if>
-            <if test="createdBy != null">#{createdBy},</if>
-            <if test="createdTime != null">#{createdTime},</if>
-            <if test="updatedBy != null">#{updatedBy},</if>
-            <if test="updatedTime != null">#{updatedTime},</if>
-        </trim>
-    </insert>
-
-    <update id="updateCntMedia" parameterType="CntMedia">
-        update cnt_media
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="buiId != null and buiId != ''">bui_id = #{buiId},</if>
-            <if test="modelType != null">model_type = #{modelType},</if>
-            <if test="mediaUrl != null">media_url = #{mediaUrl},</if>
-            <if test="mediaType != null">media_type = #{mediaType},</if>
-            <if test="createdBy != null">created_by = #{createdBy},</if>
-            <if test="createdTime != null">created_time = #{createdTime},</if>
-            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
-            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
-        </trim>
-        where id = #{id}
-    </update>
-
-    <delete id="deleteCntMediaById" parameterType="String">
-        delete from cnt_media where id = #{id}
-    </delete>
-
-    <delete id="deleteCntMediaByIds" parameterType="String">
-        delete from cnt_media where id in
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </delete>
-    <delete id="deleteCntMediaByCollectionIds">
-        delete from cnt_media where bui_id in
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
-        </foreach> and model_type='collection_model_type'
-    </delete>
 </mapper>

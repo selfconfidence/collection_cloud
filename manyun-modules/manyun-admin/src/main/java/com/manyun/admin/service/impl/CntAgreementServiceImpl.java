@@ -1,6 +1,9 @@
 package com.manyun.admin.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.manyun.common.security.utils.SecurityUtils;
@@ -17,7 +20,7 @@ import com.manyun.admin.service.ICntAgreementService;
  * @date 2022-07-19
  */
 @Service
-public class CntAgreementServiceImpl implements ICntAgreementService
+public class CntAgreementServiceImpl extends ServiceImpl<CntAgreementMapper,CntAgreement> implements ICntAgreementService
 {
     @Autowired
     private CntAgreementMapper cntAgreementMapper;
@@ -31,7 +34,7 @@ public class CntAgreementServiceImpl implements ICntAgreementService
     @Override
     public CntAgreement selectCntAgreementById(String id)
     {
-        return cntAgreementMapper.selectCntAgreementById(id);
+        return getById(id);
     }
 
     /**
@@ -58,7 +61,7 @@ public class CntAgreementServiceImpl implements ICntAgreementService
         cntAgreement.setId(IdUtils.getSnowflakeNextIdStr());
         cntAgreement.setCreatedBy(SecurityUtils.getUsername());
         cntAgreement.setCreatedTime(DateUtils.getNowDate());
-        return cntAgreementMapper.insertCntAgreement(cntAgreement);
+        return save(cntAgreement)==true?1:0;
     }
 
     /**
@@ -72,7 +75,7 @@ public class CntAgreementServiceImpl implements ICntAgreementService
     {
         cntAgreement.setUpdatedBy(SecurityUtils.getUsername());
         cntAgreement.setUpdatedTime(DateUtils.getNowDate());
-        return cntAgreementMapper.updateCntAgreement(cntAgreement);
+        return updateById(cntAgreement)==true?1:0;
     }
 
     /**
@@ -84,7 +87,7 @@ public class CntAgreementServiceImpl implements ICntAgreementService
     @Override
     public int deleteCntAgreementByIds(String[] ids)
     {
-        return cntAgreementMapper.deleteCntAgreementByIds(ids);
+        return removeByIds(Arrays.asList(ids))==true?1:0;
     }
 
     /**
@@ -96,6 +99,6 @@ public class CntAgreementServiceImpl implements ICntAgreementService
     @Override
     public int deleteCntAgreementById(String id)
     {
-        return cntAgreementMapper.deleteCntAgreementById(id);
+        return removeById(id)==true?1:0;
     }
 }

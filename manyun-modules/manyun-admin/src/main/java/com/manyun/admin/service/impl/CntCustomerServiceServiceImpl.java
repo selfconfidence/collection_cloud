@@ -1,10 +1,13 @@
 package com.manyun.admin.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.admin.domain.vo.CntCustomerServiceVo;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.StringUtils;
@@ -21,7 +24,7 @@ import com.manyun.admin.service.ICntCustomerServiceService;
  * @date 2022-07-21
  */
 @Service
-public class CntCustomerServiceServiceImpl implements ICntCustomerServiceService
+public class CntCustomerServiceServiceImpl extends ServiceImpl<CntCustomerServiceMapper,CntCustomerService> implements ICntCustomerServiceService
 {
     @Autowired
     private CntCustomerServiceMapper cntCustomerServiceMapper;
@@ -35,7 +38,7 @@ public class CntCustomerServiceServiceImpl implements ICntCustomerServiceService
     @Override
     public CntCustomerService selectCntCustomerServiceByMenuId(Long menuId)
     {
-        return cntCustomerServiceMapper.selectCntCustomerServiceByMenuId(menuId);
+        return getById(menuId);
     }
 
     /**
@@ -72,7 +75,7 @@ public class CntCustomerServiceServiceImpl implements ICntCustomerServiceService
     @Override
     public int insertCntCustomerService(CntCustomerService cntCustomerService)
     {
-        return cntCustomerServiceMapper.insertCntCustomerService(cntCustomerService);
+        return save(cntCustomerService)==true?1:0;
     }
 
     /**
@@ -84,7 +87,7 @@ public class CntCustomerServiceServiceImpl implements ICntCustomerServiceService
     @Override
     public int updateCntCustomerService(CntCustomerService cntCustomerService)
     {
-        return cntCustomerServiceMapper.updateCntCustomerService(cntCustomerService);
+        return updateById(cntCustomerService)==true?1:0;
     }
 
     /**
@@ -96,11 +99,11 @@ public class CntCustomerServiceServiceImpl implements ICntCustomerServiceService
     @Override
     public R deleteCntCustomerServiceByMenuIds(Long[] menuIds)
     {
-        List<Long> list = cntCustomerServiceMapper.selectParentIdByMenuIds(menuIds);
+        List<CntCustomerService> list = list(Wrappers.<CntCustomerService>lambdaQuery().in(CntCustomerService::getParentId, menuIds));
         if(list.size()>0){
             return R.fail("菜单id为: "+ StringUtils.join(list,",") + " 有子菜单,请先删除子菜单!");
         }
-        return cntCustomerServiceMapper.deleteCntCustomerServiceByMenuIds(menuIds)==0?R.fail():R.ok();
+        return removeByIds(Arrays.asList(menuIds))==true?R.ok():R.fail();
     }
 
 }

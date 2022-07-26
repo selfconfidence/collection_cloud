@@ -3,6 +3,8 @@ package com.manyun.admin.domain;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.manyun.common.core.annotation.Excel;
 import io.swagger.annotations.ApiModel;
@@ -11,6 +13,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 @ApiModel("订单对象")
+@TableName("cnt_order")
 public class CntOrder implements Serializable
 {
     private static final long serialVersionUID = 1L;

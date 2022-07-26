@@ -21,21 +21,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, cate_type, cate_name, cate_image, cate_info, bind_creation, created_by, created_time, updated_by, updated_time from cnt_cate
     </sql>
 
-    <select id="selectCntCateList" parameterType="CntCate" resultMap="CntCateResult">
-        <include refid="selectCntCateVo"/>
-        <where>
-            <if test="cateType != null "> and cate_type = #{cateType}</if>
-            <if test="cateName != null  and cateName != ''"> and cate_name like concat('%', #{cateName}, '%')</if>
-            <if test="cateImage != null  and cateImage != ''"> and cate_image = #{cateImage}</if>
-            <if test="cateInfo != null  and cateInfo != ''"> and cate_info = #{cateInfo}</if>
-            <if test="bindCreation != null  and bindCreation != ''"> and bind_creation = #{bindCreation}</if>
-            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
-            <if test="createdTime != null "> and created_time = #{createdTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
-            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
-        </where>
-    </select>
-
     <select id="selectSearchCateList" parameterType="CateQuery" resultMap="CntCateResult">
         <include refid="selectCntCateVo"/>
         <where>
@@ -43,63 +28,4 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
 
-    <select id="selectCntCateById" parameterType="String" resultMap="CntCateResult">
-        <include refid="selectCntCateVo"/>
-        where id = #{id}
-    </select>
-
-    <insert id="insertCntCate" parameterType="CntCate">
-        insert into cnt_cate
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">id,</if>
-            <if test="cateType != null">cate_type,</if>
-            <if test="cateName != null and cateName != ''">cate_name,</if>
-            <if test="cateImage != null">cate_image,</if>
-            <if test="cateInfo != null">cate_info,</if>
-            <if test="bindCreation != null">bind_creation,</if>
-            <if test="createdBy != null">created_by,</if>
-            <if test="createdTime != null">created_time,</if>
-            <if test="updatedBy != null">updated_by,</if>
-            <if test="updatedTime != null">updated_time,</if>
-         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">#{id},</if>
-            <if test="cateType != null">#{cateType},</if>
-            <if test="cateName != null and cateName != ''">#{cateName},</if>
-            <if test="cateImage != null">#{cateImage},</if>
-            <if test="cateInfo != null">#{cateInfo},</if>
-            <if test="bindCreation != null">#{bindCreation},</if>
-            <if test="createdBy != null">#{createdBy},</if>
-            <if test="createdTime != null">#{createdTime},</if>
-            <if test="updatedBy != null">#{updatedBy},</if>
-            <if test="updatedTime != null">#{updatedTime},</if>
-         </trim>
-    </insert>
-
-    <update id="updateCntCate" parameterType="CntCate">
-        update cnt_cate
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="cateType != null">cate_type = #{cateType},</if>
-            <if test="cateName != null and cateName != ''">cate_name = #{cateName},</if>
-            <if test="cateImage != null">cate_image = #{cateImage},</if>
-            <if test="cateInfo != null">cate_info = #{cateInfo},</if>
-            <if test="bindCreation != null">bind_creation = #{bindCreation},</if>
-            <if test="createdBy != null">created_by = #{createdBy},</if>
-            <if test="createdTime != null">created_time = #{createdTime},</if>
-            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
-            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
-        </trim>
-        where id = #{id}
-    </update>
-
-    <delete id="deleteCntCateById" parameterType="String">
-        delete from cnt_cate where id = #{id}
-    </delete>
-
-    <delete id="deleteCntCateByIds" parameterType="String">
-        delete from cnt_cate where id in
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </delete>
 </mapper>

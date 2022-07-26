@@ -1,6 +1,8 @@
 package com.manyun.admin.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntBox;
 import com.manyun.admin.domain.query.BoxQuery;
 import com.manyun.admin.domain.query.OrderQuery;
@@ -13,7 +15,7 @@ import com.manyun.admin.domain.vo.CntBoxVo;
  * @author yanwei
  * @date 2022-07-13
  */
-public interface ICntBoxService
+public interface ICntBoxService extends IService<CntBox>
 {
     /**
      * 查询盲盒;盲盒主体

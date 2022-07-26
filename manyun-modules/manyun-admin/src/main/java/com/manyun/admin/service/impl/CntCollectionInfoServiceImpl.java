@@ -1,9 +1,11 @@
 package com.manyun.admin.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.admin.domain.query.CollectionInfoQuery;
 import com.manyun.admin.domain.vo.CnfCreationdVo;
 import com.manyun.admin.domain.vo.CntCollectionInfoVo;
@@ -23,13 +25,13 @@ import com.manyun.admin.service.ICntCollectionInfoService;
  * @date 2022-07-14
  */
 @Service
-public class CntCollectionInfoServiceImpl implements ICntCollectionInfoService
+public class CntCollectionInfoServiceImpl extends ServiceImpl<CntCollectionInfoMapper,CntCollectionInfo> implements ICntCollectionInfoService
 {
     @Autowired
     private CntCollectionInfoMapper cntCollectionInfoMapper;
 
     /**
-     * 查询藏品详情
+     * 查询藏品详情详情
      *
      * @param id 藏品详情主键
      * @return 藏品详情
@@ -37,7 +39,7 @@ public class CntCollectionInfoServiceImpl implements ICntCollectionInfoService
     @Override
     public CntCollectionInfo selectCntCollectionInfoById(String id)
     {
-        return cntCollectionInfoMapper.selectCntCollectionInfoById(id);
+        return getById(id);
     }
 
     /**
@@ -64,7 +66,7 @@ public class CntCollectionInfoServiceImpl implements ICntCollectionInfoService
         cntCollectionInfo.setId(IdUtils.getSnowflakeNextIdStr());
         cntCollectionInfo.setCreatedBy(SecurityUtils.getUsername());
         cntCollectionInfo.setCreatedTime(DateUtils.getNowDate());
-        return cntCollectionInfoMapper.insertCntCollectionInfo(cntCollectionInfo);
+        return save(cntCollectionInfo)==true?1:0;
     }
 
     /**
@@ -78,7 +80,7 @@ public class CntCollectionInfoServiceImpl implements ICntCollectionInfoService
     {
         cntCollectionInfo.setUpdatedBy(SecurityUtils.getUsername());
         cntCollectionInfo.setUpdatedTime(DateUtils.getNowDate());
-        return cntCollectionInfoMapper.updateCntCollectionInfo(cntCollectionInfo);
+        return updateById(cntCollectionInfo)==true?1:0;
     }
 
     /**
@@ -90,7 +92,7 @@ public class CntCollectionInfoServiceImpl implements ICntCollectionInfoService
     @Override
     public int deleteCntCollectionInfoByIds(String[] ids)
     {
-        return cntCollectionInfoMapper.deleteCntCollectionInfoByIds(ids);
+        return removeByIds(Arrays.asList(ids))==true?1:0;
     }
 
     /**
@@ -102,6 +104,6 @@ public class CntCollectionInfoServiceImpl implements ICntCollectionInfoService
     @Override
     public int deleteCntCollectionInfoById(String id)
     {
-        return cntCollectionInfoMapper.deleteCntCollectionInfoById(id);
+        return removeById(id)==true?1:0;
     }
 }

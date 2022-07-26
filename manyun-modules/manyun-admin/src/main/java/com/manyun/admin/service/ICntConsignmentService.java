@@ -2,6 +2,8 @@ package com.manyun.admin.service;
 
 import java.util.List;
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.manyun.admin.domain.CntConsignment;
 import com.manyun.admin.domain.query.ConsignmentQuery;
 import com.manyun.admin.domain.vo.CntConsignmentVo;
 
@@ -11,7 +13,7 @@ import com.manyun.admin.domain.vo.CntConsignmentVo;
  * @author yanwei
  * @date 2022-07-14
  */
-public interface ICntConsignmentService
+public interface ICntConsignmentService extends IService<CntConsignment>
 {
 
     /**

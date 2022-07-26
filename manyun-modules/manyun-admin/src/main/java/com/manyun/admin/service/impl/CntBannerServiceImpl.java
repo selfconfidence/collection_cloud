@@ -1,7 +1,9 @@
 package com.manyun.admin.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.manyun.common.security.utils.SecurityUtils;
@@ -18,7 +20,7 @@ import com.manyun.admin.service.ICntBannerService;
  * @date 2022-07-12
  */
 @Service
-public class CntBannerServiceImpl implements ICntBannerService
+public class CntBannerServiceImpl extends ServiceImpl<CntBannerMapper,CntBanner> implements ICntBannerService
 {
     @Autowired
     private CntBannerMapper cntBannerMapper;
@@ -32,7 +34,7 @@ public class CntBannerServiceImpl implements ICntBannerService
     @Override
     public CntBanner selectCntBannerById(String id)
     {
-        return cntBannerMapper.selectCntBannerById(id);
+        return getById(id);
     }
 
     /**
@@ -59,7 +61,7 @@ public class CntBannerServiceImpl implements ICntBannerService
         cntBanner.setId(IdUtils.getSnowflakeNextIdStr());
         cntBanner.setCreatedBy(SecurityUtils.getUsername());
         cntBanner.setCreatedTime(DateUtils.getNowDate());
-        return cntBannerMapper.insertCntBanner(cntBanner);
+        return save(cntBanner)==true?1:0;
     }
 
     /**
@@ -73,7 +75,7 @@ public class CntBannerServiceImpl implements ICntBannerService
     {
         cntBanner.setUpdatedBy(SecurityUtils.getUsername());
         cntBanner.setUpdatedTime(DateUtils.getNowDate());
-        return cntBannerMapper.updateCntBanner(cntBanner);
+        return updateById(cntBanner)==true?1:0;
     }
 
     /**
@@ -85,7 +87,7 @@ public class CntBannerServiceImpl implements ICntBannerService
     @Override
     public int deleteCntBannerByIds(String[] ids)
     {
-        return cntBannerMapper.deleteCntBannerByIds(ids);
+        return removeByIds(Arrays.asList(ids))==true?1:0;
     }
 
     /**
@@ -97,6 +99,6 @@ public class CntBannerServiceImpl implements ICntBannerService
     @Override
     public int deleteCntBannerById(String id)
     {
-        return cntBannerMapper.deleteCntBannerById(id);
+        return removeById(id)==true?1:0;
     }
 }

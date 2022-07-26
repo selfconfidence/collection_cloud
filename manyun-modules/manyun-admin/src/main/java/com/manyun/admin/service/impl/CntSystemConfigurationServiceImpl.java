@@ -1,6 +1,9 @@
 package com.manyun.admin.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.manyun.common.security.utils.SecurityUtils;
@@ -17,7 +20,7 @@ import com.manyun.admin.service.ICntSystemConfigurationService;
  * @date 2022-07-19
  */
 @Service
-public class CntSystemConfigurationServiceImpl implements ICntSystemConfigurationService
+public class CntSystemConfigurationServiceImpl extends ServiceImpl<CntSystemConfigurationMapper,CntSystemConfiguration> implements ICntSystemConfigurationService
 {
     @Autowired
     private CntSystemConfigurationMapper cntSystemConfigurationMapper;
@@ -31,7 +34,7 @@ public class CntSystemConfigurationServiceImpl implements ICntSystemConfiguratio
     @Override
     public CntSystemConfiguration selectCntSystemConfigurationById(String id)
     {
-        return cntSystemConfigurationMapper.selectCntSystemConfigurationById(id);
+        return getById(id);
     }
 
     /**
@@ -58,7 +61,7 @@ public class CntSystemConfigurationServiceImpl implements ICntSystemConfiguratio
         cntSystemConfiguration.setId(IdUtils.getSnowflakeNextIdStr());
         cntSystemConfiguration.setCreatedBy(SecurityUtils.getUsername());
         cntSystemConfiguration.setCreatedTime(DateUtils.getNowDate());
-        return cntSystemConfigurationMapper.insertCntSystemConfiguration(cntSystemConfiguration);
+        return save(cntSystemConfiguration)==true?1:0;
     }
 
     /**
@@ -72,7 +75,7 @@ public class CntSystemConfigurationServiceImpl implements ICntSystemConfiguratio
     {
         cntSystemConfiguration.setUpdatedBy(SecurityUtils.getUsername());
         cntSystemConfiguration.setUpdatedTime(DateUtils.getNowDate());
-        return cntSystemConfigurationMapper.updateCntSystemConfiguration(cntSystemConfiguration);
+        return updateById(cntSystemConfiguration)==true?1:0;
     }
 
     /**
@@ -84,7 +87,7 @@ public class CntSystemConfigurationServiceImpl implements ICntSystemConfiguratio
     @Override
     public int deleteCntSystemConfigurationByIds(String[] ids)
     {
-        return cntSystemConfigurationMapper.deleteCntSystemConfigurationByIds(ids);
+        return removeByIds(Arrays.asList(ids))==true?1:0;
     }
 
     /**
@@ -96,6 +99,6 @@ public class CntSystemConfigurationServiceImpl implements ICntSystemConfiguratio
     @Override
     public int deleteCntSystemConfigurationById(String id)
     {
-        return cntSystemConfigurationMapper.deleteCntSystemConfigurationById(id);
+        return removeById(id)==true?1:0;
     }
 }

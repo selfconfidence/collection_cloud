@@ -7,11 +7,13 @@ import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.admin.domain.CntCollection;
 import com.manyun.admin.domain.dto.SaveBoxCollectionDto;
 import com.manyun.admin.domain.query.BoxCollectionQuery;
 import com.manyun.admin.domain.vo.CntBoxCollectionVo;
-import com.manyun.admin.mapper.CntCollectionMapper;
+import com.manyun.admin.service.ICntCollectionService;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.manyun.common.security.utils.SecurityUtils;
@@ -29,13 +31,13 @@ import org.springframework.transaction.annotation.Transactional;
  * @date 2022-07-15
  */
 @Service
-public class CntBoxCollectionServiceImpl implements ICntBoxCollectionService
+public class CntBoxCollectionServiceImpl extends ServiceImpl<CntBoxCollectionMapper,CntBoxCollection> implements ICntBoxCollectionService
 {
     @Autowired
     private CntBoxCollectionMapper cntBoxCollectionMapper;
 
     @Autowired
-    private CntCollectionMapper cntCollectionMapper;
+    private ICntCollectionService collectionService;
 
     /**
      * 查询盲盒与藏品中间列表
@@ -66,10 +68,10 @@ public class CntBoxCollectionServiceImpl implements ICntBoxCollectionService
         String boxId = boxCollectionDto.getBoxId();
         List<CntBoxCollectionVo> cntBoxCollectionVoList = boxCollectionDto.getCntBoxCollectionVos();
         Assert.isTrue(Objects.nonNull(cntBoxCollectionVoList),"新增失败!");
-        cntBoxCollectionMapper.deleteCntBoxCollectionById(null,boxId);
+        remove(Wrappers.<CntBoxCollection>lambdaQuery().eq(CntBoxCollection::getBoxId,boxId));
         if(cntBoxCollectionVoList.size()>0){
             List<String> collectionIds = cntBoxCollectionVoList.stream().map(CntBoxCollectionVo::getCollectionId).collect(Collectors.toList());
-            List<CntCollection> collectionList = cntCollectionMapper.selectCntCollectionByIds(collectionIds);
+            List<CntCollection> collectionList = collectionService.listByIds(collectionIds);
             List<CntBoxCollection> boxCollectionList = cntBoxCollectionVoList.stream().map(m -> {
                 CntBoxCollection cntBoxCollection = new CntBoxCollection();
                 BeanUtil.copyProperties(m, cntBoxCollection);
@@ -83,7 +85,7 @@ public class CntBoxCollectionServiceImpl implements ICntBoxCollectionService
                 cntBoxCollection.setCreatedTime(DateUtils.getNowDate());
                 return cntBoxCollection;
             }).collect(Collectors.toList());
-            cntBoxCollectionMapper.insertCntBoxCollectionList(boxCollectionList);
+            saveBatch(boxCollectionList);
         }
         return 1;
     }

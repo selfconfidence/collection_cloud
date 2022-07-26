@@ -1,19 +1,21 @@
 package com.manyun.admin.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntBanner;
 
 /**
  * 轮播Service接口
- * 
+ *
  * @author yanwei
  * @date 2022-07-12
  */
-public interface ICntBannerService 
+public interface ICntBannerService extends IService<CntBanner>
 {
     /**
      * 查询轮播
-     * 
+     *
      * @param id 轮播主键
      * @return 轮播
      */
@@ -21,7 +23,7 @@ public interface ICntBannerService
 
     /**
      * 查询轮播列表
-     * 
+     *
      * @param cntBanner 轮播
      * @return 轮播集合
      */
@@ -29,7 +31,7 @@ public interface ICntBannerService
 
     /**
      * 新增轮播
-     * 
+     *
      * @param cntBanner 轮播
      * @return 结果
      */
@@ -37,7 +39,7 @@ public interface ICntBannerService
 
     /**
      * 修改轮播
-     * 
+     *
      * @param cntBanner 轮播
      * @return 结果
      */
@@ -45,7 +47,7 @@ public interface ICntBannerService
 
     /**
      * 批量删除轮播
-     * 
+     *
      * @param ids 需要删除的轮播主键集合
      * @return 结果
      */
@@ -53,7 +55,7 @@ public interface ICntBannerService
 
     /**
      * 删除轮播信息
-     * 
+     *
      * @param id 轮播主键
      * @return 结果
      */

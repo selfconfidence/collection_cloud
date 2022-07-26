@@ -1,6 +1,9 @@
 package com.manyun.admin.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.manyun.common.security.utils.SecurityUtils;
@@ -17,7 +20,7 @@ import com.manyun.admin.service.ICntWithdrawService;
  * @date 2022-07-19
  */
 @Service
-public class CntWithdrawServiceImpl implements ICntWithdrawService
+public class CntWithdrawServiceImpl extends ServiceImpl<CntWithdrawMapper,CntWithdraw> implements ICntWithdrawService
 {
     @Autowired
     private CntWithdrawMapper cntWithdrawMapper;
@@ -31,7 +34,7 @@ public class CntWithdrawServiceImpl implements ICntWithdrawService
     @Override
     public CntWithdraw selectCntWithdrawById(String id)
     {
-        return cntWithdrawMapper.selectCntWithdrawById(id);
+        return getById(id);
     }
 
     /**
@@ -58,7 +61,7 @@ public class CntWithdrawServiceImpl implements ICntWithdrawService
         cntWithdraw.setId(IdUtils.getSnowflakeNextIdStr());
         cntWithdraw.setCreatedBy(SecurityUtils.getUsername());
         cntWithdraw.setCreatedTime(DateUtils.getNowDate());
-        return cntWithdrawMapper.insertCntWithdraw(cntWithdraw);
+        return save(cntWithdraw)==true?1:0;
     }
 
     /**
@@ -72,7 +75,7 @@ public class CntWithdrawServiceImpl implements ICntWithdrawService
     {
         cntWithdraw.setUpdatedBy(SecurityUtils.getUsername());
         cntWithdraw.setUpdatedTime(DateUtils.getNowDate());
-        return cntWithdrawMapper.updateCntWithdraw(cntWithdraw);
+        return updateById(cntWithdraw)==true?1:0;
     }
 
     /**
@@ -84,7 +87,7 @@ public class CntWithdrawServiceImpl implements ICntWithdrawService
     @Override
     public int deleteCntWithdrawByIds(String[] ids)
     {
-        return cntWithdrawMapper.deleteCntWithdrawByIds(ids);
+        return removeByIds(Arrays.asList(ids))==true?1:0;
     }
 
     /**
@@ -96,6 +99,6 @@ public class CntWithdrawServiceImpl implements ICntWithdrawService
     @Override
     public int deleteCntWithdrawById(String id)
     {
-        return cntWithdrawMapper.deleteCntWithdrawById(id);
+        return removeById(id)==true?1:0;
     }
 }

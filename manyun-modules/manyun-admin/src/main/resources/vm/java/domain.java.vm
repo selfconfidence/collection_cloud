@@ -5,6 +5,7 @@ import ${import};
 #end
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import com.baomidou.mybatisplus.annotation.TableName;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 #if($table.crud || $table.sub)
@@ -19,6 +20,7 @@ import com.manyun.common.core.web.domain.TreeEntity;
 #set($Entity="extends TreeEntity")
 #end
 @ApiModel("${functionName}对象")
+@TableName("${tableName}")
 public class ${ClassName} ${Entity}
 {
     private static final long serialVersionUID = 1L;

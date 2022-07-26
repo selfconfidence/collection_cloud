@@ -2,15 +2,17 @@ package com.manyun.admin.domain;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import com.manyun.common.core.web.domain.BaseEntity;
 
 
 @ApiModel("创作者对象")
+@TableName("cnf_creationd")
 public class CnfCreationd implements Serializable
 {
 
