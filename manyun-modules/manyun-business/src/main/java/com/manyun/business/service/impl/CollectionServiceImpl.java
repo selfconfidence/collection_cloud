@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.manyun.business.design.pay.RootPay;
 import com.manyun.business.domain.dto.MsgCommDto;
 import com.manyun.business.domain.dto.MsgThisDto;
@@ -22,9 +23,7 @@ import com.manyun.business.mapper.*;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.comm.api.RemoteBuiUserService;
-import com.manyun.comm.api.RemoteUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
-import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.enums.CollectionStatus;
@@ -230,7 +229,6 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         // 并行执行
         Set<String> cateIds = cateCollectionList.parallelStream().map(item -> item.getCateId()).collect(Collectors.toSet());
         if (cateIds.isEmpty()) return userCateVoList;
-
         Map<String, List<CntCollection>> cateLists = cateCollectionList.parallelStream().collect(Collectors.groupingBy(CntCollection::getCateId));
         List<Cate> cates = cateMapper.selectBatchIds(cateIds);
         Map<String, Cate> cateMap = cates.parallelStream().collect(Collectors.toMap(Cate::getId, Function.identity()));
@@ -238,10 +236,12 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         List<CntCreationd> cntCreationds = cntCreationdService.list(Wrappers.<CntCreationd>lambdaQuery().in(CntCreationd::getId, cates.parallelStream().map(item -> item.getBindCreation()).collect(Collectors.toList())));
         Map<String, CntCreationd> creationdMap = cntCreationds.parallelStream().collect(Collectors.toMap(CntCreationd::getId, Function.identity()));
         cateLists.forEach((cateId,cntCollections)->{
+            // 需要对 cntCollections 进行重构结构
+            Map<String,List<CntCollection>> userCollectionMaps  = cateUserCollection(cntCollections,userCollections);
             Cate cate = cateMap.get(cateId);
             UserCateVo userCateVo = Builder.of(UserCateVo::new).build();
             BeanUtil.copyProperties(cate,userCateVo,"userCateCollectionVos");
-            userCateVo.setUserCateCollectionVos(cntCollections.parallelStream().map(this::initUserCateCollectionVo).collect(Collectors.toList()));
+            userCateVo.setUserCateCollectionVos(initUserCateCollectionVo(userCollectionMaps));
             CntCreationd cntCreationd = creationdMap.get(cate.getBindCreation());
             if (Objects.nonNull(cntCreationd)){
                 userCateVo.setHeadImage(cntCreationd.getHeadImage());
@@ -251,6 +251,25 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
             userCateVoList.add(userCateVo);
         });
         return userCateVoList;
+    }
+
+    /**
+     * 用户编号key
+     * @param cntCollections
+     * @param userCollections
+     * @return
+     */
+    private Map<String,List<CntCollection>> cateUserCollection(List<CntCollection> cntCollections, List<UserCollection> userCollections) {
+        HashMap<String,List<CntCollection>> userCntMap = Maps.newHashMap();
+        for (UserCollection userCollection : userCollections) {
+            String collectionId = userCollection.getCollectionId();
+            List<CntCollection> collectionList = cntCollections.parallelStream().filter(item -> item.getId().equals(collectionId)).collect(Collectors.toList());
+            userCntMap.merge(userCollection.getId(),collectionList , (oldValue, newValue) -> {
+                oldValue.addAll(newValue);
+                return oldValue;
+            });
+        }
+        return userCntMap;
     }
 
     @Override
@@ -292,12 +311,26 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         return cntTarService.tarCollection(getById(id),userId);
     }
 
-    private UserCateCollectionVo initUserCateCollectionVo(CntCollection cntCollection) {
-        UserCateCollectionVo userCateCollectionVo = Builder.of(UserCateCollectionVo::new).build();
-        userCateCollectionVo.setCollectionName(cntCollection.getCollectionName());
-        userCateCollectionVo.setId(cntCollection.getId());
-        userCateCollectionVo.setMediaVos(mediaService.initMediaVos(cntCollection.getId(),COLLECTION_MODEL_TYPE));
-        return userCateCollectionVo;
+    private List<UserCateCollectionVo> initUserCateCollectionVo(Map<String,List<CntCollection>> cntCollectionMaps) {
+        List<UserCateCollectionVo> userCateCollectionVoList = Lists.newArrayList();
+        Map<String,List<MediaVo>>  meMaps  = Maps.newHashMap();
+        cntCollectionMaps.forEach((key,val)->{
+            for (CntCollection cntCollection : val) {
+                List<MediaVo> tempMediaVoList = null;
+                if ((tempMediaVoList = meMaps.get(cntCollection.getId())) == null){
+                    tempMediaVoList = mediaService.initMediaVos(cntCollection.getId(),COLLECTION_MODEL_TYPE);
+                    meMaps.put(cntCollection.getId(), tempMediaVoList);
+                }
+                UserCateCollectionVo userCateCollectionVo = Builder.of(UserCateCollectionVo::new).build();
+                userCateCollectionVo.setCollectionName(cntCollection.getCollectionName());
+                userCateCollectionVo.setId(cntCollection.getId());
+                userCateCollectionVo.setUserCollectionId(key);
+                userCateCollectionVo.setMediaVos(tempMediaVoList);
+                userCateCollectionVoList.add(userCateCollectionVo);
+            }
+        });
+
+        return userCateCollectionVoList;
     }
 
 

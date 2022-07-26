@@ -14,6 +14,9 @@ public class UserCateCollectionVo implements Serializable {
     @ApiModelProperty("藏品编号")
     private String id;
 
+    @ApiModelProperty("用户和藏品得唯一编号")
+    private String userCollectionId;
+
     @ApiModelProperty("藏品名称")
     private String collectionName;
 

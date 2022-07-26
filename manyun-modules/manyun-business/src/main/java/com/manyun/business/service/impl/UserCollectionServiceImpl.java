@@ -2,9 +2,11 @@ package com.manyun.business.service.impl;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
+import com.manyun.business.design.mychain.MyChainService;
 import com.manyun.business.domain.dto.*;
 import com.manyun.business.domain.entity.UserCollection;
 import com.manyun.business.domain.vo.UserCollectionVo;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -55,7 +58,12 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
     @Autowired
     private IMsgService msgService;
 
+    @Autowired
+    private MyChainService myChainService;
+
     /**
+     * 直接上链即可,转让的新增个函数进行处理
+     *
      * 绑定用户与藏品的相关联信息
      * @param userId
      * @param buiId
@@ -71,6 +79,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
             userCollection.setCollectionId(buiId);
             userCollection.setUserId(userId);
             userCollection.setSourceInfo(info);
+            userCollection.setLinkAddr(IdUtil.getSnowflake().nextIdStr());
             userCollection.setIsExist(USE_EXIST.getCode());
             userCollection.setCollectionName(collectionName);
             // 初始化 未上链过程
@@ -78,11 +87,81 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
             userCollection.createD(userId);
             userCollections.add(userCollection);
         }
-        // TODO 上链
         saveBatch(userCollections);
         // 增加日志
         logsService.saveLogs(LogInfoDto.builder().jsonTxt(info).buiId(userId).modelType(COLLECTION_MODEL_TYPE).isType(PULL_SOURCE).formInfo(goodsNum.toString()).build());
+        // 开始上链 // 组装所有上链所需要数据结构 并且不能报错
+        for (UserCollection userCollection : userCollections) {
+            myChainService.accountCollectionUp(CallCommitDto.builder()
+                    .userCollectionId(userCollection.getId())
+                    .artId(userCollection.getLinkAddr())
+                            .artName(userCollection.getCollectionName())
+                            .artSize("80")
+                            .location(userCollection.getSourceInfo())
+                            .price("0.0")
+                            .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy MM dd")))
+                            .sellway(userCollection.getSourceInfo())
+                            .owner(userCollection.getUserId())
+                    .build(), (hash)->{
+                userCollection.setIsLink(OK_LINK.getCode());
+                userCollection.setRealCompany("蚂蚁链");
+                // 编号特殊生成
+                userCollection.setCollectionNumber(StrUtil.format("CNT_{}", RandomUtil.randomInt(8)));
+                //userCollection.setLinkAddr(hash);
+                userCollection.setCollectionHash(hash);
+                userCollection.updateD(userCollection.getUserId());
+                updateById(userCollection);
+            });
+        }
     }
+
+
+    /**
+     *
+     * @param tranUserId 转让方用户编号
+     * @param toUserId  受让方用户编号
+     * @param tranUserCollection  转让方的藏品中间表
+     * @param format
+     * @param formatTran
+     */
+    // 转让,需要额外处理了,这个链 属于转增级别的链
+   public void tranCollection(String tranUserId,String toUserId,UserCollection tranUserCollection,String format,String formatTran){
+       UserCollection userCollection = Builder.of(UserCollection::new).build();
+       userCollection.setId(IdUtil.getSnowflake().nextIdStr());
+       userCollection.setCollectionId(tranUserCollection.getCollectionId());
+       userCollection.setUserId(toUserId);
+       userCollection.setSourceInfo(format);
+       userCollection.setLinkAddr(tranUserCollection.getLinkAddr());
+       userCollection.setIsExist(USE_EXIST.getCode());
+       userCollection.setCollectionName(tranUserCollection.getCollectionName());
+       // 初始化 未上链过程
+       userCollection.setIsLink(NOT_LINK.getCode());
+       userCollection.createD(toUserId);
+       save(userCollection);
+       // 开始转赠
+       myChainService.tranForm(CallTranDto.builder()
+               .userCollectionId(userCollection.getId())
+               .artId(userCollection.getLinkAddr())
+               .owner(userCollection.getUserId())
+               .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy MM dd"))).build(), (hash) ->{
+           // 得到 hash
+           userCollection.setIsLink(OK_LINK.getCode());
+           userCollection.setRealCompany("蚂蚁链");
+           // 编号特殊生成
+           userCollection.setCollectionNumber(StrUtil.format("CNT_{}", RandomUtil.randomInt(8)));
+          // userCollection.setLinkAddr(hash);
+           userCollection.setCollectionHash(hash);
+           userCollection.updateD(userCollection.getUserId());
+           // 流转记录
+           stepService.saveBatch(StepDto.builder().buiId(tranUserCollection.getCollectionId()).userId(tranUserId).modelType(COLLECTION_MODEL_TYPE).reMark("转让方").formHash(hash).formInfo(formatTran).build()
+                   ,StepDto.builder().buiId(tranUserCollection.getCollectionId()).userId(toUserId).modelType(COLLECTION_MODEL_TYPE).formHash(hash).reMark("受让方").formInfo(format).build()
+           );
+       });
+
+
+
+
+   }
 
     /**
      * 查询拥有拥有得藏品
@@ -131,20 +210,18 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         UserCollection userCollection = getOne(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getId, buiId).eq(UserCollection::getUserId, tranUserId).eq(UserCollection::getIsLink, OK_LINK));
         String format = StrUtil.format("{}:赠送获得该藏品!", userCollection.getCollectionName());
         String formatTran = StrUtil.format("{}:藏品被赠送!",userCollection.getCollectionName());
-        //TODO 转让还是重新上链?
-        bindCollection(toUserId,userCollection.getCollectionId(),userCollection.getCollectionName(),format,Integer.valueOf(1));
-        //删除原始拥有者的绑定关系 //TODO 此处可以考虑,新增 是否存在 字段,可以用此字段做过渡....
-        removeById(userCollection.getId());
+        //原始拥有者的绑定关系 解绑
+        userCollection.setIsExist(NOT_EXIST.getCode());
+        updateById(userCollection);
         // 增加日志 ...................
         logsService.saveLogs(
                 LogInfoDto.builder().jsonTxt(format).buiId(toUserId).modelType(COLLECTION_MODEL_TYPE).isType(PULL_SOURCE).formInfo(Integer.valueOf(1).toString()).build()
                 ,LogInfoDto.builder().jsonTxt(formatTran).buiId(tranUserId).modelType(COLLECTION_MODEL_TYPE).isType(POLL_SOURCE).formInfo(Integer.valueOf(1).toString()).build()
         );
+        // 此接口更改为转赠链接口
+        //bindCollection(toUserId,userCollection.getCollectionId(),userCollection.getCollectionName(),format,Integer.valueOf(1));
+        tranCollection(tranUserId,toUserId,userCollection,format,formatTran);
 
-        // 流转记录
-        stepService.saveBatch(StepDto.builder().buiId(buiId).userId(tranUserId).modelType(COLLECTION_MODEL_TYPE).reMark("转让方").formInfo(formatTran).build()
-                ,StepDto.builder().buiId(buiId).userId(toUserId).modelType(COLLECTION_MODEL_TYPE).reMark("受让方").formInfo(format).build()
-        );
 
         msgService.saveMsgThis(MsgThisDto.builder().userId(tranUserId).msgForm(formatTran).msgTitle(formatTran).build());
         msgService.saveMsgThis(MsgThisDto.builder().userId(toUserId).msgForm(format).msgTitle(format).build());

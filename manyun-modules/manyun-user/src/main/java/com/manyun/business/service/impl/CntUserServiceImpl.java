@@ -2,10 +2,8 @@ package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.DesensitizedUtil;
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.*;
+import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.config.AliRealConfig;
 import com.manyun.business.config.UnionRealConfig;
@@ -226,6 +224,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     @Override
     public void checkCertifyIdStatus(String certifyId, CntUserDto cntUser) {
         aliRealConfig.checkCertifyIdStatus(certifyId);
+        optimisticRealUser(cntUser.getId());
     }
 
     @Override
@@ -282,11 +281,12 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     public void optimisticRealUser(String userId){
         CntUser cntUser = getById(userId);
         cntUser.setIsReal(OK_REAL.getCode());
-        //TODO 生成链上地址
-        //cntUser.setLinkAddr();
+        // 用手机号当 模拟地址 无奈之举
+        cntUser.setLinkAddr(SecureUtil.sha256(cntUser.getPhone()));
         cntUser.updateD(userId);
         updateById(cntUser);
     }
+
 
     private UserInfoVo initUserLevelVo(CntUser cntUser) {
         UserInfoVo userInfoVo = Builder.of(UserInfoVo::new).build();

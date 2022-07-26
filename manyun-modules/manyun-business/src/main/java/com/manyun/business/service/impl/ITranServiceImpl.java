@@ -70,7 +70,7 @@ public class ITranServiceImpl implements ITranService {
 
         // 藏品
         if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(accFormType))
-            Assert.isTrue(userCollectionService.existUserCollection(userId,tranAccForm.getBuiId()),"选择的藏品有误,请核实藏品详细信息!");
+            Assert.isTrue(userCollectionService.existUserCollection(userId,tranAccForm.getBuiId()),"选择的藏品有误,请核实藏品详细信息,确定藏品是否上链!");
 
         // 盲盒
         if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(accFormType))

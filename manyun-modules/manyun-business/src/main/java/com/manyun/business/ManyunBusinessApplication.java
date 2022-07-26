@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.manyun.common.security.annotation.EnableCustomConfig;
 import com.manyun.common.security.annotation.EnableManyunFeignClients;
 import com.manyun.common.swagger.annotation.EnableCustomSwagger2;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
@@ -17,6 +18,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableManyunFeignClients    // 远程feign 调用注解
 @SpringBootApplication
 @EnableAsync
+@EnableRetry
 public class ManyunBusinessApplication
 {
     public static void main(String[] args)
