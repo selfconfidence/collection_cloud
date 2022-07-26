@@ -10,6 +10,7 @@ import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -43,5 +44,7 @@ public interface IAuctionSendService extends IService<AuctionSend> {
     List<KeywordVo> queryDict(String keyword);
 
     CollectionInfoVo getBaseCollectionInfoVo(String collectionId);
+
+    BigDecimal auctionSendConfig();
 
 }

@@ -74,6 +74,15 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
     private IBoxCollectionService boxCollectionService;
 
     /**
+     * 查询保证金比例
+     * @return
+     */
+    @Override
+    public BigDecimal auctionSendConfig() {
+        return systemService.getVal(BusinessConstants.SystemTypeConstant.MARGIN_SCALE, BigDecimal.class);
+    }
+
+    /**
      * 送拍到拍卖市场
      * @param auctionSendForm
      * @param userId
@@ -167,6 +176,8 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
     private MyAuctionSendVo providerMyAuctionSendVo(AuctionSend auctionSend) {
         MyAuctionSendVo auctionSendVo = Builder.of(MyAuctionSendVo::new).build();
         BeanUtil.copyProperties(auctionSend, auctionSendVo);
+        auctionSendVo.setDelayTime(systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_DELAY_TIME, Integer.class));
+        auctionSendVo.setCommission(systemService.getVal(BusinessConstants.SystemTypeConstant.COMMISSION_SCALE, BigDecimal.class));
         if (auctionSend.getGoodsType() == 1) {
             List<MediaVo> mediaVos = mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
             auctionSendVo.setMediaVos(mediaVos);
