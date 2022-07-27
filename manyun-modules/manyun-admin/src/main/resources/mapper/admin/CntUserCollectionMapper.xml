@@ -26,4 +26,29 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, user_id, collection_id, collection_name, collection_number, collection_hash, link_addr, is_link, source_info, is_exist, real_company, created_by, created_time, updated_by, updated_time from cnt_user_collection
     </sql>
 
+    <select id="myCollectionList" resultType="com.manyun.admin.domain.vo.UserCollectionVo">
+        SELECT
+            cuc.id,
+            cuc.collection_id collectionId,
+            cu.nick_name nickName,
+            cu.phone phone,
+            cuc.collection_name collectionName,
+            cuc.collection_number collectionNumber,
+            cuc.collection_hash collectionHash,
+            cuc.link_addr linkAddr,
+            cuc.is_link isLink,
+            cuc.source_info sourceInfo,
+            cuc.real_company realCompany,
+            cuc.created_time createdTime,
+            cuc.updated_time updatedTime
+        FROM
+            cnt_user_collection cuc
+        inner join
+            cnt_user cu
+        on
+            cuc.user_id=cu.user_id
+        where
+            cuc.user_id=#{userId}
+    </select>
+
 </mapper>

@@ -34,7 +34,6 @@
             u.status,
             u.nick_name nickName,
             u.phone,
-            m.real_phone realPhone,
             m.real_name realName,
             m.cart_just cartJust,
             m.cart_back cartBack,
@@ -47,7 +46,7 @@
         inner join cnt_money m on u.id = m.user_id
         <where>
             <if test="realName != null  and realName != ''"> and m.real_name like concat('%', #{realName}, '%')</if>
-            <if test="realPhone != null  and realPhone != ''"> and m.real_phone = #{realPhone}</if>
+            <if test="phone != null  and phone != ''"> and u.phone = #{phone}</if>
         </where>
     </select>
 

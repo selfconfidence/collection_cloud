@@ -82,7 +82,7 @@ public class CntActionTarServiceImpl extends ServiceImpl<CntActionTarMapper,CntA
             List<MediaVo> mediaVoList = mediaService.list(Wrappers.<CntMedia>lambdaQuery().in(CntMedia::getBuiId,collectionIds).eq(CntMedia::getModelType,BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE))
                     .stream().map(m->{
                         MediaVo mediaVo=new MediaVo();
-                        BeanUtil.copyProperties(mediaVo,m);
+                        BeanUtil.copyProperties(m,mediaVo);
                         return mediaVo;
                     }).collect(Collectors.toList());
             List<CntActionTar> list = cntActionTarVos.stream().map(m -> {

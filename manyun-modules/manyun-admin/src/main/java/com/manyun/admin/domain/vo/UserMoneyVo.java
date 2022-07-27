@@ -22,9 +22,6 @@ public class UserMoneyVo {
     @ApiModelProperty("用户电话号")
     private String phone;
 
-    @ApiModelProperty("真实手机号")
-    private String realPhone;
-
     @ApiModelProperty("真实姓名")
     private String realName;
 

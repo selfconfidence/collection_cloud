@@ -11,7 +11,7 @@ public class UserMoneyQuery {
     @ApiModelProperty("真实姓名")
     private String realName;
 
-    @ApiModelProperty("真实手机号")
-    private String realPhone;
+    @ApiModelProperty("手机号")
+    private String phone;
 
 }

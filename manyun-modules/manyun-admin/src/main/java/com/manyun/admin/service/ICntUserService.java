@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntOrder;
 import com.manyun.admin.domain.CntUser;
 import com.manyun.admin.domain.query.UserMoneyQuery;
+import com.manyun.admin.domain.vo.CntOrderVo;
 import com.manyun.admin.domain.vo.UserCollectionVo;
 import com.manyun.admin.domain.vo.UserMoneyVo;
 
@@ -37,7 +38,7 @@ public interface ICntUserService extends IService<CntUser>
     /**
      * 我的订单
      */
-    List<CntOrder> myOrderList(String userId);
+    List<CntOrderVo> myOrderList(String userId);
 
     /**
      * 我的藏品

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.admin.domain.CntOrder;
 import com.manyun.admin.domain.CntUserCollection;
 import com.manyun.admin.domain.query.UserMoneyQuery;
+import com.manyun.admin.domain.vo.CntOrderVo;
 import com.manyun.admin.domain.vo.UserCollectionVo;
 import com.manyun.admin.domain.vo.UserMoneyVo;
 import com.manyun.admin.mapper.CntMediaMapper;
@@ -77,21 +78,18 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> imple
      * 我的订单
      */
     @Override
-    public List<CntOrder> myOrderList(String userId) {
-        return orderService.list(Wrappers.<CntOrder>lambdaQuery().eq(CntOrder::getUserId,userId));
+    public List<CntOrderVo> myOrderList(String userId)
+    {
+        return orderService.myOrderList(userId);
     }
 
     /**
      * 我的藏品
      */
     @Override
-    public List<UserCollectionVo> myCollectionList(String userId) {
-        List<UserCollectionVo> userCollectionVos=userCollectionService.list(Wrappers.<CntUserCollection>lambdaQuery().eq(CntUserCollection::getUserId,userId).orderByDesc(CntUserCollection::getCreatedTime)).stream().map(m->{
-            UserCollectionVo userCollectionVo=new UserCollectionVo();
-            BeanUtil.copyProperties(userCollectionVo,m);
-            return userCollectionVo;
-        }).collect(Collectors.toList());
-        return  userCollectionVos
+    public List<UserCollectionVo> myCollectionList(String userId)
+    {
+        return  userCollectionService.myCollectionList(userId)
                     .parallelStream()
                     .map(item ->
                     {
