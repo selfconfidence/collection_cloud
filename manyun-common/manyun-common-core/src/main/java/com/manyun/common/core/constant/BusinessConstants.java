@@ -41,6 +41,12 @@ public interface BusinessConstants {
         String TRAN_ACC= "TRAN_ACC";
 
         /**
+         * 转赠说明
+         */
+        String TRAN_INFO= "TRAN_INFO";
+
+
+        /**
          * 寄售手续费
          */
         String  CONSIGNMENT_SERVER_CHARGE = "consignment_server_chage";

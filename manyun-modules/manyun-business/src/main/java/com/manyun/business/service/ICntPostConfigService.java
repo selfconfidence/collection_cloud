@@ -14,4 +14,6 @@ import com.manyun.business.domain.entity.CntPostConfig;
 public interface ICntPostConfigService extends IService<CntPostConfig> {
 
     boolean isConfigPostCustomer(String userId, String buiId);
+
+    boolean isConfigPostBoxCustomer(String userId, String buiId);
 }

@@ -12,16 +12,15 @@ import com.manyun.business.domain.dto.*;
 import com.manyun.business.domain.entity.UserCollection;
 import com.manyun.business.domain.vo.UserCollectionVo;
 import com.manyun.business.mapper.UserCollectionMapper;
-import com.manyun.business.service.ILogsService;
-import com.manyun.business.service.IMsgService;
-import com.manyun.business.service.IStepService;
-import com.manyun.business.service.IUserCollectionService;
+import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.domain.Builder;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +61,9 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
     @Autowired
     private MyChainService myChainService;
 
+    @Autowired
+    private ObjectFactory<ICollectionService> collectionServiceObjectFactory;
+
     /**
      * 直接上链即可,转让的新增个函数进行处理
      *
@@ -93,13 +95,14 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         logsService.saveLogs(LogInfoDto.builder().jsonTxt(info).buiId(userId).modelType(COLLECTION_MODEL_TYPE).isType(PULL_SOURCE).formInfo(goodsNum.toString()).build());
         // 开始上链 // 组装所有上链所需要数据结构 并且不能报错
         for (UserCollection userCollection : userCollections) {
+            BigDecimal realPrice = collectionServiceObjectFactory.getObject().getById(userCollection.getCollectionId()).getRealPrice();
             myChainService.accountCollectionUp(CallCommitDto.builder()
                     .userCollectionId(userCollection.getId())
                     .artId(userCollection.getLinkAddr())
                             .artName(userCollection.getCollectionName())
                             .artSize("80")
                             .location(userCollection.getSourceInfo())
-                            .price("0.0")
+                            .price(realPrice.toString())
                             .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy MM dd")))
                             .sellway(userCollection.getSourceInfo())
                             .owner(userCollection.getUserId())
@@ -259,13 +262,15 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
     public void resetUpLink(String userId, String userCollectionId) {
         UserCollection userCollection = getOne(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getUserId,userId).eq(UserCollection::getId,userCollectionId));
         Assert.isTrue(Objects.nonNull(userCollection) && NOT_LINK.getCode().equals(userCollection.getIsLink()),"藏品信息有误,请核实!");
+        BigDecimal realPrice = collectionServiceObjectFactory.getObject().getById(userCollection.getCollectionId()).getRealPrice();
+
         myChainService.accountCollectionUp(CallCommitDto.builder()
                         .userCollectionId(userCollection.getId())
                         .artId(userCollection.getLinkAddr())
                         .artName(userCollection.getCollectionName())
                         .artSize("80")
                         .location(userCollection.getSourceInfo())
-                        .price("0.0")
+                        .price(realPrice.toString())
                         .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy MM dd")))
                         .sellway(userCollection.getSourceInfo())
                         .owner(userCollection.getUserId())
@@ -278,6 +283,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                     userCollection.setCollectionHash(hash);
                     userCollection.updateD(userCollection.getUserId());
                     updateById(userCollection);
+                    // TODO 会有个 bug 就是如果是转赠失败的话，那么统一上链处理，流转记录得不到记录。
     });
 
     }

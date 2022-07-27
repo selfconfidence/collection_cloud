@@ -42,7 +42,11 @@ public class TranController {
         return R.ok(systemService.getVal(BusinessConstants.SystemTypeConstant.TRAN_ACC, String.class));
     }
 
-
+    @GetMapping("/tranInfo")
+    @ApiOperation(value = "转赠说明")
+    public R<String> tranInfo(){
+        return R.ok(systemService.getVal(BusinessConstants.SystemTypeConstant.TRAN_INFO, String.class));
+    }
     @PostMapping("/tranTypeToPoint")
     @ApiOperation("进行转赠")
     public synchronized R  tranTypeToPoint(@RequestBody @Valid TranAccForm tranAccForm){
