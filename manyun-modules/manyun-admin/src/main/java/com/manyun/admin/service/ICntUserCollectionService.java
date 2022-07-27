@@ -3,6 +3,7 @@ package com.manyun.admin.service;
 import java.util.List;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntUserCollection;
+import com.manyun.admin.domain.vo.UserCollectionVo;
 
 /**
  * 用户购买藏品中间Service接口
@@ -12,5 +13,10 @@ import com.manyun.admin.domain.CntUserCollection;
  */
 public interface ICntUserCollectionService extends IService<CntUserCollection>
 {
+
+    /**
+     * 我的藏品
+     */
+    List<UserCollectionVo> myCollectionList(String userId);
 
 }

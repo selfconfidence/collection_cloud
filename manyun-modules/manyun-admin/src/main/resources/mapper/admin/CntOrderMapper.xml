@@ -27,4 +27,29 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, created_by, created_time, updated_by, updated_time, goods_num, order_no, user_id, bui_id, goods_type, order_status, pay_type, order_amount, end_time, pay_time, collection_name from cnt_order
     </sql>
 
+    <select id="myOrderList" resultType="com.manyun.admin.domain.vo.CntOrderVo">
+        SELECT
+            co.id,
+            co.order_no orderNo,
+            cu.nick_name nickName,
+            cu.phone,
+            co.collection_name collectionName,
+            co.goods_type goodsType,
+            co.goods_num goodsNum,
+            co.order_status orderStatus,
+            co.pay_type payType,
+            co.order_amount orderAmount,
+            co.pay_time payTime,
+            co.created_time createdTime,
+            co.updated_time updatedTime
+        FROM
+	        cnt_order co
+	    INNER JOIN
+	        cnt_user cu
+	    ON
+	        co.user_id = cu.user_id
+	    where
+	        co.user_id=#{userId}
+    </select>
+
 </mapper>

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.manyun.admin.domain.CntUserCollection;
+import com.manyun.admin.domain.vo.UserCollectionVo;
 
 /**
  * 用户购买藏品中间Mapper接口
@@ -13,5 +14,10 @@ import com.manyun.admin.domain.CntUserCollection;
  */
 public interface CntUserCollectionMapper  extends BaseMapper<CntUserCollection>
 {
+
+    /**
+     * 我的藏品
+     */
+    List<UserCollectionVo> myCollectionList(String userId);
 
 }

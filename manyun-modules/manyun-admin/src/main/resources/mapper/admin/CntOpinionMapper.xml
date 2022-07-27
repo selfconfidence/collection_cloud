@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntOpinionMapper">
+
+    <resultMap type="CntOpinion" id="CntOpinionResult">
+        <result property="id"    column="id"    />
+        <result property="opinionUserId"    column="opinion_user_id"    />
+        <result property="opinionUserName"    column="opinion_user_name"    />
+        <result property="opinionUserPhone"    column="opinion_user_phone"    />
+        <result property="opinionContent"    column="opinion_content"    />
+        <result property="img"    column="img"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectCntOpinionVo">
+        select id, opinion_user_id, opinion_user_name, opinion_user_phone, opinion_content, img, created_by, created_time, updated_by, updated_time, status from cnt_opinion
+    </sql>
+
+    <select id="selectCntOpinionList" parameterType="CntOpinion" resultMap="CntOpinionResult">
+        <include refid="selectCntOpinionVo"/>
+        <where>
+            <if test="opinionUserId != null  and opinionUserId != ''"> and opinion_user_id = #{opinionUserId}</if>
+            <if test="opinionUserName != null  and opinionUserName != ''"> and opinion_user_name like concat('%', #{opinionUserName}, '%')</if>
+            <if test="opinionUserPhone != null  and opinionUserPhone != ''"> and opinion_user_phone = #{opinionUserPhone}</if>
+            <if test="opinionContent != null  and opinionContent != ''"> and opinion_content = #{opinionContent}</if>
+            <if test="img != null  and img != ''"> and img = #{img}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdTime != null "> and created_time = #{createdTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
+            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+
+</mapper>

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.manyun.admin.domain.CntOrder;
 import com.manyun.admin.domain.query.UserMoneyQuery;
+import com.manyun.admin.domain.vo.CntOrderVo;
 import com.manyun.admin.domain.vo.UserCollectionVo;
 import com.manyun.admin.domain.vo.UserMoneyVo;
 import com.manyun.common.core.domain.R;
@@ -51,10 +52,10 @@ public class CntUserController extends BaseController
 
     @GetMapping("/myOrderList")
     @ApiOperation("我的订单")
-    public TableDataInfo<CntOrder> myOrderList(String userId)
+    public TableDataInfo<CntOrderVo> myOrderList(String userId)
     {
         startPage();
-        List<CntOrder> list = cntUserService.myOrderList(userId);
+        List<CntOrderVo> list = cntUserService.myOrderList(userId);
         return getDataTable(list);
     }
 

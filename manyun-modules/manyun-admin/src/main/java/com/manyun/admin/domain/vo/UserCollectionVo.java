@@ -7,20 +7,30 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Data
 @ApiModel("我的藏品视图对象")
-public class UserCollectionVo implements Serializable {
+public class UserCollectionVo {
 
-    @ApiModelProperty("用户和藏品唯一标识联系")
+    @ApiModelProperty("主键")
     private String id;
+
+    @ApiModelProperty("用户昵称")
+    private String nickName;
+
+    @ApiModelProperty("用户电话号")
+    private String phone;
 
     @ApiModelProperty("藏品id")
     private String collectionId;
 
     @ApiModelProperty("藏品名称")
     private String collectionName;
+
+    @ApiModelProperty("藏品主图")
+    private List<MediaVo> mediaVos;
 
     @ApiModelProperty("藏品编号;上链后")
     private String collectionNumber;
@@ -41,10 +51,11 @@ public class UserCollectionVo implements Serializable {
     private String realCompany;
 
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-    @ApiModelProperty("拥有时间")
-    private LocalDateTime createdTime;
+    @ApiModelProperty("创建时间")
+    private Date createdTime;
 
-    @ApiModelProperty("藏品主图")
-    private List<MediaVo> mediaVos;
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty("更新时间")
+    private Date updatedTime;
 
 }
