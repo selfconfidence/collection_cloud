@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
 import com.manyun.business.design.mychain.MyChainService;
@@ -114,6 +115,8 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
             });
         }
     }
+
+
 
 
     /**
@@ -244,6 +247,39 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         userCollection.setSourceInfo(StrUtil.join("\n", userCollection.getSourceInfo(),info));
         updateById(userCollection);
         return userCollection.getCollectionId();
+    }
+
+
+    /**
+     * 重新上链
+     * @param userId
+     * @param userCollectionId
+     */
+    @Override
+    public void resetUpLink(String userId, String userCollectionId) {
+        UserCollection userCollection = getOne(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getUserId,userId).eq(UserCollection::getId,userCollectionId));
+        Assert.isTrue(Objects.nonNull(userCollection) && NOT_LINK.getCode().equals(userCollection.getIsLink()),"藏品信息有误,请核实!");
+        myChainService.accountCollectionUp(CallCommitDto.builder()
+                        .userCollectionId(userCollection.getId())
+                        .artId(userCollection.getLinkAddr())
+                        .artName(userCollection.getCollectionName())
+                        .artSize("80")
+                        .location(userCollection.getSourceInfo())
+                        .price("0.0")
+                        .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy MM dd")))
+                        .sellway(userCollection.getSourceInfo())
+                        .owner(userCollection.getUserId())
+                        .build(), (hash)->{
+                    userCollection.setIsLink(OK_LINK.getCode());
+                    userCollection.setRealCompany("蚂蚁链");
+                    // 编号特殊生成
+                    userCollection.setCollectionNumber(StrUtil.format("CNT_{}", RandomUtil.randomInt(8)));
+                    //userCollection.setLinkAddr(hash);
+                    userCollection.setCollectionHash(hash);
+                    userCollection.updateD(userCollection.getUserId());
+                    updateById(userCollection);
+    });
+
     }
 
 

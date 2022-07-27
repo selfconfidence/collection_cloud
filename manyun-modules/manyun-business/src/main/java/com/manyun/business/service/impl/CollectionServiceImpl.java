@@ -85,7 +85,6 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
 
     private final RootPay rootPay;
 
-    private final ICntTarService cntTarService;
 
     private final ICntPostExcelService cntPostExcelService;
     private final ICntPostConfigService postConfigService;
@@ -308,7 +307,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     @Override
     public Integer tarCollection(String id, String userId) {
         // 开始抽签
-        return cntTarService.tarCollection(getById(id),userId);
+        return tarService.tarCollection(getById(id),userId);
     }
 
     private List<UserCateCollectionVo> initUserCateCollectionVo(Map<String,List<CntCollection>> cntCollectionMaps) {

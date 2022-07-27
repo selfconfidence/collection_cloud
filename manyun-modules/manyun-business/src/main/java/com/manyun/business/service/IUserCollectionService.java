@@ -33,4 +33,7 @@ public interface IUserCollectionService extends IService<UserCollection> {
 
 
     String hideUserCollection(String buiId, String userId, String info);
+
+    void resetUpLink(String userId, String userCollectionId);
+
 }
