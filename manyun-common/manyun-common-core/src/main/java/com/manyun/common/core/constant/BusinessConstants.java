@@ -45,7 +45,6 @@ public interface BusinessConstants {
          */
         String TRAN_INFO= "TRAN_INFO";
 
-
         /**
          * 寄售手续费
          */
@@ -56,6 +55,10 @@ public interface BusinessConstants {
          */
         String  CONSIGNMENT_ORDER_TIME =  "consignment_order_time";
 
+        /**
+         * 拍卖出售须知
+         */
+        String AUCTION_SELL_INFO = "auction_sell_info";
 
         /**
          * 拍卖订单到期时间

@@ -78,8 +78,8 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
      * @return
      */
     @Override
-    public BigDecimal auctionSendConfig() {
-        return systemService.getVal(BusinessConstants.SystemTypeConstant.MARGIN_SCALE, BigDecimal.class);
+    public R<BigDecimal> auctionSendConfig() {
+        return R.ok(systemService.getVal(BusinessConstants.SystemTypeConstant.MARGIN_SCALE, BigDecimal.class));
     }
 
     /**

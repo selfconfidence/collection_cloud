@@ -26,8 +26,11 @@ public class AuctionOrder implements Serializable {
     @ApiModelProperty("主键")
     private String id;
 
-    @ApiModelProperty("用户id")
-    private String userId;
+    @ApiModelProperty("卖方id")
+    private String fromUserId;
+
+    @ApiModelProperty("买方id")
+    private String toUserId;
 
     @ApiModelProperty("订单号")
     private String orderNo;

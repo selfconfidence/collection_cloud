@@ -7,7 +7,9 @@ import com.manyun.business.domain.query.AuctionMarketQuery;
 import com.manyun.business.domain.query.AuctionSendQuery;
 import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.IAuctionSendService;
+import com.manyun.business.service.ISystemService;
 import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.security.annotation.InnerAuth;
@@ -37,6 +39,9 @@ public class AuctionSendController {
     @Autowired
     private IAuctionSendService auctionSendService;
 
+    @Autowired
+    private ISystemService systemService;
+
     @PostMapping("/auctionSend")
     @ApiOperation("提交送拍")
     public R auctionSend(@Valid @RequestBody AuctionSendForm auctionSendForm) {
@@ -46,7 +51,7 @@ public class AuctionSendController {
 
     @GetMapping("/auctionSendConfig")
     @ApiOperation("获取保证金比例")
-    public BigDecimal auctionSendConfig() {
+    public R<BigDecimal> auctionSendConfig() {
         return auctionSendService.auctionSendConfig();
     }
 
@@ -96,6 +101,12 @@ public class AuctionSendController {
     public R timeStartAuction(){
         auctionSendService.timeStartAuction();
         return R.ok();
+    }
+
+    @GetMapping("/sellInfo")
+    @ApiOperation(value = "出售须知")
+    public R<String> sellInfo(){
+        return R.ok(systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_SELL_INFO, String.class));
     }
 
 
