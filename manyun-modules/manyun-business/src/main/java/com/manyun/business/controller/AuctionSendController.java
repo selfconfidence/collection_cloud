@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -41,6 +42,12 @@ public class AuctionSendController {
     public R auctionSend(@Valid @RequestBody AuctionSendForm auctionSendForm) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return auctionSendService.auctionSend(auctionSendForm, loginBusinessUser.getUserId());
+    }
+
+    @GetMapping("/auctionSendConfig")
+    @ApiOperation("获取保证金比例")
+    public BigDecimal auctionSendConfig() {
+        return auctionSendService.auctionSendConfig();
     }
 
     @PostMapping("/reAuctionSend")

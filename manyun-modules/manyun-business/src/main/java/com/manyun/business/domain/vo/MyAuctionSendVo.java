@@ -37,8 +37,26 @@ public class MyAuctionSendVo {
     @ApiModelProperty("一口价")
     private BigDecimal soldPrice;
 
+    @ApiModelProperty("当前价")
+    private BigDecimal nowPrice;
+
+    @ApiModelProperty("保证金")
+    private BigDecimal margin;
+
+    @ApiModelProperty("佣金比例")
+    private BigDecimal commission;
+
+    @ApiModelProperty("延拍时长")
+    private Integer delayTime;
+
+    @ApiModelProperty("开始时间")
+    private LocalDateTime startTime;
+
+    @ApiModelProperty("结束时间")
+    private LocalDateTime endTime;
+
     @ApiModelProperty("拍卖状态;1待开始，2竞拍中，3待支付，4已完成，5已违约，6已流拍")
-    private Integer auctionStatus;
+    private Integer auctionSendStatus;
 
     @ApiModelProperty("创建时间 yyyy-MM-dd HH:mm:ss"  )
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
