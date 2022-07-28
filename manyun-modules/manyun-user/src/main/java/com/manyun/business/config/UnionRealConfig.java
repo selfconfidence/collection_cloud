@@ -64,16 +64,21 @@ public class UnionRealConfig {
         Map<String,String> data = new HashMap<>();
         String encData= SM2.sm2Encrypt(JSON.toJSONString(body), pubKey);
         data.put("data",encData);
-        System.out.println(ColorUtil.log("明文参数") + JSON.toJSONString(body));
-        System.out.println(ColorUtil.log("加密结果") + encData);
-        System.out.println(ColorUtil.log("上送报文") + JSON.toJSONString(data));
+        log.info("明文参数---" + JSON.toJSONString(body));
+        log.info("加密结果---" + encData);
+        log.info("上送报文---" + JSON.toJSONString(data));
+        //System.out.println(ColorUtil.log("明文参数") + JSON.toJSONString(body));
+        //System.out.println(ColorUtil.log("加密结果") + encData);
+        //System.out.println(ColorUtil.log("上送报文") + JSON.toJSONString(data));
         try{
             String authorization =  getOpenBodySig(appId, appKey, JSON.toJSONString(data));
             String str = post(url,JSON.toJSONString(data), authorization);
             JSONObject rspMap = JSONObject.parseObject(str);
-            System.out.println(ColorUtil.log("响应报文") + JSON.toJSONString(rspMap));
+            //System.out.println(ColorUtil.log("响应报文") + JSON.toJSONString(rspMap));
+            log.info("响应报文---"+ JSON.toJSONString(rspMap));
             String rawData = SM2.sm2Decrypt(rspMap.getString("data"), priKey);
-            System.out.println(ColorUtil.log("响应报文data解密") + rawData);
+            log.info("响应报文data解密" + rawData);
+            //System.out.println(ColorUtil.log("响应报文data解密") + rawData);
             JSONObject jsonObject = JSONObject.parseObject(rawData);
             if (!"0000".equals(jsonObject.getString("detailRespCode"))) {
                 return R.fail(jsonObject.getString("detailRespMsg"));
@@ -111,7 +116,8 @@ public class UnionRealConfig {
             // 读取响应
             int responseCode=connection.getResponseCode();
             if(responseCode!=200){
-                System.out.println("返回错误");
+                log.info("返回错误");
+                //System.out.println("返回错误");
             }
             reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String lines;

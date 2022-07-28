@@ -45,6 +45,6 @@ public interface IAuctionSendService extends IService<AuctionSend> {
 
     CollectionInfoVo getBaseCollectionInfoVo(String collectionId);
 
-    BigDecimal auctionSendConfig();
+    R<BigDecimal> auctionSendConfig();
 
 }

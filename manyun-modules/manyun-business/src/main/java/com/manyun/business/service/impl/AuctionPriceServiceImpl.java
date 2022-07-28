@@ -155,7 +155,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                             .nowPrice(auctionSend.getNowPrice())
                             .sendAuctionId(s)
                             .auctionPriceId(winAuctionPrice.getId())
-                            .userId(winAuctionPrice.getUserId()).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));
+                            .fromUserId(auctionSend.getUserId())
+                            .toUserId(winAuctionPrice.getUserId()).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));
                     auctionSend.setAuctionSendStatus(AuctionSendStatus.WAIT_PAY.getCode());
 
                     //成功后退还未拍中者保证金
@@ -393,7 +394,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .nowPrice(auctionSend.getSoldPrice())
                 .payType(auctionPayFixedForm.getPayType())
                 .sendAuctionId(auctionPayFixedForm.getAuctionSendId())
-                .userId(userId).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));
+                .fromUserId(auctionSend.getUserId())
+                .toUserId(userId).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));
 
         PayVo payVo = rootPay.execPayVo(PayInfoDto.builder()
                 .payType(auctionPayFixedForm.getPayType())

@@ -15,7 +15,9 @@ public class AuctionOrderCreateDto implements Serializable {
 
     private Integer payType;
 
-    private String userId;
+    private String fromUserId;
+
+    private String toUserId;
 
     private String goodsId;
 

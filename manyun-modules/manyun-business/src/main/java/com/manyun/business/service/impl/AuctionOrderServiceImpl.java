@@ -65,7 +65,7 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
 
     @Override
     public TableDataInfo<AuctionOrderVo> myAuctionOrderList(AuctionOrderQuery orderQuery, String userId) {
-        List<AuctionOrder> list = list(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getUserId, userId)
+        List<AuctionOrder> list = list(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getToUserId, userId)
                 .eq(orderQuery.getAuctionStatus() != null && orderQuery.getAuctionStatus() != 0, AuctionOrder::getAuctionStatus, orderQuery.getAuctionStatus())
                 .orderByDesc(AuctionOrder::getCreatedTime));
         return TableDataInfoUtil.pageTableDataInfo(list.parallelStream().map(this::providerAuctionOrderVo).collect(Collectors.toList()), list);
@@ -91,7 +91,7 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
 
         AuctionOrder auctionOrder = Builder.of(AuctionOrder::new).build();
         BeanUtil.copyProperties(auctionOrderCreateDto, auctionOrder);
-        auctionOrder.createD(auctionOrderCreateDto.getUserId());
+        auctionOrder.createD(auctionOrderCreateDto.getToUserId());
 
         String idStr = IdUtil.getSnowflake().nextIdStr();
         auctionOrder.setId(idStr);
@@ -111,7 +111,7 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
 
     @Override
     public List<AuctionOrder> checkUnpaidOrder(String payUserId) {
-        return this.list(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getUserId, payUserId)
+        return this.list(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getToUserId, payUserId)
                 .eq(AuctionOrder::getAuctionStatus, AuctionStatus.WAIT_PAY.getCode()));
     }
 
@@ -125,7 +125,7 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
         //更改订单状态
 
         auctionOrder.setAuctionStatus(AuctionStatus.PAY_SUCCESS.getCode());
-        auctionOrder.updateD(auctionOrder.getUserId());
+        auctionOrder.updateD(auctionOrder.getToUserId());
         updateById(auctionOrder);
 
         //更改送拍状态
@@ -157,13 +157,14 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
         //绑定藏品关系
         if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(goodsType)) {
             // 盲盒
-            userBoxService.bindBox(auctionOrder.getUserId(),auctionOrder.getGoodsId(),info,1);
+            userBoxService.bindBox(auctionOrder.getToUserId(),auctionOrder.getGoodsId(),info,1);
             return;
         }
 
         if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(goodsType)) {
             // 藏品
-            userCollectionService.bindCollection(auctionOrder.getUserId(),auctionOrder.getGoodsName(),auctionOrder.getGoodsId(),info,1);
+            //userCollectionService.bindCollection(auctionOrder.getToUserId(),auctionOrder.getGoodsName(),auctionOrder.getGoodsId(),info,1);
+            userCollectionService.tranCollection(auctionOrder.getFromUserId(),auctionOrder.getToUserId(),auctionOrder.getGoodsId());
             return;
         }
         throw new IllegalStateException("not fount order good_type = " + goodsType);
@@ -188,7 +189,7 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
             auctionPrice.setAuctionStatus(AuctionStatus.BID_BREAK.getCode());
             auctionPriceService.updateById(auctionPrice);
             item.setAuctionStatus(AuctionStatus.BID_BREAK.getCode());
-            item.updateD(item.getUserId());
+            item.updateD(item.getToUserId());
             return item;
         }).collect(Collectors.toList());
         updateBatchById(updateOrder);
