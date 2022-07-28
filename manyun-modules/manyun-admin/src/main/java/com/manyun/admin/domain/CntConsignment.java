@@ -39,7 +39,7 @@ public class CntConsignment implements Serializable
     private String orderId;
 
     @ApiModelProperty("0藏品，1盲盒")
-    private Long isType;
+    private Integer isType;
 
     @ApiModelProperty("手续费")
     private BigDecimal serverCharge;
@@ -54,10 +54,10 @@ public class CntConsignment implements Serializable
     private String payUserId;
 
     @ApiModelProperty("0待打款,1=已打款")
-    private Long toPay;
+    private Integer toPay;
 
     @ApiModelProperty("寄售状态-1=已寄售,2=已锁单(有买方,未支付而已)  3=已售出")
-    private Long consignmentStatus;
+    private Integer consignmentStatus;
 
     @ApiModelProperty("词条")
     private String formInfo;
@@ -76,167 +76,148 @@ public class CntConsignment implements Serializable
     @ApiModelProperty("更新时间")
     private Date updatedTime;
 
-    public void setId(String id)
-    {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getId()
-    {
-        return id;
+    public String getBuiName() {
+        return buiName;
     }
-    public void setBuiName(String buiName)
-    {
+
+    public void setBuiName(String buiName) {
         this.buiName = buiName;
     }
 
-    public String getBuiName()
-    {
-        return buiName;
+    public String getBuiId() {
+        return buiId;
     }
-    public void setBuiId(String buiId)
-    {
+
+    public void setBuiId(String buiId) {
         this.buiId = buiId;
     }
 
-    public String getBuiId()
-    {
-        return buiId;
+    public String getCateId() {
+        return cateId;
     }
-    public void setCateId(String cateId)
-    {
+
+    public void setCateId(String cateId) {
         this.cateId = cateId;
     }
 
-    public String getCateId()
-    {
-        return cateId;
+    public String getRealBuiId() {
+        return realBuiId;
     }
-    public void setRealBuiId(String realBuiId)
-    {
+
+    public void setRealBuiId(String realBuiId) {
         this.realBuiId = realBuiId;
     }
 
-    public String getRealBuiId()
-    {
-        return realBuiId;
+    public String getOrderId() {
+        return orderId;
     }
-    public void setOrderId(String orderId)
-    {
+
+    public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
 
-    public String getOrderId()
-    {
-        return orderId;
+    public Integer getIsType() {
+        return isType;
     }
-    public void setIsType(Long isType)
-    {
+
+    public void setIsType(Integer isType) {
         this.isType = isType;
     }
 
-    public Long getIsType()
-    {
-        return isType;
+    public BigDecimal getServerCharge() {
+        return serverCharge;
     }
-    public void setServerCharge(BigDecimal serverCharge)
-    {
+
+    public void setServerCharge(BigDecimal serverCharge) {
         this.serverCharge = serverCharge;
     }
 
-    public BigDecimal getServerCharge()
-    {
-        return serverCharge;
+    public BigDecimal getConsignmentPrice() {
+        return consignmentPrice;
     }
-    public void setConsignmentPrice(BigDecimal consignmentPrice)
-    {
+
+    public void setConsignmentPrice(BigDecimal consignmentPrice) {
         this.consignmentPrice = consignmentPrice;
     }
 
-    public BigDecimal getConsignmentPrice()
-    {
-        return consignmentPrice;
+    public String getSendUserId() {
+        return sendUserId;
     }
-    public void setSendUserId(String sendUserId)
-    {
+
+    public void setSendUserId(String sendUserId) {
         this.sendUserId = sendUserId;
     }
 
-    public String getSendUserId()
-    {
-        return sendUserId;
+    public String getPayUserId() {
+        return payUserId;
     }
-    public void setPayUserId(String payUserId)
-    {
+
+    public void setPayUserId(String payUserId) {
         this.payUserId = payUserId;
     }
 
-    public String getPayUserId()
-    {
-        return payUserId;
+    public Integer getToPay() {
+        return toPay;
     }
-    public void setToPay(Long toPay)
-    {
+
+    public void setToPay(Integer toPay) {
         this.toPay = toPay;
     }
 
-    public Long getToPay()
-    {
-        return toPay;
+    public Integer getConsignmentStatus() {
+        return consignmentStatus;
     }
-    public void setConsignmentStatus(Long consignmentStatus)
-    {
+
+    public void setConsignmentStatus(Integer consignmentStatus) {
         this.consignmentStatus = consignmentStatus;
     }
 
-    public Long getConsignmentStatus()
-    {
-        return consignmentStatus;
+    public String getFormInfo() {
+        return formInfo;
     }
-    public void setFormInfo(String formInfo)
-    {
+
+    public void setFormInfo(String formInfo) {
         this.formInfo = formInfo;
     }
 
-    public String getFormInfo()
-    {
-        return formInfo;
+    public String getCreatedBy() {
+        return createdBy;
     }
-    public void setCreatedBy(String createdBy)
-    {
+
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedBy()
-    {
-        return createdBy;
+    public Date getCreatedTime() {
+        return createdTime;
     }
-    public void setCreatedTime(Date createdTime)
-    {
+
+    public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
 
-    public Date getCreatedTime()
-    {
-        return createdTime;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
-    public void setUpdatedBy(String updatedBy)
-    {
+
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedBy()
-    {
-        return updatedBy;
-    }
-    public void setUpdatedTime(Date updatedTime)
-    {
-        this.updatedTime = updatedTime;
+    public Date getUpdatedTime() {
+        return updatedTime;
     }
 
-    public Date getUpdatedTime()
-    {
-        return updatedTime;
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
     }
 
     @Override

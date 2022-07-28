@@ -12,7 +12,7 @@ import java.util.List;
 public class CntCollectionVo {
 
     @ApiModelProperty("藏品状态;0=下架,1=正常,2=售罄")
-    private Long statusBy;
+    private Integer statusBy;
 
     @ApiModelProperty("主键")
     private String id;
@@ -30,9 +30,9 @@ public class CntCollectionVo {
     private BigDecimal realPrice;
 
     @ApiModelProperty("库存")
-    private Long balance;
+    private Integer balance;
 
     @ApiModelProperty("已售")
-    private Long selfBalance;
+    private Integer selfBalance;
 
 }

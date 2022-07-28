@@ -19,6 +19,9 @@ public class CntCollectionAlterVo
     @ApiModelProperty("系列编号")
     private String cateId;
 
+    @ApiModelProperty("抽签编号")
+    private String tarId;
+
     @ApiModelProperty("创作者编号")
     private String bindCreation;
 
@@ -36,9 +39,9 @@ public class CntCollectionAlterVo
     private Date publishTime;
 
     @ApiModelProperty("发售数量")
-    private Long balance;
+    private Integer balance;
 
     @ApiModelProperty("流通数量")
-    private Long selfBalance;
+    private Integer selfBalance;
 
 }

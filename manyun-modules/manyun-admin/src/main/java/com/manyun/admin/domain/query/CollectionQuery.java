@@ -15,6 +15,6 @@ public class CollectionQuery {
     private String collectionName;
 
     @ApiModelProperty("藏品状态;0=下架,1=正常,2=售罄")
-    private Long statusBy;
+    private Integer statusBy;
 
 }

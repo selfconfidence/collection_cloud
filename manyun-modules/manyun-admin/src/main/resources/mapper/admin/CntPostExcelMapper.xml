@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntPostExcelMapper">
+
+    <resultMap type="CntPostExcel" id="CntPostExcelResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="phone"    column="phone"    />
+        <result property="buiId"    column="bui_id"    />
+        <result property="buiName"    column="bui_name"    />
+        <result property="typeName"    column="type_name"    />
+        <result property="reMark"    column="re_mark"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCntPostExcelVo">
+        select id, user_id, phone, bui_id, bui_name, type_name, re_mark, created_by, created_time, updated_by, updated_time from cnt_post_excel
+    </sql>
+
+    <select id="selectCntPostExcelList" parameterType="CntPostExcel" resultMap="CntPostExcelResult">
+        <include refid="selectCntPostExcelVo"/>
+        <where>
+            <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="buiId != null  and buiId != ''"> and bui_id = #{buiId}</if>
+            <if test="buiName != null  and buiName != ''"> and bui_name like concat('%', #{buiName}, '%')</if>
+            <if test="typeName != null  and typeName != ''"> and type_name like concat('%', #{typeName}, '%')</if>
+            <if test="reMark != null  and reMark != ''"> and re_mark = #{reMark}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdTime != null "> and created_time = #{createdTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
+            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
+        </where>
+    </select>
+
+</mapper>

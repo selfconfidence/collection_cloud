@@ -20,10 +20,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
-import com.manyun.admin.domain.CntCollection;
 import com.manyun.admin.service.ICntCollectionService;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.TableDataInfo;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/collection")
@@ -80,9 +81,9 @@ public class CntCollectionController extends BaseController
 
     @PostMapping("/airdrop")
     @ApiOperation("空投")
-    public R airdrop(@RequestBody AirdropDto airdropDto)
+    public R airdrop(@Valid @RequestBody AirdropDto airdropDto)
     {
-        return toResult(cntCollectionService.airdrop(airdropDto));
+        return cntCollectionService.airdrop(airdropDto);
     }
 
 }

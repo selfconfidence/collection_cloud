@@ -16,8 +16,11 @@ import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.mapper.*;
 import com.manyun.admin.service.*;
+import com.manyun.comm.api.MyChainxSystemService;
 import com.manyun.common.core.constant.BusinessConstants;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
@@ -52,6 +55,9 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
 
     @Autowired
     private ICntUserCollectionService userCollectionService;
+
+    @Autowired
+    private MyChainxSystemService myChainxSystemService;
 
     /**
      * 查询藏品详情
@@ -281,15 +287,15 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int airdrop(AirdropDto airdropDto) {
+    public R airdrop(AirdropDto airdropDto) {
         //验证用户
         List<CntUser> cntUsers = userService.list(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPhone,airdropDto.getPhone()));
         Assert.isTrue(cntUsers.size()>0,"用户不存在!");
         CntCollection collection = getById(airdropDto.getCollectionId());
         Assert.isTrue(Objects.nonNull(collection),"藏品不存在!");
         String collectionId = collection.getId();
-        Long selfBalance = collection.getSelfBalance();
-        Long balance = collection.getBalance();
+        Integer selfBalance = collection.getSelfBalance();
+        Integer balance = collection.getBalance();
         Assert.isFalse(selfBalance>=balance,"已售空!");
         //扣减库存
         updateById(
@@ -300,16 +306,21 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                         .with(CntCollection::setBalance,(balance-1))
                         .build()
         );
-        //用户藏品信息未完善 待上链
-        return userCollectionService.save(
+        //增加用户藏品
+        String idStr = IdUtils.getSnowflakeNextIdStr();
+        userCollectionService.save(
                 Builder
                         .of(CntUserCollection::new)
-                        .with(CntUserCollection::setId,IdUtils.getSnowflakeNextIdStr())
+                        .with(CntUserCollection::setId,idStr)
                         .with(CntUserCollection::setUserId,cntUsers.get(0).getUserId())
                         .with(CntUserCollection::setCollectionId,collection.getId())
                         .with(CntUserCollection::setCollectionName,collection.getCollectionName())
+                        .with(CntUserCollection::setLinkAddr,idStr)
+                        .with(CntUserCollection::setSourceInfo,"空投")
                         .build()
-        )==true?1:0;
+        );
+        //上链
+        return  myChainxSystemService.resetUpLink(cntUsers.get(0).getUserId(),idStr, SecurityConstants.INNER);
     }
 
 }

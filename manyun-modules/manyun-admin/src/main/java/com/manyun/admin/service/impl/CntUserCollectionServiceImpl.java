@@ -1,6 +1,7 @@
 package com.manyun.admin.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.admin.domain.vo.MyChainxVo;
 import com.manyun.admin.domain.vo.UserCollectionVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,14 @@ public class CntUserCollectionServiceImpl extends ServiceImpl<CntUserCollectionM
     @Override
     public List<UserCollectionVo> myCollectionList(String userId) {
         return cntUserCollectionMapper.myCollectionList(userId);
+    }
+
+    /**
+     * 重试上链列表
+     */
+    @Override
+    public List<MyChainxVo> myChainxList() {
+        return cntUserCollectionMapper.myChainxList();
     }
 
 }

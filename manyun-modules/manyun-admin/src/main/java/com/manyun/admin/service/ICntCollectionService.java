@@ -8,6 +8,7 @@ import com.manyun.admin.domain.dto.AirdropDto;
 import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
 import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.*;
+import com.manyun.common.core.domain.R;
 
 /**
  * 藏品Service接口
@@ -62,5 +63,5 @@ public interface ICntCollectionService extends IService<CntCollection>
      * @param airdropDto 空投请求参数
      * @return
      */
-    int airdrop(AirdropDto airdropDto);
+    R airdrop(AirdropDto airdropDto);
 }

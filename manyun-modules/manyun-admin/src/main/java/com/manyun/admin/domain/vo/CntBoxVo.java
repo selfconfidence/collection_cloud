@@ -29,16 +29,16 @@ public class CntBoxVo {
     private BigDecimal realPrice;
 
     @ApiModelProperty("1未开启,2已开启")
-    private Long boxOpen;
+    private Integer boxOpen;
 
     @ApiModelProperty("盲盒状态;0=下架,1=正常,2=售罄")
     private Integer statusBy;
 
     @ApiModelProperty("库存")
-    private Long balance;
+    private Integer balance;
 
     @ApiModelProperty("已售")
-    private Long selfBalance;
+    private Integer selfBalance;
 
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("创建时间")

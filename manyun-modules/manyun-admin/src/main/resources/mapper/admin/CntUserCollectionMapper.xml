@@ -27,28 +27,48 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </sql>
 
     <select id="myCollectionList" resultType="com.manyun.admin.domain.vo.UserCollectionVo">
-        SELECT
+        select
             cuc.id,
-            cuc.collection_id collectionId,
-            cu.nick_name nickName,
+            cuc.collection_id collectionid,
+            cu.nick_name nickname,
             cu.phone phone,
-            cuc.collection_name collectionName,
-            cuc.collection_number collectionNumber,
-            cuc.collection_hash collectionHash,
-            cuc.link_addr linkAddr,
-            cuc.is_link isLink,
-            cuc.source_info sourceInfo,
-            cuc.real_company realCompany,
-            cuc.created_time createdTime,
-            cuc.updated_time updatedTime
-        FROM
+            cuc.collection_name collectionname,
+            cuc.collection_number collectionnumber,
+            cuc.collection_hash collectionhash,
+            cuc.link_addr linkaddr,
+            cuc.is_link islink,
+            cuc.source_info sourceinfo,
+            cuc.real_company realcompany,
+            cuc.created_time createdtime,
+            cuc.updated_time updatedtime
+        from
             cnt_user_collection cuc
         inner join
             cnt_user cu
         on
             cuc.user_id=cu.user_id
         where
-            cuc.user_id=#{userId}
+            cuc.user_id=#{userid}
+    </select>
+
+    <select id="myChainxList" resultType="com.manyun.admin.domain.vo.MyChainxVo">
+        select
+            cuc.id,
+            cuc.user_id,
+            cu.nick_name nickname,
+            cu.phone phone,
+            cuc.collection_id collectionid,
+            cuc.collection_name collectionname,
+            cuc.source_info sourceinfo,
+            cuc.collection_hash collectionhash
+        from
+            cnt_user_collection cuc
+        inner join
+            cnt_user cu
+        on
+            cuc.user_id=cu.user_id
+        where
+            cuc.is_link=1
     </select>
 
 </mapper>

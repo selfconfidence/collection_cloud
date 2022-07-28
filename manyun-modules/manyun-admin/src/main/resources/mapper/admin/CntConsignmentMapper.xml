@@ -59,7 +59,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="collectorUserId != null and  collectorUserId != ''"> and cs.user_id = #{collectorUserId}</if>
             <if test="collectorName != null  and collectorName != ''"> and cs.nick_name like concat('%', #{collectorName}, '%')</if>
             <if test="buiName != null  and buiName != ''"> and js.bui_name like concat('%', #{buiName}, '%')</if>
-            <if test="isType != null  and isType != ''"> and js.is_type = #{isType}</if>
+            <if test="isType != null"> and js.is_type = #{isType}</if>
             <if test="consignmentStatus != null  and consignmentStatus != ''"> and js.consignment_status = #{consignmentStatus}</if>
             <if test="sellerName != null  and sellerName != ''"> and mr.nick_name like concat('%', #{sellerName}, '%')</if>
             <if test="payType != null  and payType != ''"> and o.pay_type = #{payType}</if>

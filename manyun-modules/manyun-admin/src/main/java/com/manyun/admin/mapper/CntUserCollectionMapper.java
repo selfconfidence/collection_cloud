@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.manyun.admin.domain.CntUserCollection;
+import com.manyun.admin.domain.vo.MyChainxVo;
 import com.manyun.admin.domain.vo.UserCollectionVo;
 
 /**
@@ -20,4 +21,8 @@ public interface CntUserCollectionMapper  extends BaseMapper<CntUserCollection>
      */
     List<UserCollectionVo> myCollectionList(String userId);
 
+    /**
+     * 重试上链列表
+     */
+    List<MyChainxVo> myChainxList();
 }

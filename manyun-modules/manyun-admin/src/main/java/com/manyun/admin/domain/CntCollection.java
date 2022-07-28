@@ -2,6 +2,7 @@ package com.manyun.admin.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -34,16 +35,16 @@ public class CntCollection implements Serializable
     private BigDecimal realPrice;
 
     @ApiModelProperty("已售")
-    private Long selfBalance;
+    private Integer selfBalance;
 
     @ApiModelProperty("库存")
-    private Long balance;
+    private Integer balance;
 
     @ApiModelProperty("版本标识")
-    private Long versionFlag;
+    private Integer versionFlag;
 
     @ApiModelProperty("藏品状态;0=下架,1=正常,2=售罄")
-    private Long statusBy;
+    private Integer statusBy;
 
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("发售时间")
@@ -70,160 +71,142 @@ public class CntCollection implements Serializable
     private String cateId;
 
     @ApiModelProperty("可以提前购的盲盒子")
-    private Long postTime;
+    private Integer postTime;
 
-    public void setId(String id)
-    {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getId()
-    {
-        return id;
+    public String getCollectionName() {
+        return collectionName;
     }
-    public void setCollectionName(String collectionName)
-    {
+
+    public void setCollectionName(String collectionName) {
         this.collectionName = collectionName;
     }
 
-    public String getCollectionName()
-    {
-        return collectionName;
+    public String getTarId() {
+        return tarId;
     }
-    public void setTarId(String tarId)
-    {
+
+    public void setTarId(String tarId) {
         this.tarId = tarId;
     }
 
-    public String getTarId()
-    {
-        return tarId;
+    public BigDecimal getSourcePrice() {
+        return sourcePrice;
     }
-    public void setSourcePrice(BigDecimal sourcePrice)
-    {
+
+    public void setSourcePrice(BigDecimal sourcePrice) {
         this.sourcePrice = sourcePrice;
     }
 
-    public BigDecimal getSourcePrice()
-    {
-        return sourcePrice;
+    public BigDecimal getRealPrice() {
+        return realPrice;
     }
-    public void setRealPrice(BigDecimal realPrice)
-    {
+
+    public void setRealPrice(BigDecimal realPrice) {
         this.realPrice = realPrice;
     }
 
-    public BigDecimal getRealPrice()
-    {
-        return realPrice;
+    public Integer getSelfBalance() {
+        return selfBalance;
     }
-    public void setSelfBalance(Long selfBalance)
-    {
+
+    public void setSelfBalance(Integer selfBalance) {
         this.selfBalance = selfBalance;
     }
 
-    public Long getSelfBalance()
-    {
-        return selfBalance;
+    public Integer getBalance() {
+        return balance;
     }
-    public void setBalance(Long balance)
-    {
+
+    public void setBalance(Integer balance) {
         this.balance = balance;
     }
 
-    public Long getBalance()
-    {
-        return balance;
+    public Integer getVersionFlag() {
+        return versionFlag;
     }
-    public void setVersionFlag(Long versionFlag)
-    {
+
+    public void setVersionFlag(Integer versionFlag) {
         this.versionFlag = versionFlag;
     }
 
-    public Long getVersionFlag()
-    {
-        return versionFlag;
+    public Integer getStatusBy() {
+        return statusBy;
     }
-    public void setStatusBy(Long statusBy)
-    {
+
+    public void setStatusBy(Integer statusBy) {
         this.statusBy = statusBy;
     }
 
-    public Long getStatusBy()
-    {
-        return statusBy;
+    public Date getPublishTime() {
+        return publishTime;
     }
-    public void setPublishTime(Date publishTime)
-    {
+
+    public void setPublishTime(Date publishTime) {
         this.publishTime = publishTime;
     }
 
-    public Date getPublishTime()
-    {
-        return publishTime;
+    public String getBindCreation() {
+        return bindCreation;
     }
-    public void setBindCreation(String bindCreation)
-    {
+
+    public void setBindCreation(String bindCreation) {
         this.bindCreation = bindCreation;
     }
 
-    public String getBindCreation()
-    {
-        return bindCreation;
+    public String getCreatedBy() {
+        return createdBy;
     }
-    public void setCreatedBy(String createdBy)
-    {
+
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedBy()
-    {
-        return createdBy;
+    public Date getCreatedTime() {
+        return createdTime;
     }
-    public void setCreatedTime(Date createdTime)
-    {
+
+    public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
 
-    public Date getCreatedTime()
-    {
-        return createdTime;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
-    public void setUpdatedBy(String updatedBy)
-    {
+
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedBy()
-    {
-        return updatedBy;
+    public Date getUpdatedTime() {
+        return updatedTime;
     }
-    public void setUpdatedTime(Date updatedTime)
-    {
+
+    public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
     }
 
-    public Date getUpdatedTime()
-    {
-        return updatedTime;
+    public String getCateId() {
+        return cateId;
     }
-    public void setCateId(String cateId)
-    {
+
+    public void setCateId(String cateId) {
         this.cateId = cateId;
     }
 
-    public String getCateId()
-    {
-        return cateId;
-    }
-    public void setPostTime(Long postTime)
-    {
-        this.postTime = postTime;
+    public Integer getPostTime() {
+        return postTime;
     }
 
-    public Long getPostTime()
-    {
-        return postTime;
+    public void setPostTime(Integer postTime) {
+        this.postTime = postTime;
     }
 
     @Override

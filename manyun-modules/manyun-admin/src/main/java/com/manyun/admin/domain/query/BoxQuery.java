@@ -12,10 +12,10 @@ import java.util.Date;
 public class BoxQuery {
 
     @ApiModelProperty("1未开启,2已开启")
-    private Long boxOpen;
+    private Integer boxOpen;
 
     @ApiModelProperty("盲盒状态;0=下架,1=正常,2=售罄 ")
-    private Long statusBy;
+    private Integer statusBy;
 
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("发售时间")

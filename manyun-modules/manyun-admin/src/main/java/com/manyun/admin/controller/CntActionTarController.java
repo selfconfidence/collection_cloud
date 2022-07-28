@@ -30,7 +30,7 @@ import com.manyun.common.core.web.page.TableDataInfo;
  * @date 2022-07-21
  */
 @RestController
-@RequestMapping("/tar")
+@RequestMapping("/actionTar")
 @Api(tags = "活动合成附属信息apis")
 public class CntActionTarController extends BaseController
 {

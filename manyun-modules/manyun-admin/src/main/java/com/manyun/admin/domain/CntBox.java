@@ -2,6 +2,7 @@ package com.manyun.admin.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -10,8 +11,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import com.manyun.common.core.annotation.Excel;
-import com.manyun.common.core.web.domain.BaseEntity;
 
 
 @ApiModel("盲盒对象")
@@ -28,7 +27,7 @@ public class CntBox implements Serializable
     private String cateId;
 
     @ApiModelProperty("可以提前购的盲盒子 - 如果为null 就代表不是提前购")
-    private Long postTime;
+    private Integer postTime;
 
     @ApiModelProperty("抽签编号 如果为null不需要抽签,否则需要抽签")
     private String tarId;
@@ -37,16 +36,16 @@ public class CntBox implements Serializable
     private String boxTitle;
 
     @ApiModelProperty("已售")
-    private Long selfBalance;
+    private Integer selfBalance;
 
     @ApiModelProperty("库存")
-    private Long balance;
+    private Integer balance;
 
     @ApiModelProperty("1未开启,2已开启")
-    private Long boxOpen;
+    private Integer boxOpen;
 
     @ApiModelProperty("盲盒状态;0=下架,1=正常,2=售罄 ")
-    private Long statusBy;
+    private Integer statusBy;
 
     @ApiModelProperty("盲盒详情")
     private String boxInfo;
@@ -75,158 +74,140 @@ public class CntBox implements Serializable
     @ApiModelProperty("更新时间")
     private Date updatedTime;
 
-    public void setId(String id)
-    {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getId()
-    {
-        return id;
+    public String getCateId() {
+        return cateId;
     }
-    public void setCateId(String cateId)
-    {
+
+    public void setCateId(String cateId) {
         this.cateId = cateId;
     }
 
-    public String getCateId()
-    {
-        return cateId;
+    public Integer getPostTime() {
+        return postTime;
     }
-    public void setPostTime(Long postTime)
-    {
+
+    public void setPostTime(Integer postTime) {
         this.postTime = postTime;
     }
 
-    public Long getPostTime()
-    {
-        return postTime;
+    public String getTarId() {
+        return tarId;
     }
-    public void setTarId(String tarId)
-    {
+
+    public void setTarId(String tarId) {
         this.tarId = tarId;
     }
 
-    public String getTarId()
-    {
-        return tarId;
+    public String getBoxTitle() {
+        return boxTitle;
     }
-    public void setBoxTitle(String boxTitle)
-    {
+
+    public void setBoxTitle(String boxTitle) {
         this.boxTitle = boxTitle;
     }
 
-    public String getBoxTitle()
-    {
-        return boxTitle;
+    public Integer getSelfBalance() {
+        return selfBalance;
     }
-    public void setSelfBalance(Long selfBalance)
-    {
+
+    public void setSelfBalance(Integer selfBalance) {
         this.selfBalance = selfBalance;
     }
 
-    public Long getSelfBalance()
-    {
-        return selfBalance;
+    public Integer getBalance() {
+        return balance;
     }
-    public void setBalance(Long balance)
-    {
+
+    public void setBalance(Integer balance) {
         this.balance = balance;
     }
 
-    public Long getBalance()
-    {
-        return balance;
+    public Integer getBoxOpen() {
+        return boxOpen;
     }
-    public void setBoxOpen(Long boxOpen)
-    {
+
+    public void setBoxOpen(Integer boxOpen) {
         this.boxOpen = boxOpen;
     }
 
-    public Long getBoxOpen()
-    {
-        return boxOpen;
+    public Integer getStatusBy() {
+        return statusBy;
     }
-    public void setStatusBy(Long statusBy)
-    {
+
+    public void setStatusBy(Integer statusBy) {
         this.statusBy = statusBy;
     }
 
-    public Long getStatusBy()
-    {
-        return statusBy;
+    public String getBoxInfo() {
+        return boxInfo;
     }
-    public void setBoxInfo(String boxInfo)
-    {
+
+    public void setBoxInfo(String boxInfo) {
         this.boxInfo = boxInfo;
     }
 
-    public String getBoxInfo()
-    {
-        return boxInfo;
+    public Date getPublishTime() {
+        return publishTime;
     }
-    public void setPublishTime(Date publishTime)
-    {
+
+    public void setPublishTime(Date publishTime) {
         this.publishTime = publishTime;
     }
 
-    public Date getPublishTime()
-    {
-        return publishTime;
+    public BigDecimal getSourcePrice() {
+        return sourcePrice;
     }
-    public void setSourcePrice(BigDecimal sourcePrice)
-    {
+
+    public void setSourcePrice(BigDecimal sourcePrice) {
         this.sourcePrice = sourcePrice;
     }
 
-    public BigDecimal getSourcePrice()
-    {
-        return sourcePrice;
+    public BigDecimal getRealPrice() {
+        return realPrice;
     }
-    public void setRealPrice(BigDecimal realPrice)
-    {
+
+    public void setRealPrice(BigDecimal realPrice) {
         this.realPrice = realPrice;
     }
 
-    public BigDecimal getRealPrice()
-    {
-        return realPrice;
+    public String getCreatedBy() {
+        return createdBy;
     }
-    public void setCreatedBy(String createdBy)
-    {
+
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedBy()
-    {
-        return createdBy;
+    public Date getCreatedTime() {
+        return createdTime;
     }
-    public void setCreatedTime(Date createdTime)
-    {
+
+    public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
 
-    public Date getCreatedTime()
-    {
-        return createdTime;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
-    public void setUpdatedBy(String updatedBy)
-    {
+
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedBy()
-    {
-        return updatedBy;
-    }
-    public void setUpdatedTime(Date updatedTime)
-    {
-        this.updatedTime = updatedTime;
+    public Date getUpdatedTime() {
+        return updatedTime;
     }
 
-    public Date getUpdatedTime()
-    {
-        return updatedTime;
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
     }
 
     @Override

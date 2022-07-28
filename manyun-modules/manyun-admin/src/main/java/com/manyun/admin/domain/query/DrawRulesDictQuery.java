@@ -1,0 +1,19 @@
+package com.manyun.admin.domain.query;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import org.hibernate.validator.constraints.Range;
+
+import javax.validation.constraints.NotNull;
+
+@ApiModel("抽签规则字典条件查询对象")
+@Data
+public class DrawRulesDictQuery {
+
+    @ApiModelProperty(value = "抽签类型;(1=盲盒,2=藏品)",required = true)
+    @NotNull(message = "参数不能为空")
+    @Range(min = 1,max = 2,message = "参数传入有误")
+    private Integer tarType;
+
+}

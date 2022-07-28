@@ -1,6 +1,7 @@
 package com.manyun.admin.controller;
 
 
+import com.manyun.admin.domain.query.DrawRulesDictQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.service.CntDictService;
 import com.manyun.common.core.web.controller.BaseController;
@@ -8,10 +9,9 @@ import com.manyun.common.core.web.page.TableDataInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -65,6 +65,33 @@ public class CntDictController extends BaseController
     {
         startPage();
         List<CustomerServiceDictVo> list = cntDictService.customerServiceDict();
+        return getDataTable(list);
+    }
+
+    @PostMapping("/drawRulesDict")
+    @ApiOperation("抽签规则字典")
+    public TableDataInfo<DrawRulesDictVo> drawRulesDict(@Valid @RequestBody DrawRulesDictQuery drawRulesDictQuery)
+    {
+        startPage();
+        List<DrawRulesDictVo> list = cntDictService.drawRulesDict(drawRulesDictQuery);
+        return getDataTable(list);
+    }
+
+    @GetMapping("/postSellDict")
+    @ApiOperation("提前购配置可以购买字典")
+    public TableDataInfo<TqgGoodsDictVo> postSellDict()
+    {
+        startPage();
+        List<TqgGoodsDictVo> list = cntDictService.postSellDict();
+        return getDataTable(list);
+    }
+
+    @GetMapping("/postExistDict")
+    @ApiOperation("提前购配置已经拥有字典")
+    public TableDataInfo<TqgGoodsDictVo> postExistDict()
+    {
+        startPage();
+        List<TqgGoodsDictVo> list = cntDictService.postExistDict();
         return getDataTable(list);
     }
 
