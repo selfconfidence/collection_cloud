@@ -244,7 +244,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
      */
     @Override
     public String hideUserCollection(String buiId, String userId, String info) {
-        UserCollection userCollection = getOne(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getIsExist, USE_EXIST.getCode()).eq(UserCollection::getId, buiId).eq(UserCollection::getUserId, userId).eq(UserCollection::getIsLink, OK_LINK));
+        UserCollection userCollection = getOne(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getIsExist, USE_EXIST.getCode()).eq(UserCollection::getId, buiId).eq(UserCollection::getUserId, userId).eq(UserCollection::getIsLink, OK_LINK.getCode()));
         Assert.isTrue(Objects.nonNull(userCollection),"藏品有误,检查藏品是否上链!");
         userCollection.setIsExist(NOT_EXIST.getCode());
         userCollection.updateD(userId);
