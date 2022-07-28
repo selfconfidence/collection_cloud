@@ -370,7 +370,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
             CntCollection cntCollection = collectionService.getById(realBuiId);
             cateId = cntCollection.getCateId();
             buiName = cntCollection.getCollectionName();
-            return;
+           // return;
         }
        // 盲盒
         if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(type)){
@@ -380,7 +380,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
             Box box = boxService.getById(realBuiId);
             cateId = box.getCateId();
             buiName= box.getBoxTitle();
-            return;
+           // return;
         }
         if (StrUtil.isBlank(info) && StrUtil.isBlank(realBuiId))
            throw new ServiceException("not fount type [0-1] now type is "+type+"");
