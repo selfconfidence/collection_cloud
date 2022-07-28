@@ -110,7 +110,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                 userCollection.setIsLink(OK_LINK.getCode());
                 userCollection.setRealCompany("蚂蚁链");
                 // 编号特殊生成
-                userCollection.setCollectionNumber(StrUtil.format("CNT_{}", RandomUtil.randomInt(8)));
+                userCollection.setCollectionNumber(StrUtil.format("CNT_{}",IdUtil.nanoId()));
                 //userCollection.setLinkAddr(hash);
                 userCollection.setCollectionHash(hash);
                 userCollection.updateD(userCollection.getUserId());
@@ -154,10 +154,11 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
            userCollection.setIsLink(OK_LINK.getCode());
            userCollection.setRealCompany("蚂蚁链");
            // 编号特殊生成
-           userCollection.setCollectionNumber(StrUtil.format("CNT_{}", RandomUtil.randomInt(8)));
+           userCollection.setCollectionNumber(StrUtil.format("CNT_{}", IdUtil.nanoId()));
           // userCollection.setLinkAddr(hash);
            userCollection.setCollectionHash(hash);
            userCollection.updateD(userCollection.getUserId());
+           updateById(userCollection);
            // 流转记录
            stepService.saveBatch(StepDto.builder().buiId(tranUserCollection.getCollectionId()).userId(tranUserId).modelType(COLLECTION_MODEL_TYPE).reMark("转让方").formHash(hash).formInfo(formatTran).build()
                    ,StepDto.builder().buiId(tranUserCollection.getCollectionId()).userId(toUserId).modelType(COLLECTION_MODEL_TYPE).formHash(hash).reMark("受让方").formInfo(format).build()
@@ -202,7 +203,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
     @Override
     public Boolean existUserCollection(String userId, String id) {
         // 必须是已上链的
-        return Objects.nonNull(getOne(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getIsExist,USE_EXIST.getCode()).eq(UserCollection::getId,id).eq(UserCollection::getUserId,userId).eq(UserCollection::getIsLink,OK_LINK)));
+        return Objects.nonNull(getOne(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getIsExist,USE_EXIST.getCode()).eq(UserCollection::getId,id).eq(UserCollection::getUserId,userId).eq(UserCollection::getIsLink,OK_LINK.getCode())));
     }
 
     /**
@@ -213,7 +214,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
      */
     @Override
     public void tranCollection(String tranUserId, String toUserId, String buiId) {
-        UserCollection userCollection = getOne(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getId, buiId).eq(UserCollection::getUserId, tranUserId).eq(UserCollection::getIsLink, OK_LINK));
+        UserCollection userCollection = getOne(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getId, buiId).eq(UserCollection::getUserId, tranUserId).eq(UserCollection::getIsLink, OK_LINK.getCode()));
         String format = StrUtil.format("{}:赠送获得该藏品!", userCollection.getCollectionName());
         String formatTran = StrUtil.format("{}:藏品被赠送!",userCollection.getCollectionName());
         //原始拥有者的绑定关系 解绑
@@ -278,7 +279,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                     userCollection.setIsLink(OK_LINK.getCode());
                     userCollection.setRealCompany("蚂蚁链");
                     // 编号特殊生成
-                    userCollection.setCollectionNumber(StrUtil.format("CNT_{}", RandomUtil.randomInt(8)));
+                    userCollection.setCollectionNumber(StrUtil.format("CNT_{}", IdUtil.nanoId()));
                     //userCollection.setLinkAddr(hash);
                     userCollection.setCollectionHash(hash);
                     userCollection.updateD(userCollection.getUserId());
@@ -287,6 +288,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
     });
 
     }
+
 
 
     /**
