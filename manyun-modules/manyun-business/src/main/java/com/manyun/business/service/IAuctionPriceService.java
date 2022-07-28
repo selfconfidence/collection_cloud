@@ -12,6 +12,8 @@ import com.manyun.business.domain.vo.*;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.TableDataInfo;
 
+import java.math.BigDecimal;
+
 /**
  * <p>
  * 竞价表 服务类
@@ -22,7 +24,7 @@ import com.manyun.common.core.web.page.TableDataInfo;
  */
 public interface IAuctionPriceService extends IService<AuctionPrice> {
 
-    R myAuctionPrice(AuctionPriceForm auctionPriceForm, String userId);
+    R<BigDecimal> myAuctionPrice(AuctionPriceForm auctionPriceForm, String userId);
 
     TableDataInfo<AuctionPriceVo> auctionPriceList(AuctionPriceQuery auctionPriceQuery);
 

@@ -9,10 +9,7 @@ import com.manyun.business.design.delay.DelayQueue;
 import com.manyun.business.design.pay.RootPay;
 import com.manyun.business.domain.dto.AuctionOrderCreateDto;
 import com.manyun.business.domain.dto.PayInfoDto;
-import com.manyun.business.domain.entity.AuctionOrder;
-import com.manyun.business.domain.entity.AuctionPrice;
-import com.manyun.business.domain.entity.AuctionSend;
-import com.manyun.business.domain.entity.Money;
+import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.form.AuctionPayFixedForm;
 import com.manyun.business.domain.form.AuctionPayForm;
 import com.manyun.business.domain.form.AuctionPayMarginForm;
@@ -96,26 +93,28 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     @Autowired
     private RemoteBuiUserService remoteBuiUserService;
 
+    @Autowired
+    private IAuctionMarginService auctionMarginService;
+
 
     //判断是否出过价
 
     @Override
     public R checkPayMargin(AuctionPriceForm auctionPriceForm, String userId) {
-        List<AuctionPrice> priceList = list(Wrappers.<AuctionPrice>lambdaQuery().eq(AuctionPrice::getAuctionSendId, auctionPriceForm.getAuctionSendId())
-                .eq(AuctionPrice::getUserId, userId));
-
+        List<AuctionMargin> list = auctionMarginService.list(Wrappers.<AuctionMargin>lambdaQuery().eq(AuctionMargin::getAuctionSendId, auctionPriceForm.getAuctionSendId())
+                .eq(AuctionMargin::getUserId, userId));
         //判断是否出过价
-        if (priceList.isEmpty()) {
+        if (list.size() > 0) {
             //支付保证金
-            return R.fail(CodeStatus.NO_PAY_MARGIN.getCode(),"尚未支付保证金，请先支付");
-        } else {
             return R.ok("已支付保证金，可以出价");
+        } else {
+            return R.ok(CodeStatus.NO_PAY_MARGIN.getCode(),"尚未支付保证金，请先支付");
         }
     }
 
 
     @Override
-    public synchronized R myAuctionPrice(AuctionPriceForm auctionPriceForm, String userId) {
+    public synchronized R<BigDecimal> myAuctionPrice(AuctionPriceForm auctionPriceForm, String userId) {
         LoginBusinessUser businessUser = SecurityUtils.getNotNullLoginBusinessUser();
         AuctionSend auctionSend = auctionSendService.getById(auctionPriceForm.getAuctionSendId());
         Integer delayTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_DELAY_TIME, Integer.class);
@@ -213,12 +212,21 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         auctionPrice.setAuctionSendId(auctionPriceForm.getAuctionSendId());
         auctionPrice.setUserName(businessUser.getUsername());
         auctionPrice.setCreatedTime(LocalDateTime.now());
+        //改状态为最新
+        List<AuctionPrice> oldPriceList = list(Wrappers.<AuctionPrice>lambdaQuery()
+                .eq(AuctionPrice::getAuctionSendId, auctionPriceForm.getAuctionSendId()).eq(AuctionPrice::getUserId, userId));
+        if (oldPriceList.size() > 0) {
+            for (AuctionPrice oldPrice : oldPriceList) {
+                oldPrice.setIsNew(2);
+            }
+            updateBatchById(oldPriceList);
+        }
         this.save(auctionPrice);
 
         auctionSendService.update(Wrappers.<AuctionSend>lambdaUpdate()
                 .set(AuctionSend::getNowPrice, auctionPrice.getBidPrice()));
 
-        return R.ok();
+        return R.ok(auctionPrice.getBidPrice());
     }
 
     /**
@@ -244,7 +252,15 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     @Override
     public TableDataInfo<MyAuctionPriceVo> myAuctionPriceList(MyAuctionPriceQuery myAuctionPriceQuery, String userId) {
         //查询出当前用户出价过的藏品
-        Set<String> auctionSendIds = list(Wrappers.<AuctionPrice>lambdaQuery()
+        List<AuctionPrice> auctionPriceList = list(Wrappers.<AuctionPrice>lambdaQuery()
+                .eq(myAuctionPriceQuery.getAuctionPriceStatus() != null && myAuctionPriceQuery.getAuctionPriceStatus() != 0, AuctionPrice::getAuctionStatus, myAuctionPriceQuery.getAuctionPriceStatus())
+                .eq(AuctionPrice::getUserId, userId)
+                .eq(AuctionPrice::getIsNew, 1));
+
+        return TableDataInfoUtil.pageTableDataInfo(auctionPriceList.parallelStream().map(this::providerMyAuctionPriceVo).collect(Collectors.toList()), auctionPriceList);
+
+
+        /*Set<String> auctionSendIds = list(Wrappers.<AuctionPrice>lambdaQuery()
                 .eq(myAuctionPriceQuery.getAuctionPriceStatus() != null && myAuctionPriceQuery.getAuctionPriceStatus() != 0,AuctionPrice::getAuctionStatus, myAuctionPriceQuery.getAuctionPriceStatus())
                 .eq(AuctionPrice::getUserId, userId))
                 .parallelStream().map(item -> item.getAuctionSendId()).collect(Collectors.toSet());
@@ -252,13 +268,15 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         if (!auctionSendIds.isEmpty()) {
             sendList = auctionSendService.list(Wrappers.<AuctionSend>lambdaQuery().in(AuctionSend::getId, auctionSendIds));
         }
-        return TableDataInfoUtil.pageTableDataInfo(sendList.parallelStream().map(this::providerMyAuctionPriceVo).collect(Collectors.toList()), sendList);
+        return TableDataInfoUtil.pageTableDataInfo(sendList.parallelStream().map(this::providerMyAuctionPriceVo).collect(Collectors.toList()), sendList);*/
     }
 
-    private MyAuctionPriceVo providerMyAuctionPriceVo(AuctionSend auctionSend) {
+    private MyAuctionPriceVo providerMyAuctionPriceVo(AuctionPrice auctionPrice) {
         MyAuctionPriceVo myAuctionPriceVo = Builder.of(MyAuctionPriceVo::new).build();
-        myAuctionPriceVo.setAuctionVo(auctionSendService.getAuctionSendVo(auctionSend.getId()));
-        myAuctionPriceVo.setAuctionSendId(auctionSend.getId());
+        AuctionSend auctionSend = auctionSendService.getById(auctionPrice.getAuctionSendId());
+        myAuctionPriceVo.setAuctionVo(auctionSendService.getAuctionSendVo(auctionPrice.getAuctionSendId()));
+        myAuctionPriceVo.setAuctionSendId(auctionPrice.getAuctionSendId());
+        myAuctionPriceVo.setAuctionStatus(auctionPrice.getAuctionStatus());
         String mediaUrl = "";
         if (auctionSend.getGoodsType() == 1) {
             mediaUrl = mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE).get(0).getMediaUrl();
@@ -346,6 +364,13 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         return payVo;
     }
 
+    /**
+     * 支付保证金
+     * @param payUserId
+     * @param auctionPayMarginForm
+     * @return
+     */
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public synchronized PayVo payMargin(String payUserId, AuctionPayMarginForm auctionPayMarginForm) {
@@ -355,6 +380,12 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         BigDecimal margin = auctionSend.getStartPrice().multiply(systemService.getVal(BusinessConstants.SystemTypeConstant.MARGIN_SCALE, BigDecimal.class)).setScale(2, RoundingMode.HALF_UP);
         Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, payUserId));
         BigDecimal moneyBalance = money.getMoneyBalance();
+        AuctionMargin auctionMargin = Builder.of(AuctionMargin::new).build();
+        auctionMargin.setAuctionSendId(auctionPayMarginForm.getAuctionSendId());
+        auctionMargin.setUserId(payUserId);
+        auctionMargin.setMargin(margin);
+        auctionMargin.createD(payUserId);
+        auctionMarginService.save(auctionMargin);
 
         String payMarginHost ="";
 

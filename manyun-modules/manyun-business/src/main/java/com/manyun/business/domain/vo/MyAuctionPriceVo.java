@@ -1,5 +1,6 @@
 package com.manyun.business.domain.vo;
 
+import com.manyun.common.core.enums.AuctionStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,5 +20,8 @@ public class MyAuctionPriceVo {
 
     @ApiModelProperty("竞品拍卖相关信息")
     private AuctionVo auctionVo;
+
+    @ApiModelProperty("竞拍状态")
+    private Integer auctionStatus;
 
 }

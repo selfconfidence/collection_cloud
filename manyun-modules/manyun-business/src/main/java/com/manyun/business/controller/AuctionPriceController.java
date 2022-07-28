@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 
 /**
  * <p>
@@ -38,7 +39,7 @@ public class AuctionPriceController {
 
     @PostMapping("/myAuctionPrice")
     @ApiOperation("我的出价")
-    public R myAuctionPrice(@Valid @RequestBody AuctionPriceForm auctionPriceForm) {
+    public R<BigDecimal> myAuctionPrice(@Valid @RequestBody AuctionPriceForm auctionPriceForm) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return auctionPriceService.myAuctionPrice(auctionPriceForm, loginBusinessUser.getUserId());
     }
@@ -91,6 +92,8 @@ public class AuctionPriceController {
     }
 
     @PostMapping("/checkPayMargin")
+
+
     @ApiOperation(value = "是否支付过保证金")
     public R checkPayMargin(@RequestBody @Valid AuctionPriceForm auctionPriceForm) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();

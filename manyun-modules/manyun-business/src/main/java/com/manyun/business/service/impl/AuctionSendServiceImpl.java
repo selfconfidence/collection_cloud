@@ -17,12 +17,15 @@ import com.manyun.business.mapper.CollectionInfoMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.constant.BusinessConstants;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.AuctionSendStatus;
 import com.manyun.common.core.exception.ServiceException;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import com.manyun.common.security.utils.SecurityUtils;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,6 +76,9 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
     @Autowired
     private IBoxCollectionService boxCollectionService;
 
+    @Autowired
+    private ObjectFactory<IAuctionPriceService> auctionPriceServiceObjectFactory;
+
     /**
      * 查询保证金比例
      * @return
@@ -89,6 +95,7 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public R auctionSend(AuctionSendForm auctionSendForm, String userId) {
         checkAll(auctionSendForm, userId);
         aspect(auctionSendForm, userId);
@@ -267,6 +274,8 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         auctionVo.setStartPrice(auctionSend.getStartPrice());
         auctionVo.setConcernedNum(auctionSend.getConcernedNum());
         auctionVo.setDelayTime(delayTime);
+        auctionVo.setStartTime(auctionSend.getStartTime());
+        auctionVo.setEndTime(auctionSend.getEndTime());
         return auctionVo;
     }
 
@@ -291,6 +300,9 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
 
     private AuctionMarketVo providerAuctionMarketVo (AuctionSend auctionSend) {
         AuctionMarketVo marketVo = Builder.of(AuctionMarketVo::new).build();
+        //出价次数
+        int size = auctionPriceServiceObjectFactory.getObject().list(Wrappers.<AuctionPrice>lambdaQuery().eq(AuctionPrice::getAuctionSendId, auctionSend.getId())).size();
+        marketVo.setPriceCount(size);
         BeanUtil.copyProperties(auctionSend, marketVo);
         if (auctionSend.getGoodsType() == 1) {
             marketVo.setMediaVos(mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
@@ -315,7 +327,8 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
     //流拍后重新送拍
     @Override
     public R reAuctionSend(AuctionSendForm auctionSendForm, String auctionSendId) {
-        Integer preTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_PRE_TIME, Integer.class);
+        String userId = SecurityUtils.getNotNullLoginBusinessUser().getUserId();
+        /*Integer preTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_PRE_TIME, Integer.class);
         Integer bidTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_BID_TIME, Integer.class);
         AuctionSend auctionSend = getById(auctionSendId);
         auctionSend.setAuctionSendStatus(AuctionSendStatus.WAIT_START.getCode());
@@ -329,7 +342,9 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         auctionSend.setStartTime(LocalDateTime.now().plusMinutes(preTime));
         auctionSend.setEndTime(LocalDateTime.now().plusMinutes(preTime + bidTime));
         auctionSend.updateD(auctionSend.getUserId());
-        updateById(auctionSend);
+        updateById(auctionSend);*/
+        checkAll(auctionSendForm, userId);
+        aspect(auctionSendForm, userId);
         return R.ok();
     }
 
@@ -345,8 +360,10 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
             Assert.isTrue(userBoxService.existUserBox(userId,auctionSendForm.getMyGoodsId()),"选择的盲盒有误,请核实盲盒详细信息!");
 
         boolean exists = this.baseMapper.exists(Wrappers.<AuctionSend>lambdaQuery()
-                .eq(AuctionSend::getMyGoodsId, auctionSendForm.getMyGoodsId()));
-        Assert.isFalse(exists, "请勿重复送拍");
+                .eq(AuctionSend::getMyGoodsId, auctionSendForm.getMyGoodsId())
+                .ne(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_BREAK.getCode())
+                .ne(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_PASS.getCode()));
+        Assert.isFalse(exists, "请勿重复送拍,请确定竞品当前状态");
     }
 
     private void aspect(@NotNull AuctionSendForm auctionSendForm, @NotNull String userId) {
@@ -365,16 +382,14 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
             CntCollection cntCollection = collectionService.getById(realBuiId);
             cateId = cntCollection.getCateId();
             buiName = cntCollection.getCollectionName();
-            return;
         }
         if (type == 2) {
             // 将自己的盲盒 隐藏,归并状态及词条
-            info = StrUtil.format("该盲盒被寄售了,已将盲盒移送到寄售市场!");
+            info = StrUtil.format("该盲盒被送拍了,已将盲盒移送到拍卖市场!");
             realBuiId = userBoxService.hideUserBox(myGoodsId,userId,info);
             Box box = boxService.getById(realBuiId);
             cateId = box.getCateId();
             buiName= box.getBoxTitle();
-            return;
         }
         if (StrUtil.isBlank(info) && StrUtil.isBlank(realBuiId))
             throw new ServiceException("not fount type [0-1] now type is "+type+"");

@@ -40,7 +40,18 @@ public class AuctionMarketVo implements Serializable {
     private BigDecimal soldPrice;
 
     @ApiModelProperty("拍卖状态;1待开始，2竞拍中，3待支付，4已完成，5已违约，6已流拍")
-    private Integer auctionStatus;
+    private Integer auctionSendStatus;
+
+    @ApiModelProperty("开始时间 yyyy-MM-dd HH:mm:ss"  )
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime startTime;
+
+    @ApiModelProperty("结束时间 yyyy-MM-dd HH:mm:ss"  )
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime endTime;
+
+    @ApiModelProperty("出价次数")
+    private Integer priceCount;
 
     @ApiModelProperty("创建人")
     private String createdBy;
@@ -55,6 +66,5 @@ public class AuctionMarketVo implements Serializable {
     @ApiModelProperty("更新时间 yyyy-MM-dd HH:mm:ss"  )
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedTime;
-
 
 }

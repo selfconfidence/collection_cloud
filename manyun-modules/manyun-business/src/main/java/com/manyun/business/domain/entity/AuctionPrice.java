@@ -52,4 +52,7 @@ public class AuctionPrice implements Serializable {
 
     @ApiModelProperty("更新时间")
     private LocalDateTime updatedTime;
+
+    @ApiModelProperty("是否最新：1最新，2旧")
+    private Integer isNew;
 }
