@@ -13,7 +13,7 @@ import java.util.Date;
 public class CntCollectionAlterVo
 {
 
-    @ApiModelProperty("藏品id 增加的时候不需要  修改的时候需要")
+    @ApiModelProperty("藏品id 增加时删除该参数不需要  修改时传入该参数")
     private String id;
 
     @ApiModelProperty("系列编号")

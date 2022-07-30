@@ -4,8 +4,10 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntBox;
+import com.manyun.admin.domain.dto.CntBoxAlterCombineDto;
 import com.manyun.admin.domain.query.BoxQuery;
 import com.manyun.admin.domain.query.OrderQuery;
+import com.manyun.admin.domain.vo.CntBoxDetailsVo;
 import com.manyun.admin.domain.vo.CntBoxOrderVo;
 import com.manyun.admin.domain.vo.CntBoxVo;
 
@@ -18,12 +20,12 @@ import com.manyun.admin.domain.vo.CntBoxVo;
 public interface ICntBoxService extends IService<CntBox>
 {
     /**
-     * 查询盲盒;盲盒主体
+     * 查询盲盒;盲盒主体详情
      *
      * @param id 盲盒;盲盒主体主键
      * @return 盲盒;盲盒主体
      */
-    public CntBox selectCntBoxById(String id);
+    public CntBoxDetailsVo selectCntBoxById(String id);
 
     /**
      * 查询盲盒;盲盒主体列表
@@ -36,18 +38,18 @@ public interface ICntBoxService extends IService<CntBox>
     /**
      * 新增盲盒;盲盒主体
      *
-     * @param cntBox 盲盒;盲盒主体
+     * @param boxAlterCombineDto
      * @return 结果
      */
-    public int insertCntBox(CntBox cntBox);
+    public int insertCntBox(CntBoxAlterCombineDto boxAlterCombineDto);
 
     /**
      * 修改盲盒;盲盒主体
      *
-     * @param cntBox 盲盒;盲盒主体
+     * @param boxAlterCombineDto
      * @return 结果
      */
-    public int updateCntBox(CntBox cntBox);
+    public int updateCntBox(CntBoxAlterCombineDto boxAlterCombineDto);
 
     /**
      * 批量删除盲盒;盲盒主体

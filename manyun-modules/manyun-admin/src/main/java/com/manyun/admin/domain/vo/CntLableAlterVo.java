@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-@ApiModel("藏品绑定标签接收参数视图")
+@ApiModel("绑定标签接收参数视图")
 public class CntLableAlterVo
 {
 

@@ -62,11 +62,7 @@ public class CntPostExcelController extends BaseController
         return toResult(cntPostExcelService.deleteCntPostExcelByIds(ids));
     }
 
-
-    /***
-     * 下载模板
-     *
-     */
+    @ApiOperation("下载模板")
     @PostMapping("/importTemplate")
     public void importTemplate(HttpServletResponse response)
     {
@@ -74,10 +70,7 @@ public class CntPostExcelController extends BaseController
         util.importTemplateExcel(response, "提前购数据");
     }
 
-    /***
-     * 获取导入的数据,并处理
-     *
-     */
+    @ApiOperation("获取导入的数据,并处理")
     @PostMapping("/importData")
     public R importData(@RequestPart("file") MultipartFile file) throws Exception
     {

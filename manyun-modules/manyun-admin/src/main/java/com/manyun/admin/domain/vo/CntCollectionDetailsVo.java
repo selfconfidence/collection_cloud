@@ -43,10 +43,10 @@ public class CntCollectionDetailsVo
     private Date publishTime;
 
     @ApiModelProperty("发售数量")
-    private Long balance;
+    private Integer balance;
 
     @ApiModelProperty("流通数量")
-    private Long selfBalance;
+    private Integer selfBalance;
 
     @ApiModelProperty("主图")
     private List<MediaVo> mediaVos;
