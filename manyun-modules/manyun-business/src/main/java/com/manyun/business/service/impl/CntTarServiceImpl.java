@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Objects;
 
-import static com.manyun.common.core.enums.TarStatus.CEN_NOT_TAR;
+import static com.manyun.common.core.enums.TarStatus.*;
 
 /**
  * <p>
@@ -63,7 +63,6 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
 
     @Override
     public Integer tarBox(Box box, String userId) {
-
         return tarComm(box.getId(),box.getTarId(),userId);
     }
 
@@ -95,10 +94,10 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
         HashMap<Integer, Integer> objectObjectHashMap = Maps.newHashMap();
         for (int i = 0; i < 100; i++) {
              if (range >=i){
-                 objectObjectHashMap.put(i,Integer.valueOf(1));
+                 objectObjectHashMap.put(i,Integer.valueOf(CEN_YES_TAR.getCode()));
                  continue;
              }
-            objectObjectHashMap.put(i,Integer.valueOf(2));
+            objectObjectHashMap.put(i,Integer.valueOf(CEN_NO_TAR.getCode()));
         }
         return objectObjectHashMap.get( Long.valueOf(DateUtil.current() % 100).intValue());
 

@@ -223,8 +223,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             Set<String> collectionIds = cacheCollectionMap.keySet();
             List<CntCollection> cntCollections = collectionService.getObject().listByIds(collectionIds);
             for (CntCollection cntCollection : cntCollections) {
-                cntCollection.setBalance(cntCollection.getBalance() + cacheBoxMap.get(cntCollection.getId()));
-                cntCollection.setSelfBalance(cntCollection.getSelfBalance() - cacheBoxMap.get(cntCollection.getId()));
+                cntCollection.setBalance(cntCollection.getBalance() + cacheCollectionMap.get(cntCollection.getId()));
+                cntCollection.setSelfBalance(cntCollection.getSelfBalance() - cacheCollectionMap.get(cntCollection.getId()));
             }
             collectionService.getObject().updateBatchById(cntCollections);
         }

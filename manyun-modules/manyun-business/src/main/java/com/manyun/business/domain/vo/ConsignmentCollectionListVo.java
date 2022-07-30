@@ -1,5 +1,6 @@
 package com.manyun.business.domain.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -7,6 +8,7 @@ import lombok.Data;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -29,13 +31,19 @@ public class ConsignmentCollectionListVo implements Serializable {
     private Integer consignmentStatus;
 
     @ApiModelProperty("剩余支付时间 consignmentStatus = 2 有效  过了这个时间 才可以释放订单,其他人才可以抢购")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endPayTime;
 
 
     @ApiModelProperty("寄售时间")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdTime;
 
+    @ApiModelProperty("寄售服务费")
+    private BigDecimal serverCharge;
 
+    @ApiModelProperty("寄售价格")
+    private BigDecimal consignmentPrice;
 
 
 

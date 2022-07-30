@@ -274,6 +274,9 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         consignmentOrderVo.setId(cntConsignment.getId());
         consignmentOrderVo.setConsignmentStatus(cntConsignment.getConsignmentStatus());
         consignmentOrderVo.setCreatedTime(cntConsignment.getCreatedTime());
+        consignmentOrderVo.setType(cntConsignment.getIsType());
+        consignmentOrderVo.setServerCharge(cntConsignment.getServerCharge());
+        consignmentOrderVo.setConsignmentPrice(cntConsignment.getConsignmentPrice());
         // 需要验证订单 才可以拿到此值
         if (LOCK_CONSIGN.getCode().equals(cntConsignment.getConsignmentStatus()) && StrUtil.isNotBlank(cntConsignment.getOrderId())){
             // 订单查询 将剩余支付时间补足即可
@@ -303,6 +306,8 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         consignmentBoxListVo.setId(cntConsignment.getId());
         consignmentBoxListVo.setConsignmentStatus(cntConsignment.getConsignmentStatus());
         consignmentBoxListVo.setCreatedTime(cntConsignment.getCreatedTime());
+        consignmentBoxListVo.setConsignmentPrice(cntConsignment.getConsignmentPrice());
+        consignmentBoxListVo.setServerCharge(cntConsignment.getServerCharge());
         // 需要验证订单 才可以拿到此值
         if (LOCK_CONSIGN.getCode().equals(cntConsignment.getConsignmentStatus()) && StrUtil.isNotBlank(cntConsignment.getOrderId())){
             // 订单查询 将剩余支付时间补足即可
@@ -339,6 +344,8 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         collectionListVo.setId(cntConsignment.getId());
         collectionListVo.setConsignmentStatus(cntConsignment.getConsignmentStatus());
         collectionListVo.setCreatedTime(cntConsignment.getCreatedTime());
+        collectionListVo.setConsignmentPrice(cntConsignment.getConsignmentPrice());
+        collectionListVo.setServerCharge(cntConsignment.getServerCharge());
         // 需要验证订单 才可以拿到此值
         if (LOCK_CONSIGN.getCode().equals(cntConsignment.getConsignmentStatus()) && StrUtil.isNotBlank(cntConsignment.getOrderId())){
             // 订单查询 将剩余支付时间补足即可
