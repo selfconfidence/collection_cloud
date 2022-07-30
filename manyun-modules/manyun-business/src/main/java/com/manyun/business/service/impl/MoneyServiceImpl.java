@@ -76,7 +76,9 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         } else  {
             // 不够扣
             moneyPayMoney = NumberUtil.sub(realPayMoney, money.getMoneyBalance());
+            if (moneyPayMoney.compareTo(realPayMoney) !=0)
             logsService.saveLogs(LogInfoDto.builder().buiId(userId).jsonTxt(formInfo).formInfo( money.getMoneyBalance().toString()).isType(POLL_SOURCE).modelType(MONEY_TYPE).build());
+
             money.setMoneyBalance(NumberUtil.add(0D));
 
         }

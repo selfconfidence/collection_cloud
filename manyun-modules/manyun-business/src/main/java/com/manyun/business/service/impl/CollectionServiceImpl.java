@@ -186,7 +186,6 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         if (MONEY_TAPE.getCode().equals(collectionSellForm.getPayType()) && StrUtil.isBlank(payVo.getBody())){
             // 调用完成订单
             orderService.notifyPaySuccess(payVo.getOutHost());
-
             String title = StrUtil.format("购买了 {} 藏品!", cntCollection.getCollectionName());
             String form = StrUtil.format("使用余额{};购买了 {} 藏品!",realPayMoney.toString(), cntCollection.getCollectionName());
             msgService.saveMsgThis(MsgThisDto.builder().userId(userId).msgForm(form).msgTitle(title).build());
