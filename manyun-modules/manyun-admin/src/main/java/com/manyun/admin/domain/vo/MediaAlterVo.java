@@ -7,7 +7,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-@ApiModel("藏品绑定图片接收参数视图")
+@ApiModel("绑定图片接收参数视图")
 public class MediaAlterVo implements Serializable {
 
     @ApiModelProperty("主图")

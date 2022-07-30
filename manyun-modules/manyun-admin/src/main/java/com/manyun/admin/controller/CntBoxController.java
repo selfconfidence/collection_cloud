@@ -2,8 +2,10 @@ package com.manyun.admin.controller;
 
 import java.util.List;
 
+import com.manyun.admin.domain.dto.CntBoxAlterCombineDto;
 import com.manyun.admin.domain.query.BoxQuery;
 import com.manyun.admin.domain.query.OrderQuery;
+import com.manyun.admin.domain.vo.CntBoxDetailsVo;
 import com.manyun.admin.domain.vo.CntBoxOrderVo;
 import com.manyun.admin.domain.vo.CntBoxVo;
 import com.manyun.common.core.domain.R;
@@ -46,7 +48,7 @@ public class CntBoxController extends BaseController
     //@RequiresPermissions("admin:box:query")
     @GetMapping(value = "/{id}")
     @ApiOperation("盲盒详细信息")
-    public R<CntBox> getInfo(@PathVariable("id") String id)
+    public R<CntBoxDetailsVo> getInfo(@PathVariable("id") String id)
     {
         return R.ok(cntBoxService.selectCntBoxById(id));
     }
@@ -55,18 +57,18 @@ public class CntBoxController extends BaseController
     @Log(title = "新增盲盒", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增盲盒")
-    public R add(@RequestBody CntBox cntBox)
+    public R add(@RequestBody CntBoxAlterCombineDto boxAlterCombineDto)
     {
-        return toResult(cntBoxService.insertCntBox(cntBox));
+        return toResult(cntBoxService.insertCntBox(boxAlterCombineDto));
     }
 
     //@RequiresPermissions("admin:box:edit")
     @Log(title = "修改盲盒", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("修改盲盒")
-    public R edit(@RequestBody CntBox cntBox)
+    public R edit(@RequestBody CntBoxAlterCombineDto boxAlterCombineDto)
     {
-        return toResult(cntBoxService.updateCntBox(cntBox));
+        return toResult(cntBoxService.updateCntBox(boxAlterCombineDto));
     }
 
     //@RequiresPermissions("admin:box:remove")

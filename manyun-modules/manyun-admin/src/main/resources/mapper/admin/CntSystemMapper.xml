@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntSystemMapper">
+
+    <resultMap type="CntSystem" id="CntSystemResult">
+        <result property="id"    column="id"    />
+        <result property="systemLable"    column="system_lable"    />
+        <result property="systemVal"    column="system_val"    />
+        <result property="systemType"    column="system_type"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCntSystemVo">
+        select id, system_lable, system_val, system_type, created_by, created_time, updated_by, updated_time from cnt_system
+    </sql>
+
+    <select id="selectCntSystemList" parameterType="SystemQuery" resultMap="CntSystemResult">
+        <include refid="selectCntSystemVo"/>
+        <where>
+            <if test="systemLable != null  and systemLable != ''"> and system_lable like concat('%', #{systemLable}, '%')</if>
+        </where>
+    </select>
+
+</mapper>

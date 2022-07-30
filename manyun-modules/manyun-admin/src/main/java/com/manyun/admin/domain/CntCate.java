@@ -22,7 +22,7 @@ public class CntCate implements Serializable
     private String id;
 
     @ApiModelProperty("1=藏品系列，2=盲盒分类")
-    private Long cateType;
+    private Integer cateType;
 
     @ApiModelProperty("系列名称")
     private String cateName;
@@ -50,95 +50,84 @@ public class CntCate implements Serializable
     @ApiModelProperty("更新时间")
     private Date updatedTime;
 
-    public void setId(String id)
-    {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getId()
-    {
-        return id;
+    public Integer getCateType() {
+        return cateType;
     }
-    public void setCateType(Long cateType)
-    {
+
+    public void setCateType(Integer cateType) {
         this.cateType = cateType;
     }
 
-    public Long getCateType()
-    {
-        return cateType;
+    public String getCateName() {
+        return cateName;
     }
-    public void setCateName(String cateName)
-    {
+
+    public void setCateName(String cateName) {
         this.cateName = cateName;
     }
 
-    public String getCateName()
-    {
-        return cateName;
+    public String getCateImage() {
+        return cateImage;
     }
-    public void setCateImage(String cateImage)
-    {
+
+    public void setCateImage(String cateImage) {
         this.cateImage = cateImage;
     }
 
-    public String getCateImage()
-    {
-        return cateImage;
+    public String getCateInfo() {
+        return cateInfo;
     }
-    public void setCateInfo(String cateInfo)
-    {
+
+    public void setCateInfo(String cateInfo) {
         this.cateInfo = cateInfo;
     }
 
-    public String getCateInfo()
-    {
-        return cateInfo;
+    public String getBindCreation() {
+        return bindCreation;
     }
-    public void setBindCreation(String bindCreation)
-    {
+
+    public void setBindCreation(String bindCreation) {
         this.bindCreation = bindCreation;
     }
 
-    public String getBindCreation()
-    {
-        return bindCreation;
+    public String getCreatedBy() {
+        return createdBy;
     }
-    public void setCreatedBy(String createdBy)
-    {
+
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedBy()
-    {
-        return createdBy;
+    public Date getCreatedTime() {
+        return createdTime;
     }
-    public void setCreatedTime(Date createdTime)
-    {
+
+    public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
 
-    public Date getCreatedTime()
-    {
-        return createdTime;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
-    public void setUpdatedBy(String updatedBy)
-    {
+
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedBy()
-    {
-        return updatedBy;
-    }
-    public void setUpdatedTime(Date updatedTime)
-    {
-        this.updatedTime = updatedTime;
+    public Date getUpdatedTime() {
+        return updatedTime;
     }
 
-    public Date getUpdatedTime()
-    {
-        return updatedTime;
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
     }
 
     @Override
