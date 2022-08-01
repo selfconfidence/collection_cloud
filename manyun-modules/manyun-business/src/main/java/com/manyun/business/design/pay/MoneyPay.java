@@ -38,7 +38,7 @@ public class MoneyPay implements RootPayServer {
         if (MONEY_TAPE.getCode().equals(payInfoDto.getPayType())){
             // 是自己执行的
             // 钱包自行扣除进行支付 - 可以组合支付..... 不够可以组合支付！！！ -银联
-            String formInfo = StrUtil.format("消费-{}", payInfoDto.getRealPayMoney().toString());
+            String formInfo = StrUtil.format("消费");
             BigDecimal moneyPayMoney = moneyService.ordePay(payInfoDto.getOutHost(), payInfoDto.getUserId(), payInfoDto.getRealPayMoney(), formInfo);
             if (moneyPayMoney.compareTo(NumberUtil.add(0D)) >= 1){
                 //TODO 银联.....

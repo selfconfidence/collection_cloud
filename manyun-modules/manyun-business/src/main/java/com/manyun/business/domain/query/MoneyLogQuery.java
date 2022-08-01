@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -22,7 +23,7 @@ public class MoneyLogQuery extends PageQuery  {
 
     @ApiModelProperty("时间查询 yyyy-MM-dd"  )
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd")
-    private LocalDateTime createdTime;
+    private LocalDate createdTime;
 
 
 }

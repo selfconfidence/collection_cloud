@@ -113,7 +113,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
     @Override
     public TableDataInfo<MoneyLogVo> pageMoneyLog(String userId, MoneyLogQuery moneyLogQuery) {
         PageHelper.startPage(moneyLogQuery.getPageNum(),moneyLogQuery.getPageSize());
-        List<Logs> logsList = logsService.list(Wrappers.<Logs>lambdaQuery().eq(Logs::getBuiId, userId).eq(Logs::getModelType, MONEY_TYPE).eq(Objects.nonNull(moneyLogQuery.getIsType()), Logs::getIsType, moneyLogQuery.getIsType()).last(Objects.nonNull(moneyLogQuery.getCreatedTime()), " and DATE_FORMAT(created_time,'%Y-%m-%d') = " + DateUtils.getDate() + " ").orderByDesc(Logs::getCreatedTime));
+        List<Logs> logsList = logsService.list(Wrappers.<Logs>lambdaQuery().eq(Logs::getBuiId, userId).eq(Logs::getModelType, MONEY_TYPE).eq(Objects.nonNull(moneyLogQuery.getIsType()), Logs::getIsType, moneyLogQuery.getIsType()).last(Objects.nonNull(moneyLogQuery.getCreatedTime()), " and DATE_FORMAT(created_time,'%Y-%m-%d') = " + moneyLogQuery.getCreatedTime() + " ").orderByDesc(Logs::getCreatedTime));
         List<MoneyLogVo> moneyLogVos = logsList.parallelStream().map(this::initMoneyLogVo).collect(Collectors.toList());
         return TableDataInfoUtil.pageTableDataInfo(moneyLogVos,logsList);
     }
