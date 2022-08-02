@@ -232,6 +232,7 @@ public class AliUtil {
      */
     private static String uploadObject(InputStream is, String folder, String fileName,boolean encode, int expire) {
         log.debug("要上传的文体名称：" + fileName);
+        String typeName =getContentType(fileName);
         OSSClient ossClient = null;
         try {
             if (!folder.endsWith("/")) {
@@ -241,7 +242,7 @@ public class AliUtil {
             createBucketName(ossClient,  SpringUtils.getBean(AliOssConfig.class).getBucketName());
             createFolder(ossClient, folder);
             String key = null;
-            if (encode) {
+            if (encode && typeName !=null) {
                 key = UUID.randomUUID().toString().replaceAll("-", "");
             } else {
                 key = fileName;
@@ -267,7 +268,8 @@ public class AliUtil {
             metadata.setContentEncoding("utf-8");
             //文件的MIME，定义文件的类型及网页编码，决定浏览器将以什么形式、什么编码读取文件。如果用户没有指定则根据Key或文件名的扩展名生成，
             // 指定上传的内容类型。内容类型决定浏览器将以什么形式、什么编码读取文件。如果没有指定则根据文件的扩展名生成，如果没有扩展名则为默认值application/octet-stream。
-            metadata.setContentType(getContentType(fileName));
+            if (typeName  != null)
+            metadata.setContentType(typeName);
             //指定该Object被下载时的名称（指示MINME用户代理如何显示附加的文件，打开或下载，及文件名称）
             metadata.setContentDisposition("filename=" + fileName);
             //上传文件   (上传文件流的形式)
@@ -375,7 +377,7 @@ public class AliUtil {
             return "text/xml";
         }
         //默认返回类型
-        return "image/jpeg";
+        return null;
     }
 
 /*

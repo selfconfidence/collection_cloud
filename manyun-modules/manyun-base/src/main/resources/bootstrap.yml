@@ -3,7 +3,7 @@ server:
   port: 9202
 
 # Spring
-spring: 
+spring:
   application:
     # 应用名称
     name: manyun-base
@@ -23,3 +23,6 @@ spring:
         # 共享配置
         shared-configs:
           - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+  servlet:
+    multipart:
+      max-file-size: 1024MB # 1G 存储 3D图片
