@@ -10,6 +10,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.*;
 import com.manyun.admin.domain.excel.PostExcel;
 import com.manyun.admin.domain.vo.CntPostExcelVo;
@@ -21,6 +22,9 @@ import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,17 +57,19 @@ public class CntPostExcelServiceImpl extends ServiceImpl<CntPostExcelMapper,CntP
     /**
      * 查询提前购格列表
      *
-     * @param cntPostExcel 提前购格
+     * @param pageQuery
      * @return 提前购格
      */
     @Override
-    public List<CntPostExcelVo> selectCntPostExcelList(CntPostExcel cntPostExcel)
+    public TableDataInfo<CntPostExcelVo> selectCntPostExcelList(PageQuery pageQuery)
     {
-        return cntPostExcelMapper.selectCntPostExcelList(cntPostExcel).stream().map(m->{
+        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
+        List<CntPostExcel> cntPostExcels = cntPostExcelMapper.selectCntPostExcelList(new CntPostExcel());
+        return TableDataInfoUtil.pageTableDataInfo(cntPostExcels.parallelStream().map(m->{
             CntPostExcelVo postExcelVo=new CntPostExcelVo();
             BeanUtil.copyProperties(m,postExcelVo);
             return postExcelVo;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()),cntPostExcels);
     }
 
     /**

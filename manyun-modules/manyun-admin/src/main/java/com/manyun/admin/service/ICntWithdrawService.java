@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntWithdraw;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * 提现配置Service接口
@@ -24,10 +26,10 @@ public interface ICntWithdrawService extends IService<CntWithdraw>
     /**
      * 查询提现配置列表
      *
-     * @param cntWithdraw 提现配置
+     * @param pageQuery
      * @return 提现配置集合
      */
-    public List<CntWithdraw> selectCntWithdrawList(CntWithdraw cntWithdraw);
+    public TableDataInfo<CntWithdraw> selectCntWithdrawList(PageQuery pageQuery);
 
     /**
      * 新增提现配置

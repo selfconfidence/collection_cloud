@@ -6,10 +6,13 @@ import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.query.CreationdQuery;
 import com.manyun.admin.domain.vo.CnfCreationdVo;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,13 +51,15 @@ public class CnfCreationdServiceImpl extends ServiceImpl<CnfCreationdMapper,CnfC
      * @return 创作者
      */
     @Override
-    public List<CnfCreationdVo> selectCnfCreationdList(CreationdQuery creationdQuery)
+    public TableDataInfo<CnfCreationdVo> selectCnfCreationdList(CreationdQuery creationdQuery)
     {
-        return cnfCreationdMapper.selectSerachCreationdList(creationdQuery).stream().map(m ->{
+        PageHelper.startPage(creationdQuery.getPageNum(),creationdQuery.getPageSize());
+        List<CnfCreationd> creationdList = cnfCreationdMapper.selectSerachCreationdList(creationdQuery);
+        return TableDataInfoUtil.pageTableDataInfo(creationdList.parallelStream().map(m ->{
             CnfCreationdVo cnfCreationdVo=new CnfCreationdVo();
             BeanUtil.copyProperties(m,cnfCreationdVo);
             return cnfCreationdVo;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()),creationdList);
     }
 
     /**

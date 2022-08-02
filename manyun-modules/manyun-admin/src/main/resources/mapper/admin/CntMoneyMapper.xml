@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntMoneyMapper">
+
+    <resultMap type="CntMoney" id="CntMoneyResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="realName"    column="real_name"    />
+        <result property="realPhone"    column="real_phone"    />
+        <result property="cartJust"    column="cart_just"    />
+        <result property="cartBack"    column="cart_back"    />
+        <result property="isBindCart"    column="is_bind_cart"    />
+        <result property="moneyBalance"    column="money_balance"    />
+        <result property="bankName"    column="bank_name"    />
+        <result property="bankCart"    column="bank_cart"    />
+        <result property="bankOpen"    column="bank_open"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCntMoneyVo">
+        select id, user_id, real_name, real_phone, cart_just, cart_back, is_bind_cart, money_balance, bank_name, bank_cart, bank_open, created_by, created_time, updated_by, updated_time from cnt_money
+    </sql>
+
+</mapper>

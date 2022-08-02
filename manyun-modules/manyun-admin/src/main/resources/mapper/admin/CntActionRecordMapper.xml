@@ -19,16 +19,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, action_id, collection_id, collection_name, created_by, created_time, updated_by, updated_time from cnt_action_record
     </sql>
 
-    <select id="selectCntActionRecordList" parameterType="CntActionRecord" resultMap="CntActionRecordResult">
-        <include refid="selectCntActionRecordVo"/>
+    <select id="selectCntActionRecordList" parameterType="ActionRecordQuery" resultType="CntActionRecordVo">
+        select
+            ca.action_title,
+            ca.action_image,
+            ca.action_status,
+            ca.start_time,
+            ca.end_time,
+            car.nick_name,
+            car.collection_name
+        from
+            cnt_action_record car
+        inner join  cnt_action ca on car.action_id = ca.id
         <where>
-            <if test="actionId != null  and actionId != ''"> and action_id = #{actionId}</if>
-            <if test="collectionId != null  and collectionId != ''"> and collection_id = #{collectionId}</if>
-            <if test="collectionName != null  and collectionName != ''"> and collection_name like concat('%', #{collectionName}, '%')</if>
-            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
-            <if test="createdTime != null "> and created_time = #{createdTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
-            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
+            <if test="actionTitle != null  and actionTitle != ''"> and ca.action_title like concat('%', #{actionTitle}, '%')</if>
         </where>
     </select>
 

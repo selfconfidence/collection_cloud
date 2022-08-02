@@ -20,7 +20,7 @@ public class CntTarVo
     private BigDecimal tarPro;
 
     @ApiModelProperty("抽签类型;(1=盲盒,2=藏品)")
-    private Long tarType;
+    private Integer tarType;
 
     @ApiModelProperty("创建时间")
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")

@@ -3,6 +3,7 @@ package com.manyun.admin.controller;
 
 import com.manyun.admin.domain.vo.CntFeedbackVo;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.PageQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +41,9 @@ public class CntFeedbackController extends BaseController
     //@RequiresPermissions("admin:feedback:list")
     @GetMapping("/list")
     @ApiOperation("查询产品举报反馈列表")
-    public TableDataInfo<CntFeedbackVo> list()
+    public TableDataInfo<CntFeedbackVo> list(PageQuery pageQuery)
     {
-        startPage();
-        List<CntFeedbackVo> list = cntFeedbackService.selectCntFeedbackList(new CntFeedback());
-        return getDataTable(list);
+        return cntFeedbackService.selectCntFeedbackList(pageQuery);
     }
 
     /**

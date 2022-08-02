@@ -8,9 +8,13 @@ import java.util.stream.Collectors;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.vo.CntCustomerServiceVo;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.StringUtils;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.manyun.admin.mapper.CntCustomerServiceMapper;
@@ -44,14 +48,15 @@ public class CntCustomerServiceServiceImpl extends ServiceImpl<CntCustomerServic
     /**
      * 查询客服列表
      *
-     * @param cntCustomerService 客服
+     * @param pageQuery
      * @return 客服
      */
     @Override
-    public List<CntCustomerServiceVo> selectCntCustomerServiceList(CntCustomerService cntCustomerService)
+    public TableDataInfo<CntCustomerServiceVo> selectCntCustomerServiceList(PageQuery pageQuery)
     {
-        List<CntCustomerService> cntCustomerServices = cntCustomerServiceMapper.selectCntCustomerServiceList(cntCustomerService);
-        return cntCustomerServices.stream().map(m ->{
+        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
+        List<CntCustomerService> cntCustomerServices = cntCustomerServiceMapper.selectCntCustomerServiceList(new CntCustomerService());
+        return TableDataInfoUtil.pageTableDataInfo(cntCustomerServices.parallelStream().map(m ->{
             CntCustomerServiceVo cntCustomerServiceVo=new CntCustomerServiceVo();
             BeanUtil.copyProperties(m,cntCustomerServiceVo);
             if(m.getParentId()==0){
@@ -63,7 +68,7 @@ public class CntCustomerServiceServiceImpl extends ServiceImpl<CntCustomerServic
                 }
             }
             return cntCustomerServiceVo;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()),cntCustomerServices);
     }
 
     /**

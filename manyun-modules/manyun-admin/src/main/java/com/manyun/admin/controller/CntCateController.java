@@ -36,9 +36,7 @@ public class CntCateController extends BaseController
     @ApiOperation("藏品分类列表")
     public TableDataInfo<CntCateVo> list(CateQuery cateQuery)
     {
-        startPage();
-        List<CntCateVo> list = cntCateService.selectCntCateList(cateQuery);
-        return getDataTable(list);
+        return cntCateService.selectCntCateList(cateQuery);
     }
 
     //@RequiresPermissions("admin:cate:query")

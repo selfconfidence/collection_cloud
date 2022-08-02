@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntOrderConfiguration;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * 订单配置Service接口
@@ -24,10 +26,10 @@ public interface ICntOrderConfigurationService extends IService<CntOrderConfigur
     /**
      * 查询订单配置列表
      *
-     * @param cntOrderConfiguration 订单配置
+     * @param pageQuery
      * @return 订单配置集合
      */
-    public List<CntOrderConfiguration> selectCntOrderConfigurationList(CntOrderConfiguration cntOrderConfiguration);
+    public TableDataInfo<CntOrderConfiguration> selectCntOrderConfigurationList(PageQuery pageQuery);
 
     /**
      * 新增订单配置

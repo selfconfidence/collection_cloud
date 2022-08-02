@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntSystem;
 import com.manyun.admin.domain.query.SystemQuery;
 import com.manyun.admin.domain.vo.CntSystemVo;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * 平台规则Service接口
@@ -25,10 +26,10 @@ public interface ICntSystemService extends IService<CntSystem>
     /**
      * 查询平台规则列表
      *
-     * @param SystemQuery
+     * @param systemQuery
      * @return 平台规则集合
      */
-    public List<CntSystemVo> selectCntSystemList(SystemQuery SystemQuery);
+    public TableDataInfo<CntSystemVo> selectCntSystemList(SystemQuery systemQuery);
 
     /**
      * 修改平台规则

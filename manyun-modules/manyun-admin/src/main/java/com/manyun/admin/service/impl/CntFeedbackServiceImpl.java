@@ -4,9 +4,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.vo.CntFeedbackVo;
 import com.manyun.common.core.utils.DateUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,17 +33,19 @@ public class CntFeedbackServiceImpl extends ServiceImpl<CntFeedbackMapper,CntFee
     /**
      * 查询产品举报反馈列表
      *
-     * @param cntFeedback 产品举报反馈
+     * @param pageQuery
      * @return 产品举报反馈
      */
     @Override
-    public List<CntFeedbackVo> selectCntFeedbackList(CntFeedback cntFeedback)
+    public TableDataInfo<CntFeedbackVo> selectCntFeedbackList(PageQuery pageQuery)
     {
-        return cntFeedbackMapper.selectCntFeedbackList(cntFeedback).stream().map(m->{
+        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
+        List<CntFeedback> cntFeedbacks = cntFeedbackMapper.selectCntFeedbackList(new CntFeedback());
+        return TableDataInfoUtil.pageTableDataInfo(cntFeedbacks.parallelStream().map(m->{
             CntFeedbackVo cntFeedbackVo=new CntFeedbackVo();
             BeanUtil.copyProperties(m,cntFeedbackVo);
             return cntFeedbackVo;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()),cntFeedbacks);
     }
 
     /**

@@ -6,6 +6,8 @@ import com.manyun.admin.domain.CntPostExcel;
 import com.manyun.admin.domain.excel.PostExcel;
 import com.manyun.admin.domain.vo.CntPostExcelVo;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * 提前购格Service接口
@@ -19,10 +21,10 @@ public interface ICntPostExcelService extends IService<CntPostExcel>
     /**
      * 查询提前购格列表
      *
-     * @param cntPostExcel 提前购格
+     * @param pageQuery
      * @return 提前购格集合
      */
-    public List<CntPostExcelVo> selectCntPostExcelList(CntPostExcel cntPostExcel);
+    public TableDataInfo<CntPostExcelVo> selectCntPostExcelList(PageQuery pageQuery);
 
     /**
      * 批量删除提前购格

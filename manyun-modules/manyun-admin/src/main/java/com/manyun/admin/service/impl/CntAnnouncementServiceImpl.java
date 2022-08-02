@@ -2,9 +2,14 @@ package com.manyun.admin.service.impl;
 
 import java.util.List;
 import java.util.Arrays;
+
+import com.github.pagehelper.PageHelper;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,13 +45,15 @@ public class CntAnnouncementServiceImpl extends ServiceImpl<CntAnnouncementMappe
     /**
      * 查询公告列表
      *
-     * @param cntAnnouncement 公告
+     * @param pageQuery
      * @return 公告
      */
     @Override
-    public List<CntAnnouncement> selectCntAnnouncementList(CntAnnouncement cntAnnouncement)
+    public TableDataInfo<CntAnnouncement> selectCntAnnouncementList(PageQuery pageQuery)
     {
-        return cntAnnouncementMapper.selectCntAnnouncementList(cntAnnouncement);
+        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
+        List<CntAnnouncement> cntAnnouncements = cntAnnouncementMapper.selectCntAnnouncementList(new CntAnnouncement());
+        return TableDataInfoUtil.pageTableDataInfo(cntAnnouncements,cntAnnouncements);
     }
 
     /**

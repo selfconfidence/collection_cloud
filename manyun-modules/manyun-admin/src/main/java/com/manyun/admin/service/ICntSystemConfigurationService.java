@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntSystemConfiguration;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * 系统配置Service接口
@@ -24,10 +26,10 @@ public interface ICntSystemConfigurationService extends IService<CntSystemConfig
     /**
      * 查询系统配置列表
      *
-     * @param cntSystemConfiguration 系统配置
+     * @param pageQuery
      * @return 系统配置集合
      */
-    public List<CntSystemConfiguration> selectCntSystemConfigurationList(CntSystemConfiguration cntSystemConfiguration);
+    public TableDataInfo<CntSystemConfiguration> selectCntSystemConfigurationList(PageQuery pageQuery);
 
     /**
      * 新增系统配置

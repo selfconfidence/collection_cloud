@@ -37,7 +37,7 @@ public class CntOrder implements Serializable
     private Date updatedTime;
 
     @ApiModelProperty("购买数量")
-    private Long goodsNum;
+    private Integer goodsNum;
 
     @ApiModelProperty("订单号")
     private String orderNo;
@@ -49,13 +49,13 @@ public class CntOrder implements Serializable
     private String buiId;
 
     @ApiModelProperty("商品类型;0藏品，1盲盒")
-    private Long goodsType;
+    private Integer goodsType;
 
     @ApiModelProperty("订单状态;0待付款，1已完成，2已取消，-1支付未回调 3=进行中(这个比较特殊 属于寄售的时候用的)")
-    private Long orderStatus;
+    private Integer orderStatus;
 
     @ApiModelProperty("支付方式;0平台，1支付宝，2微信，3银联")
-    private Long payType;
+    private Integer payType;
 
     @ApiModelProperty("订单金额")
     private BigDecimal orderAmount;
@@ -71,149 +71,132 @@ public class CntOrder implements Serializable
     @ApiModelProperty("藏品名称")
     private String collectionName;
 
-    public void setId(String id)
-    {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getId()
-    {
-        return id;
+    public String getCreatedBy() {
+        return createdBy;
     }
-    public void setCreatedBy(String createdBy)
-    {
+
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedBy()
-    {
-        return createdBy;
+    public Date getCreatedTime() {
+        return createdTime;
     }
-    public void setCreatedTime(Date createdTime)
-    {
+
+    public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
 
-    public Date getCreatedTime()
-    {
-        return createdTime;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
-    public void setUpdatedBy(String updatedBy)
-    {
+
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedBy()
-    {
-        return updatedBy;
+    public Date getUpdatedTime() {
+        return updatedTime;
     }
-    public void setUpdatedTime(Date updatedTime)
-    {
+
+    public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
     }
 
-    public Date getUpdatedTime()
-    {
-        return updatedTime;
+    public Integer getGoodsNum() {
+        return goodsNum;
     }
-    public void setGoodsNum(Long goodsNum)
-    {
+
+    public void setGoodsNum(Integer goodsNum) {
         this.goodsNum = goodsNum;
     }
 
-    public Long getGoodsNum()
-    {
-        return goodsNum;
+    public String getOrderNo() {
+        return orderNo;
     }
-    public void setOrderNo(String orderNo)
-    {
+
+    public void setOrderNo(String orderNo) {
         this.orderNo = orderNo;
     }
 
-    public String getOrderNo()
-    {
-        return orderNo;
+    public String getUserId() {
+        return userId;
     }
-    public void setUserId(String userId)
-    {
+
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
-    public String getUserId()
-    {
-        return userId;
+    public String getBuiId() {
+        return buiId;
     }
-    public void setBuiId(String buiId)
-    {
+
+    public void setBuiId(String buiId) {
         this.buiId = buiId;
     }
 
-    public String getBuiId()
-    {
-        return buiId;
+    public Integer getGoodsType() {
+        return goodsType;
     }
-    public void setGoodsType(Long goodsType)
-    {
+
+    public void setGoodsType(Integer goodsType) {
         this.goodsType = goodsType;
     }
 
-    public Long getGoodsType()
-    {
-        return goodsType;
+    public Integer getOrderStatus() {
+        return orderStatus;
     }
-    public void setOrderStatus(Long orderStatus)
-    {
+
+    public void setOrderStatus(Integer orderStatus) {
         this.orderStatus = orderStatus;
     }
 
-    public Long getOrderStatus()
-    {
-        return orderStatus;
+    public Integer getPayType() {
+        return payType;
     }
-    public void setPayType(Long payType)
-    {
+
+    public void setPayType(Integer payType) {
         this.payType = payType;
     }
 
-    public Long getPayType()
-    {
-        return payType;
+    public BigDecimal getOrderAmount() {
+        return orderAmount;
     }
-    public void setOrderAmount(BigDecimal orderAmount)
-    {
+
+    public void setOrderAmount(BigDecimal orderAmount) {
         this.orderAmount = orderAmount;
     }
 
-    public BigDecimal getOrderAmount()
-    {
-        return orderAmount;
+    public Date getEndTime() {
+        return endTime;
     }
-    public void setEndTime(Date endTime)
-    {
+
+    public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 
-    public Date getEndTime()
-    {
-        return endTime;
+    public Date getPayTime() {
+        return payTime;
     }
-    public void setPayTime(Date payTime)
-    {
+
+    public void setPayTime(Date payTime) {
         this.payTime = payTime;
     }
 
-    public Date getPayTime()
-    {
-        return payTime;
-    }
-    public void setCollectionName(String collectionName)
-    {
-        this.collectionName = collectionName;
+    public String getCollectionName() {
+        return collectionName;
     }
 
-    public String getCollectionName()
-    {
-        return collectionName;
+    public void setCollectionName(String collectionName) {
+        this.collectionName = collectionName;
     }
 
     @Override

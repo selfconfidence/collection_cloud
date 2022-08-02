@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.manyun.admin.domain.vo.CntPostExistVo;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.PageQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,11 +44,9 @@ public class CntPostExistController extends BaseController
     //@RequiresPermissions("admin:exist:list")
     @GetMapping("/list")
     @ApiOperation("查询提前购配置已经拥有列表")
-    public TableDataInfo<CntPostExistVo> list()
+    public TableDataInfo<CntPostExistVo> list(PageQuery pageQuery)
     {
-        startPage();
-        List<CntPostExistVo> list = cntPostExistService.selectCntPostExistList(new CntPostExist());
-        return getDataTable(list);
+        return cntPostExistService.selectCntPostExistList(pageQuery);
     }
 
     /**

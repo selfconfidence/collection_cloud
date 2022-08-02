@@ -5,10 +5,12 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntOrder;
 import com.manyun.admin.domain.CntUser;
+import com.manyun.admin.domain.dto.UpdateBalanceDto;
 import com.manyun.admin.domain.query.UserMoneyQuery;
 import com.manyun.admin.domain.vo.CntOrderVo;
 import com.manyun.admin.domain.vo.UserCollectionVo;
 import com.manyun.admin.domain.vo.UserMoneyVo;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * 用户Service接口
@@ -25,7 +27,7 @@ public interface ICntUserService extends IService<CntUser>
      * @param userMoneyQuery 用户和钱包信息
      * @return 结果
      */
-    List<UserMoneyVo> selectUserMoneyList(UserMoneyQuery userMoneyQuery);
+    TableDataInfo<UserMoneyVo> selectUserMoneyList(UserMoneyQuery userMoneyQuery);
 
     /**
      * 修改用户
@@ -45,4 +47,8 @@ public interface ICntUserService extends IService<CntUser>
      */
     List<UserCollectionVo> myCollectionList(String userId);
 
+    /**
+     * 修改余额
+     */
+    int updateBalance(UpdateBalanceDto balanceDto);
 }

@@ -16,13 +16,13 @@ public class CntCustomerService implements Serializable
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("菜单ID")
-    private Long menuId;
+    private Integer menuId;
 
     @ApiModelProperty("菜单名称")
     private String menuName;
 
     @ApiModelProperty("父菜单ID")
-    private Long parentId;
+    private Integer parentId;
 
     @ApiModelProperty("显示顺序")
     private Integer orderNum;
@@ -50,68 +50,60 @@ public class CntCustomerService implements Serializable
     @ApiModelProperty("更新时间")
     private Date updateTime;
 
-    public void setMenuId(Long menuId)
-    {
+    public Integer getMenuId() {
+        return menuId;
+    }
+
+    public void setMenuId(Integer menuId) {
         this.menuId = menuId;
     }
 
-    public Long getMenuId()
-    {
-        return menuId;
+    public String getMenuName() {
+        return menuName;
     }
-    public void setMenuName(String menuName)
-    {
+
+    public void setMenuName(String menuName) {
         this.menuName = menuName;
     }
 
-    public String getMenuName()
-    {
-        return menuName;
+    public Integer getParentId() {
+        return parentId;
     }
-    public void setParentId(Long parentId)
-    {
+
+    public void setParentId(Integer parentId) {
         this.parentId = parentId;
     }
 
-    public Long getParentId()
-    {
-        return parentId;
+    public Integer getOrderNum() {
+        return orderNum;
     }
-    public void setOrderNum(Integer orderNum)
-    {
+
+    public void setOrderNum(Integer orderNum) {
         this.orderNum = orderNum;
     }
 
-    public Integer getOrderNum()
-    {
-        return orderNum;
+    public String getMenuStatus() {
+        return menuStatus;
     }
-    public void setMenuStatus(String menuStatus)
-    {
+
+    public void setMenuStatus(String menuStatus) {
         this.menuStatus = menuStatus;
     }
 
-    public String getMenuStatus()
-    {
-        return menuStatus;
+    public String getArticleTitle() {
+        return articleTitle;
     }
-    public void setArticleTitle(String articleTitle)
-    {
+
+    public void setArticleTitle(String articleTitle) {
         this.articleTitle = articleTitle;
     }
 
-    public String getArticleTitle()
-    {
-        return articleTitle;
-    }
-    public void setArticleContent(String articleContent)
-    {
-        this.articleContent = articleContent;
+    public String getArticleContent() {
+        return articleContent;
     }
 
-    public String getArticleContent()
-    {
-        return articleContent;
+    public void setArticleContent(String articleContent) {
+        this.articleContent = articleContent;
     }
 
     public String getCreateBy() {

@@ -32,6 +32,7 @@
         select
             u.id,
             u.status,
+            u.user_id userId,
             u.nick_name nickName,
             u.phone,
             m.real_name realName,
@@ -40,6 +41,7 @@
             m.bank_name bankName,
             m.bank_cart bankCart,
             m.bank_open bankOpen,
+            m.money_balance moneyBalance,
             m.created_time createdTime
         from
             cnt_user u

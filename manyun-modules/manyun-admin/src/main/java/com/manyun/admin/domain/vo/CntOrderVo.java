@@ -25,19 +25,19 @@ public class CntOrderVo {
     private String phone;
 
     @ApiModelProperty("商品类型;0藏品，1盲盒")
-    private Long goodsType;
+    private Integer goodsType;
 
     @ApiModelProperty("藏品名称")
     private String collectionName;
 
     @ApiModelProperty("购买数量")
-    private Long goodsNum;
+    private Integer goodsNum;
 
     @ApiModelProperty("订单状态;0待付款，1已完成，2已取消，-1支付未回调 3=进行中(这个比较特殊 属于寄售的时候用的)")
-    private Long orderStatus;
+    private Integer orderStatus;
 
     @ApiModelProperty("支付方式;0平台，1支付宝，2微信，3银联")
-    private Long payType;
+    private Integer payType;
 
     @ApiModelProperty("订单金额")
     private BigDecimal orderAmount;

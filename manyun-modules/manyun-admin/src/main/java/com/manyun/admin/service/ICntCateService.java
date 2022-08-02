@@ -7,6 +7,7 @@ import com.manyun.admin.domain.CntCate;
 import com.manyun.admin.domain.query.CateQuery;
 import com.manyun.admin.domain.vo.CntCateVo;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * 藏品系列_分类Service接口
@@ -30,7 +31,7 @@ public interface ICntCateService extends IService<CntCate>
      * @param cateQuery
      * @return 藏品系列_分类集合
      */
-    public List<CntCateVo> selectCntCateList(CateQuery cateQuery);
+    public TableDataInfo<CntCateVo> selectCntCateList(CateQuery cateQuery);
 
     /**
      * 新增藏品系列_分类

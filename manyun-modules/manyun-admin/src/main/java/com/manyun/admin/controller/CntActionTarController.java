@@ -1,6 +1,5 @@
 package com.manyun.admin.controller;
 
-import java.util.List;
 
 import com.manyun.admin.domain.dto.SaveActionTarDto;
 import com.manyun.admin.domain.query.ActionTarQuery;
@@ -17,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
-import com.manyun.common.security.annotation.RequiresPermissions;
-import com.manyun.admin.domain.CntActionTar;
 import com.manyun.admin.service.ICntActionTarService;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.TableDataInfo;
@@ -45,9 +42,7 @@ public class CntActionTarController extends BaseController
     @ApiOperation("查询活动合成附属信息列表")
     public TableDataInfo<CntActionTarVo> list(ActionTarQuery actionTarQuery)
     {
-        startPage();
-        List<CntActionTarVo> list = cntActionTarService.selectCntActionTarList(actionTarQuery);
-        return getDataTable(list);
+        return cntActionTarService.selectCntActionTarList(actionTarQuery);
     }
 
     /**

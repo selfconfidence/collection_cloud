@@ -17,6 +17,6 @@ public class OrderQuery
     private String userId;
 
     @ApiModelProperty("订单状态;0待付款，1已完成，2已取消，-1支付未回调 3=进行中(这个比较特殊 属于寄售的时候用的)")
-    private Long orderStatus;
+    private Integer orderStatus;
 
 }

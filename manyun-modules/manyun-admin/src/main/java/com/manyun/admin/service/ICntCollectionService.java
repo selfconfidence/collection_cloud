@@ -9,6 +9,7 @@ import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
 import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * 藏品Service接口
@@ -32,7 +33,7 @@ public interface ICntCollectionService extends IService<CntCollection>
      * @param collectionQuery
      * @return 藏品集合
      */
-    public List<CntCollectionVo> selectCntCollectionList(CollectionQuery collectionQuery);
+    public TableDataInfo<CntCollectionVo> selectCntCollectionList(CollectionQuery collectionQuery);
 
     /**
      * 新增藏品

@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.PageQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +38,9 @@ public class CntMarketingController extends BaseController
     //@RequiresPermissions("admin:marketing:list")
     @GetMapping("/list")
     @ApiOperation("查询营销配置列表")
-    public TableDataInfo<CntMarketing> list(CntMarketing cntMarketing)
+    public TableDataInfo<CntMarketing> list(PageQuery pageQuery)
     {
-        startPage();
-        List<CntMarketing> list = cntMarketingService.selectCntMarketingList(cntMarketing);
-        return getDataTable(list);
+        return cntMarketingService.selectCntMarketingList(pageQuery);
     }
 
     //@RequiresPermissions("admin:marketing:query")

@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntCustomerService;
 import com.manyun.admin.domain.vo.CntCustomerServiceVo;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * 客服Service接口
@@ -26,10 +28,10 @@ public interface ICntCustomerServiceService extends IService<CntCustomerService>
     /**
      * 查询客服列表
      *
-     * @param cntCustomerService 客服
+     * @param pageQuery
      * @return 客服集合
      */
-    public List<CntCustomerServiceVo> selectCntCustomerServiceList(CntCustomerService cntCustomerService);
+    public TableDataInfo<CntCustomerServiceVo> selectCntCustomerServiceList(PageQuery pageQuery);
 
     /**
      * 新增客服

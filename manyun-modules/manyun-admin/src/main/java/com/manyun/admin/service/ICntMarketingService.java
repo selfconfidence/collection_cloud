@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntMarketing;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * 营销配置Service接口
@@ -24,10 +26,10 @@ public interface ICntMarketingService extends IService<CntMarketing>
     /**
      * 查询营销配置列表
      *
-     * @param cntMarketing 营销配置
+     * @param pageQuery
      * @return 营销配置集合
      */
-    public List<CntMarketing> selectCntMarketingList(CntMarketing cntMarketing);
+    public TableDataInfo<CntMarketing> selectCntMarketingList(PageQuery pageQuery);
 
     /**
      * 新增营销配置

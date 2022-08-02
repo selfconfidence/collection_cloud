@@ -4,8 +4,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,13 +44,15 @@ public class CntWithdrawServiceImpl extends ServiceImpl<CntWithdrawMapper,CntWit
     /**
      * 查询提现配置列表
      *
-     * @param cntWithdraw 提现配置
+     * @param pageQuery
      * @return 提现配置
      */
     @Override
-    public List<CntWithdraw> selectCntWithdrawList(CntWithdraw cntWithdraw)
+    public TableDataInfo<CntWithdraw> selectCntWithdrawList(PageQuery pageQuery)
     {
-        return cntWithdrawMapper.selectCntWithdrawList(cntWithdraw);
+        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
+        List<CntWithdraw> cntWithdraws = cntWithdrawMapper.selectCntWithdrawList(new CntWithdraw());
+        return TableDataInfoUtil.pageTableDataInfo(cntWithdraws,cntWithdraws);
     }
 
     /**

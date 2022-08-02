@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntAgreement;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * 协议相关Service接口
@@ -24,10 +26,10 @@ public interface ICntAgreementService extends IService<CntAgreement>
     /**
      * 查询协议相关列表
      *
-     * @param cntAgreement 协议相关
+     * @param pageQuery
      * @return 协议相关集合
      */
-    public List<CntAgreement> selectCntAgreementList(CntAgreement cntAgreement);
+    public TableDataInfo<CntAgreement> selectCntAgreementList(PageQuery pageQuery);
 
     /**
      * 新增协议相关

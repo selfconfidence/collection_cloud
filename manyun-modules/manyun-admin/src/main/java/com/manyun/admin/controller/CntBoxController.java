@@ -40,9 +40,7 @@ public class CntBoxController extends BaseController
     @ApiOperation("盲盒列表")
     public TableDataInfo<CntBoxVo> list(BoxQuery boxQuery)
     {
-        startPage();
-        List<CntBoxVo> list = cntBoxService.selectCntBoxList(boxQuery);
-        return getDataTable(list);
+        return cntBoxService.selectCntBoxList(boxQuery);
      }
 
     //@RequiresPermissions("admin:box:query")

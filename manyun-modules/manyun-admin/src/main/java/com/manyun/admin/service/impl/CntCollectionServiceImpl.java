@@ -9,6 +9,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.*;
 import com.manyun.admin.domain.dto.AirdropDto;
 import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
@@ -24,6 +25,8 @@ import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -81,14 +84,16 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
      * @return 藏品
      */
     @Override
-    public List<CntCollectionVo> selectCntCollectionList(CollectionQuery collectionQuery)
+    public TableDataInfo<CntCollectionVo> selectCntCollectionList(CollectionQuery collectionQuery)
     {
-        return cntCollectionMapper.selectSearchCollectionList(collectionQuery).stream().map(m -> {
+        PageHelper.startPage(collectionQuery.getPageNum(),collectionQuery.getPageSize());
+        List<CntCollection> cntCollectionList = cntCollectionMapper.selectSearchCollectionList(collectionQuery);
+        return TableDataInfoUtil.pageTableDataInfo(cntCollectionList.parallelStream().map(m->{
             CntCollectionVo cntCollectionVo = new CntCollectionVo();
             BeanUtil.copyProperties(m, cntCollectionVo);
             cntCollectionVo.setMediaVos(mediaService.initMediaVos(m.getId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
             return cntCollectionVo;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()), cntCollectionList);
     }
 
     /**
@@ -127,10 +132,9 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         //标签
         CntLableAlterVo cntLableAlterVo = collectionAlterCombineDto.getCntLableAlterVo();
         if (Objects.nonNull(cntLableAlterVo)) {
-            String lableIds = cntLableAlterVo.getLableIds();
-            if (StringUtils.isNotBlank(lableIds)) {
-                String[] arr = lableIds.split(",");
-                List<CntCollectionLable> cntCollectionLables = Arrays.asList(arr).stream().map(m -> {
+            String[] lableIds = cntLableAlterVo.getLableIds();
+            if (lableIds.length>0) {
+                List<CntCollectionLable> cntCollectionLables = Arrays.asList(lableIds).stream().map(m -> {
                     return Builder.of(CntCollectionLable::new)
                             .with(CntCollectionLable::setId, IdUtils.getSnowflakeNextIdStr())
                             .with(CntCollectionLable::setCollectionId, idStr)
@@ -150,7 +154,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                             .with(CntMedia::setBuiId, idStr)
                             .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)
                             .with(CntMedia::setMediaUrl, mediaAlterVo.getImg())
-                            .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE.toString())
+                            .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)
                             .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
                             .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
             );
@@ -207,12 +211,11 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         }
         //标签
         CntLableAlterVo cntLableAlterVo = collectionAlterCombineDto.getCntLableAlterVo();
-        String lableIds = cntLableAlterVo.getLableIds();
+        String[] lableIds = cntLableAlterVo.getLableIds();
         if (Objects.nonNull(collectionInfoAlterVo)) {
-            if (StringUtils.isNotBlank(lableIds)) {
+            if (lableIds.length>0) {
                 collectionLableService.remove(Wrappers.<CntCollectionLable>lambdaQuery().eq(CntCollectionLable::getCollectionId, collectionId));
-                String[] arr = lableIds.split(",");
-                List<CntCollectionLable> cntCollectionLables = Arrays.asList(arr).stream().map(m -> {
+                List<CntCollectionLable> cntCollectionLables = Arrays.asList(lableIds).stream().map(m -> {
                     return Builder.of(CntCollectionLable::new)
                             .with(CntCollectionLable::setId, IdUtils.getSnowflakeNextIdStr())
                             .with(CntCollectionLable::setCollectionId, collectionId)

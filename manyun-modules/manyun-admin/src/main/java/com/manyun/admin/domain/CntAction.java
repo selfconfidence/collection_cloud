@@ -26,7 +26,7 @@ public class CntAction implements Serializable
     private String actionImage;
 
     @ApiModelProperty("活动状态;1=待开始,2=进行中,3=结束")
-    private Long actionStatus;
+    private Integer actionStatus;
 
     @ApiModelProperty("活动开始时间")
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
@@ -56,113 +56,100 @@ public class CntAction implements Serializable
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedTime;
 
-    public void setId(String id)
-    {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getId()
-    {
-        return id;
+    public String getActionTitle() {
+        return actionTitle;
     }
-    public void setActionTitle(String actionTitle)
-    {
+
+    public void setActionTitle(String actionTitle) {
         this.actionTitle = actionTitle;
     }
 
-    public String getActionTitle()
-    {
-        return actionTitle;
+    public String getActionImage() {
+        return actionImage;
     }
-    public void setActionImage(String actionImage)
-    {
+
+    public void setActionImage(String actionImage) {
         this.actionImage = actionImage;
     }
 
-    public String getActionImage()
-    {
-        return actionImage;
+    public Integer getActionStatus() {
+        return actionStatus;
     }
-    public void setActionStatus(Long actionStatus)
-    {
+
+    public void setActionStatus(Integer actionStatus) {
         this.actionStatus = actionStatus;
     }
 
-    public Long getActionStatus()
-    {
-        return actionStatus;
+    public Date getStartTime() {
+        return startTime;
     }
-    public void setStartTime(Date startTime)
-    {
+
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
-    public Date getStartTime()
-    {
-        return startTime;
+    public Date getEndTime() {
+        return endTime;
     }
-    public void setEndTime(Date endTime)
-    {
+
+    public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 
-    public Date getEndTime()
-    {
-        return endTime;
+    public String getCollectionId() {
+        return collectionId;
     }
-    public void setCollectionId(String collectionId)
-    {
+
+    public void setCollectionId(String collectionId) {
         this.collectionId = collectionId;
     }
 
-    public String getCollectionId()
-    {
-        return collectionId;
+    public String getRuleContent() {
+        return ruleContent;
     }
-    public void setRuleContent(String ruleContent)
-    {
+
+    public void setRuleContent(String ruleContent) {
         this.ruleContent = ruleContent;
     }
 
-    public String getRuleContent()
-    {
-        return ruleContent;
+    public String getCreatedBy() {
+        return createdBy;
     }
-    public void setCreatedBy(String createdBy)
-    {
+
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedBy()
-    {
-        return createdBy;
+    public Date getCreatedTime() {
+        return createdTime;
     }
-    public void setCreatedTime(Date createdTime)
-    {
+
+    public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
 
-    public Date getCreatedTime()
-    {
-        return createdTime;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
-    public void setUpdatedBy(String updatedBy)
-    {
+
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedBy()
-    {
-        return updatedBy;
-    }
-    public void setUpdatedTime(Date updatedTime)
-    {
-        this.updatedTime = updatedTime;
+    public Date getUpdatedTime() {
+        return updatedTime;
     }
 
-    public Date getUpdatedTime()
-    {
-        return updatedTime;
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
     }
 
     @Override

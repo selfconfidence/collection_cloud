@@ -5,11 +5,11 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-@ApiModel("条件查询对象")
+@ApiModel("活动记录条件查询对象")
 @Data
-public class CollectionInfoQuery extends PageQuery {
+public class ActionRecordQuery extends PageQuery {
 
-    @ApiModelProperty("发行方")
-    private String publishOther;
+    @ApiModelProperty("活动标题")
+    private String actionTitle;
 
 }

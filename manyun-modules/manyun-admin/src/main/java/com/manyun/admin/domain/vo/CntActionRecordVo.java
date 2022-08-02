@@ -14,10 +14,27 @@ public class CntActionRecordVo {
     @ApiModelProperty("主键")
     private String id;
 
-    @ApiModelProperty("用户昵称")
+    @ApiModelProperty("活动标题")
+    private String actionTitle;
+
+    @ApiModelProperty("活动封面")
+    private String actionImage;
+
+    @ApiModelProperty("活动状态;1=待开始,2=进行中,3=结束")
+    private Integer actionStatus;
+
+    @ApiModelProperty("活动开始时间")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date startTime;
+
+    @ApiModelProperty("活动结束时间")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date endTime;
+
+    @ApiModelProperty("合成用户昵称")
     private String nickName;
 
-    @ApiModelProperty("藏品名称")
+    @ApiModelProperty("合成藏品名称")
     private String collectionName;
 
     @ApiModelProperty("创建时间")

@@ -2,6 +2,7 @@ package com.manyun.admin.service;
 
 import com.manyun.admin.domain.query.DrawRulesDictQuery;
 import com.manyun.admin.domain.vo.*;
+import com.manyun.common.core.domain.R;
 
 import java.util.List;
 
@@ -16,40 +17,40 @@ public interface CntDictService
     /***
      * 查询藏品字典
      */
-    List<CntCollectionDictVo> collectionDict();
+    R collectionDict();
 
     /***
      * 查询藏品系列字典
      */
-    List<CollectionCateDictVo> collectionCateDict();
+    R collectionCateDict();
 
     /***
      * 查询创作者字典
      */
-    List<CreationdDictVo> creationdDict();
+    R creationdDict();
 
     /***
      * 查询标签字典
      */
-    List<LableDictVo> lableDict();
+    R lableDict();
 
     /***
      * 查询客服字典
      */
-    List<CustomerServiceDictVo> customerServiceDict();
+    R customerServiceDict();
 
     /***
      * 抽签规则字典
      */
-    List<DrawRulesDictVo> drawRulesDict(DrawRulesDictQuery drawRulesDictQuery);
+    R drawRulesDict(DrawRulesDictQuery drawRulesDictQuery);
 
     /***
      * 提前购配置可以购买字典
      */
-    List<TqgGoodsDictVo> postSellDict();
+    R postSellDict();
 
     /***
      * 提前购配置已经拥有字典
      */
-    List<TqgGoodsDictVo> postExistDict();
+    R postExistDict();
 }
