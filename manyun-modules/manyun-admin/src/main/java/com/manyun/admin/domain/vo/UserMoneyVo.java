@@ -3,6 +3,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 
@@ -15,6 +16,9 @@ public class UserMoneyVo {
 
     @ApiModelProperty("帐号状态（0正常 1停用）")
     private String status;
+
+    @ApiModelProperty("用户id;平台内部生成,短编号")
+    private String userId;
 
     @ApiModelProperty("用户昵称")
     private String nickName;
@@ -39,6 +43,9 @@ public class UserMoneyVo {
 
     @ApiModelProperty("开户所在地")
     private String bankOpen;
+
+    @ApiModelProperty("钱包余量")
+    private BigDecimal moneyBalance;
 
     @ApiModelProperty("创建时间")
     private Date createdTime;

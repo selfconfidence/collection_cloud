@@ -39,9 +39,7 @@ public class CntCollectionController extends BaseController
     @ApiOperation("查询藏品管理列表")
     public TableDataInfo<CntCollectionVo> list(CollectionQuery collectionQuery)
     {
-        startPage();
-        List<CntCollectionVo> list = cntCollectionService.selectCntCollectionList(collectionQuery);
-        return getDataTable(list);
+        return cntCollectionService.selectCntCollectionList(collectionQuery);
     }
 
     //@RequiresPermissions("admin:collection:query")

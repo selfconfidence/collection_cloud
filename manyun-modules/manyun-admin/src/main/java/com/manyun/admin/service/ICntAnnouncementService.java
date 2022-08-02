@@ -3,6 +3,8 @@ package com.manyun.admin.service;
 import java.util.List;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntAnnouncement;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * 公告Service接口
@@ -23,10 +25,10 @@ public interface ICntAnnouncementService extends IService<CntAnnouncement>
     /**
      * 查询公告列表
      *
-     * @param cntAnnouncement 公告
+     * @param pageQuery
      * @return 公告集合
      */
-    public List<CntAnnouncement> selectCntAnnouncementList(CntAnnouncement cntAnnouncement);
+    public TableDataInfo<CntAnnouncement> selectCntAnnouncementList(PageQuery pageQuery);
 
     /**
      * 新增公告

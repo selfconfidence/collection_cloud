@@ -29,7 +29,7 @@ public class CntUser implements Serializable
     private String linkAddr;
 
     @ApiModelProperty("是否实名;1=未实名,2=实名")
-    private Long isReal;
+    private Integer isReal;
 
     @ApiModelProperty(" 邀请码;用户初始化生成")
     private String pleaseCode;
@@ -69,158 +69,140 @@ public class CntUser implements Serializable
     @ApiModelProperty("帐号状态（0正常 1停用）")
     private String status;
 
-    public void setId(String id)
-    {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getId()
-    {
-        return id;
+    public String getNickName() {
+        return nickName;
     }
-    public void setNickName(String nickName)
-    {
+
+    public void setNickName(String nickName) {
         this.nickName = nickName;
     }
 
-    public String getNickName()
-    {
-        return nickName;
+    public String getPhone() {
+        return phone;
     }
-    public void setPhone(String phone)
-    {
+
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 
-    public String getPhone()
-    {
-        return phone;
+    public String getLinkAddr() {
+        return linkAddr;
     }
-    public void setLinkAddr(String linkAddr)
-    {
+
+    public void setLinkAddr(String linkAddr) {
         this.linkAddr = linkAddr;
     }
 
-    public String getLinkAddr()
-    {
-        return linkAddr;
+    public Integer getIsReal() {
+        return isReal;
     }
-    public void setIsReal(Long isReal)
-    {
+
+    public void setIsReal(Integer isReal) {
         this.isReal = isReal;
     }
 
-    public Long getIsReal()
-    {
-        return isReal;
+    public String getPleaseCode() {
+        return pleaseCode;
     }
-    public void setPleaseCode(String pleaseCode)
-    {
+
+    public void setPleaseCode(String pleaseCode) {
         this.pleaseCode = pleaseCode;
     }
 
-    public String getPleaseCode()
-    {
-        return pleaseCode;
+    public String getParentId() {
+        return parentId;
     }
-    public void setParentId(String parentId)
-    {
+
+    public void setParentId(String parentId) {
         this.parentId = parentId;
     }
 
-    public String getParentId()
-    {
-        return parentId;
+    public String getUserInfo() {
+        return userInfo;
     }
-    public void setUserInfo(String userInfo)
-    {
+
+    public void setUserInfo(String userInfo) {
         this.userInfo = userInfo;
     }
 
-    public String getUserInfo()
-    {
-        return userInfo;
+    public String getUserId() {
+        return userId;
     }
-    public void setUserId(String userId)
-    {
+
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
-    public String getUserId()
-    {
-        return userId;
+    public String getHeadImage() {
+        return headImage;
     }
-    public void setHeadImage(String headImage)
-    {
+
+    public void setHeadImage(String headImage) {
         this.headImage = headImage;
     }
 
-    public String getHeadImage()
-    {
-        return headImage;
+    public String getLoginPass() {
+        return loginPass;
     }
-    public void setLoginPass(String loginPass)
-    {
+
+    public void setLoginPass(String loginPass) {
         this.loginPass = loginPass;
     }
 
-    public String getLoginPass()
-    {
-        return loginPass;
+    public String getPayPass() {
+        return payPass;
     }
-    public void setPayPass(String payPass)
-    {
+
+    public void setPayPass(String payPass) {
         this.payPass = payPass;
     }
 
-    public String getPayPass()
-    {
-        return payPass;
+    public String getCreatedBy() {
+        return createdBy;
     }
-    public void setCreatedBy(String createdBy)
-    {
+
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedBy()
-    {
-        return createdBy;
+    public Date getCreatedTime() {
+        return createdTime;
     }
-    public void setCreatedTime(Date createdTime)
-    {
+
+    public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
 
-    public Date getCreatedTime()
-    {
-        return createdTime;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
-    public void setUpdatedBy(String updatedBy)
-    {
+
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedBy()
-    {
-        return updatedBy;
+    public Date getUpdatedTime() {
+        return updatedTime;
     }
-    public void setUpdatedTime(Date updatedTime)
-    {
+
+    public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
     }
 
-    public Date getUpdatedTime()
-    {
-        return updatedTime;
-    }
-    public void setStatus(String status)
-    {
-        this.status = status;
+    public String getStatus() {
+        return status;
     }
 
-    public String getStatus()
-    {
-        return status;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Override

@@ -10,6 +10,6 @@ public class CntLableAlterVo
 {
 
     @ApiModelProperty("标签编号")
-    private String lableIds;
+    private String[] lableIds;
 
 }

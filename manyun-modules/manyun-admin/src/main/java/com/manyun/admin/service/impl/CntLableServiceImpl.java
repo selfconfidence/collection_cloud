@@ -6,9 +6,13 @@ import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.vo.CntLableVo;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,17 +47,19 @@ public class CntLableServiceImpl extends ServiceImpl<CntLableMapper,CntLable> im
     /**
      * 查询藏品标签列表
      *
-     * @param cntLable 藏品标签
+     * @param pageQuery
      * @return 藏品标签
      */
     @Override
-    public List<CntLableVo> selectCntLableList(CntLable cntLable)
+    public TableDataInfo<CntLableVo> selectCntLableList(PageQuery pageQuery)
     {
-        return cntLableMapper.selectCntLableList(cntLable).stream().map(m ->{
+        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
+        List<CntLable> cntLables = cntLableMapper.selectCntLableList(new CntLable());
+        return TableDataInfoUtil.pageTableDataInfo(cntLables.parallelStream().map(m ->{
             CntLableVo cntLableVo=new CntLableVo();
             BeanUtil.copyProperties(m,cntLableVo);
             return cntLableVo;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()),cntLables);
     }
 
     /**

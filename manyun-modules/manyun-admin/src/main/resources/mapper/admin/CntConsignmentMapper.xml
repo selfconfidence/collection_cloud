@@ -32,8 +32,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectOrderList" resultType="com.manyun.admin.domain.vo.CntConsignmentVo">
         select
             js.id,
-            js.consignment_status consignmentStatus,
             js.is_type isType,
+            js.bui_name buiName,
+            js.consignment_price consignmentPrice,
+            js.server_charge serverCharge,
+            js.consignment_status consignmentStatus,
+            js.to_pay toPay,
             cs.nick_name collectorName,
             cs.phone collectorPhone,
             mr.nick_name sellerName,
@@ -43,25 +47,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             o.created_time createOrderTime,
             o.pay_time payTime
         from
-	        cnt_consignment js
+            cnt_consignment js
         left join
-	        cnt_user cs
+            cnt_user cs
         on js.send_user_id=cs.user_id
         left join
-	        cnt_user mr
+            cnt_user mr
         on js.pay_user_id=mr.user_id
         left join
-	        cnt_order o
+            cnt_order o
         on js.order_id=o.order_no
         <where>
             <if test="id != null  and id != ''"> and js.id = #{id}</if>
-            <if test="collectorPhone != null  and collectorPhone != ''"> and cs.phone = #{collectorPhone}</if>
-            <if test="collectorUserId != null and  collectorUserId != ''"> and cs.user_id = #{collectorUserId}</if>
-            <if test="collectorName != null  and collectorName != ''"> and cs.nick_name like concat('%', #{collectorName}, '%')</if>
+            <if test="isType != null and isType!=''"> and js.is_type = #{isType}</if>
             <if test="buiName != null  and buiName != ''"> and js.bui_name like concat('%', #{buiName}, '%')</if>
-            <if test="isType != null"> and js.is_type = #{isType}</if>
             <if test="consignmentStatus != null  and consignmentStatus != ''"> and js.consignment_status = #{consignmentStatus}</if>
+            <if test="collectorName != null  and collectorName != ''"> and cs.nick_name like concat('%', #{collectorName}, '%')</if>
+            <if test="collectorPhone != null  and collectorPhone != ''"> and cs.phone = #{collectorPhone}</if>
             <if test="sellerName != null  and sellerName != ''"> and mr.nick_name like concat('%', #{sellerName}, '%')</if>
+            <if test="sellerPhone != null  and sellerPhone != ''"> and mr.phone = #{sellerPhone}</if>
             <if test="payType != null  and payType != ''"> and o.pay_type = #{payType}</if>
             <if test="createOrderTime != null  and createOrderTime != ''"> and o.created_time = #{createOrderTime}</if>
         </where>

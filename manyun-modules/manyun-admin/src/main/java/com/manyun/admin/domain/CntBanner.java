@@ -33,7 +33,7 @@ public class CntBanner implements Serializable
     private String bannerInfo;
 
     @ApiModelProperty("轮播类型;1=首页轮播,2=竞拍轮播")
-    private Long bannerType;
+    private Integer bannerType;
 
     @ApiModelProperty("跳转链接")
     private String jumpLink;
@@ -52,95 +52,84 @@ public class CntBanner implements Serializable
     @ApiModelProperty("更新时间")
     private Date updatedTime;
 
-    public void setId(String id)
-    {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getId()
-    {
-        return id;
+    public String getBannerTitle() {
+        return bannerTitle;
     }
-    public void setBannerTitle(String bannerTitle)
-    {
+
+    public void setBannerTitle(String bannerTitle) {
         this.bannerTitle = bannerTitle;
     }
 
-    public String getBannerTitle()
-    {
-        return bannerTitle;
+    public String getBannerImage() {
+        return bannerImage;
     }
-    public void setBannerImage(String bannerImage)
-    {
+
+    public void setBannerImage(String bannerImage) {
         this.bannerImage = bannerImage;
     }
 
-    public String getBannerImage()
-    {
-        return bannerImage;
+    public String getBannerInfo() {
+        return bannerInfo;
     }
-    public void setBannerInfo(String bannerInfo)
-    {
+
+    public void setBannerInfo(String bannerInfo) {
         this.bannerInfo = bannerInfo;
     }
 
-    public String getBannerInfo()
-    {
-        return bannerInfo;
+    public Integer getBannerType() {
+        return bannerType;
     }
-    public void setBannerType(Long bannerType)
-    {
+
+    public void setBannerType(Integer bannerType) {
         this.bannerType = bannerType;
     }
 
-    public Long getBannerType()
-    {
-        return bannerType;
+    public String getJumpLink() {
+        return jumpLink;
     }
-    public void setJumpLink(String jumpLink)
-    {
+
+    public void setJumpLink(String jumpLink) {
         this.jumpLink = jumpLink;
     }
 
-    public String getJumpLink()
-    {
-        return jumpLink;
+    public String getCreatedBy() {
+        return createdBy;
     }
-    public void setCreatedBy(String createdBy)
-    {
+
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedBy()
-    {
-        return createdBy;
+    public Date getCreatedTime() {
+        return createdTime;
     }
-    public void setCreatedTime(Date createdTime)
-    {
+
+    public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
 
-    public Date getCreatedTime()
-    {
-        return createdTime;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
-    public void setUpdatedBy(String updatedBy)
-    {
+
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedBy()
-    {
-        return updatedBy;
-    }
-    public void setUpdatedTime(Date updatedTime)
-    {
-        this.updatedTime = updatedTime;
+    public Date getUpdatedTime() {
+        return updatedTime;
     }
 
-    public Date getUpdatedTime()
-    {
-        return updatedTime;
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
     }
 
     @Override

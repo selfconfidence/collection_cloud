@@ -38,13 +38,13 @@ public class CntUserCollection implements Serializable
     private String linkAddr;
 
     @ApiModelProperty("是否上链;1=未上链,2=已上链")
-    private Long isLink;
+    private Integer isLink;
 
     @ApiModelProperty("来源")
     private String sourceInfo;
 
     @ApiModelProperty("1=存在,2=不存在(寄售回滚有用)")
-    private Long isExist;
+    private Integer isExist;
 
     @ApiModelProperty("认证机构;购买后")
     private String realCompany;
@@ -63,140 +63,124 @@ public class CntUserCollection implements Serializable
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedTime;
 
-    public void setId(String id)
-    {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getId()
-    {
-        return id;
+    public String getUserId() {
+        return userId;
     }
-    public void setUserId(String userId)
-    {
+
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
-    public String getUserId()
-    {
-        return userId;
+    public String getCollectionId() {
+        return collectionId;
     }
-    public void setCollectionId(String collectionId)
-    {
+
+    public void setCollectionId(String collectionId) {
         this.collectionId = collectionId;
     }
 
-    public String getCollectionId()
-    {
-        return collectionId;
+    public String getCollectionName() {
+        return collectionName;
     }
-    public void setCollectionName(String collectionName)
-    {
+
+    public void setCollectionName(String collectionName) {
         this.collectionName = collectionName;
     }
 
-    public String getCollectionName()
-    {
-        return collectionName;
+    public String getCollectionNumber() {
+        return collectionNumber;
     }
-    public void setCollectionNumber(String collectionNumber)
-    {
+
+    public void setCollectionNumber(String collectionNumber) {
         this.collectionNumber = collectionNumber;
     }
 
-    public String getCollectionNumber()
-    {
-        return collectionNumber;
+    public String getCollectionHash() {
+        return collectionHash;
     }
-    public void setCollectionHash(String collectionHash)
-    {
+
+    public void setCollectionHash(String collectionHash) {
         this.collectionHash = collectionHash;
     }
 
-    public String getCollectionHash()
-    {
-        return collectionHash;
+    public String getLinkAddr() {
+        return linkAddr;
     }
-    public void setLinkAddr(String linkAddr)
-    {
+
+    public void setLinkAddr(String linkAddr) {
         this.linkAddr = linkAddr;
     }
 
-    public String getLinkAddr()
-    {
-        return linkAddr;
+    public Integer getIsLink() {
+        return isLink;
     }
-    public void setIsLink(Long isLink)
-    {
+
+    public void setIsLink(Integer isLink) {
         this.isLink = isLink;
     }
 
-    public Long getIsLink()
-    {
-        return isLink;
+    public String getSourceInfo() {
+        return sourceInfo;
     }
-    public void setSourceInfo(String sourceInfo)
-    {
+
+    public void setSourceInfo(String sourceInfo) {
         this.sourceInfo = sourceInfo;
     }
 
-    public String getSourceInfo()
-    {
-        return sourceInfo;
+    public Integer getIsExist() {
+        return isExist;
     }
-    public void setIsExist(Long isExist)
-    {
+
+    public void setIsExist(Integer isExist) {
         this.isExist = isExist;
     }
 
-    public Long getIsExist()
-    {
-        return isExist;
+    public String getRealCompany() {
+        return realCompany;
     }
-    public void setRealCompany(String realCompany)
-    {
+
+    public void setRealCompany(String realCompany) {
         this.realCompany = realCompany;
     }
 
-    public String getRealCompany()
-    {
-        return realCompany;
+    public String getCreatedBy() {
+        return createdBy;
     }
-    public void setCreatedBy(String createdBy)
-    {
+
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedBy()
-    {
-        return createdBy;
+    public Date getCreatedTime() {
+        return createdTime;
     }
-    public void setCreatedTime(Date createdTime)
-    {
+
+    public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
 
-    public Date getCreatedTime()
-    {
-        return createdTime;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
-    public void setUpdatedBy(String updatedBy)
-    {
+
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedBy()
-    {
-        return updatedBy;
-    }
-    public void setUpdatedTime(Date updatedTime)
-    {
-        this.updatedTime = updatedTime;
+    public Date getUpdatedTime() {
+        return updatedTime;
     }
 
-    public Date getUpdatedTime()
-    {
-        return updatedTime;
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
     }
 
     @Override

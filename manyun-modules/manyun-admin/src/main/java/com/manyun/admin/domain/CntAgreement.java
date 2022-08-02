@@ -31,7 +31,7 @@ public class CntAgreement implements Serializable
 
     /** 协议类型;1=用户协议,2=隐私协议,3=关于我们 */
     @ApiModelProperty("协议类型;1=用户协议,2=隐私协议,3=关于我们")
-    private Long agreementType;
+    private Integer agreementType;
 
     /** 协议标题 */
     @ApiModelProperty("协议标题")
@@ -59,77 +59,68 @@ public class CntAgreement implements Serializable
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedTime;
 
-    public void setId(String id)
-    {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getId()
-    {
-        return id;
+    public Integer getAgreementType() {
+        return agreementType;
     }
-    public void setAgreementType(Long agreementType)
-    {
+
+    public void setAgreementType(Integer agreementType) {
         this.agreementType = agreementType;
     }
 
-    public Long getAgreementType()
-    {
-        return agreementType;
+    public String getAgreementTitle() {
+        return agreementTitle;
     }
-    public void setAgreementTitle(String agreementTitle)
-    {
+
+    public void setAgreementTitle(String agreementTitle) {
         this.agreementTitle = agreementTitle;
     }
 
-    public String getAgreementTitle()
-    {
-        return agreementTitle;
+    public String getAgreementInfo() {
+        return agreementInfo;
     }
-    public void setAgreementInfo(String agreementInfo)
-    {
+
+    public void setAgreementInfo(String agreementInfo) {
         this.agreementInfo = agreementInfo;
     }
 
-    public String getAgreementInfo()
-    {
-        return agreementInfo;
+    public String getCreatedBy() {
+        return createdBy;
     }
-    public void setCreatedBy(String createdBy)
-    {
+
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedBy()
-    {
-        return createdBy;
+    public Date getCreatedTime() {
+        return createdTime;
     }
-    public void setCreatedTime(Date createdTime)
-    {
+
+    public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
 
-    public Date getCreatedTime()
-    {
-        return createdTime;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
-    public void setUpdatedBy(String updatedBy)
-    {
+
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedBy()
-    {
-        return updatedBy;
-    }
-    public void setUpdatedTime(Date updatedTime)
-    {
-        this.updatedTime = updatedTime;
+    public Date getUpdatedTime() {
+        return updatedTime;
     }
 
-    public Date getUpdatedTime()
-    {
-        return updatedTime;
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
     }
 
     @Override

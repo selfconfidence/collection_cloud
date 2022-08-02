@@ -23,7 +23,7 @@ public class CntTar implements Serializable
     private BigDecimal tarPro;
 
     @ApiModelProperty("抽签类型;(1=盲盒,2=藏品)")
-    private Long tarType;
+    private Integer tarType;
 
     @ApiModelProperty("创建人")
     private String createdBy;
@@ -39,68 +39,60 @@ public class CntTar implements Serializable
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedTime;
 
-    public void setId(String id)
-    {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getId()
-    {
-        return id;
+    public BigDecimal getTarPro() {
+        return tarPro;
     }
-    public void setTarPro(BigDecimal tarPro)
-    {
+
+    public void setTarPro(BigDecimal tarPro) {
         this.tarPro = tarPro;
     }
 
-    public BigDecimal getTarPro()
-    {
-        return tarPro;
+    public Integer getTarType() {
+        return tarType;
     }
-    public void setTarType(Long tarType)
-    {
+
+    public void setTarType(Integer tarType) {
         this.tarType = tarType;
     }
 
-    public Long getTarType()
-    {
-        return tarType;
+    public String getCreatedBy() {
+        return createdBy;
     }
-    public void setCreatedBy(String createdBy)
-    {
+
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedBy()
-    {
-        return createdBy;
+    public Date getCreatedTime() {
+        return createdTime;
     }
-    public void setCreatedTime(Date createdTime)
-    {
+
+    public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
 
-    public Date getCreatedTime()
-    {
-        return createdTime;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
-    public void setUpdatedBy(String updatedBy)
-    {
+
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedBy()
-    {
-        return updatedBy;
-    }
-    public void setUpdatedTime(Date updatedTime)
-    {
-        this.updatedTime = updatedTime;
+    public Date getUpdatedTime() {
+        return updatedTime;
     }
 
-    public Date getUpdatedTime()
-    {
-        return updatedTime;
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
     }
 
     @Override

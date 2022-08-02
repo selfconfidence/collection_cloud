@@ -12,7 +12,13 @@ public class CntCollectionInfoAlterVo {
     @ApiModelProperty("发行方")
     private String publishOther;
 
+    @ApiModelProperty("发行方头像")
+    private String publishAuther;
+
     @ApiModelProperty("购买须知")
     private String customerTail;
+
+    @ApiModelProperty("藏品故事")
+    private String lookInfo;
 
 }

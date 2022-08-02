@@ -5,10 +5,14 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.vo.CntTarVo;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,17 +48,19 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper,CntTar> implemen
     /**
      * 查询抽签规则(盲盒,藏品)列表
      *
-     * @param cntTar 抽签规则(盲盒,藏品)
+     * @param pageQuery
      * @return 抽签规则(盲盒,藏品)
      */
     @Override
-    public List<CntTarVo> selectCntTarList(CntTar cntTar)
+    public TableDataInfo<CntTarVo> selectCntTarList(PageQuery pageQuery)
     {
-        return cntTarMapper.selectCntTarList(cntTar).stream().map(m->{
+        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
+        List<CntTar> cntTars = cntTarMapper.selectCntTarList(new CntTar());
+        return TableDataInfoUtil.pageTableDataInfo(cntTars.parallelStream().map(m->{
             CntTarVo cntTarVo=new CntTarVo();
             BeanUtil.copyProperties(m,cntTarVo);
             return cntTarVo;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()),cntTars);
     }
 
     /**

@@ -23,10 +23,10 @@ public class CntActionTar implements Serializable
     private String actionId;
 
     @ApiModelProperty("需要多少对应的藏品")
-    private Long releaseNum;
+    private Integer releaseNum;
 
     @ApiModelProperty("需要销毁多少藏品 _ 此值不可大于 release_num 字段")
-    private Long deleteNum;
+    private Integer deleteNum;
 
     @ApiModelProperty("此目标需要的藏品编号")
     private String collectionId;
@@ -51,104 +51,92 @@ public class CntActionTar implements Serializable
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedTime;
 
-    public void setId(String id)
-    {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getId()
-    {
-        return id;
+    public String getActionId() {
+        return actionId;
     }
-    public void setActionId(String actionId)
-    {
+
+    public void setActionId(String actionId) {
         this.actionId = actionId;
     }
 
-    public String getActionId()
-    {
-        return actionId;
+    public Integer getReleaseNum() {
+        return releaseNum;
     }
-    public void setReleaseNum(Long releaseNum)
-    {
+
+    public void setReleaseNum(Integer releaseNum) {
         this.releaseNum = releaseNum;
     }
 
-    public Long getReleaseNum()
-    {
-        return releaseNum;
+    public Integer getDeleteNum() {
+        return deleteNum;
     }
-    public void setDeleteNum(Long deleteNum)
-    {
+
+    public void setDeleteNum(Integer deleteNum) {
         this.deleteNum = deleteNum;
     }
 
-    public Long getDeleteNum()
-    {
-        return deleteNum;
+    public String getCollectionId() {
+        return collectionId;
     }
-    public void setCollectionId(String collectionId)
-    {
+
+    public void setCollectionId(String collectionId) {
         this.collectionId = collectionId;
     }
 
-    public String getCollectionId()
-    {
-        return collectionId;
+    public String getCollectionImage() {
+        return collectionImage;
     }
-    public void setCollectionImage(String collectionImage)
-    {
+
+    public void setCollectionImage(String collectionImage) {
         this.collectionImage = collectionImage;
     }
 
-    public String getCollectionImage()
-    {
-        return collectionImage;
+    public String getCollectionName() {
+        return collectionName;
     }
-    public void setCollectionName(String collectionName)
-    {
+
+    public void setCollectionName(String collectionName) {
         this.collectionName = collectionName;
     }
 
-    public String getCollectionName()
-    {
-        return collectionName;
+    public String getCreatedBy() {
+        return createdBy;
     }
-    public void setCreatedBy(String createdBy)
-    {
+
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedBy()
-    {
-        return createdBy;
+    public Date getCreatedTime() {
+        return createdTime;
     }
-    public void setCreatedTime(Date createdTime)
-    {
+
+    public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
 
-    public Date getCreatedTime()
-    {
-        return createdTime;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
-    public void setUpdatedBy(String updatedBy)
-    {
+
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedBy()
-    {
-        return updatedBy;
-    }
-    public void setUpdatedTime(Date updatedTime)
-    {
-        this.updatedTime = updatedTime;
+    public Date getUpdatedTime() {
+        return updatedTime;
     }
 
-    public Date getUpdatedTime()
-    {
-        return updatedTime;
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
     }
 
     @Override

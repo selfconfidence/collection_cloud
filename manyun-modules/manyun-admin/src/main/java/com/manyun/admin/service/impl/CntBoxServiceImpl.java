@@ -9,6 +9,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.*;
 import com.manyun.admin.domain.dto.CntBoxAlterCombineDto;
 import com.manyun.admin.domain.query.BoxQuery;
@@ -22,6 +23,8 @@ import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,18 +77,16 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
      * @return 盲盒;盲盒主体
      */
     @Override
-    public List<CntBoxVo> selectCntBoxList(BoxQuery boxQuery)
+    public TableDataInfo<CntBoxVo> selectCntBoxList(BoxQuery boxQuery)
     {
+        PageHelper.startPage(boxQuery.getPageNum(),boxQuery.getPageSize());
         List<CntBox> cntBoxList = cntBoxMapper.selectSearchBoxList(boxQuery);
-        return cntBoxList
-                .parallelStream()
-                .map(item ->
-                {
+        return TableDataInfoUtil.pageTableDataInfo(cntBoxList.parallelStream().map(item -> {
                     CntBoxVo cntBoxVo = new CntBoxVo();
                     BeanUtil.copyProperties(item, cntBoxVo);
                     cntBoxVo.setMediaVos(mediaService.initMediaVos(item.getId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
                     return cntBoxVo;
-                }).collect(Collectors.toList());
+                }).collect(Collectors.toList()),cntBoxList);
     }
 
     /**
@@ -113,10 +114,9 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         //标签
         CntLableAlterVo cntLableAlterVo = boxAlterCombineDto.getCntLableAlterVo();
         if (Objects.nonNull(cntLableAlterVo)) {
-            String lableIds = cntLableAlterVo.getLableIds();
-            if (StringUtils.isNotBlank(lableIds)) {
-                String[] arr = lableIds.split(",");
-                List<CntCollectionLable> cntCollectionLables = Arrays.asList(arr).stream().map(m -> {
+            String[] lableIds = cntLableAlterVo.getLableIds();
+            if (lableIds.length>0) {
+                List<CntCollectionLable> cntCollectionLables = Arrays.asList(lableIds).stream().map(m -> {
                     return Builder.of(CntCollectionLable::new)
                             .with(CntCollectionLable::setId, IdUtils.getSnowflakeNextIdStr())
                             .with(CntCollectionLable::setCollectionId, idStr)
@@ -168,12 +168,11 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         }
         //标签
         CntLableAlterVo cntLableAlterVo = boxAlterCombineDto.getCntLableAlterVo();
-        String lableIds = cntLableAlterVo.getLableIds();
+        String[] lableIds = cntLableAlterVo.getLableIds();
         if (Objects.nonNull(cntLableAlterVo)) {
-            if (StringUtils.isNotBlank(lableIds)) {
+            if (lableIds.length>0) {
                 collectionLableService.remove(Wrappers.<CntCollectionLable>lambdaQuery().eq(CntCollectionLable::getCollectionId, boxId));
-                String[] arr = lableIds.split(",");
-                List<CntCollectionLable> cntCollectionLables = Arrays.asList(arr).stream().map(m -> {
+                List<CntCollectionLable> cntCollectionLables = Arrays.asList(lableIds).stream().map(m -> {
                     return Builder.of(CntCollectionLable::new)
                             .with(CntCollectionLable::setId, IdUtils.getSnowflakeNextIdStr())
                             .with(CntCollectionLable::setCollectionId, boxId)

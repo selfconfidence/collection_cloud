@@ -46,9 +46,7 @@ public class CntActionController extends BaseController
     @ApiOperation("查询活动列表")
     public TableDataInfo<CntActionVo> list(ActionQuery actionQuery)
     {
-        startPage();
-        List<CntActionVo> list = cntActionService.selectCntActionList(actionQuery);
-        return getDataTable(list);
+        return cntActionService.selectCntActionList(actionQuery);
     }
 
     /**

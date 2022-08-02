@@ -42,11 +42,9 @@ public class CntSystemController extends BaseController
     //@RequiresPermissions("admin:system:list")
     @GetMapping("/list")
     @ApiOperation("查询平台规则列表")
-    public TableDataInfo<CntSystemVo> list(SystemQuery SystemQuery)
+    public TableDataInfo<CntSystemVo> list(SystemQuery systemQuery)
     {
-        startPage();
-        List<CntSystemVo> list = cntSystemService.selectCntSystemList(SystemQuery);
-        return getDataTable(list);
+        return cntSystemService.selectCntSystemList(systemQuery);
     }
 
     /**

@@ -3,6 +3,7 @@ package com.manyun.admin.controller;
 import java.util.List;
 
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.PageQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,11 +43,9 @@ public class CntAnnouncementController extends BaseController
     @RequiresPermissions("admin:announcement:list")
     @GetMapping("/list")
     @ApiOperation("查询公告列表")
-    public TableDataInfo<CntAnnouncement> list(CntAnnouncement cntAnnouncement)
+    public TableDataInfo<CntAnnouncement> list(PageQuery pageQuery)
     {
-        startPage();
-        List<CntAnnouncement> list = cntAnnouncementService.selectCntAnnouncementList(cntAnnouncement);
-        return getDataTable(list);
+        return cntAnnouncementService.selectCntAnnouncementList(pageQuery);
     }
 
     /**

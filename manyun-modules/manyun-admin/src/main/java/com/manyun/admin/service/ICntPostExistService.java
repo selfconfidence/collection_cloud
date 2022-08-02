@@ -3,6 +3,8 @@ package com.manyun.admin.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntPostExist;
 import com.manyun.admin.domain.vo.CntPostExistVo;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 import java.util.List;
 
@@ -25,10 +27,10 @@ public interface ICntPostExistService extends IService<CntPostExist>
     /**
      * 查询提前购配置已经拥有列表
      *
-     * @param cntPostExist 提前购配置已经拥有
+     * @param pageQuery
      * @return 提前购配置已经拥有集合
      */
-    public List<CntPostExistVo> selectCntPostExistList(CntPostExist cntPostExist);
+    public TableDataInfo<CntPostExistVo> selectCntPostExistList(PageQuery pageQuery);
 
     /**
      * 新增提前购配置已经拥有

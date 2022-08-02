@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.CntActionTar;
 import com.manyun.admin.domain.query.ActionQuery;
 import com.manyun.admin.domain.vo.CntActionVo;
@@ -14,6 +15,8 @@ import com.manyun.admin.mapper.CntActionTarMapper;
 import com.manyun.admin.service.ICntActionTarService;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,13 +59,15 @@ public class CntActionServiceImpl extends ServiceImpl<CntActionMapper,CntAction>
      * @return 活动
      */
     @Override
-    public List<CntActionVo> selectCntActionList(ActionQuery actionQuery)
+    public TableDataInfo<CntActionVo> selectCntActionList(ActionQuery actionQuery)
     {
-        return cntActionMapper.selectSearchActionList(actionQuery).stream().map(m ->{
+        PageHelper.startPage(actionQuery.getPageNum(),actionQuery.getPageSize());
+        List<CntAction> cntActions = cntActionMapper.selectSearchActionList(actionQuery);
+        return TableDataInfoUtil.pageTableDataInfo(cntActions.parallelStream().map(m ->{
             CntActionVo cntActionVo=new CntActionVo();
             BeanUtil.copyProperties(m,cntActionVo);
             return cntActionVo;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()),cntActions);
     }
 
     /**

@@ -13,9 +13,9 @@ public class CntActionTarVo {
     private String collectionId;
 
     @ApiModelProperty("合成所需数量")
-    private Long releaseNum;
+    private Integer releaseNum;
 
     @ApiModelProperty("合成消耗数量")
-    private Long deleteNum;
+    private Integer deleteNum;
 
 }

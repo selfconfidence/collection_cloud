@@ -35,6 +35,9 @@ public class CntCollectionDetailsVo
     @ApiModelProperty("发行方")
     private String publishOther;
 
+    @ApiModelProperty("发行方头像")
+    private String publishAuther;
+
     @ApiModelProperty("标签编号")
     private List<String> lableIds;
 
@@ -53,5 +56,8 @@ public class CntCollectionDetailsVo
 
     @ApiModelProperty("购买须知")
     private String customerTail;
+
+    @ApiModelProperty("藏品故事")
+    private String lookInfo;
 
 }

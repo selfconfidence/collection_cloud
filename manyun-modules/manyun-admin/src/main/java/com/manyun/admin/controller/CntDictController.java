@@ -4,6 +4,7 @@ package com.manyun.admin.controller;
 import com.manyun.admin.domain.query.DrawRulesDictQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.service.CntDictService;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.TableDataInfo;
 import io.swagger.annotations.Api;
@@ -25,74 +26,58 @@ public class CntDictController extends BaseController
 
     @GetMapping("/collectionDict")
     @ApiOperation("查询藏品字典")
-    public TableDataInfo<CntCollectionDictVo> collectionDict()
+    public R collectionDict()
     {
-        startPage();
-        List<CntCollectionDictVo> list = cntDictService.collectionDict();
-        return getDataTable(list);
+        return cntDictService.collectionDict();
     }
 
     @GetMapping("/collectionCateDict")
     @ApiOperation("查询藏品系列字典")
-    public TableDataInfo<CollectionCateDictVo> collectionCateDict()
+    public R collectionCateDict()
     {
-        startPage();
-        List<CollectionCateDictVo> list = cntDictService.collectionCateDict();
-        return getDataTable(list);
+        return cntDictService.collectionCateDict();
     }
 
     @GetMapping("/creationdDict")
     @ApiOperation("创作者字典")
-    public TableDataInfo<CreationdDictVo> creationdDict()
+    public R creationdDict()
     {
-        startPage();
-        List<CreationdDictVo> list = cntDictService.creationdDict();
-        return getDataTable(list);
+        return cntDictService.creationdDict();
     }
 
     @GetMapping("/lableDict")
     @ApiOperation("标签字典")
-    public TableDataInfo<LableDictVo> lableDict()
+    public R lableDict()
     {
-        startPage();
-        List<LableDictVo> list = cntDictService.lableDict();
-        return getDataTable(list);
+        return cntDictService.lableDict();
     }
 
     @GetMapping("/customerServiceDict")
     @ApiOperation("客服字典")
-    public TableDataInfo<CustomerServiceDictVo> customerServiceDict()
+    public R customerServiceDict()
     {
-        startPage();
-        List<CustomerServiceDictVo> list = cntDictService.customerServiceDict();
-        return getDataTable(list);
+        return cntDictService.customerServiceDict();
     }
 
     @PostMapping("/drawRulesDict")
     @ApiOperation("抽签规则字典")
-    public TableDataInfo<DrawRulesDictVo> drawRulesDict(@Valid @RequestBody DrawRulesDictQuery drawRulesDictQuery)
+    public R drawRulesDict(@Valid @RequestBody DrawRulesDictQuery drawRulesDictQuery)
     {
-        startPage();
-        List<DrawRulesDictVo> list = cntDictService.drawRulesDict(drawRulesDictQuery);
-        return getDataTable(list);
+        return cntDictService.drawRulesDict(drawRulesDictQuery);
     }
 
     @GetMapping("/postSellDict")
     @ApiOperation("提前购配置可以购买字典")
-    public TableDataInfo<TqgGoodsDictVo> postSellDict()
+    public R postSellDict()
     {
-        startPage();
-        List<TqgGoodsDictVo> list = cntDictService.postSellDict();
-        return getDataTable(list);
+        return cntDictService.postSellDict();
     }
 
     @GetMapping("/postExistDict")
     @ApiOperation("提前购配置已经拥有字典")
-    public TableDataInfo<TqgGoodsDictVo> postExistDict()
+    public R postExistDict()
     {
-        startPage();
-        List<TqgGoodsDictVo> list = cntDictService.postExistDict();
-        return getDataTable(list);
+        return cntDictService.postExistDict();
     }
 
 }

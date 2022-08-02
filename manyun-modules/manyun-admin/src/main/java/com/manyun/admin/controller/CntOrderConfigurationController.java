@@ -4,6 +4,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.PageQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +37,9 @@ public class CntOrderConfigurationController extends BaseController
     //@RequiresPermissions("admin:configuration:list")
     @GetMapping("/list")
     @ApiOperation("查询订单配置列表")
-    public TableDataInfo<CntOrderConfiguration> list(CntOrderConfiguration cntOrderConfiguration)
+    public TableDataInfo<CntOrderConfiguration> list(PageQuery pageQuery)
     {
-        startPage();
-        List<CntOrderConfiguration> list = cntOrderConfigurationService.selectCntOrderConfigurationList(cntOrderConfiguration);
-        return getDataTable(list);
+        return cntOrderConfigurationService.selectCntOrderConfigurationList(pageQuery);
     }
 
 

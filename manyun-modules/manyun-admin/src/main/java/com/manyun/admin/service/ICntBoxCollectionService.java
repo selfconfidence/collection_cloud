@@ -7,6 +7,7 @@ import com.manyun.admin.domain.CntBoxCollection;
 import com.manyun.admin.domain.dto.SaveBoxCollectionDto;
 import com.manyun.admin.domain.query.BoxCollectionQuery;
 import com.manyun.admin.domain.vo.CntBoxCollectionVo;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * 盲盒与藏品中间Service接口
@@ -23,7 +24,7 @@ public interface ICntBoxCollectionService extends IService<CntBoxCollection>
      * @param boxCollectionQuery 盲盒与藏品中间
      * @return 盲盒与藏品中间集合
      */
-    public List<CntBoxCollectionVo> selectCntBoxCollectionList(BoxCollectionQuery boxCollectionQuery);
+    public TableDataInfo<CntBoxCollectionVo> selectCntBoxCollectionList(BoxCollectionQuery boxCollectionQuery);
 
     /**
      * 新增盲盒与藏品中间

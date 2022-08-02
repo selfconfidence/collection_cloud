@@ -2,7 +2,7 @@ package com.manyun.admin.controller;
 
 import java.util.List;
 
-import com.manyun.admin.domain.CntOrder;
+import com.manyun.admin.domain.dto.UpdateBalanceDto;
 import com.manyun.admin.domain.query.UserMoneyQuery;
 import com.manyun.admin.domain.vo.CntOrderVo;
 import com.manyun.admin.domain.vo.UserCollectionVo;
@@ -11,11 +11,7 @@ import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
 import com.manyun.admin.domain.CntUser;
@@ -36,9 +32,7 @@ public class CntUserController extends BaseController
     @ApiOperation("用户管理列表")
     public TableDataInfo<UserMoneyVo> list(UserMoneyQuery userMoneyQuery)
     {
-        startPage();
-        List<UserMoneyVo> list = cntUserService.selectUserMoneyList(userMoneyQuery);
-        return getDataTable(list);
+        return cntUserService.selectUserMoneyList(userMoneyQuery);
     }
 
     //@RequiresPermissions("admin:user:edit")
@@ -66,6 +60,13 @@ public class CntUserController extends BaseController
         startPage();
         List<UserCollectionVo> list = cntUserService.myCollectionList(userId);
         return getDataTable(list);
+    }
+
+    @PostMapping("/updateBalance")
+    @ApiOperation("修改余额")
+    public R updateBalance(@RequestBody UpdateBalanceDto balanceDto)
+    {
+        return toResult(cntUserService.updateBalance(balanceDto));
     }
 
 }

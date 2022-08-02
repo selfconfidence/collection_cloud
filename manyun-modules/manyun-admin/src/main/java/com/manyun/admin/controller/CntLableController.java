@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.manyun.admin.domain.vo.CntLableVo;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.PageQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +36,9 @@ public class CntLableController extends BaseController
     //@RequiresPermissions("admin:lable:list")
     @GetMapping("/list")
     @ApiOperation("查询标签管理列表")
-    public TableDataInfo<CntLableVo> list()
+    public TableDataInfo<CntLableVo> list(PageQuery pageQuery)
     {
-        startPage();
-        List<CntLableVo> list = cntLableService.selectCntLableList(new CntLable());
-        return getDataTable(list);
+        return cntLableService.selectCntLableList(pageQuery);
     }
 
     //@RequiresPermissions("admin:lable:query")

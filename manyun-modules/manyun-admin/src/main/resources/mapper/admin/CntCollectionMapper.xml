@@ -46,10 +46,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             cp.real_price realPrice,
             cp.bind_creation bindCreation,
             cpxq.publish_other publishOther,
+            cpxq.publish_auther publishAuther,
             cp.publish_time publishTime,
             cp.balance balance,
             cp.self_balance selfBalance,
-            cpxq.customer_tail customerTail
+            cpxq.customer_tail customerTail,
+            cpxq.look_info lookInfo
         from
 	        cnt_collection cp
         left join

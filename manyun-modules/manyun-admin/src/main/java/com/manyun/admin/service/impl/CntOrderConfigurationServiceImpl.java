@@ -4,8 +4,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,13 +44,15 @@ public class CntOrderConfigurationServiceImpl extends ServiceImpl<CntOrderConfig
     /**
      * 查询订单配置列表
      *
-     * @param cntOrderConfiguration 订单配置
+     * @param pageQuery
      * @return 订单配置
      */
     @Override
-    public List<CntOrderConfiguration> selectCntOrderConfigurationList(CntOrderConfiguration cntOrderConfiguration)
+    public TableDataInfo<CntOrderConfiguration> selectCntOrderConfigurationList(PageQuery pageQuery)
     {
-        return cntOrderConfigurationMapper.selectCntOrderConfigurationList(cntOrderConfiguration);
+        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
+        List<CntOrderConfiguration> cntOrderConfigurations = cntOrderConfigurationMapper.selectCntOrderConfigurationList(new CntOrderConfiguration());
+        return TableDataInfoUtil.pageTableDataInfo(cntOrderConfigurations,cntOrderConfigurations);
     }
 
     /**

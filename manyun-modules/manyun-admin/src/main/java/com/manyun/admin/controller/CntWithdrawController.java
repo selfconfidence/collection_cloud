@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.PageQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +38,9 @@ public class CntWithdrawController extends BaseController
     //@RequiresPermissions("admin:withdraw:list")
     @GetMapping("/list")
     @ApiOperation("查询提现配置列表")
-    public TableDataInfo<CntWithdraw> list(CntWithdraw cntWithdraw)
+    public TableDataInfo<CntWithdraw> list(PageQuery pageQuery)
     {
-        startPage();
-        List<CntWithdraw> list = cntWithdrawService.selectCntWithdrawList(cntWithdraw);
-        return getDataTable(list);
+        return cntWithdrawService.selectCntWithdrawList(pageQuery);
     }
 
     //@RequiresPermissions("admin:withdraw:query")

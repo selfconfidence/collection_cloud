@@ -23,10 +23,10 @@ public class CntOrderConfiguration implements Serializable
     private String balancePay;
 
     @ApiModelProperty("转赠限制")
-    private Long makeGive;
+    private Integer makeGive;
 
     @ApiModelProperty("支付限制")
-    private Long payLimitTime;
+    private Integer payLimitTime;
 
     @ApiModelProperty("实名认证配置 0:未实名 1:已实名")
     private String identify;
@@ -45,86 +45,76 @@ public class CntOrderConfiguration implements Serializable
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedTime;
 
-    public void setId(String id)
-    {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getId()
-    {
-        return id;
+    public String getBalancePay() {
+        return balancePay;
     }
-    public void setBalancePay(String balancePay)
-    {
+
+    public void setBalancePay(String balancePay) {
         this.balancePay = balancePay;
     }
 
-    public String getBalancePay()
-    {
-        return balancePay;
+    public Integer getMakeGive() {
+        return makeGive;
     }
-    public void setMakeGive(Long makeGive)
-    {
+
+    public void setMakeGive(Integer makeGive) {
         this.makeGive = makeGive;
     }
 
-    public Long getMakeGive()
-    {
-        return makeGive;
+    public Integer getPayLimitTime() {
+        return payLimitTime;
     }
-    public void setPayLimitTime(Long payLimitTime)
-    {
+
+    public void setPayLimitTime(Integer payLimitTime) {
         this.payLimitTime = payLimitTime;
     }
 
-    public Long getPayLimitTime()
-    {
-        return payLimitTime;
+    public String getIdentify() {
+        return identify;
     }
-    public void setIdentify(String identify)
-    {
+
+    public void setIdentify(String identify) {
         this.identify = identify;
     }
 
-    public String getIdentify()
-    {
-        return identify;
+    public String getCreatedBy() {
+        return createdBy;
     }
-    public void setCreatedBy(String createdBy)
-    {
+
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedBy()
-    {
-        return createdBy;
+    public Date getCreatedTime() {
+        return createdTime;
     }
-    public void setCreatedTime(Date createdTime)
-    {
+
+    public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
 
-    public Date getCreatedTime()
-    {
-        return createdTime;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
-    public void setUpdatedBy(String updatedBy)
-    {
+
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedBy()
-    {
-        return updatedBy;
-    }
-    public void setUpdatedTime(Date updatedTime)
-    {
-        this.updatedTime = updatedTime;
+    public Date getUpdatedTime() {
+        return updatedTime;
     }
 
-    public Date getUpdatedTime()
-    {
-        return updatedTime;
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
     }
 
     @Override

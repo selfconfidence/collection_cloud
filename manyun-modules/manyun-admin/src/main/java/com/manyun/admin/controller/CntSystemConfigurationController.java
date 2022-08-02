@@ -4,6 +4,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.PageQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +37,9 @@ public class CntSystemConfigurationController extends BaseController
     //@RequiresPermissions("admin:configuration:list")
     @GetMapping("/list")
     @ApiOperation("查询系统配置列表")
-    public TableDataInfo<CntSystemConfiguration> list(CntSystemConfiguration cntSystemConfiguration)
+    public TableDataInfo<CntSystemConfiguration> list(PageQuery pageQuery)
     {
-        startPage();
-        List<CntSystemConfiguration> list = cntSystemConfigurationService.selectCntSystemConfigurationList(cntSystemConfiguration);
-        return getDataTable(list);
+        return cntSystemConfigurationService.selectCntSystemConfigurationList(pageQuery);
     }
 
     //@RequiresPermissions("admin:configuration:query")

@@ -4,8 +4,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,13 +44,15 @@ public class CntSystemConfigurationServiceImpl extends ServiceImpl<CntSystemConf
     /**
      * 查询系统配置列表
      *
-     * @param cntSystemConfiguration 系统配置
+     * @param pageQuery 系统配置
      * @return 系统配置
      */
     @Override
-    public List<CntSystemConfiguration> selectCntSystemConfigurationList(CntSystemConfiguration cntSystemConfiguration)
+    public TableDataInfo<CntSystemConfiguration> selectCntSystemConfigurationList(PageQuery pageQuery)
     {
-        return cntSystemConfigurationMapper.selectCntSystemConfigurationList(cntSystemConfiguration);
+        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
+        List<CntSystemConfiguration> cntSystemConfigurations = cntSystemConfigurationMapper.selectCntSystemConfigurationList(new CntSystemConfiguration());
+        return TableDataInfoUtil.pageTableDataInfo(cntSystemConfigurations,cntSystemConfigurations);
     }
 
     /**

@@ -1,7 +1,5 @@
 package com.manyun.admin.controller;
 
-import java.util.List;
-
 import com.manyun.admin.domain.query.CreationdQuery;
 import com.manyun.admin.domain.vo.CnfCreationdVo;
 import com.manyun.common.core.domain.R;
@@ -36,9 +34,7 @@ public class CnfCreationdController extends BaseController
     @ApiOperation("查询创作者列表")
     public TableDataInfo<CnfCreationdVo> list(CreationdQuery creationdQuery)
     {
-        startPage();
-        List<CnfCreationdVo> list = cnfCreationdService.selectCnfCreationdList(creationdQuery);
-        return getDataTable(list);
+        return cnfCreationdService.selectCnfCreationdList(creationdQuery);
     }
 
     //@RequiresPermissions("admin:creationd:query")

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.manyun.admin.domain.vo.CntPostSellVo;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.PageQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,11 +44,9 @@ public class CntPostSellController extends BaseController
     //@RequiresPermissions("admin:sell:list")
     @GetMapping("/list")
     @ApiOperation("查询提前购配置可以购买列表")
-    public TableDataInfo<CntPostSellVo> list()
+    public TableDataInfo<CntPostSellVo> list(PageQuery pageQuery)
     {
-        startPage();
-        List<CntPostSellVo> list = cntPostSellService.selectCntPostSellList(new CntPostSell());
-        return getDataTable(list);
+        return cntPostSellService.selectCntPostSellList(pageQuery);
     }
 
     /**

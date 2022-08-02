@@ -29,7 +29,7 @@ public class CntActionVo {
     private Date endTime;
 
     @ApiModelProperty("活动状态;1=待开始,2=进行中,3=结束")
-    private Long actionStatus;
+    private Integer actionStatus;
 
     @ApiModelProperty("规则内容")
     private String ruleContent;

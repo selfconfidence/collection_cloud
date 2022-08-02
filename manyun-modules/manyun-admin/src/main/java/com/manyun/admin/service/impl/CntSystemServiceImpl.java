@@ -5,12 +5,15 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.query.SystemQuery;
 import com.manyun.admin.domain.vo.CntSystemVo;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,17 +52,19 @@ public class CntSystemServiceImpl extends ServiceImpl<CntSystemMapper,CntSystem>
     /**
      * 查询平台规则列表
      *
-     * @param SystemQuery
+     * @param systemQuery
      * @return 平台规则
      */
     @Override
-    public List<CntSystemVo> selectCntSystemList(SystemQuery SystemQuery)
+    public TableDataInfo<CntSystemVo> selectCntSystemList(SystemQuery systemQuery)
     {
-        return cntSystemMapper.selectCntSystemList(SystemQuery).stream().map(m->{
+        PageHelper.startPage(systemQuery.getPageNum(),systemQuery.getPageSize());
+        List<CntSystem> cntSystems = cntSystemMapper.selectCntSystemList(systemQuery);
+        return  TableDataInfoUtil.pageTableDataInfo(cntSystems.parallelStream().map(m->{
             CntSystemVo cntSystemVo=new CntSystemVo();
             BeanUtil.copyProperties(m,cntSystemVo);
             return cntSystemVo;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()),cntSystems);
     }
 
     /**

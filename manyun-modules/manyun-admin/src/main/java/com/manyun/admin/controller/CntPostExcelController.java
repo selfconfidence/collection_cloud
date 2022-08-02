@@ -8,6 +8,7 @@ import com.manyun.comm.api.domain.SysUser;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.poi.ExcelUtil;
 import com.manyun.common.core.web.domain.AjaxResult;
+import com.manyun.common.core.web.page.PageQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,11 +44,9 @@ public class CntPostExcelController extends BaseController
     @RequiresPermissions("admin:excel:list")
     @GetMapping("/list")
     @ApiOperation("查询提前购格列表")
-    public TableDataInfo<CntPostExcelVo> list(CntPostExcel cntPostExcel)
+    public TableDataInfo<CntPostExcelVo> list(PageQuery pageQuery)
     {
-        startPage();
-        List<CntPostExcelVo> list = cntPostExcelService.selectCntPostExcelList(cntPostExcel);
-        return getDataTable(list);
+        return cntPostExcelService.selectCntPostExcelList(pageQuery);
     }
 
     /**

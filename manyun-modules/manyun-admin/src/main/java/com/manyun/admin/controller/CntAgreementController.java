@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.PageQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +38,9 @@ public class CntAgreementController extends BaseController
     //@RequiresPermissions("admin:agreement:list")
     @GetMapping("/list")
     @ApiOperation("查询协议相关列表")
-    public TableDataInfo<CntAgreement> list()
+    public TableDataInfo<CntAgreement> list(PageQuery pageQuery)
     {
-        startPage();
-        List<CntAgreement> list = cntAgreementService.selectCntAgreementList(new CntAgreement());
-        return getDataTable(list);
+        return cntAgreementService.selectCntAgreementList(pageQuery);
     }
 
     //@RequiresPermissions("admin:agreement:query")

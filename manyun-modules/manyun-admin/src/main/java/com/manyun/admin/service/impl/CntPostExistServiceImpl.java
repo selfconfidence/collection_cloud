@@ -5,10 +5,14 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.vo.CntPostExistVo;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,17 +48,19 @@ public class CntPostExistServiceImpl extends ServiceImpl<CntPostExistMapper,CntP
     /**
      * 查询提前购配置已经拥有列表
      *
-     * @param cntPostExist 提前购配置已经拥有
+     * @param pageQuery
      * @return 提前购配置已经拥有
      */
     @Override
-    public List<CntPostExistVo> selectCntPostExistList(CntPostExist cntPostExist)
+    public TableDataInfo<CntPostExistVo> selectCntPostExistList(PageQuery pageQuery)
     {
-        return cntPostExistMapper.selectCntPostExistList(cntPostExist).stream().map(m->{
+        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
+        List<CntPostExist> cntPostExists = cntPostExistMapper.selectCntPostExistList(new CntPostExist());
+        return TableDataInfoUtil.pageTableDataInfo(cntPostExists.parallelStream().map(m->{
             CntPostExistVo cntPostExistVo=new CntPostExistVo();
             BeanUtil.copyProperties(m,cntPostExistVo);
             return cntPostExistVo;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()),cntPostExists);
     }
 
     /**

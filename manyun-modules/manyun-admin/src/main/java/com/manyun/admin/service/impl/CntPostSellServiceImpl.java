@@ -5,10 +5,14 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.vo.CntPostSellVo;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,17 +48,19 @@ public class CntPostSellServiceImpl extends ServiceImpl<CntPostSellMapper,CntPos
     /**
      * 查询提前购配置可以购买列表
      *
-     * @param cntPostSell 提前购配置可以购买
+     * @param pageQuery
      * @return 提前购配置可以购买
      */
     @Override
-    public List<CntPostSellVo> selectCntPostSellList(CntPostSell cntPostSell)
+    public TableDataInfo<CntPostSellVo> selectCntPostSellList(PageQuery pageQuery)
     {
-        return cntPostSellMapper.selectCntPostSellList(cntPostSell).stream().map(m->{
+        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
+        List<CntPostSell> cntPostSells = cntPostSellMapper.selectCntPostSellList(new CntPostSell());
+        return TableDataInfoUtil.pageTableDataInfo(cntPostSells.parallelStream().map(m->{
             CntPostSellVo cntPostSellVo=new CntPostSellVo();
             BeanUtil.copyProperties(m,cntPostSellVo);
             return cntPostSellVo;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()),cntPostSells);
     }
 
     /**

@@ -5,6 +5,8 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntLable;
 import com.manyun.admin.domain.vo.CntLableVo;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * 藏品标签Service接口
@@ -25,10 +27,10 @@ public interface ICntLableService extends IService<CntLable>
     /**
      * 查询藏品标签列表
      *
-     * @param cntLable 藏品标签
+     * @param pageQuery
      * @return 藏品标签集合
      */
-    public List<CntLableVo> selectCntLableList(CntLable cntLable);
+    public TableDataInfo<CntLableVo> selectCntLableList(PageQuery pageQuery);
 
     /**
      * 新增藏品标签

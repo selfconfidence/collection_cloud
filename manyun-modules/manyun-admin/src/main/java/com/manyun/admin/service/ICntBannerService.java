@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntBanner;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * 轮播Service接口
@@ -24,10 +26,10 @@ public interface ICntBannerService extends IService<CntBanner>
     /**
      * 查询轮播列表
      *
-     * @param cntBanner 轮播
+     * @param pageQuery
      * @return 轮播集合
      */
-    public List<CntBanner> selectCntBannerList(CntBanner cntBanner);
+    public TableDataInfo<CntBanner> selectCntBannerList(PageQuery pageQuery);
 
     /**
      * 新增轮播

@@ -29,7 +29,7 @@ public class CntLable implements Serializable
     private String content;
 
     @ApiModelProperty("标签状态")
-    private Long isType;
+    private Integer isType;
 
     @ApiModelProperty("创建人")
     private String createdBy;
@@ -48,86 +48,76 @@ public class CntLable implements Serializable
     @ApiModelProperty("排序")
     private Integer orderNum;
 
-    public void setId(String id)
-    {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getId()
-    {
-        return id;
+    public String getLableName() {
+        return lableName;
     }
-    public void setLableName(String lableName)
-    {
+
+    public void setLableName(String lableName) {
         this.lableName = lableName;
     }
 
-    public String getLableName()
-    {
-        return lableName;
+    public String getContent() {
+        return content;
     }
-    public void setContent(String content)
-    {
+
+    public void setContent(String content) {
         this.content = content;
     }
 
-    public String getContent()
-    {
-        return content;
+    public Integer getIsType() {
+        return isType;
     }
-    public void setIsType(Long isType)
-    {
+
+    public void setIsType(Integer isType) {
         this.isType = isType;
     }
 
-    public Long getIsType()
-    {
-        return isType;
+    public String getCreatedBy() {
+        return createdBy;
     }
-    public void setCreatedBy(String createdBy)
-    {
+
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedBy()
-    {
-        return createdBy;
+    public Date getCreatedTime() {
+        return createdTime;
     }
-    public void setCreatedTime(Date createdTime)
-    {
+
+    public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
 
-    public Date getCreatedTime()
-    {
-        return createdTime;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
-    public void setUpdatedBy(String updatedBy)
-    {
+
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedBy()
-    {
-        return updatedBy;
+    public Date getUpdatedTime() {
+        return updatedTime;
     }
-    public void setUpdatedTime(Date updatedTime)
-    {
+
+    public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
     }
 
-    public Date getUpdatedTime()
-    {
-        return updatedTime;
-    }
-    public void setOrderNum(Integer orderNum)
-    {
-        this.orderNum = orderNum;
+    public Integer getOrderNum() {
+        return orderNum;
     }
 
-    public Integer getOrderNum()
-    {
-        return orderNum;
+    public void setOrderNum(Integer orderNum) {
+        this.orderNum = orderNum;
     }
 
     @Override

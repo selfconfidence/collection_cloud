@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntConsignment;
 import com.manyun.admin.domain.query.ConsignmentQuery;
 import com.manyun.admin.domain.vo.CntConsignmentVo;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * 寄售市场主_寄售订单Service接口
@@ -22,6 +23,6 @@ public interface ICntConsignmentService extends IService<CntConsignment>
      * @param consignmentQuery
      * @return 寄售市场主_寄售订单集合
      */
-    public List<CntConsignmentVo> selectCntConsignmentList(ConsignmentQuery consignmentQuery);
+    public TableDataInfo<CntConsignmentVo> selectCntConsignmentList(ConsignmentQuery consignmentQuery);
 
 }

@@ -19,7 +19,7 @@ public class CntAnnouncement implements Serializable
     private String id;
 
     @ApiModelProperty("公告类型;1平台公告，2发售信息，3上新公告")
-    private Long noticeType;
+    private Integer noticeType;
 
     @ApiModelProperty("公告内容")
     private String noticeContent;
@@ -38,68 +38,60 @@ public class CntAnnouncement implements Serializable
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedTime;
 
-    public void setId(String id)
-    {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getId()
-    {
-        return id;
+    public Integer getNoticeType() {
+        return noticeType;
     }
-    public void setNoticeType(Long noticeType)
-    {
+
+    public void setNoticeType(Integer noticeType) {
         this.noticeType = noticeType;
     }
 
-    public Long getNoticeType()
-    {
-        return noticeType;
+    public String getNoticeContent() {
+        return noticeContent;
     }
-    public void setNoticeContent(String noticeContent)
-    {
+
+    public void setNoticeContent(String noticeContent) {
         this.noticeContent = noticeContent;
     }
 
-    public String getNoticeContent()
-    {
-        return noticeContent;
+    public String getCreatedBy() {
+        return createdBy;
     }
-    public void setCreatedBy(String createdBy)
-    {
+
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedBy()
-    {
-        return createdBy;
+    public Date getCreatedTime() {
+        return createdTime;
     }
-    public void setCreatedTime(Date createdTime)
-    {
+
+    public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
 
-    public Date getCreatedTime()
-    {
-        return createdTime;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
-    public void setUpdatedBy(String updatedBy)
-    {
+
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedBy()
-    {
-        return updatedBy;
-    }
-    public void setUpdatedTime(Date updatedTime)
-    {
-        this.updatedTime = updatedTime;
+    public Date getUpdatedTime() {
+        return updatedTime;
     }
 
-    public Date getUpdatedTime()
-    {
-        return updatedTime;
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
     }
 
     @Override

@@ -4,6 +4,8 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntPostSell;
 import com.manyun.admin.domain.vo.CntPostSellVo;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * 提前购配置可以购买Service接口
@@ -24,10 +26,10 @@ public interface ICntPostSellService extends IService<CntPostSell>
     /**
      * 查询提前购配置可以购买列表
      *
-     * @param cntPostSell 提前购配置可以购买
+     * @param pageQuery
      * @return 提前购配置可以购买集合
      */
-    public List<CntPostSellVo> selectCntPostSellList(CntPostSell cntPostSell);
+    public TableDataInfo<CntPostSellVo> selectCntPostSellList(PageQuery pageQuery);
 
     /**
      * 新增提前购配置可以购买

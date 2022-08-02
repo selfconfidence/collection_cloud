@@ -8,6 +8,7 @@ import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.mapper.*;
 import com.manyun.admin.service.*;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.CateType;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,13 +55,13 @@ public class CntDictServiceImpl implements CntDictService
      * 查询藏品字典
      */
     @Override
-    public List<CntCollectionDictVo> collectionDict()
+    public R collectionDict()
     {
-        return collectionService.list().stream().map(m ->{
+        return R.ok(collectionService.list().stream().map(m ->{
             CntCollectionDictVo cntCollectionDictVo=new CntCollectionDictVo();
             BeanUtil.copyProperties(m,cntCollectionDictVo);
             return cntCollectionDictVo;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()));
     }
 
     /***
@@ -68,74 +69,74 @@ public class CntDictServiceImpl implements CntDictService
      * @return
      */
     @Override
-    public List<CollectionCateDictVo> collectionCateDict()
+    public R collectionCateDict()
     {
-        return cateService.list(Wrappers.<CntCate>lambdaQuery().eq(CntCate::getCateType,Long.valueOf(CateType.COLLECTION_CATE.getCode()))).stream().map(m ->{
+        return R.ok(cateService.list(Wrappers.<CntCate>lambdaQuery().eq(CntCate::getCateType,Long.valueOf(CateType.COLLECTION_CATE.getCode()))).stream().map(m ->{
             CollectionCateDictVo collectionCateDictVo=new CollectionCateDictVo();
             BeanUtil.copyProperties(m,collectionCateDictVo);
             return collectionCateDictVo;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()));
     }
 
     /***
      * 查询创作者字典
      */
     @Override
-    public List<CreationdDictVo> creationdDict()
+    public R creationdDict()
     {
-        return creationdService.list().stream().map(m ->{
+        return R.ok(creationdService.list().stream().map(m ->{
             CreationdDictVo creationdDictVo=new CreationdDictVo();
             BeanUtil.copyProperties(m,creationdDictVo);
             return creationdDictVo;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()));
     }
 
     /***
      * 查询标签字典
      */
     @Override
-    public List<LableDictVo> lableDict()
+    public R lableDict()
     {
-        return lableService.list().stream().map(m ->{
+        return R.ok(lableService.list().stream().map(m ->{
             LableDictVo lableDictVo=new LableDictVo();
             BeanUtil.copyProperties(m,lableDictVo);
             return lableDictVo;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()));
     }
 
     /***
      * 查询客服字典
      */
     @Override
-    public List<CustomerServiceDictVo> customerServiceDict()
+    public R customerServiceDict()
     {
         List<CustomerServiceDictVo> customerServiceDictVos=customerServiceService.list(Wrappers.<CntCustomerService>lambdaQuery().eq(CntCustomerService::getMenuStatus,"0").eq(CntCustomerService::getParentId,0)).stream().map(m ->{
             CustomerServiceDictVo customerServiceDictVo=new CustomerServiceDictVo();
             BeanUtil.copyProperties(m,customerServiceDictVo);
             return customerServiceDictVo;
         }).collect(Collectors.toList());
-        customerServiceDictVos.add(Builder.of(CustomerServiceDictVo::new).with(CustomerServiceDictVo::setMenuId,Long.valueOf(0)).with(CustomerServiceDictVo::setMenuName,"父菜单").build());
-        return customerServiceDictVos.stream().sorted(Comparator.comparing(CustomerServiceDictVo::getMenuId)).collect(Collectors.toList());
+        customerServiceDictVos.add(Builder.of(CustomerServiceDictVo::new).with(CustomerServiceDictVo::setMenuId,0).with(CustomerServiceDictVo::setMenuName,"父菜单").build());
+        return R.ok(customerServiceDictVos);
     }
 
     /***
      * 抽签规则字典
      */
     @Override
-    public List<DrawRulesDictVo> drawRulesDict(DrawRulesDictQuery drawRulesDictQuery)
+    public R drawRulesDict(DrawRulesDictQuery drawRulesDictQuery)
     {
-        return cntTarService.list(Wrappers.<CntTar>lambdaQuery().eq(CntTar::getTarType,drawRulesDictQuery.getTarType())).stream().map(m->{
+        return R.ok(cntTarService.list(Wrappers.<CntTar>lambdaQuery().eq(CntTar::getTarType,drawRulesDictQuery.getTarType())).stream().map(m->{
             DrawRulesDictVo drawRulesDictVo=new DrawRulesDictVo();
             BeanUtil.copyProperties(m,drawRulesDictVo);
             return drawRulesDictVo;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()));
     }
 
     /***
      * 提前购配置可以购买字典
      */
     @Override
-    public List<TqgGoodsDictVo> postSellDict()
+    public R postSellDict()
     {
         List<TqgGoodsDictVo> tqgGoodsDictVos = collectionService
                 .list(
@@ -157,14 +158,14 @@ public class CntDictServiceImpl implements CntDictService
                     tqgGoodsDictVo.setBuiName(m.getBoxTitle());
                     return tqgGoodsDictVo;
                 }).collect(Collectors.toList()));
-        return tqgGoodsDictVos;
+        return R.ok(tqgGoodsDictVos);
     }
 
     /***
      * 提前购配置已经拥有字典
      */
     @Override
-    public List<TqgGoodsDictVo> postExistDict() {
+    public R postExistDict() {
         List<TqgGoodsDictVo> tqgGoodsDictVos = collectionService
                 .list().stream().map(m -> {
                     TqgGoodsDictVo tqgGoodsDictVo = new TqgGoodsDictVo();
@@ -179,7 +180,7 @@ public class CntDictServiceImpl implements CntDictService
                     tqgGoodsDictVo.setBuiName(m.getBoxTitle());
                     return tqgGoodsDictVo;
                 }).collect(Collectors.toList()));
-        return tqgGoodsDictVos;
+        return R.ok(tqgGoodsDictVos);
     }
 
 

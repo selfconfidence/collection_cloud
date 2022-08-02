@@ -24,9 +24,7 @@ public class CntConsignmentController extends BaseController
     @ApiOperation("订单管理列表")
     public TableDataInfo<CntConsignmentVo> list(ConsignmentQuery consignmentQuery)
     {
-        startPage();
-        List<CntConsignmentVo> list = cntConsignmentService.selectCntConsignmentList(consignmentQuery);
-        return getDataTable(list);
+        return cntConsignmentService.selectCntConsignmentList(consignmentQuery);
     }
 
 }

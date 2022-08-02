@@ -9,6 +9,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.CntCollection;
 import com.manyun.admin.domain.CntMedia;
 import com.manyun.admin.domain.dto.SaveActionTarDto;
@@ -20,6 +21,8 @@ import com.manyun.admin.service.ICntMediaService;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,13 +56,15 @@ public class CntActionTarServiceImpl extends ServiceImpl<CntActionTarMapper,CntA
      * @return 活动合成附属信息
      */
     @Override
-    public List<CntActionTarVo> selectCntActionTarList(ActionTarQuery actionTarQuery)
+    public TableDataInfo<CntActionTarVo> selectCntActionTarList(ActionTarQuery actionTarQuery)
     {
-        return cntActionTarMapper.selectSearchActionTarList(actionTarQuery).stream().map(m ->{
+        PageHelper.startPage(actionTarQuery.getPageNum(),actionTarQuery.getPageSize());
+        List<CntActionTar> cntActionTars = cntActionTarMapper.selectSearchActionTarList(actionTarQuery);
+        return TableDataInfoUtil.pageTableDataInfo(cntActionTars.parallelStream().map(m ->{
             CntActionTarVo cntActionTarVo=new CntActionTarVo();
             BeanUtil.copyProperties(m,cntActionTarVo);
             return cntActionTarVo;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()),cntActionTars);
     }
 
     /**

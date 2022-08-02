@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CnfCreationd;
 import com.manyun.admin.domain.query.CreationdQuery;
 import com.manyun.admin.domain.vo.CnfCreationdVo;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * 创作者Service接口
@@ -29,7 +30,7 @@ public interface ICnfCreationdService extends IService<CnfCreationd>
      * @param creationdQuery
      * @return 创作者集合
      */
-    public List<CnfCreationdVo> selectCnfCreationdList(CreationdQuery creationdQuery);
+    public TableDataInfo<CnfCreationdVo> selectCnfCreationdList(CreationdQuery creationdQuery);
 
     /**
      * 新增创作者

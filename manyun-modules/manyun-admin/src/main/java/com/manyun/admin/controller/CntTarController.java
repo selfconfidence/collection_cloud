@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.manyun.admin.domain.vo.CntTarVo;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.PageQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,11 +43,9 @@ public class CntTarController extends BaseController
     //@RequiresPermissions("admin:tar:list")
     @GetMapping("/list")
     @ApiOperation("查询抽签规则(盲盒,藏品)列表")
-    public TableDataInfo<CntTarVo> list()
+    public TableDataInfo<CntTarVo> list(PageQuery pageQuery)
     {
-        startPage();
-        List<CntTarVo> list = cntTarService.selectCntTarList(new CntTar());
-        return getDataTable(list);
+        return cntTarService.selectCntTarList(pageQuery);
     }
 
     /**

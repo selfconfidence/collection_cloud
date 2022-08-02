@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.CntBox;
 import com.manyun.admin.domain.CntCollection;
 import com.manyun.admin.domain.query.CateQuery;
@@ -17,6 +18,8 @@ import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,14 +64,15 @@ public class CntCateServiceImpl extends ServiceImpl<CntCateMapper,CntCate> imple
      * @return 藏品系列_分类
      */
     @Override
-    public List<CntCateVo> selectCntCateList(CateQuery cateQuery)
+    public TableDataInfo<CntCateVo> selectCntCateList(CateQuery cateQuery)
     {
-        return cntCateMapper.selectSearchCateList(cateQuery).parallelStream()
-                .map( e -> {
-                    CntCateVo cntCateVo=new CntCateVo();
-                    BeanUtil.copyProperties(e,cntCateVo);
-                    return cntCateVo;
-                }).collect(Collectors.toList());
+        PageHelper.startPage(cateQuery.getPageNum(),cateQuery.getPageSize());
+        List<CntCate> cntCateList = cntCateMapper.selectSearchCateList(cateQuery);
+        return TableDataInfoUtil.pageTableDataInfo(cntCateList.parallelStream().map( e -> {
+            CntCateVo cntCateVo=new CntCateVo();
+            BeanUtil.copyProperties(e,cntCateVo);
+            return cntCateVo;
+        }).collect(Collectors.toList()),cntCateList);
     }
 
     /**

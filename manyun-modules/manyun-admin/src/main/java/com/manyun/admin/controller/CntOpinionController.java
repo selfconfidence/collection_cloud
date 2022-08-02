@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.manyun.admin.domain.vo.CntOpinionVo;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.PageQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +41,9 @@ public class CntOpinionController extends BaseController
     //@RequiresPermissions("admin:opinion:list")
     @GetMapping("/list")
     @ApiOperation("查询产品建议列表")
-    public TableDataInfo<CntOpinionVo> list()
+    public TableDataInfo<CntOpinionVo> list(PageQuery pageQuery)
     {
-        startPage();
-        List<CntOpinionVo> list = cntOpinionService.selectCntOpinionList(new CntOpinion());
-        return getDataTable(list);
+        return cntOpinionService.selectCntOpinionList(pageQuery);
     }
 
     /**

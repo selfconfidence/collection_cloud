@@ -12,13 +12,13 @@ public class CntCustomerServiceVo
 {
 
     @ApiModelProperty("菜单ID")
-    private Long menuId;
+    private Integer menuId;
 
     @ApiModelProperty("菜单名称")
     private String menuName;
 
     @ApiModelProperty("父菜单ID")
-    private Long parentId;
+    private Integer parentId;
 
     @ApiModelProperty("父菜单名称")
     private String parentName;

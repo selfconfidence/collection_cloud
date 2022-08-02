@@ -10,6 +10,7 @@ import com.manyun.admin.domain.query.OrderQuery;
 import com.manyun.admin.domain.vo.CntBoxDetailsVo;
 import com.manyun.admin.domain.vo.CntBoxOrderVo;
 import com.manyun.admin.domain.vo.CntBoxVo;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
  * 盲盒;盲盒主体Service接口
@@ -33,7 +34,7 @@ public interface ICntBoxService extends IService<CntBox>
      * @param boxQuery 盲盒;盲盒主体
      * @return 盲盒;盲盒主体集合
      */
-    public List<CntBoxVo> selectCntBoxList(BoxQuery boxQuery);
+    public TableDataInfo<CntBoxVo> selectCntBoxList(BoxQuery boxQuery);
 
     /**
      * 新增盲盒;盲盒主体

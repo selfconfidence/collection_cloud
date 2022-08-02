@@ -30,7 +30,7 @@ public class CntWithdraw implements Serializable
     private BigDecimal minmoney;
 
     @ApiModelProperty("月提现次数")
-    private Long monthlimit;
+    private Integer monthlimit;
 
     @ApiModelProperty("提现规则")
     private String rule;
@@ -49,95 +49,84 @@ public class CntWithdraw implements Serializable
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedTime;
 
-    public void setId(String id)
-    {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getId()
-    {
-        return id;
+    public String getState() {
+        return state;
     }
-    public void setState(String state)
-    {
+
+    public void setState(String state) {
         this.state = state;
     }
 
-    public String getState()
-    {
-        return state;
+    public BigDecimal getServicefee() {
+        return servicefee;
     }
-    public void setServicefee(BigDecimal servicefee)
-    {
+
+    public void setServicefee(BigDecimal servicefee) {
         this.servicefee = servicefee;
     }
 
-    public BigDecimal getServicefee()
-    {
-        return servicefee;
+    public BigDecimal getMinmoney() {
+        return minmoney;
     }
-    public void setMinmoney(BigDecimal minmoney)
-    {
+
+    public void setMinmoney(BigDecimal minmoney) {
         this.minmoney = minmoney;
     }
 
-    public BigDecimal getMinmoney()
-    {
-        return minmoney;
+    public Integer getMonthlimit() {
+        return monthlimit;
     }
-    public void setMonthlimit(Long monthlimit)
-    {
+
+    public void setMonthlimit(Integer monthlimit) {
         this.monthlimit = monthlimit;
     }
 
-    public Long getMonthlimit()
-    {
-        return monthlimit;
+    public String getRule() {
+        return rule;
     }
-    public void setRule(String rule)
-    {
+
+    public void setRule(String rule) {
         this.rule = rule;
     }
 
-    public String getRule()
-    {
-        return rule;
+    public String getCreatedBy() {
+        return createdBy;
     }
-    public void setCreatedBy(String createdBy)
-    {
+
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedBy()
-    {
-        return createdBy;
+    public Date getCreatedTime() {
+        return createdTime;
     }
-    public void setCreatedTime(Date createdTime)
-    {
+
+    public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
 
-    public Date getCreatedTime()
-    {
-        return createdTime;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
-    public void setUpdatedBy(String updatedBy)
-    {
+
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedBy()
-    {
-        return updatedBy;
-    }
-    public void setUpdatedTime(Date updatedTime)
-    {
-        this.updatedTime = updatedTime;
+    public Date getUpdatedTime() {
+        return updatedTime;
     }
 
-    public Date getUpdatedTime()
-    {
-        return updatedTime;
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
     }
 
     @Override
