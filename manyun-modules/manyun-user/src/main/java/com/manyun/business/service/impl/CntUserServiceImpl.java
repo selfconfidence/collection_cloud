@@ -199,14 +199,17 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
      * @return
      */
     @Override
-    public R userRealName(UserRealForm userRealForm) {
+    public R userRealName(UserRealForm userRealForm, String userId) {
         R r = unionRealConfig.unionReal(userRealForm);
         if (200 != r.getCode()) {
-            return R.fail();
+            return R.fail("实名认证失败");
         }
         UserRealMoneyForm userRealMoneyForm = Builder.of(UserRealMoneyForm::new).build();
+        userRealMoneyForm.setUserId(userId);
         userRealMoneyForm.setBankcard(userRealForm.getBankCart());
-        remoteBuiMoneyService.updateUserMoney(userRealMoneyForm, SecurityConstants.INNER);
+        userRealMoneyForm.setCartNo(userRealForm.getCartNo());
+        userRealMoneyForm.setUserRealName(userRealForm.getRealName());
+        r = remoteBuiMoneyService.updateUserMoney(userRealMoneyForm, SecurityConstants.INNER);
         return r;
     }
 

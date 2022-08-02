@@ -37,6 +37,9 @@ public class Money implements Serializable {
     @ApiModelProperty("真实手机号")
     private String realPhone;
 
+    @ApiModelProperty("身份证号")
+    private String cartNo;
+
     @ApiModelProperty("身份证正面_图片链接")
     private String cartJust;
 
