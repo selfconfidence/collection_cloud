@@ -105,7 +105,7 @@ public class CntUserController extends BaseController {
     @ApiOperation("实名认证 -- 银联")
     public R realUser(@RequestBody @Valid UserRealForm userRealForm){
         String phoneCode = (String) redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(userRealForm.getPhone()));
-        //Assert.isTrue(userRealForm.getPhoneCode().equals(phoneCode),"验证码输入错误,请核实!");
+        Assert.isTrue(userRealForm.getPhoneCode().equals(phoneCode),"验证码输入错误,请核实!");
         return userService.userRealName(userRealForm);
     }
 
