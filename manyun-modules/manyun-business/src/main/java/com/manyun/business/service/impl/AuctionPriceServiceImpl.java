@@ -146,6 +146,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                     //拍中者
                     AuctionPrice winAuctionPrice = list.get(0);
                     winAuctionPrice.setAuctionStatus(AuctionStatus.WAIT_PAY.getCode());
+                    winAuctionPrice.setEndPayTime(LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class)));
                     //回调成功,生成订单
                     String auctionOrderNo = auctionOrderService.createAuctionOrder(AuctionOrderCreateDto.builder()
                             .goodsId(auctionSend.getGoodsId())
@@ -157,6 +158,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                             .fromUserId(auctionSend.getUserId())
                             .toUserId(winAuctionPrice.getUserId()).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));
                     auctionSend.setAuctionSendStatus(AuctionSendStatus.WAIT_PAY.getCode());
+                    auctionSend.setEndPayTime(LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class)));
 
                     //成功后退还未拍中者保证金
                     //拍中者暂不退还，支付成功再退
@@ -223,8 +225,9 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         }
         this.save(auctionPrice);
 
-        auctionSendService.update(Wrappers.<AuctionSend>lambdaUpdate()
-                .set(AuctionSend::getNowPrice, auctionPrice.getBidPrice()));
+        auctionSend.setNowPrice(auctionPrice.getBidPrice());
+
+        auctionSendService.updateById(auctionSend);
 
         return R.ok(auctionPrice.getBidPrice());
     }
@@ -257,6 +260,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .eq(AuctionPrice::getUserId, userId)
                 .eq(AuctionPrice::getIsNew, 1));
 
+
+
         return TableDataInfoUtil.pageTableDataInfo(auctionPriceList.parallelStream().map(this::providerMyAuctionPriceVo).collect(Collectors.toList()), auctionPriceList);
 
 
@@ -277,6 +282,11 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         myAuctionPriceVo.setAuctionVo(auctionSendService.getAuctionSendVo(auctionPrice.getAuctionSendId()));
         myAuctionPriceVo.setAuctionSendId(auctionPrice.getAuctionSendId());
         myAuctionPriceVo.setAuctionStatus(auctionPrice.getAuctionStatus());
+        myAuctionPriceVo.setGoodsId(auctionSend.getGoodsId());
+        myAuctionPriceVo.setGoodsType(auctionSend.getGoodsType());
+        if (auctionPrice.getEndPayTime() != null) {
+            myAuctionPriceVo.setEndPayTime(auctionPrice.getEndPayTime());
+        }
         String mediaUrl = "";
         if (auctionSend.getGoodsType() == 1) {
             mediaUrl = mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE).get(0).getMediaUrl();
@@ -329,6 +339,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     @Override
     @Transactional(rollbackFor = Exception.class)
     public synchronized PayVo payAuction(String payUserId, AuctionPayForm auctionPayForm) {
+
         AuctionPrice auctionPrice = getById(auctionPayForm.getAuctionPriceId());
         AuctionSend auctionSend = auctionSendService.getById(auctionPrice.getAuctionSendId());
         AuctionOrder auctionOrder = auctionOrderService.getById(auctionSend.getAuctionOrderId());

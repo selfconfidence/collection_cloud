@@ -74,6 +74,9 @@ public class AuctionSend implements Serializable {
     @ApiModelProperty("结束时间")
     private LocalDateTime endTime;
 
+    @ApiModelProperty("剩余支付时间")
+    private LocalDateTime endPayTime;
+
     @ApiModelProperty("创建人")
     private String createdBy;
 

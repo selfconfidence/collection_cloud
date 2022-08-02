@@ -41,6 +41,9 @@ public class AuctionPrice implements Serializable {
     @ApiModelProperty("竞拍状态")
     private Integer auctionStatus;
 
+    @ApiModelProperty("剩余支付时间")
+    private LocalDateTime endPayTime;
+
     @ApiModelProperty("创建人")
     private String createdBy;
 

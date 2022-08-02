@@ -47,7 +47,7 @@ public class AuctionPriceController {
     @PostMapping("/auctionPriceList")
     @ApiOperation("竞价列表")
     public R<TableDataInfo<AuctionPriceVo>> auctionPriceList(@RequestBody AuctionPriceQuery auctionPriceQuery) {
-        PageUtils.startPage();
+        PageUtils.startPage(auctionPriceQuery.getPageNum(), auctionPriceQuery.getPageSize());
         TableDataInfo<AuctionPriceVo> auctionPriceVoTableDataInfo = auctionPriceService.auctionPriceList(auctionPriceQuery);
         return R.ok(auctionPriceVoTableDataInfo);
     }
@@ -55,7 +55,7 @@ public class AuctionPriceController {
     @PostMapping("/myAuctionPriceList")
     @ApiOperation("我的出价列表")
     public R<TableDataInfo<MyAuctionPriceVo>> myAuctionPriceList(@RequestBody MyAuctionPriceQuery auctionPriceQuery) {
-        PageUtils.startPage();
+        PageUtils.startPage(auctionPriceQuery.getPageNum(), auctionPriceQuery.getPageSize());
         LoginBusinessUser businessUser = SecurityUtils.getNotNullLoginBusinessUser();
         TableDataInfo<MyAuctionPriceVo> myAuctionPriceVoTableDataInfo = auctionPriceService.myAuctionPriceList(auctionPriceQuery, businessUser.getUserId());
         return R.ok(myAuctionPriceVoTableDataInfo);

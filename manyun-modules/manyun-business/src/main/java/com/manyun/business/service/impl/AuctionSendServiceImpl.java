@@ -185,6 +185,9 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         BeanUtil.copyProperties(auctionSend, auctionSendVo);
         auctionSendVo.setDelayTime(systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_DELAY_TIME, Integer.class));
         auctionSendVo.setCommission(systemService.getVal(BusinessConstants.SystemTypeConstant.COMMISSION_SCALE, BigDecimal.class));
+        if (auctionSend.getEndPayTime() != null) {
+            auctionSendVo.setEndPayTime(auctionSend.getEndPayTime());
+        }
         if (auctionSend.getGoodsType() == 1) {
             List<MediaVo> mediaVos = mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
             auctionSendVo.setMediaVos(mediaVos);

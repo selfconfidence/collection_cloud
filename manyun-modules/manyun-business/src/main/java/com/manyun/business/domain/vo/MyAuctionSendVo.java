@@ -55,6 +55,10 @@ public class MyAuctionSendVo {
     @ApiModelProperty("结束时间")
     private LocalDateTime endTime;
 
+    @ApiModelProperty("剩余支付时间，只有状态为待支付才有效")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime endPayTime;
+
     @ApiModelProperty("拍卖状态;1待开始，2竞拍中，3待支付，4已完成，5已违约，6已流拍")
     private Integer auctionSendStatus;
 
