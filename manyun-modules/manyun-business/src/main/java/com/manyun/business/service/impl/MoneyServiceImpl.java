@@ -138,11 +138,14 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         return moneyLogVo;
     }
 
+    @Override
     public void updateUserMoney(UserRealMoneyForm userRealMoneyForm) {
-        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        Money moneyUser = getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, loginBusinessUser.getUserId()));
+
+        Money moneyUser = getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userRealMoneyForm.getUserId()));
+        moneyUser.setCartNo(userRealMoneyForm.getCartNo());
+        moneyUser.setRealName(userRealMoneyForm.getUserRealName());
         moneyUser.setBankCart(userRealMoneyForm.getBankcard());
-        moneyUser.updateD(loginBusinessUser.getUserId());
+        moneyUser.updateD(userRealMoneyForm.getUserId());
         updateById(moneyUser);
     }
 

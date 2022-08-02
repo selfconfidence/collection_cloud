@@ -51,5 +51,5 @@ public interface ICntUserService extends IService<CntUser> {
 
     CntUser jgPhoneLogin(JgLoginTokenForm jgLoginTokenForm);
 
-    R userRealName(UserRealForm userRealForm);
+    R userRealName(UserRealForm userRealForm, String userId);
 }

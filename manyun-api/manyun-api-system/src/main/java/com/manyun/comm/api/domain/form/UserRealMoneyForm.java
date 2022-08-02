@@ -10,4 +10,14 @@ public class UserRealMoneyForm {
 
     @ApiModelProperty("银行卡号")
     private String bankcard;
+
+    @ApiModelProperty("真实姓名")
+    private String userRealName;
+
+    @ApiModelProperty("身份证号")
+    private String cartNo;
+
+    @ApiModelProperty("用户id")
+    private String userId;
+
 }
