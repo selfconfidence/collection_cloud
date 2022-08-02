@@ -151,7 +151,7 @@ public class AliRealConfig {
 //                : response.getResultObject().getMaterialInfo());
         Assert.isTrue("200".equals(response.getCode()),response.getMessage());
 
-        Assert.isTrue("200".equals(response.getResultObject().getSubCode()),response.getResultObject().getMaterialInfo());
+        Assert.isTrue("200".equals(response.getResultObject().getSubCode()),response.getResultObject().getPassed());
     }
 
 

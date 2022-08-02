@@ -36,7 +36,6 @@ public class BuiTask
 
     /**
      * 定时调度取消未支付的订单
-     * TODO 未配置
      */
     public void timeCancel(){
         remoteOrderService.timeCancel(SecurityConstants.INNER);

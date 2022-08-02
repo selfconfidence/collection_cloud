@@ -69,7 +69,7 @@ public class AuthFilter implements GlobalFilter, Ordered
         }
         String userid = JwtUtils.getUserId(claims);
         String username = JwtUtils.getUserName(claims);
-        if (StringUtils.isEmpty(userid) || StringUtils.isEmpty(username))
+        if (StringUtils.isEmpty(userid))
         {
             return unauthorizedResponse(exchange, "令牌验证失败");
         }

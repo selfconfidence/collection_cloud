@@ -85,6 +85,8 @@ public class SecurityUtils
      */
     public static LoginBusinessUser getTestLoginBusinessUser()
     {
+        if (true)
+            return getNotNullLoginBusinessUser();
         //  测试用户
         LoginBusinessUser loginBusinessUser = new LoginBusinessUser();
         loginBusinessUser.setUserId("1");

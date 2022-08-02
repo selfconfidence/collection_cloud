@@ -71,18 +71,16 @@ public class MoneyController extends BaseController {
 
     @GetMapping("/bindCard")
     @ApiOperation("调取银联 一键绑卡 -暂未实现 ")
+    @Deprecated
     public R bindCard(){
-        //TODO 调取银联 一键绑卡 -暂未实现
-
-        return R.ok();
+        return R.fail();
     }
 
     @PostMapping("/fullMoney")
     @ApiOperation("钱包充值")
     @Deprecated
     public R fullMoney(){
-        //TODO 调取第三方支付, 暂未实现
-        return R.ok();
+        return R.fail();
     }
 
     @GetMapping("/initUserMoney/{userId}")

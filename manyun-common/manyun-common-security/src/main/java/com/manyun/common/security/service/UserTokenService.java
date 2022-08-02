@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -50,7 +51,7 @@ public class UserTokenService
         LoginBusinessUser loginBusinessUser=new LoginBusinessUser();
         String token = IdUtils.fastUUID();
         String userId = cntUser.getId();
-        String nickName = cntUser.getNickName();
+        String nickName = Objects.isNull(cntUser.getNickName()) ? "cnt_null_name":cntUser.getNickName();
         loginBusinessUser.setToken(token);
         loginBusinessUser.setUserId(userId);
         loginBusinessUser.setUsername(nickName);
