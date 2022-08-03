@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.*;
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
 import static com.manyun.common.core.enums.CollectionStatus.DOWN_ACTION;
+import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
 import static com.manyun.common.core.enums.PayTypeEnum.MONEY_TAPE;
 import static com.manyun.common.core.enums.TarStatus.CEN_YES_TAR;
 import static com.manyun.common.core.enums.TarStatus.NO_TAR;
@@ -217,7 +218,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     public List<UserCateVo> cateCollectionByUserId(String userId) {
         List<UserCateVo> userCateVoList = Lists.newLinkedList();
 
-        List<UserCollection> userCollections = userCollectionService.list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getUserId, userId));
+        List<UserCollection> userCollections = userCollectionService.list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getIsExist, USE_EXIST.getCode()).eq(UserCollection::getUserId, userId));
         // 如果没有,直接返回
        if (userCollections.isEmpty()) return userCateVoList;
         // 开始得到分类
