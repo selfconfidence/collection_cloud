@@ -46,14 +46,13 @@ public class AuthFilter implements GlobalFilter, Ordered
         ServerHttpRequest.Builder mutate = request.mutate();
 
         String url = request.getURI().getPath();
-        // 跳过不需要验证的路径
-        if (StringUtils.matches(url, ignoreWhite.getWhites()))
-        {
-            return chain.filter(exchange);
-        }
+        // 跳过不需要验证的路径 有些情况下 会 if 登录 else 未登录的接口做取舍，无感知处理
+        boolean matches = StringUtils.matches(url, ignoreWhite.getWhites());
+
         String token = getToken(request);
         if (StringUtils.isEmpty(token))
         {
+            if (matches)return chain.filter(exchange);
             return unauthorizedResponse(exchange, "令牌不能为空");
         }
         Claims claims = JwtUtils.parseToken(token);

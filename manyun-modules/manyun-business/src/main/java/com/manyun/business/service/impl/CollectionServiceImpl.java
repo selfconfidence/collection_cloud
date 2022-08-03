@@ -218,7 +218,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     public List<UserCateVo> cateCollectionByUserId(String userId) {
         List<UserCateVo> userCateVoList = Lists.newLinkedList();
 
-        List<UserCollection> userCollections = userCollectionService.list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getIsExist, USE_EXIST.getCode()).eq(UserCollection::getUserId, userId));
+        List<UserCollection> userCollections = userCollectionService.list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getUserId, userId).eq(UserCollection::getIsExist, USE_EXIST.getCode()));
         // 如果没有,直接返回
        if (userCollections.isEmpty()) return userCateVoList;
         // 开始得到分类
