@@ -11,10 +11,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.vo.CntCustomerServiceVo;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.manyun.admin.mapper.CntCustomerServiceMapper;
@@ -34,7 +36,7 @@ public class CntCustomerServiceServiceImpl extends ServiceImpl<CntCustomerServic
     private CntCustomerServiceMapper cntCustomerServiceMapper;
 
     /**
-     * 查询客服
+     * 查询客服详情
      *
      * @param menuId 客服主键
      * @return 客服
@@ -42,7 +44,7 @@ public class CntCustomerServiceServiceImpl extends ServiceImpl<CntCustomerServic
     @Override
     public CntCustomerService selectCntCustomerServiceByMenuId(Long menuId)
     {
-        return getById(menuId);
+        return cntCustomerServiceMapper.selectCntCustomerServiceByMenuId(menuId);
     }
 
     /**
@@ -62,7 +64,7 @@ public class CntCustomerServiceServiceImpl extends ServiceImpl<CntCustomerServic
             if(m.getParentId()==0){
                 cntCustomerServiceVo.setParentName("父菜单");
             }else {
-                Optional<CntCustomerService> optional = cntCustomerServices.stream().filter(f -> f.getMenuId()==m.getParentId()).findFirst();
+                Optional<CntCustomerService> optional = cntCustomerServiceMapper.selectCntCustomerServiceList(new CntCustomerService()).parallelStream().filter(f -> f.getMenuId().equals(m.getParentId())).findFirst();
                 if(optional.isPresent()){
                     cntCustomerServiceVo.setParentName(optional.get().getMenuName());
                 }
@@ -80,7 +82,9 @@ public class CntCustomerServiceServiceImpl extends ServiceImpl<CntCustomerServic
     @Override
     public int insertCntCustomerService(CntCustomerService cntCustomerService)
     {
-        return save(cntCustomerService)==true?1:0;
+        cntCustomerService.setCreateBy(SecurityUtils.getUsername());
+        cntCustomerService.setCreateTime(DateUtils.getNowDate());
+        return cntCustomerServiceMapper.insertCntCustomerService(cntCustomerService);
     }
 
     /**
@@ -92,7 +96,9 @@ public class CntCustomerServiceServiceImpl extends ServiceImpl<CntCustomerServic
     @Override
     public int updateCntCustomerService(CntCustomerService cntCustomerService)
     {
-        return updateById(cntCustomerService)==true?1:0;
+        cntCustomerService.setUpdateBy(SecurityUtils.getUsername());
+        cntCustomerService.setUpdateTime(DateUtils.getNowDate());
+        return cntCustomerServiceMapper.updateCntCustomerService(cntCustomerService);
     }
 
     /**
@@ -106,9 +112,9 @@ public class CntCustomerServiceServiceImpl extends ServiceImpl<CntCustomerServic
     {
         List<CntCustomerService> list = list(Wrappers.<CntCustomerService>lambdaQuery().in(CntCustomerService::getParentId, menuIds));
         if(list.size()>0){
-            return R.fail("菜单id为: "+ StringUtils.join(list,",") + " 有子菜单,请先删除子菜单!");
+            return R.fail("菜单id为: "+ StringUtils.join(list.stream().map(CntCustomerService::getParentId).distinct().collect(Collectors.toList()), ",") + " 有子菜单,请先删除子菜单!");
         }
-        return removeByIds(Arrays.asList(menuIds))==true?R.ok():R.fail();
+        return cntCustomerServiceMapper.deleteCntCustomerServiceByMenuIds(menuIds)>0?R.ok():R.fail();
     }
 
 }

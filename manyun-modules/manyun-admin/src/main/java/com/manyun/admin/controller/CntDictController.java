@@ -1,6 +1,7 @@
 package com.manyun.admin.controller;
 
 
+import com.manyun.admin.domain.query.ActionTarDictQuery;
 import com.manyun.admin.domain.query.DrawRulesDictQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.service.CntDictService;
@@ -78,6 +79,13 @@ public class CntDictController extends BaseController
     public R postExistDict()
     {
         return cntDictService.postExistDict();
+    }
+
+    @PostMapping("/actionTarDict")
+    @ApiOperation("活动合成材料字典")
+    public R actionTarDict(@Valid @RequestBody ActionTarDictQuery tarDictQuery)
+    {
+        return cntDictService.actionTarDict(tarDictQuery);
     }
 
 }

@@ -1,6 +1,5 @@
 package com.manyun.admin.controller;
 
-import java.util.List;
 
 import com.manyun.admin.domain.query.CollectionInfoQuery;
 import com.manyun.admin.domain.vo.CntCollectionInfoVo;

@@ -9,11 +9,14 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.CntActionTar;
+import com.manyun.admin.domain.CntCollection;
 import com.manyun.admin.domain.query.ActionQuery;
 import com.manyun.admin.domain.vo.CntActionVo;
 import com.manyun.admin.mapper.CntActionTarMapper;
 import com.manyun.admin.service.ICntActionTarService;
+import com.manyun.admin.service.ICntCollectionService;
 import com.manyun.common.core.utils.DateUtils;
+import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
@@ -39,6 +42,9 @@ public class CntActionServiceImpl extends ServiceImpl<CntActionMapper,CntAction>
 
     @Autowired
     private ICntActionTarService actionTarService;
+
+    @Autowired
+    private ICntCollectionService collectionService;
 
     /**
      * 查询活动
@@ -66,6 +72,8 @@ public class CntActionServiceImpl extends ServiceImpl<CntActionMapper,CntAction>
         return TableDataInfoUtil.pageTableDataInfo(cntActions.parallelStream().map(m ->{
             CntActionVo cntActionVo=new CntActionVo();
             BeanUtil.copyProperties(m,cntActionVo);
+            CntCollection cntCollection = collectionService.getById(m.getCollectionId());
+            cntActionVo.setCollectionName(cntCollection==null?"":cntCollection.getCollectionName());
             return cntActionVo;
         }).collect(Collectors.toList()),cntActions);
     }

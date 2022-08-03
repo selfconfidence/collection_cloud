@@ -81,9 +81,6 @@ public class CntActionTarServiceImpl extends ServiceImpl<CntActionTarMapper,CntA
         List<CntActionTarVo> cntActionTarVos = saveActionTarDto.getCntActionTarVos();
         String actionId = saveActionTarDto.getActionId();
         Assert.isTrue(Objects.nonNull(cntActionTarVos),"新增失败!");
-        List<String> collect = cntActionTarVos.stream().map(CntActionTarVo::getCollectionId).collect(Collectors.toList());
-        CntActionTar actionTar = getById(actionId);
-        Assert.isFalse(collect.contains(actionTar.getCollectionId()),"合成材料不可与合成藏品一致!");
         remove(Wrappers.<CntActionTar>lambdaQuery().eq(CntActionTar::getActionId,actionId));
         if(cntActionTarVos.size()>0){
             List<String> collectionIds = cntActionTarVos.stream().map(CntActionTarVo::getCollectionId).collect(Collectors.toList());

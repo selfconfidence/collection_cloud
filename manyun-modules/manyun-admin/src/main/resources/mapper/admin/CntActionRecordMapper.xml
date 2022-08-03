@@ -21,6 +21,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectCntActionRecordList" parameterType="ActionRecordQuery" resultType="CntActionRecordVo">
         select
+            car.id,
             ca.action_title,
             ca.action_image,
             ca.action_status,

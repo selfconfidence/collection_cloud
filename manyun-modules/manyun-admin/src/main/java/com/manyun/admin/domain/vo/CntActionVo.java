@@ -28,6 +28,12 @@ public class CntActionVo {
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endTime;
 
+    @ApiModelProperty("此活动合成的藏品编号")
+    private String collectionId;
+
+    @ApiModelProperty("此活动合成的藏品名称")
+    private String collectionName;
+
     @ApiModelProperty("活动状态;1=待开始,2=进行中,3=结束")
     private Integer actionStatus;
 

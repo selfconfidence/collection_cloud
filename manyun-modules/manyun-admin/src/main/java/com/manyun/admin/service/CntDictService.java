@@ -1,5 +1,6 @@
 package com.manyun.admin.service;
 
+import com.manyun.admin.domain.query.ActionTarDictQuery;
 import com.manyun.admin.domain.query.DrawRulesDictQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.common.core.domain.R;
@@ -53,4 +54,9 @@ public interface CntDictService
      * 提前购配置已经拥有字典
      */
     R postExistDict();
+
+    /***
+     * 活动合成材料字典
+     */
+    R actionTarDict(ActionTarDictQuery tarDictQuery);
 }

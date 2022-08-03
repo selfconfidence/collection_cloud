@@ -1,5 +1,6 @@
 package com.manyun.admin.service.impl;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -73,6 +74,8 @@ public class CntBoxCollectionServiceImpl extends ServiceImpl<CntBoxCollectionMap
         String boxId = boxCollectionDto.getBoxId();
         List<CntBoxCollectionVo> cntBoxCollectionVoList = boxCollectionDto.getCntBoxCollectionVos();
         Assert.isTrue(Objects.nonNull(cntBoxCollectionVoList),"新增失败!");
+        BigDecimal tranSvgSum = cntBoxCollectionVoList.stream().map(CntBoxCollectionVo::getTranSvg).reduce(BigDecimal.ZERO, BigDecimal::add);
+        Assert.isFalse(tranSvgSum.compareTo(BigDecimal.valueOf(100.00))==1,"概率总和不得超过100%!");
         remove(Wrappers.<CntBoxCollection>lambdaQuery().eq(CntBoxCollection::getBoxId,boxId));
         if(cntBoxCollectionVoList.size()>0){
             List<String> collectionIds = cntBoxCollectionVoList.stream().map(CntBoxCollectionVo::getCollectionId).collect(Collectors.toList());

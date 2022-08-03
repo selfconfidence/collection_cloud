@@ -3,6 +3,7 @@ package com.manyun.admin.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.admin.domain.*;
+import com.manyun.admin.domain.query.ActionTarDictQuery;
 import com.manyun.admin.domain.query.DrawRulesDictQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.mapper.*;
@@ -110,12 +111,13 @@ public class CntDictServiceImpl implements CntDictService
     @Override
     public R customerServiceDict()
     {
-        List<CustomerServiceDictVo> customerServiceDictVos=customerServiceService.list(Wrappers.<CntCustomerService>lambdaQuery().eq(CntCustomerService::getMenuStatus,"0").eq(CntCustomerService::getParentId,0)).stream().map(m ->{
+        List<CustomerServiceDictVo> customerServiceDictVos=new ArrayList<>();
+        customerServiceDictVos.add(Builder.of(CustomerServiceDictVo::new).with(CustomerServiceDictVo::setMenuId,0).with(CustomerServiceDictVo::setMenuName,"父菜单").build());
+        customerServiceDictVos.addAll(customerServiceService.list(Wrappers.<CntCustomerService>lambdaQuery().eq(CntCustomerService::getMenuStatus,"0").eq(CntCustomerService::getParentId,0)).stream().map(m ->{
             CustomerServiceDictVo customerServiceDictVo=new CustomerServiceDictVo();
             BeanUtil.copyProperties(m,customerServiceDictVo);
             return customerServiceDictVo;
-        }).collect(Collectors.toList());
-        customerServiceDictVos.add(Builder.of(CustomerServiceDictVo::new).with(CustomerServiceDictVo::setMenuId,0).with(CustomerServiceDictVo::setMenuName,"父菜单").build());
+        }).collect(Collectors.toList()));
         return R.ok(customerServiceDictVos);
     }
 
@@ -181,6 +183,18 @@ public class CntDictServiceImpl implements CntDictService
                     return tqgGoodsDictVo;
                 }).collect(Collectors.toList()));
         return R.ok(tqgGoodsDictVos);
+    }
+
+    /***
+     * 活动合成材料字典
+     */
+    @Override
+    public R actionTarDict(ActionTarDictQuery tarDictQuery) {
+        return R.ok(collectionService.list(Wrappers.<CntCollection>lambdaQuery().ne(CntCollection::getId,tarDictQuery.getCollectionId())).parallelStream().map(m ->{
+            CntCollectionDictVo cntCollectionDictVo=new CntCollectionDictVo();
+            BeanUtil.copyProperties(m,cntCollectionDictVo);
+            return cntCollectionDictVo;
+        }).collect(Collectors.toList()));
     }
 
 

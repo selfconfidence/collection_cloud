@@ -1,11 +1,8 @@
 package com.manyun.admin.service;
 
-import java.util.List;
-
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntAction;
 import com.manyun.admin.domain.query.ActionQuery;
-import com.manyun.admin.domain.vo.CntActionVo;
 import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
@@ -30,7 +27,7 @@ public interface ICntActionService extends IService<CntAction>
      * @param actionQuery 活动
      * @return 活动集合
      */
-    public TableDataInfo<CntActionVo> selectCntActionList(ActionQuery actionQuery);
+    public TableDataInfo selectCntActionList(ActionQuery actionQuery);
 
     /**
      * 新增活动
