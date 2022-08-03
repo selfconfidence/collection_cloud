@@ -5,8 +5,10 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.CntConsignment;
+import com.manyun.admin.domain.dto.PaymentReviewDto;
 import com.manyun.admin.domain.query.ConsignmentQuery;
 import com.manyun.admin.domain.vo.CntConsignmentVo;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,12 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         PageHelper.startPage(consignmentQuery.getPageNum(),consignmentQuery.getPageSize());
         List<CntConsignmentVo> cntConsignmentVos = cntConsignmentMapper.selectOrderList(consignmentQuery);
         return TableDataInfoUtil.pageTableDataInfo(cntConsignmentVos,cntConsignmentVos);
+    }
+
+    @Override
+    public R paymentReview(PaymentReviewDto paymentReviewDto) {
+
+        return null;
     }
 
 }

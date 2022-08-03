@@ -230,7 +230,7 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
     private SyntheticRecordVo syntheticRecordVo(ActionRecord actionRecord) {
         SyntheticRecordVo syntheticRecordVo = Builder.of(SyntheticRecordVo::new).build();
         BeanUtil.copyProperties(actionRecord, syntheticRecordVo);
-        List<MediaVo> mediaVoList = mediaService.initMediaVos(syntheticRecordVo.getId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
+        List<MediaVo> mediaVoList = mediaService.initMediaVos(actionRecord.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
         syntheticRecordVo.setMediaVos(mediaVoList);
         return syntheticRecordVo;
     }
