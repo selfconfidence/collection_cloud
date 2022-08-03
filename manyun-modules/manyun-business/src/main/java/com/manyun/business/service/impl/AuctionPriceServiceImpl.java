@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import static com.manyun.common.core.enums.PayTypeEnum.MONEY_TAPE;
 
 import static com.manyun.common.core.enums.AliPayEnum.*;
 import static com.manyun.common.core.enums.WxPayEnum.*;
@@ -145,6 +146,12 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                     List<AuctionPrice> list = list(Wrappers.<AuctionPrice>lambdaQuery().eq(AuctionPrice::getAuctionSendId, s).orderByDesc(AuctionPrice::getBidPrice));
                     //拍中者
                     AuctionPrice winAuctionPrice = list.get(0);
+                    //未拍中者修改状态为未拍中
+                    list.parallelStream().map(item -> {
+                        item.setAuctionStatus(AuctionStatus.BID_MISSED.getCode());
+                        return item;
+                    }).collect(Collectors.toList());
+                    //拍中者修改状态为待支付
                     winAuctionPrice.setAuctionStatus(AuctionStatus.WAIT_PAY.getCode());
                     winAuctionPrice.setEndPayTime(LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class)));
                     //回调成功,生成订单
@@ -162,23 +169,16 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
                     //成功后退还未拍中者保证金
                     //拍中者暂不退还，支付成功再退
-                    List<AuctionPrice> updateList = list.parallelStream().map(item -> {
-                        item.setAuctionStatus(AuctionStatus.BID_MISSED.getCode());
-                        return item;
-                    }).collect(Collectors.toList());
-                    //排除拍中者
-                    list.remove(winAuctionPrice);
-
                     Set<String> collect = list.parallelStream().map(item -> item.getUserId()).collect(Collectors.toSet());
+                    //排除拍中者
+                    collect.remove(winAuctionPrice.getUserId());
                     //退保证金
                     for (String userId : collect) {
                         Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
                         money.setMoneyBalance(money.getMoneyBalance().add(auctionSend.getMargin()));
                         moneyService.updateById(money);
                     }
-                    //拍中者加进来改状态
-                    list.add(winAuctionPrice);
-                    updateBatchById(updateList);
+                    updateBatchById(list);
                 }
 
                 @Override
@@ -367,10 +367,10 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         auctionOrder.setPayType(auctionPayForm.getPayType());
         auctionOrderService.updateById(auctionOrder);
         // 走这一步如果 是余额支付 那就说明扣款成功了！！！
-        /*if (MONEY_TAPE.getCode().equals(auctionPayForm.getPayType())){
+        if (MONEY_TAPE.getCode().equals(auctionPayForm.getPayType())){
             // 调用完成订单
-            auctionOrderService.notifyPaySuccess(payVo.getOutHost());
-        }*/
+            auctionOrderService.notifyPaySuccess(payVo.getOutHost(), payUserId);
+        }
 
         return payVo;
     }
