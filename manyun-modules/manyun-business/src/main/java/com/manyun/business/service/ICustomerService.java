@@ -25,6 +25,6 @@ public interface ICustomerService extends IService<CustomerService> {
 
     int saveFeedback(FeedbackForm feedbackForm, LoginBusinessUser loginBusinessUser);
 
-    ArticleVo articleDetails(Long id);
+    ArticleVo articleDetails(Integer id);
 
 }

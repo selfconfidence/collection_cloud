@@ -63,13 +63,13 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerServiceMapper, Cust
      * @return
      */
     @Override
-    public ArticleVo articleDetails(Long id) {
+    public ArticleVo articleDetails(Integer id) {
         ArticleVo articleVo = Builder.of(ArticleVo::new).build();
         CustomerService customerService = customerServiceMapper.selectOne(Wrappers.
                 <CustomerService>lambdaQuery()
                 .ne(CustomerService::getParentId,0)
                 .eq(CustomerService::getMenuStatus,0)
-                .eq(CustomerService::getMenuId,id));
+                .eq(CustomerService::getId,id));
         BeanUtil.copyProperties(customerService,articleVo);
         return articleVo;
     }
@@ -124,6 +124,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerServiceMapper, Cust
     private CustomerServiceVo customerServiceVo(CustomerService customerService) {
         CustomerServiceVo customerServiceVo = Builder.of(CustomerServiceVo::new).build();
         BeanUtil.copyProperties(customerService,customerServiceVo);
+        customerServiceVo.setMenuId(customerService.getId());
         return customerServiceVo;
     }
 

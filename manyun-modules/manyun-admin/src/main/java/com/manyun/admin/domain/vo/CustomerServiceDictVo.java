@@ -9,7 +9,7 @@ import lombok.Data;
 public class CustomerServiceDictVo {
 
     @ApiModelProperty("菜单ID")
-    private Integer menuId;
+    private Integer id;
 
     @ApiModelProperty("菜单名称")
     private String menuName;

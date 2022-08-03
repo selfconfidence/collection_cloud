@@ -22,13 +22,13 @@ import java.time.LocalDateTime;
 public class CustomerService implements Serializable {
 
     @ApiModelProperty("菜单Id")
-    private Long menuId;
+    private Integer id;
 
     @ApiModelProperty("菜单名称")
     private String menuName;
 
     @ApiModelProperty("父菜单Id")
-    private Long parentId;
+    private Integer parentId;
 
     @ApiModelProperty("显示顺序")
     private Integer orderNum;

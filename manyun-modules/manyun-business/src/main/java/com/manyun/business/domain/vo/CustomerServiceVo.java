@@ -12,13 +12,13 @@ import java.util.List;
 public class CustomerServiceVo {
 
     @ApiModelProperty("菜单Id")
-    private Long menuId;
+    private Integer menuId;
 
     @ApiModelProperty("菜单名称")
     private String menuName;
 
     @ApiModelProperty("父菜单Id")
-    private Long parentId;
+    private Integer parentId;
 
     @ApiModelProperty("子菜单")
     private List<CustomerServiceVo> children = new ArrayList<CustomerServiceVo>();

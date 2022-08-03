@@ -12,7 +12,7 @@ public class CntCustomerServiceVo
 {
 
     @ApiModelProperty("菜单ID")
-    private Integer menuId;
+    private Integer id;
 
     @ApiModelProperty("菜单名称")
     private String menuName;

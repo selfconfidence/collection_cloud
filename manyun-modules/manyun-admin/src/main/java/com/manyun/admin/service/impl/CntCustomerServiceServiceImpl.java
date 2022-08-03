@@ -44,7 +44,7 @@ public class CntCustomerServiceServiceImpl extends ServiceImpl<CntCustomerServic
     @Override
     public CntCustomerService selectCntCustomerServiceByMenuId(Long menuId)
     {
-        return cntCustomerServiceMapper.selectCntCustomerServiceByMenuId(menuId);
+        return getById(menuId);
     }
 
     /**
@@ -64,7 +64,7 @@ public class CntCustomerServiceServiceImpl extends ServiceImpl<CntCustomerServic
             if(m.getParentId()==0){
                 cntCustomerServiceVo.setParentName("父菜单");
             }else {
-                Optional<CntCustomerService> optional = cntCustomerServiceMapper.selectCntCustomerServiceList(new CntCustomerService()).parallelStream().filter(f -> f.getMenuId().equals(m.getParentId())).findFirst();
+                Optional<CntCustomerService> optional = cntCustomerServiceMapper.selectCntCustomerServiceList(new CntCustomerService()).parallelStream().filter(f -> f.getId().equals(m.getParentId())).findFirst();
                 if(optional.isPresent()){
                     cntCustomerServiceVo.setParentName(optional.get().getMenuName());
                 }
@@ -84,7 +84,7 @@ public class CntCustomerServiceServiceImpl extends ServiceImpl<CntCustomerServic
     {
         cntCustomerService.setCreateBy(SecurityUtils.getUsername());
         cntCustomerService.setCreateTime(DateUtils.getNowDate());
-        return cntCustomerServiceMapper.insertCntCustomerService(cntCustomerService);
+        return save(cntCustomerService)==true?1:0;
     }
 
     /**
@@ -98,7 +98,7 @@ public class CntCustomerServiceServiceImpl extends ServiceImpl<CntCustomerServic
     {
         cntCustomerService.setUpdateBy(SecurityUtils.getUsername());
         cntCustomerService.setUpdateTime(DateUtils.getNowDate());
-        return cntCustomerServiceMapper.updateCntCustomerService(cntCustomerService);
+        return updateById(cntCustomerService)==true?1:0;
     }
 
     /**
@@ -114,7 +114,7 @@ public class CntCustomerServiceServiceImpl extends ServiceImpl<CntCustomerServic
         if(list.size()>0){
             return R.fail("菜单id为: "+ StringUtils.join(list.stream().map(CntCustomerService::getParentId).distinct().collect(Collectors.toList()), ",") + " 有子菜单,请先删除子菜单!");
         }
-        return cntCustomerServiceMapper.deleteCntCustomerServiceByMenuIds(menuIds)>0?R.ok():R.fail();
+        return remove(Wrappers.<CntCustomerService>lambdaQuery().in(CntCustomerService::getId,menuIds))==true?R.ok():R.fail();
     }
 
 }

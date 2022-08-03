@@ -16,7 +16,7 @@ public class CntCustomerService implements Serializable
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("菜单ID")
-    private Integer menuId;
+    private Integer id;
 
     @ApiModelProperty("菜单名称")
     private String menuName;
@@ -50,12 +50,12 @@ public class CntCustomerService implements Serializable
     @ApiModelProperty("更新时间")
     private Date updateTime;
 
-    public Integer getMenuId() {
-        return menuId;
+    public Integer getId() {
+        return id;
     }
 
-    public void setMenuId(Integer menuId) {
-        this.menuId = menuId;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getMenuName() {
@@ -141,7 +141,7 @@ public class CntCustomerService implements Serializable
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("menuId", getMenuId())
+            .append("id", getId())
             .append("menuName", getMenuName())
             .append("parentId", getParentId())
             .append("orderNum", getOrderNum())

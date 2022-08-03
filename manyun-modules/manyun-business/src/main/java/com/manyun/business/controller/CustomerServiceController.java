@@ -42,7 +42,7 @@ public class CustomerServiceController extends BaseController {
 
     @GetMapping("/articleDetails/{id}")
     @ApiOperation("根据id查询客服中心问题文章")
-    public R<ArticleVo> articleDetails(@PathVariable Long id){
+    public R<ArticleVo> articleDetails(@PathVariable Integer id){
         return R.ok(customerService.articleDetails(id));
     }
 

@@ -112,7 +112,7 @@ public class CntDictServiceImpl implements CntDictService
     public R customerServiceDict()
     {
         List<CustomerServiceDictVo> customerServiceDictVos=new ArrayList<>();
-        customerServiceDictVos.add(Builder.of(CustomerServiceDictVo::new).with(CustomerServiceDictVo::setMenuId,0).with(CustomerServiceDictVo::setMenuName,"父菜单").build());
+        customerServiceDictVos.add(Builder.of(CustomerServiceDictVo::new).with(CustomerServiceDictVo::setId,0).with(CustomerServiceDictVo::setMenuName,"父菜单").build());
         customerServiceDictVos.addAll(customerServiceService.list(Wrappers.<CntCustomerService>lambdaQuery().eq(CntCustomerService::getMenuStatus,"0").eq(CntCustomerService::getParentId,0)).stream().map(m ->{
             CustomerServiceDictVo customerServiceDictVo=new CustomerServiceDictVo();
             BeanUtil.copyProperties(m,customerServiceDictVo);
