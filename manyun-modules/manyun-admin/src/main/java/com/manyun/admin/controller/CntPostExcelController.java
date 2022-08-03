@@ -41,7 +41,7 @@ public class CntPostExcelController extends BaseController
     /**
      * 查询提前购格列表
      */
-    @RequiresPermissions("admin:excel:list")
+    //@RequiresPermissions("admin:excel:list")
     @GetMapping("/list")
     @ApiOperation("查询提前购格列表")
     public TableDataInfo<CntPostExcelVo> list(PageQuery pageQuery)
@@ -52,7 +52,7 @@ public class CntPostExcelController extends BaseController
     /**
      * 删除提前购格
      */
-    @RequiresPermissions("admin:excel:remove")
+    //@RequiresPermissions("admin:excel:remove")
     @Log(title = "提前购格", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     @ApiOperation("删除提前购格")

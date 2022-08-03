@@ -1,5 +1,6 @@
 package com.manyun.admin.service.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -7,6 +8,7 @@ import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
@@ -96,6 +98,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         }).collect(Collectors.toList()), cntCollectionList);
     }
 
+
     /**
      * 新增藏品
      *
@@ -110,6 +113,10 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         String idStr = IdUtils.getSnowflakeNextIdStr();
         CntCollectionAlterVo collectionAlterVo = collectionAlterCombineDto.getCntCollectionAlterVo();
         Assert.isTrue(Objects.nonNull(collectionAlterVo), "新增藏品失败");
+        //验证藏品名称是否已录入
+        List<CntCollection> cntCollectionList = list(Wrappers.<CntCollection>lambdaQuery().eq(CntCollection::getCollectionName, collectionAlterVo.getCollectionName()));
+        String info = StrUtil.format("藏品名称为:{}已存在!", collectionAlterVo.getCollectionName());
+        Assert.isTrue(cntCollectionList.size()>0,info);
         CntCollection cntCollection = new CntCollection();
         BeanUtil.copyProperties(collectionAlterVo, cntCollection);
         cntCollection.setId(idStr);
@@ -177,6 +184,10 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         Assert.isTrue(Objects.nonNull(collectionAlterVo), "修改藏品失败");
         String collectionId = collectionAlterVo.getId();
         Assert.isTrue(StringUtils.isNotBlank(collectionId), "缺失必要参数");
+        //验证藏品名称是否已录入
+        List<CntCollection> cntCollectionList = list(Wrappers.<CntCollection>lambdaQuery().eq(CntCollection::getCollectionName, collectionAlterVo.getCollectionName()));
+        String info = StrUtil.format("藏品名称为:{}已存在!", collectionAlterVo.getCollectionName());
+        Assert.isTrue(cntCollectionList.size()>0,info);
         CntCollection cntCollection = new CntCollection();
         BeanUtil.copyProperties(collectionAlterVo, cntCollection);
         cntCollection.setUpdatedBy(SecurityUtils.getUsername());

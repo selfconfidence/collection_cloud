@@ -1,11 +1,11 @@
 package com.manyun.admin.service;
 
-import java.util.List;
-
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntConsignment;
+import com.manyun.admin.domain.dto.PaymentReviewDto;
 import com.manyun.admin.domain.query.ConsignmentQuery;
 import com.manyun.admin.domain.vo.CntConsignmentVo;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
@@ -25,4 +25,10 @@ public interface ICntConsignmentService extends IService<CntConsignment>
      */
     public TableDataInfo<CntConsignmentVo> selectCntConsignmentList(ConsignmentQuery consignmentQuery);
 
+    /**
+     * 打款审核
+     * @param paymentReviewDto
+     * @return
+     */
+    R paymentReview(PaymentReviewDto paymentReviewDto);
 }

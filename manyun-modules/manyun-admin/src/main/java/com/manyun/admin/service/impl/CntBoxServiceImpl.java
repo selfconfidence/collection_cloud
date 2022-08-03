@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
@@ -103,6 +104,10 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         String idStr = IdUtils.getSnowflakeNextIdStr();
         CntBoxAlterVo cntBoxAlterVo = boxAlterCombineDto.getCntBoxAlterVo();
         Assert.isTrue(Objects.nonNull(cntBoxAlterVo), "新增盲盒失败");
+        //验证盲盒名称是否已录入
+        List<CntBox> boxList = list(Wrappers.<CntBox>lambdaQuery().eq(CntBox::getBoxTitle,cntBoxAlterVo.getBoxTitle()));
+        String info = StrUtil.format("盲盒名称为:{}已存在!", cntBoxAlterVo.getBoxTitle());
+        Assert.isTrue(boxList.size()>0,info);
         CntBox cntBox = Builder.of(CntBox::new)
                 .with(CntBox::setId, idStr)
                 .with(CntBox::setCreatedBy, SecurityUtils.getUsername())
@@ -136,7 +141,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
                             .with(CntMedia::setBuiId, idStr)
                             .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
                             .with(CntMedia::setMediaUrl, mediaAlterVo.getImg())
-                            .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE.toString())
+                            .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
                             .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
                             .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
             );
@@ -159,6 +164,10 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         Assert.isTrue(Objects.nonNull(boxAlterVo), "修改盲盒失败");
         String boxId = boxAlterVo.getId();
         Assert.isTrue(StringUtils.isNotBlank(boxId), "缺失必要参数");
+        //验证盲盒名称是否已录入
+        List<CntBox> boxList = list(Wrappers.<CntBox>lambdaQuery().eq(CntBox::getBoxTitle,boxAlterVo.getBoxTitle()));
+        String info = StrUtil.format("盲盒名称为:{}已存在!", boxAlterVo.getBoxTitle());
+        Assert.isTrue(boxList.size()>0,info);
         CntBox cntBox = new CntBox();
         BeanUtil.copyProperties(boxAlterVo, cntBox);
         cntBox.setUpdatedBy(SecurityUtils.getUsername());
