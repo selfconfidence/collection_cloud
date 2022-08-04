@@ -25,4 +25,5 @@ spring:
           - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
   servlet:
     multipart:
-      max-file-size: 1024MB # 1G 存储 3D图片
+      max-file-size: 512MB
+      max-request-size: 1024MB
