@@ -43,6 +43,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             o.user_id userId,
             o.order_no orderNo,
             o.bui_id buiId,
+            o.order_status orderStatus,
             b.source_price sourcePrice,
             b.real_price realPrice,
             o.order_amount orderAmount,

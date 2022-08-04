@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -103,7 +104,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
     public R insertCntBox(CntBoxAlterCombineDto boxAlterCombineDto)
     {
         //盲盒
-        String idStr = IdUtils.getSnowflakeNextIdStr();
+        String idStr = IdUtils.getSnowflake().nextIdStr();
         CntBoxAlterVo cntBoxAlterVo = boxAlterCombineDto.getCntBoxAlterVo();
         Assert.isTrue(Objects.nonNull(cntBoxAlterVo), "新增盲盒失败");
         //验证盲盒名称是否已录入
@@ -115,12 +116,12 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         if(200!=check.getCode()){
             return R.fail(check.getCode(),check.getMsg());
         }
-        CntBox cntBox = Builder.of(CntBox::new)
-                .with(CntBox::setId, idStr)
-                .with(CntBox::setCreatedBy, SecurityUtils.getUsername())
-                .with(CntBox::setCreatedTime, DateUtils.getNowDate()).build();
+        CntBox cntBox =new CntBox();
         BeanUtil.copyProperties(cntBoxAlterVo, cntBox);
+        cntBox.setId(idStr);
         cntBox.setBoxOpen(1);
+        cntBox.setCreatedBy(SecurityUtils.getUsername());
+        cntBox.setCreatedTime(DateUtils.getNowDate());
         if (!save(cntBox)) {
             return R.fail();
         }
@@ -131,7 +132,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
             if (lableIds.length>0) {
                 List<CntCollectionLable> cntCollectionLables = Arrays.asList(lableIds).stream().map(m -> {
                     return Builder.of(CntCollectionLable::new)
-                            .with(CntCollectionLable::setId, IdUtils.getSnowflakeNextIdStr())
+                            .with(CntCollectionLable::setId, IdUtils.getSnowflake().nextIdStr())
                             .with(CntCollectionLable::setCollectionId, idStr)
                             .with(CntCollectionLable::setLableId, m)
                             .with(CntCollectionLable::setCreatedBy, SecurityUtils.getUsername())
@@ -145,7 +146,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         if (Objects.nonNull(mediaAlterVo)) {
             mediaService.save(
                     Builder.of(CntMedia::new)
-                            .with(CntMedia::setId, IdUtils.getSnowflakeNextIdStr())
+                            .with(CntMedia::setId, IdUtils.getSnowflake().nextIdStr())
                             .with(CntMedia::setBuiId, idStr)
                             .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
                             .with(CntMedia::setMediaUrl, mediaAlterVo.getImg())
