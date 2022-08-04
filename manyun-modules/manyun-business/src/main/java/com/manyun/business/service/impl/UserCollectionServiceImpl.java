@@ -101,9 +101,9 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                     .artId(userCollection.getLinkAddr())
                             .artName(userCollection.getCollectionName())
                             .artSize("80")
-                            .location(userCollection.getSourceInfo())
+                            .location(userCollection.getLinkAddr())
                             .price(realPrice.toString())
-                            .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy MM dd")))
+                            .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM")))
                             .sellway(userCollection.getSourceInfo())
                             .owner(userCollection.getUserId())
                     .build(), (hash)->{
