@@ -44,4 +44,7 @@ public class CntCollectionAlterVo
     @ApiModelProperty("流通数量")
     private Integer selfBalance;
 
+    @ApiModelProperty("可提前购的时间")
+    private Integer postTime;
+
 }

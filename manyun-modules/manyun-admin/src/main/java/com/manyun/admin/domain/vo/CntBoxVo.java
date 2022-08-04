@@ -41,6 +41,10 @@ public class CntBoxVo {
     private Integer selfBalance;
 
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty("发售时间")
+    private Date publishTime;
+
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("创建时间")
     private Date createdTime;
 

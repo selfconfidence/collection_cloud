@@ -56,7 +56,7 @@ public class CntCollectionController extends BaseController
     @ApiOperation("新增藏品管理")
     public R add(@RequestBody CntCollectionAlterCombineDto collectionAlterCombineDto)
     {
-        return toResult(cntCollectionService.insertCntCollection(collectionAlterCombineDto));
+        return cntCollectionService.insertCntCollection(collectionAlterCombineDto);
     }
 
     //@RequiresPermissions("admin:collection:edit")
@@ -65,7 +65,7 @@ public class CntCollectionController extends BaseController
     @ApiOperation("修改藏品管理")
     public R edit(@RequestBody CntCollectionAlterCombineDto collectionAlterCombineDto)
     {
-        return toResult(cntCollectionService.updateCntCollection(collectionAlterCombineDto));
+        return cntCollectionService.updateCntCollection(collectionAlterCombineDto);
     }
 
     //@RequiresPermissions("admin:collection:remove")

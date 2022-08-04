@@ -1,7 +1,5 @@
 package com.manyun.admin.controller;
 
-import java.util.List;
-
 import com.manyun.admin.domain.vo.CntLableVo;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.PageQuery;
@@ -18,11 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
-import com.manyun.common.security.annotation.RequiresPermissions;
 import com.manyun.admin.domain.CntLable;
 import com.manyun.admin.service.ICntLableService;
 import com.manyun.common.core.web.controller.BaseController;
-import com.manyun.common.core.web.domain.AjaxResult;
 import com.manyun.common.core.web.page.TableDataInfo;
 
 @RestController

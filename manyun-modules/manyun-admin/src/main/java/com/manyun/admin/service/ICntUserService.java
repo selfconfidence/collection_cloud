@@ -5,6 +5,8 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntOrder;
 import com.manyun.admin.domain.CntUser;
+import com.manyun.admin.domain.dto.MyCollectionDto;
+import com.manyun.admin.domain.dto.MyOrderDto;
 import com.manyun.admin.domain.dto.UpdateBalanceDto;
 import com.manyun.admin.domain.query.UserMoneyQuery;
 import com.manyun.admin.domain.vo.CntOrderVo;
@@ -40,12 +42,12 @@ public interface ICntUserService extends IService<CntUser>
     /**
      * 我的订单
      */
-    List<CntOrderVo> myOrderList(String userId);
+    List<CntOrderVo> myOrderList(MyOrderDto orderDto);
 
     /**
      * 我的藏品
      */
-    List<UserCollectionVo> myCollectionList(String userId);
+    List<UserCollectionVo> myCollectionList(MyCollectionDto collectionDto);
 
     /**
      * 修改余额

@@ -29,6 +29,12 @@ public class CntCollectionDetailsVo
     @ApiModelProperty("藏品现价")
     private BigDecimal realPrice;
 
+    @ApiModelProperty("可提前购的时间")
+    private Integer postTime;
+
+    @ApiModelProperty("抽签编号")
+    private String tarId;
+
     @ApiModelProperty("创作者编号")
     private String bindCreation;
 
