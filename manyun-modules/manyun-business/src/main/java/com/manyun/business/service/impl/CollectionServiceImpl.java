@@ -33,6 +33,7 @@ import com.manyun.common.core.web.page.TableDataInfoUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -149,6 +150,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
      * @return
      */
     @Override
+    @Transactional
     public PayVo sellCollection(String userId, CollectionSellForm collectionSellForm) {
         // 总结校验 —— 支付方式
         CntCollection  cntCollection = getById(collectionSellForm.getCollectionId());
@@ -165,7 +167,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
                 .orderAmount(realPayMoney)
                 .buiId(cntCollection.getId())
                 .payType(collectionSellForm.getPayType())
-                .goodsType(BOX_TAYPE)
+                .goodsType(COLLECTION_TAYPE)
                 .collectionName(cntCollection.getCollectionName())
                 .goodsNum(collectionSellForm.getSellNum())
                 .userId(userId)
@@ -351,7 +353,8 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
             Assert.isTrue(money.getMoneyBalance().compareTo(realPayMoney) >=0,"余额不足,请核实!");
         }
         // 是否需要抽？
-        if (StrUtil.isNotBlank(cntCollection.getTarId()) && CEN_YES_TAR.getCode().equals(tarService.tarStatus(userId,cntCollection.getId())))
+        if (StrUtil.isNotBlank(cntCollection.getTarId()))
+            if (!CEN_YES_TAR.getCode().equals(tarService.tarStatus(userId,cntCollection.getId())))
             Assert.isFalse(Boolean.TRUE,"未参与抽签,或暂未购买资格!");
 
         // 是否能够提前购？
@@ -416,6 +419,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         // 增加流转记录信息
         userCollectionForVo.setUserCollectionVo(userCollectionVo);
         userCollectionForVo.setStepVos(initStepVo(userCollectionVo.getCollectionId(),COLLECTION_MODEL_TYPE));
+        userCollectionForVo.setCollectionInfoVo(providerCollectionInfoVo(userCollectionVo.getCollectionId()));
         return userCollectionForVo;
     }
 

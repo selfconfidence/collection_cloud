@@ -67,15 +67,15 @@ public class BoxController extends BaseController {
     @GetMapping("/info/{id}")
     @ApiOperation("根据盲盒编号,查询盲盒的详细信息 -需登录")
     public R<BoxVo> info(@PathVariable String id){
-        String userId = SecurityUtils.getBuiUserId();
-        return R.ok(boxService.info(id,userId));
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return R.ok(boxService.info(id,loginBusinessUser.getUserId()));
     }
 
     @PostMapping("/sellBox")
     @ApiOperation("购买普通盲盒")
     public R<PayVo> sellBox(@Valid @RequestBody BoxSellForm boxSellForm){
-        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        return R.ok(boxService.sellBox(boxSellForm,notNullLoginBusinessUser.getUserId()));
+        String userId = SecurityUtils.getBuiUserId();
+        return R.ok(boxService.sellBox(boxSellForm,userId));
     }
 
     @PostMapping("/userBoxPageList")
@@ -85,11 +85,11 @@ public class BoxController extends BaseController {
         return R.ok(boxService.userBoxPageList(pageQuery,loginBusinessUser.getUserId()));
     }
 
-    @GetMapping("/openBox/{boxId}")
+    @GetMapping("/openBox/{userBoxId}")
     @ApiOperation(value = "开启盲盒",notes = "盲盒编号  点击后, 返回的 data 会弹出对应的提示信息给用户即可.")
-    public R<String> openBox(@PathVariable String boxId){
+    public R<String> openBox(@PathVariable String userBoxId){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        return R.ok(boxService.openBox(boxId,notNullLoginBusinessUser.getUserId()));
+        return R.ok(boxService.openBox(userBoxId,notNullLoginBusinessUser.getUserId()));
     }
 
     @GetMapping("/openPleaseBox")

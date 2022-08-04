@@ -228,14 +228,14 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
 
     /**
      * 开启盲盒
-     * @param boxId
+     * @param userBoxId
      * @param userId
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized String openBox(String boxId, String userId) {
-        UserBox userBox = userBoxService.getOne(Wrappers.<UserBox>lambdaQuery().eq(UserBox::getBoxId, boxId).eq(UserBox::getUserId, userId).eq(UserBox::getBoxOpen, NO_OPEN.getCode()));
+    public synchronized String openBox(String userBoxId, String userId) {
+        UserBox userBox = userBoxService.getOne(Wrappers.<UserBox>lambdaQuery().eq(UserBox::getId, userBoxId).eq(UserBox::getUserId, userId).eq(UserBox::getBoxOpen, NO_OPEN.getCode()));
         Assert.isTrue(Objects.nonNull(userBox),"盲盒已被开启,请核实!");
        // 什么样的随机算法 去得到概率性的藏品？
         // 1. 将所有藏品的概率比例拿到
@@ -319,8 +319,10 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         }
 
         // 是否需要抽？
-        if (StrUtil.isNotBlank(box.getTarId()) && CEN_YES_TAR.getCode().equals(tarService.tarStatus(userId,box.getId())))
-            Assert.isFalse(Boolean.TRUE,"未参与抽签,或暂未购买资格!");
+        // 是否需要抽？
+        if (StrUtil.isNotBlank(box.getTarId()))
+            if (!CEN_YES_TAR.getCode().equals(tarService.tarStatus(userId,box.getId())))
+                Assert.isFalse(Boolean.TRUE,"未参与抽签,或暂未购买资格!");
 
         // 是否能够提前购？
         Boolean publishTimeFlag = Boolean.TRUE;
@@ -340,7 +342,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         }
 
         // 校验盲盒是否到了发行时间
-        if (publishTimeFlag)Assert.isTrue(LocalDateTime.now().compareTo(box.getPublishTime()) >= 0,"发行时间未到,请核实!");
+        if (publishTimeFlag)Assert.isTrue(LocalDateTime.now().compareTo(box.getPublishTime()) > 0,"发行时间未到,请核实!");
 
     }
 

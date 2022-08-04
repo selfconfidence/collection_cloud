@@ -158,7 +158,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(goodsType)) {
            // 藏品
-            userCollectionService.bindCollection(order.getUserId(),order.getCollectionName(),order.getBuiId(),info,order.getGoodsNum());
+            userCollectionService.bindCollection(order.getUserId(),order.getBuiId(),order.getCollectionName(),info,order.getGoodsNum());
             return;
         }
         throw new IllegalStateException("not fount order good_type = " + goodsType);
