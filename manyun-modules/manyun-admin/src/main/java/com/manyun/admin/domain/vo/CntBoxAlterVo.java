@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
 
+import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -32,9 +34,6 @@ public class CntBoxAlterVo {
 
     @ApiModelProperty("库存")
     private Integer balance;
-
-    @ApiModelProperty("1未开启,2已开启")
-    private Integer boxOpen;
 
     @ApiModelProperty("盲盒状态;0=下架,1=正常,2=售罄 ")
     private Integer statusBy;

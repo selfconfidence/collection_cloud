@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.CntMoney;
+import com.manyun.admin.domain.dto.MyCollectionDto;
+import com.manyun.admin.domain.dto.MyOrderDto;
 import com.manyun.admin.domain.dto.UpdateBalanceDto;
 import com.manyun.admin.domain.query.UserMoneyQuery;
 import com.manyun.admin.domain.vo.CntOrderVo;
@@ -81,23 +83,18 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> imple
      * 我的订单
      */
     @Override
-    public List<CntOrderVo> myOrderList(String userId)
+    public List<CntOrderVo> myOrderList(MyOrderDto orderDto)
     {
-        return orderService.myOrderList(userId);
+        return orderService.myOrderList(orderDto.getUserId());
     }
 
     /**
      * 我的藏品
      */
     @Override
-    public List<UserCollectionVo> myCollectionList(String userId)
+    public List<UserCollectionVo> myCollectionList(MyCollectionDto collectionDto)
     {
-        return  userCollectionService.myCollectionList(userId)
-                    .parallelStream()
-                    .map(item ->
-                    {
-                        item.setMediaVos(mediaService.initMediaVos(item.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)); return item;
-                    }).collect(Collectors.toList());
+       return userCollectionService.myCollectionList(collectionDto.getUserId());
     }
 
     /**

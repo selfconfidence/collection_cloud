@@ -41,7 +41,7 @@ public interface ICntCollectionService extends IService<CntCollection>
      * @param collectionAlterCombineDto
      * @return 结果
      */
-    public int insertCntCollection(CntCollectionAlterCombineDto collectionAlterCombineDto);
+    public R insertCntCollection(CntCollectionAlterCombineDto collectionAlterCombineDto);
 
     /**
      * 修改藏品
@@ -49,7 +49,7 @@ public interface ICntCollectionService extends IService<CntCollection>
      * @param collectionAlterCombineDto
      * @return 结果
      */
-    public int updateCntCollection(CntCollectionAlterCombineDto collectionAlterCombineDto);
+    public R updateCntCollection(CntCollectionAlterCombineDto collectionAlterCombineDto);
 
     /**
      * 批量删除藏品

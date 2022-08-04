@@ -10,6 +10,7 @@ import com.manyun.admin.domain.query.OrderQuery;
 import com.manyun.admin.domain.vo.CntBoxDetailsVo;
 import com.manyun.admin.domain.vo.CntBoxOrderVo;
 import com.manyun.admin.domain.vo.CntBoxVo;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
@@ -42,7 +43,7 @@ public interface ICntBoxService extends IService<CntBox>
      * @param boxAlterCombineDto
      * @return 结果
      */
-    public int insertCntBox(CntBoxAlterCombineDto boxAlterCombineDto);
+    public R insertCntBox(CntBoxAlterCombineDto boxAlterCombineDto);
 
     /**
      * 修改盲盒;盲盒主体
@@ -50,7 +51,7 @@ public interface ICntBoxService extends IService<CntBox>
      * @param boxAlterCombineDto
      * @return 结果
      */
-    public int updateCntBox(CntBoxAlterCombineDto boxAlterCombineDto);
+    public R updateCntBox(CntBoxAlterCombineDto boxAlterCombineDto);
 
     /**
      * 批量删除盲盒;盲盒主体

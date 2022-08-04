@@ -1,9 +1,6 @@
 package com.manyun.admin.service.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
@@ -107,7 +104,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int insertCntCollection(CntCollectionAlterCombineDto collectionAlterCombineDto)
+    public R insertCntCollection(CntCollectionAlterCombineDto collectionAlterCombineDto)
     {
         //藏品
         String idStr = IdUtils.getSnowflakeNextIdStr();
@@ -116,14 +113,19 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         //验证藏品名称是否已录入
         List<CntCollection> cntCollectionList = list(Wrappers.<CntCollection>lambdaQuery().eq(CntCollection::getCollectionName, collectionAlterVo.getCollectionName()));
         String info = StrUtil.format("藏品名称为:{}已存在!", collectionAlterVo.getCollectionName());
-        Assert.isTrue(cntCollectionList.size()>0,info);
+        Assert.isFalse(cntCollectionList.size()>0,info);
+        //校验
+        R check = check(collectionAlterVo.getPostTime(), collectionAlterVo.getPublishTime(),collectionAlterCombineDto.getCntLableAlterVo());
+        if(200!=check.getCode()){
+            return R.fail(check.getCode(),check.getMsg());
+        }
         CntCollection cntCollection = new CntCollection();
         BeanUtil.copyProperties(collectionAlterVo, cntCollection);
         cntCollection.setId(idStr);
         cntCollection.setCreatedBy(SecurityUtils.getUsername());
         cntCollection.setCreatedTime(DateUtils.getNowDate());
         if (!save(cntCollection)) {
-            return 0;
+            return R.fail();
         }
         //藏品详情
         CntCollectionInfoAlterVo collectionInfoAlterVo = collectionAlterCombineDto.getCntCollectionInfoAlterVo();
@@ -166,7 +168,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                             .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
             );
         }
-        return 1;
+        return R.ok();
      }
 
     /**
@@ -177,7 +179,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateCntCollection(CntCollectionAlterCombineDto collectionAlterCombineDto)
+    public R updateCntCollection(CntCollectionAlterCombineDto collectionAlterCombineDto)
     {
         //藏品
         CntCollectionAlterVo collectionAlterVo = collectionAlterCombineDto.getCntCollectionAlterVo();
@@ -185,15 +187,20 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         String collectionId = collectionAlterVo.getId();
         Assert.isTrue(StringUtils.isNotBlank(collectionId), "缺失必要参数");
         //验证藏品名称是否已录入
-        List<CntCollection> cntCollectionList = list(Wrappers.<CntCollection>lambdaQuery().eq(CntCollection::getCollectionName, collectionAlterVo.getCollectionName()));
+        List<CntCollection> cntCollectionList = list(Wrappers.<CntCollection>lambdaQuery().eq(CntCollection::getCollectionName, collectionAlterVo.getCollectionName()).ne(CntCollection::getId,collectionId));
         String info = StrUtil.format("藏品名称为:{}已存在!", collectionAlterVo.getCollectionName());
-        Assert.isTrue(cntCollectionList.size()>0,info);
+        Assert.isFalse(cntCollectionList.size()>0,info);
+        //校验
+        R check = check(collectionAlterVo.getPostTime(), collectionAlterVo.getPublishTime(),collectionAlterCombineDto.getCntLableAlterVo());
+        if(200!=check.getCode()){
+            return R.fail(check.getCode(),check.getMsg());
+        }
         CntCollection cntCollection = new CntCollection();
         BeanUtil.copyProperties(collectionAlterVo, cntCollection);
         cntCollection.setUpdatedBy(SecurityUtils.getUsername());
         cntCollection.setUpdatedTime(DateUtils.getNowDate());
         if (!updateById(cntCollection)) {
-            return 0;
+            return R.fail();
         }
         //藏品详情
         CntCollectionInfoAlterVo collectionInfoAlterVo = collectionAlterCombineDto.getCntCollectionInfoAlterVo();
@@ -265,7 +272,30 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                 );
             }
         }
-        return 1;
+        return R.ok();
+    }
+
+    public R check(Integer postTime, Date publishTime,CntLableAlterVo lableAlterVo){
+        //验证提前购分钟是否在范围内
+        if(postTime!=null){
+            if(postTime<10 || postTime>1000){
+                return R.fail("提前购时间请输入大于等于10,小于1000的整数!");
+            }
+        }
+        //验证发售时间是否小于当前时间
+        //比较两个时间大小，前者大 = -1， 相等 =0，后者大 = 1
+        if(publishTime!=null){
+            if (DateUtils.compareTo(new Date(), publishTime, DateUtils.YYYY_MM_DD_HH_MM_SS) == -1) {
+                return R.fail("发售时间不能小于当前时间!");
+            }
+        }
+        //验证标签是否超过三个
+        if(Objects.nonNull(lableAlterVo)){
+            if(lableAlterVo.getLableIds().length>3){
+                return R.fail("藏品标签最多可选中三个!");
+            }
+        }
+        return R.ok();
     }
 
     /**
