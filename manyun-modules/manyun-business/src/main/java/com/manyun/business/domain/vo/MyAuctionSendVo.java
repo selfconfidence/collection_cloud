@@ -50,9 +50,11 @@ public class MyAuctionSendVo {
     private Integer delayTime;
 
     @ApiModelProperty("开始时间")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime startTime;
 
     @ApiModelProperty("结束时间")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endTime;
 
     @ApiModelProperty("剩余支付时间，只有状态为待支付才有效")

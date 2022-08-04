@@ -137,7 +137,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         auctionPrice.setAuctionStatus(AuctionStatus.BID_BIDING.getCode());
 
         //判断是否延拍，延拍加时间
-        if (LocalDateTime.now().isAfter(auctionSend.getEndTime()) && LocalDateTime.now().isBefore(auctionSend.getEndTime().plusMinutes(delayTime))) {
+        if (LocalDateTime.now().isAfter(auctionSend.getEndTime().minusMinutes(delayTime)) && LocalDateTime.now().isBefore(auctionSend.getEndTime())) {
             //改状态为延拍
             auctionSend.setIsDelay(2);
             //auctionSend.setEndTime(auctionSend.getEndTime().plusMinutes(delayTime));
@@ -210,6 +210,9 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     private void winnerOperation(AuctionSend auctionSend) {
         List<AuctionPrice> list = list(Wrappers.<AuctionPrice>lambdaQuery().eq(AuctionPrice::getAuctionSendId, auctionSend.getId()).orderByDesc(AuctionPrice::getBidPrice));
         //拍中者
+        if (list.isEmpty()) {
+            return;
+        }
         AuctionPrice winAuctionPrice = list.get(0);
         //未拍中者修改状态为未拍中
         list.parallelStream().map(item -> {
@@ -226,6 +229,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .goodsType(auctionSend.getGoodsType())
                 .nowPrice(auctionSend.getNowPrice())
                 .sendAuctionId(auctionSend.getId())
+                .orderAmount(winAuctionPrice.getBidPrice())
                 .auctionPriceId(winAuctionPrice.getId())
                 .fromUserId(auctionSend.getUserId())
                 .toUserId(winAuctionPrice.getUserId()).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));
@@ -353,9 +357,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     @Override
     @Transactional(rollbackFor = Exception.class)
     public synchronized PayVo payAuction(String payUserId, AuctionPayForm auctionPayForm) {
-
-        AuctionPrice auctionPrice = getById(auctionPayForm.getAuctionPriceId());
-        AuctionSend auctionSend = auctionSendService.getById(auctionPrice.getAuctionSendId());
+        AuctionSend auctionSend = auctionSendService.getById(auctionPayForm.getAuctionSendId());
         AuctionOrder auctionOrder = auctionOrderService.getById(auctionSend.getAuctionOrderId());
         /*String auctionOrderHost = auctionOrderService.createAuctionOrder(AuctionOrderCreateDto.builder()
                 .goodsId(auctionSend.getGoodsId())
@@ -490,7 +492,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     public synchronized void checkAuctionEnd() {
         List<AuctionSend> sendList = auctionSendService.list(Wrappers.<AuctionSend>lambdaQuery().le(
                 AuctionSend::getEndTime, LocalDateTime.now())
-                .eq(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_BIDING));
+                .eq(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_BIDING.getCode()));
         if (sendList.isEmpty()) return;
         for (AuctionSend auctionSend : sendList) {
             List<AuctionPrice> priceList = list(Wrappers.<AuctionPrice>lambdaQuery().eq(AuctionPrice::getAuctionSendId, auctionSend.getId()));
@@ -511,7 +513,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         List<AuctionSend> sendList = auctionSendService.list(Wrappers.<AuctionSend>lambdaQuery().le(
                 AuctionSend::getEndTime, LocalDateTime.now())
                 .eq(AuctionSend::getIsDelay, 1)
-                .eq(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_BIDING));
+                .eq(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_BIDING.getCode()));
         if (sendList.isEmpty()) return;
         for (AuctionSend auctionSend: sendList) {
             winnerOperation(auctionSend);

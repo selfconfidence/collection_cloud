@@ -27,11 +27,9 @@ public class AuctionSendForm {
     private Integer goodsType;
 
     @ApiModelProperty(value = "起拍价", required = true)
-    @Digits(integer = MoneyConstants.MoneyPrecision, fraction = MoneyConstants.MoneyScale)
     private BigDecimal startPrice;
 
     @ApiModelProperty(value = "一口价", required = true)
-    @Digits(integer = MoneyConstants.MoneyPrecision, fraction = MoneyConstants.MoneyScale)
     private BigDecimal soldPrice;
 
 }
