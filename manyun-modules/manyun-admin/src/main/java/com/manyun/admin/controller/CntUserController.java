@@ -1,7 +1,8 @@
 package com.manyun.admin.controller;
 
-import java.util.List;
 
+import com.manyun.admin.domain.dto.MyCollectionDto;
+import com.manyun.admin.domain.dto.MyOrderDto;
 import com.manyun.admin.domain.dto.UpdateBalanceDto;
 import com.manyun.admin.domain.query.UserMoneyQuery;
 import com.manyun.admin.domain.vo.CntOrderVo;
@@ -18,6 +19,8 @@ import com.manyun.admin.domain.CntUser;
 import com.manyun.admin.service.ICntUserService;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.TableDataInfo;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/userMoney")
@@ -44,22 +47,18 @@ public class CntUserController extends BaseController
         return toResult(cntUserService.updateCntUser(cntUser));
     }
 
-    @GetMapping("/myOrderList")
+    @PostMapping("/myOrderList")
     @ApiOperation("我的订单")
-    public TableDataInfo<CntOrderVo> myOrderList(String userId)
+    public R myOrderList(@RequestBody MyOrderDto orderDto)
     {
-        startPage();
-        List<CntOrderVo> list = cntUserService.myOrderList(userId);
-        return getDataTable(list);
+        return R.ok(cntUserService.myOrderList(orderDto));
     }
 
-    @GetMapping("/myCollectionList")
+    @PostMapping("/myCollectionList")
     @ApiOperation("我的藏品")
-    public TableDataInfo<UserCollectionVo> myCollectionList(String userId)
+    public R myCollectionList(@RequestBody MyCollectionDto collectionDto)
     {
-        startPage();
-        List<UserCollectionVo> list = cntUserService.myCollectionList(userId);
-        return getDataTable(list);
+        return R.ok(cntUserService.myCollectionList(collectionDto));
     }
 
     @PostMapping("/updateBalance")

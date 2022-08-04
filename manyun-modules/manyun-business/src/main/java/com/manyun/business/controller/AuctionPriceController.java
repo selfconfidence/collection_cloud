@@ -119,5 +119,13 @@ public class AuctionPriceController {
         return R.ok();
     }
 
+    @GetMapping("/checkWinner")
+    @ApiOperation(value = "定时调度结束正常拍卖流程",hidden = true)
+    @InnerAuth
+    public R checkWinner(){
+        auctionPriceService.checkWinner();
+        return R.ok();
+    }
+
 }
 

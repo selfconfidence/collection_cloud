@@ -2,6 +2,7 @@ package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.design.delay.DelayAbsAspect;
@@ -36,6 +37,8 @@ import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.lang.System;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -134,8 +137,11 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         auctionPrice.setAuctionStatus(AuctionStatus.BID_BIDING.getCode());
 
         //判断是否延拍，延拍加时间
-        if (LocalDateTime.now().isAfter(auctionSend.getEndTime())) {
-            auctionSend.setEndTime(auctionSend.getEndTime().plusMinutes(delayTime));
+        if (LocalDateTime.now().isAfter(auctionSend.getEndTime()) && LocalDateTime.now().isBefore(auctionSend.getEndTime().plusMinutes(delayTime))) {
+            //改状态为延拍
+            auctionSend.setIsDelay(2);
+            //auctionSend.setEndTime(auctionSend.getEndTime().plusMinutes(delayTime));
+            auctionSend.setEndTime(LocalDateTime.now().plusMinutes(delayTime));
 
             // 分钟为单位
             long l = TimeUnit.MINUTES.toSeconds(delayTime);
@@ -143,42 +149,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 @Override
                 public void invocationSuccess(String s) {
 
-                    List<AuctionPrice> list = list(Wrappers.<AuctionPrice>lambdaQuery().eq(AuctionPrice::getAuctionSendId, s).orderByDesc(AuctionPrice::getBidPrice));
-                    //拍中者
-                    AuctionPrice winAuctionPrice = list.get(0);
-                    //未拍中者修改状态为未拍中
-                    list.parallelStream().map(item -> {
-                        item.setAuctionStatus(AuctionStatus.BID_MISSED.getCode());
-                        return item;
-                    }).collect(Collectors.toList());
-                    //拍中者修改状态为待支付
-                    winAuctionPrice.setAuctionStatus(AuctionStatus.WAIT_PAY.getCode());
-                    winAuctionPrice.setEndPayTime(LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class)));
-                    //回调成功,生成订单
-                    String auctionOrderNo = auctionOrderService.createAuctionOrder(AuctionOrderCreateDto.builder()
-                            .goodsId(auctionSend.getGoodsId())
-                            .goodsName(auctionSend.getGoodsName())
-                            .goodsType(auctionSend.getGoodsType())
-                            .nowPrice(auctionSend.getNowPrice())
-                            .sendAuctionId(s)
-                            .auctionPriceId(winAuctionPrice.getId())
-                            .fromUserId(auctionSend.getUserId())
-                            .toUserId(winAuctionPrice.getUserId()).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));
-                    auctionSend.setAuctionSendStatus(AuctionSendStatus.WAIT_PAY.getCode());
-                    auctionSend.setEndPayTime(LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class)));
-
-                    //成功后退还未拍中者保证金
-                    //拍中者暂不退还，支付成功再退
-                    Set<String> collect = list.parallelStream().map(item -> item.getUserId()).collect(Collectors.toSet());
-                    //排除拍中者
-                    collect.remove(winAuctionPrice.getUserId());
-                    //退保证金
-                    for (String userId : collect) {
-                        Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
-                        money.setMoneyBalance(money.getMoneyBalance().add(auctionSend.getMargin()));
-                        moneyService.updateById(money);
-                    }
-                    updateBatchById(list);
+                    System.out.println("-----------------------进入回调");
+                    winnerOperation(auctionSend);
                 }
 
                 @Override
@@ -230,6 +202,48 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         auctionSendService.updateById(auctionSend);
 
         return R.ok(auctionPrice.getBidPrice());
+    }
+
+    /**
+     * 拍中后的操作
+     */
+    private void winnerOperation(AuctionSend auctionSend) {
+        List<AuctionPrice> list = list(Wrappers.<AuctionPrice>lambdaQuery().eq(AuctionPrice::getAuctionSendId, auctionSend.getId()).orderByDesc(AuctionPrice::getBidPrice));
+        //拍中者
+        AuctionPrice winAuctionPrice = list.get(0);
+        //未拍中者修改状态为未拍中
+        list.parallelStream().map(item -> {
+            item.setAuctionStatus(AuctionStatus.BID_MISSED.getCode());
+            return item;
+        }).collect(Collectors.toList());
+        //拍中者修改状态为待支付
+        winAuctionPrice.setAuctionStatus(AuctionStatus.WAIT_PAY.getCode());
+        winAuctionPrice.setEndPayTime(LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class)));
+        //回调成功,生成订单
+        String auctionOrderNo = auctionOrderService.createAuctionOrder(AuctionOrderCreateDto.builder()
+                .goodsId(auctionSend.getGoodsId())
+                .goodsName(auctionSend.getGoodsName())
+                .goodsType(auctionSend.getGoodsType())
+                .nowPrice(auctionSend.getNowPrice())
+                .sendAuctionId(auctionSend.getId())
+                .auctionPriceId(winAuctionPrice.getId())
+                .fromUserId(auctionSend.getUserId())
+                .toUserId(winAuctionPrice.getUserId()).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));
+        auctionSend.setAuctionSendStatus(AuctionSendStatus.WAIT_PAY.getCode());
+        auctionSend.setEndPayTime(LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class)));
+
+        //成功后退还未拍中者保证金
+        //拍中者暂不退还，支付成功再退
+        Set<String> collect = list.parallelStream().map(item -> item.getUserId()).collect(Collectors.toSet());
+        //排除拍中者
+        collect.remove(winAuctionPrice.getUserId());
+        //退保证金
+        for (String userId : collect) {
+            Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
+            money.setMoneyBalance(money.getMoneyBalance().add(auctionSend.getMargin()));
+            moneyService.updateById(money);
+        }
+        updateBatchById(list);
     }
 
     /**
@@ -415,6 +429,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     @Override
     @Transactional(rollbackFor = Exception.class)
     public synchronized PayVo payFixed(String userId, AuctionPayFixedForm auctionPayFixedForm) {
+        LoginBusinessUser businessUser = SecurityUtils.getNotNullLoginBusinessUser();
 
         AuctionSend auctionSend = auctionSendService.getById(auctionPayFixedForm.getAuctionSendId());
         Integer delayTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_DELAY_TIME, Integer.class);
@@ -428,6 +443,16 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         //修改竞拍状态，相当于锁单
         auctionSend.setAuctionSendStatus(AuctionSendStatus.WAIT_PAY.getCode());
         auctionSendService.updateById(auctionSend);
+        AuctionPrice auctionPrice = new AuctionPrice();
+        auctionPrice.setId(IdUtil.getSnowflakeNextIdStr());
+        auctionPrice.setAuctionStatus(AuctionStatus.BID_BIDING.getCode());
+        auctionPrice.setUserId(businessUser.getUserId());
+        auctionPrice.setAuctionSendId(auctionPayFixedForm.getAuctionSendId());
+        auctionPrice.setUserName(businessUser.getUsername());
+        auctionPrice.setCreatedTime(LocalDateTime.now());
+        auctionPrice.setEndPayTime(LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class)));
+        auctionPrice.setBidPrice(auctionSend.getSoldPrice());
+        save(auctionPrice);
 
         String auctionOrderHost = auctionOrderService.createAuctionOrder(AuctionOrderCreateDto.builder()
                 .goodsId(auctionSend.getGoodsId())
@@ -447,6 +472,12 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .wxPayEnum(FIXED_WECHAT_PAY)
                 .userId(userId).build());
 
+        if (MONEY_TAPE.getCode().equals(auctionPayFixedForm.getPayType()) && StrUtil.isBlank(payVo.getBody())){
+            // 调用完成订单
+            auctionOrderService.notifyPaySuccess(payVo.getOutHost(),userId);
+
+        }
+
         return payVo;
     }
 
@@ -457,7 +488,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     @Transactional(rollbackFor = Exception.class)
     @Override
     public synchronized void checkAuctionEnd() {
-        List<AuctionSend> sendList = auctionSendService.list(Wrappers.<AuctionSend>lambdaQuery().le(AuctionSend::getEndTime, LocalDateTime.now())
+        List<AuctionSend> sendList = auctionSendService.list(Wrappers.<AuctionSend>lambdaQuery().le(
+                AuctionSend::getEndTime, LocalDateTime.now())
                 .eq(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_BIDING));
         if (sendList.isEmpty()) return;
         for (AuctionSend auctionSend : sendList) {
@@ -469,6 +501,25 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         auctionSendService.updateBatchById(sendList);
 
     }
+
+    /**
+     * 定时检测在正常时间内竞拍的拍中者
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public synchronized void checkWinner() {
+        List<AuctionSend> sendList = auctionSendService.list(Wrappers.<AuctionSend>lambdaQuery().le(
+                AuctionSend::getEndTime, LocalDateTime.now())
+                .eq(AuctionSend::getIsDelay, 1)
+                .eq(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_BIDING));
+        if (sendList.isEmpty()) return;
+        for (AuctionSend auctionSend: sendList) {
+            winnerOperation(auctionSend);
+        }
+        auctionSendService.updateBatchById(sendList);
+
+    }
+
 
 
 }

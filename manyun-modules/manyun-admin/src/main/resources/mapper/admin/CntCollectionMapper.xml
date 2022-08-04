@@ -44,6 +44,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             cp.collection_name collectionName,
             cp.source_price sourcePrice,
             cp.real_price realPrice,
+            cp.tar_id,
+            cp.post_time,
             cp.bind_creation bindCreation,
             cpxq.publish_other publishOther,
             cpxq.publish_auther publishAuther,

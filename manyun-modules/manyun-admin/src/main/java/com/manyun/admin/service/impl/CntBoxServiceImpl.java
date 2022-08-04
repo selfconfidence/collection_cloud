@@ -1,6 +1,7 @@
 package com.manyun.admin.service.impl;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ import com.manyun.admin.service.ICntCollectionLableService;
 import com.manyun.admin.service.ICntMediaService;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
@@ -98,7 +100,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int insertCntBox(CntBoxAlterCombineDto boxAlterCombineDto)
+    public R insertCntBox(CntBoxAlterCombineDto boxAlterCombineDto)
     {
         //盲盒
         String idStr = IdUtils.getSnowflakeNextIdStr();
@@ -107,14 +109,20 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         //验证盲盒名称是否已录入
         List<CntBox> boxList = list(Wrappers.<CntBox>lambdaQuery().eq(CntBox::getBoxTitle,cntBoxAlterVo.getBoxTitle()));
         String info = StrUtil.format("盲盒名称为:{}已存在!", cntBoxAlterVo.getBoxTitle());
-        Assert.isTrue(boxList.size()>0,info);
+        Assert.isFalse(boxList.size()>0,info);
+        //校验
+        R check = check(cntBoxAlterVo.getPostTime(), cntBoxAlterVo.getPublishTime(),boxAlterCombineDto.getCntLableAlterVo());
+        if(200!=check.getCode()){
+            return R.fail(check.getCode(),check.getMsg());
+        }
         CntBox cntBox = Builder.of(CntBox::new)
                 .with(CntBox::setId, idStr)
                 .with(CntBox::setCreatedBy, SecurityUtils.getUsername())
                 .with(CntBox::setCreatedTime, DateUtils.getNowDate()).build();
         BeanUtil.copyProperties(cntBoxAlterVo, cntBox);
+        cntBox.setBoxOpen(1);
         if (!save(cntBox)) {
-            return 0;
+            return R.fail();
         }
         //标签
         CntLableAlterVo cntLableAlterVo = boxAlterCombineDto.getCntLableAlterVo();
@@ -146,7 +154,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
                             .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
             );
         }
-        return 1;
+        return R.ok();
     }
 
     /**
@@ -157,7 +165,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateCntBox(CntBoxAlterCombineDto boxAlterCombineDto)
+    public R updateCntBox(CntBoxAlterCombineDto boxAlterCombineDto)
     {
         //盲盒
         CntBoxAlterVo boxAlterVo = boxAlterCombineDto.getCntBoxAlterVo();
@@ -165,15 +173,20 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         String boxId = boxAlterVo.getId();
         Assert.isTrue(StringUtils.isNotBlank(boxId), "缺失必要参数");
         //验证盲盒名称是否已录入
-        List<CntBox> boxList = list(Wrappers.<CntBox>lambdaQuery().eq(CntBox::getBoxTitle,boxAlterVo.getBoxTitle()));
+        List<CntBox> boxList = list(Wrappers.<CntBox>lambdaQuery().eq(CntBox::getBoxTitle,boxAlterVo.getBoxTitle()).ne(CntBox::getId,boxId));
         String info = StrUtil.format("盲盒名称为:{}已存在!", boxAlterVo.getBoxTitle());
-        Assert.isTrue(boxList.size()>0,info);
+        Assert.isFalse(boxList.size()>0,info);
+        //校验
+        R check = check(boxAlterVo.getPostTime(), boxAlterVo.getPublishTime(),boxAlterCombineDto.getCntLableAlterVo());
+        if(200!=check.getCode()){
+            return R.fail(check.getCode(),check.getMsg());
+        }
         CntBox cntBox = new CntBox();
         BeanUtil.copyProperties(boxAlterVo, cntBox);
         cntBox.setUpdatedBy(SecurityUtils.getUsername());
         cntBox.setUpdatedTime(DateUtils.getNowDate());
         if (!updateById(cntBox)) {
-            return 0;
+            return R.fail();
         }
         //标签
         CntLableAlterVo cntLableAlterVo = boxAlterCombineDto.getCntLableAlterVo();
@@ -221,7 +234,30 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
                 );
             }
         }
-        return 1;
+        return R.ok();
+    }
+
+    public R check(Integer postTime, Date publishTime, CntLableAlterVo lableAlterVo){
+        //验证提前购分钟是否在范围内
+        if(postTime!=null){
+            if(postTime<10 || postTime>1000){
+                return R.fail("提前购时间请输入大于等于10,小于1000的整数!");
+            }
+        }
+        //验证发售时间是否小于当前时间
+        //比较两个时间大小，前者大 = -1， 相等 =0，后者大 = 1
+        if(publishTime!=null){
+            if (DateUtils.compareTo(new Date(), publishTime, DateUtils.YYYY_MM_DD_HH_MM_SS) == -1) {
+                return R.fail("发售时间不能小于当前时间!");
+            }
+        }
+        //验证标签是否超过三个
+        if(Objects.nonNull(lableAlterVo)){
+            if(lableAlterVo.getLableIds().length>3){
+                return R.fail("藏品标签最多可选中三个!");
+            }
+        }
+        return R.ok();
     }
 
     /**

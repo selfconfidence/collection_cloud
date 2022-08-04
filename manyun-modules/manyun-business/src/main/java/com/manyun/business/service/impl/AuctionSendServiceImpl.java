@@ -279,6 +279,7 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         auctionVo.setDelayTime(delayTime);
         auctionVo.setStartTime(auctionSend.getStartTime());
         auctionVo.setEndTime(auctionSend.getEndTime());
+        auctionVo.setAuctionPriceRange(systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_PRICE_RANGE, BigDecimal.class));
         return auctionVo;
     }
 

@@ -27,6 +27,8 @@ import com.manyun.admin.service.ICntBoxService;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.TableDataInfo;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/box")
 @Api(tags = "盲盒apis")
@@ -57,7 +59,7 @@ public class CntBoxController extends BaseController
     @ApiOperation("新增盲盒")
     public R add(@RequestBody CntBoxAlterCombineDto boxAlterCombineDto)
     {
-        return toResult(cntBoxService.insertCntBox(boxAlterCombineDto));
+        return cntBoxService.insertCntBox(boxAlterCombineDto);
     }
 
     //@RequiresPermissions("admin:box:edit")
@@ -66,7 +68,7 @@ public class CntBoxController extends BaseController
     @ApiOperation("修改盲盒")
     public R edit(@RequestBody CntBoxAlterCombineDto boxAlterCombineDto)
     {
-        return toResult(cntBoxService.updateCntBox(boxAlterCombineDto));
+        return cntBoxService.updateCntBox(boxAlterCombineDto);
     }
 
     //@RequiresPermissions("admin:box:remove")
