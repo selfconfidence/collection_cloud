@@ -25,8 +25,13 @@ public class RemoteAuctionFallbackFactory implements FallbackFactory<RemoteAucti
             public R checkAuctionEnd(String source) {
                 return null;
             }
-
+            @Override
             public R timeStartAuction(String source) {
+                return null;
+            }
+
+            @Override
+            public R checkWinner(String source) {
                 return null;
             }
         };

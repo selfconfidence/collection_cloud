@@ -33,6 +33,9 @@ public class AuctionVo {
     @ApiModelProperty("延拍时长")
     private Integer delayTime;
 
+    @ApiModelProperty("加价幅度")
+    private BigDecimal auctionPriceRange;
+
     @ApiModelProperty("开始时间 yyyy-MM-dd HH:mm:ss"  )
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime startTime;

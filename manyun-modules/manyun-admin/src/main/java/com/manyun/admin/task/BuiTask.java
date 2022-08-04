@@ -45,17 +45,29 @@ public class BuiTask
      * 定时调度取消未支付的拍卖订单
      *
      */
-
     public void timeCancelAuction() {
         remoteAuctionService.timeCancelAuction(SecurityConstants.INNER);
     }
 
+    /**
+     * 定时调度检查是否开始拍卖
+     */
     public void checkAuctionEnd() {
         remoteAuctionService.checkAuctionEnd(SecurityConstants.INNER);
     }
 
+    /**
+     * 定时调度检查拍卖是否开始
+     */
     public void timeStartAuction() {
         remoteAuctionService.timeStartAuction(SecurityConstants.INNER);
+    }
+
+    /**
+     * 定时调度检查正常拍卖流程
+     */
+    public void checkWinner() {
+        remoteAuctionService.checkWinner(SecurityConstants.INNER);
     }
 
 
