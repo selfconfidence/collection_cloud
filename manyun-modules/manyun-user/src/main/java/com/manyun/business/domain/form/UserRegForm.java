@@ -10,6 +10,12 @@ import java.io.Serializable;
 @ApiModel("用户注册表单")
 public class UserRegForm implements Serializable {
 
+    public UserRegForm(String phone) {
+        this.phone = phone;
+    }
+
+    public UserRegForm() {
+    }
 
     @ApiModelProperty("手机号")
     private String phone;

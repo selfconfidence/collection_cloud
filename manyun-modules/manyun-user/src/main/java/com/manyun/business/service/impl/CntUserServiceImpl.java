@@ -78,7 +78,11 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     @Override
     public CntUser codeLogin(String phone) {
         CntUser cntUser = getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPhone, phone));
-        Assert.isTrue(Objects.nonNull(cntUser),"暂未找到该手机号!");
+        // 登录即注册
+        if (Objects.isNull(cntUser)){
+            regUser(new UserRegForm(phone));
+            cntUser = getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPhone, phone));
+        }
         return cntUser;
     }
 
