@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -30,6 +31,9 @@ import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.manyun.common.core.enums.CollectionLink.NOT_LINK;
+import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
 
 /**
  * 藏品Service业务层处理
@@ -356,12 +360,15 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                         .with(CntUserCollection::setUserId, cntUsers.get(0).getUserId())
                         .with(CntUserCollection::setCollectionId, collection.getId())
                         .with(CntUserCollection::setCollectionName, collection.getCollectionName())
-                        .with(CntUserCollection::setLinkAddr, idStr)
+                        .with(CntUserCollection::setLinkAddr, IdUtils.getSnowflake().nextIdStr())
                         .with(CntUserCollection::setSourceInfo, "空投")
+                        .with(CntUserCollection::setIsExist,USE_EXIST.getCode())
+                        .with(CntUserCollection::setIsLink,NOT_LINK.getCode())
+                        .with(CntUserCollection::setCreatedBy,SecurityUtils.getUsername())
+                        .with(CntUserCollection::setCreatedTime,DateUtils.getNowDate())
                         .build()
         );
-        //上链
-        return myChainxSystemService.resetUpLink(cntUsers.get(0).getUserId(), idStr, SecurityConstants.INNER);
+        return R.ok(Builder.of(AirdropVo::new).with(AirdropVo::setUserId,cntUsers.get(0).getUserId()).with(AirdropVo::setUsercollectionId,idStr).build());
     }
 
 }

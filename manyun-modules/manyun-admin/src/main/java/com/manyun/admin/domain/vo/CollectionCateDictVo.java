@@ -14,4 +14,7 @@ public class CollectionCateDictVo {
     @ApiModelProperty("系列名称")
     private String cateName;
 
+    @ApiModelProperty("创作者编号")
+    private String bindCreation;
+
 }

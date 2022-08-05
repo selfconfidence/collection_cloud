@@ -1,11 +1,13 @@
 package com.manyun.admin.controller;
 
 
+import com.manyun.admin.domain.dto.MyBoxDto;
 import com.manyun.admin.domain.dto.MyCollectionDto;
 import com.manyun.admin.domain.dto.MyOrderDto;
 import com.manyun.admin.domain.dto.UpdateBalanceDto;
 import com.manyun.admin.domain.query.UserMoneyQuery;
 import com.manyun.admin.domain.vo.CntOrderVo;
+import com.manyun.admin.domain.vo.UserBoxVo;
 import com.manyun.admin.domain.vo.UserCollectionVo;
 import com.manyun.admin.domain.vo.UserMoneyVo;
 import com.manyun.common.core.domain.R;
@@ -20,6 +22,7 @@ import com.manyun.admin.service.ICntUserService;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.TableDataInfo;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -49,16 +52,23 @@ public class CntUserController extends BaseController
 
     @PostMapping("/myOrderList")
     @ApiOperation("我的订单")
-    public R myOrderList(@RequestBody MyOrderDto orderDto)
+    public R<List<CntOrderVo>> myOrderList(@RequestBody MyOrderDto orderDto)
     {
         return R.ok(cntUserService.myOrderList(orderDto));
     }
 
     @PostMapping("/myCollectionList")
     @ApiOperation("我的藏品")
-    public R myCollectionList(@RequestBody MyCollectionDto collectionDto)
+    public R<List<UserCollectionVo>> myCollectionList(@RequestBody MyCollectionDto collectionDto)
     {
         return R.ok(cntUserService.myCollectionList(collectionDto));
+    }
+
+    @PostMapping("/myBoxList")
+    @ApiOperation("我的盲盒")
+    public R<List<UserBoxVo>> myBoxList(@RequestBody MyBoxDto boxDto)
+    {
+        return R.ok(cntUserService.myBoxList(boxDto));
     }
 
     @PostMapping("/updateBalance")

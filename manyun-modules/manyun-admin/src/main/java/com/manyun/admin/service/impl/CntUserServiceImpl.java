@@ -4,16 +4,19 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.CntMoney;
+import com.manyun.admin.domain.dto.MyBoxDto;
 import com.manyun.admin.domain.dto.MyCollectionDto;
 import com.manyun.admin.domain.dto.MyOrderDto;
 import com.manyun.admin.domain.dto.UpdateBalanceDto;
 import com.manyun.admin.domain.query.UserMoneyQuery;
 import com.manyun.admin.domain.vo.CntOrderVo;
+import com.manyun.admin.domain.vo.UserBoxVo;
 import com.manyun.admin.domain.vo.UserCollectionVo;
 import com.manyun.admin.domain.vo.UserMoneyVo;
 import com.manyun.admin.service.*;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
@@ -50,6 +53,9 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> imple
     @Autowired
     private ICntMoneyService moneyService;
 
+    @Autowired
+    private ICntUserBoxService userBoxService;
+
 
     /**
      * 用户和钱包信息
@@ -85,7 +91,10 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> imple
     @Override
     public List<CntOrderVo> myOrderList(MyOrderDto orderDto)
     {
-        return orderService.myOrderList(orderDto.getUserId());
+        return orderService.myOrderList(orderDto.getUserId()).parallelStream().map(m->{
+            m.setMediaVos(mediaService.initMediaVos(m.getBuiId(),m.getGoodsType()==0?BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE:BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+            return m;
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -94,7 +103,23 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> imple
     @Override
     public List<UserCollectionVo> myCollectionList(MyCollectionDto collectionDto)
     {
-       return userCollectionService.myCollectionList(collectionDto.getUserId());
+       return userCollectionService.myCollectionList(collectionDto.getUserId()).parallelStream().map(m->{
+           m.setMediaVos(mediaService.initMediaVos(m.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
+           return m;
+       }).collect(Collectors.toList());
+    }
+
+    /**
+     * 我的盲盒
+     * @param boxDto
+     * @return
+     */
+    @Override
+    public List<UserBoxVo> myBoxList(MyBoxDto boxDto) {
+        return userBoxService.myBoxList(boxDto.getUserId()).parallelStream().map(m->{
+            m.setMediaVos(mediaService.initMediaVos(m.getBoxId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+            return m;
+        }).collect(Collectors.toList());
     }
 
     /**

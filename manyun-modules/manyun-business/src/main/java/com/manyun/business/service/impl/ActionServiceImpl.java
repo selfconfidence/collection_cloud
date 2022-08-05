@@ -3,7 +3,10 @@ package com.manyun.business.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.manyun.business.design.mychain.MyChainService;
+import com.manyun.business.domain.dto.CallCommitDto;
 import com.manyun.business.domain.dto.UserCollectionCountDto;
 import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.vo.*;
@@ -16,14 +19,21 @@ import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.manyun.common.core.enums.CollectionLink.NOT_LINK;
+import static com.manyun.common.core.enums.CollectionLink.OK_LINK;
+import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
 
 /**
  * <p>
@@ -53,6 +63,12 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
 
     @Autowired
     private IMediaService mediaService;
+
+    @Autowired
+    private ObjectFactory<ICollectionService> collectionServiceObjectFactory;
+
+    @Autowired
+    private MyChainService myChainService;
 
     /**
      * 查询活动合成列表
@@ -200,9 +216,35 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
         userCollection.setUserId(userId);
         userCollection.setCollectionId(action.getCollectionId());
         userCollection.setCollectionName(collection.getCollectionName());
+        userCollection.setLinkAddr(IdUtil.getSnowflake().nextIdStr());
+        userCollection.setIsExist(USE_EXIST.getCode());
+        userCollection.setSourceInfo("合成藏品");
+        userCollection.setIsLink(NOT_LINK.getCode());
         userCollection.setCreatedBy(userId);
         userCollection.setCreatedTime(now);
         userCollectionService.save(userCollection);
+
+        //合成藏品上链
+        BigDecimal realPrice = collectionServiceObjectFactory.getObject().getById(userCollection.getCollectionId()).getRealPrice();
+        myChainService.accountCollectionUp(CallCommitDto.builder()
+                .userCollectionId(userCollection.getId())
+                .artId(userCollection.getLinkAddr())
+                .artName(userCollection.getCollectionName())
+                .artSize("80")
+                .location(userCollection.getLinkAddr())
+                .price(realPrice.toString())
+                .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM")))
+                .sellway(userCollection.getSourceInfo())
+                .owner(userCollection.getUserId())
+                .build(), (hash)->{
+            userCollection.setIsLink(OK_LINK.getCode());
+            userCollection.setRealCompany("蚂蚁链");
+            // 编号特殊生成
+            userCollection.setCollectionNumber(StrUtil.format("CNT_{}",IdUtil.nanoId()));
+            userCollection.setCollectionHash(hash);
+            userCollection.updateD(userCollection.getUserId());
+            userCollectionService.updateById(userCollection);
+        });
 
         //增加合成记录
             actionRecordService.save(

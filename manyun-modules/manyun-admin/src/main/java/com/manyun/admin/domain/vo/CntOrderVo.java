@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @ApiModel("订单返回视图")
 @Data
@@ -27,8 +28,14 @@ public class CntOrderVo {
     @ApiModelProperty("商品类型;0藏品，1盲盒")
     private Integer goodsType;
 
-    @ApiModelProperty("藏品名称")
+    @ApiModelProperty("商品id")
+    private String buiId;
+
+    @ApiModelProperty("商品名称")
     private String collectionName;
+
+    @ApiModelProperty("商品图片")
+    private List<MediaVo> mediaVos;
 
     @ApiModelProperty("购买数量")
     private Integer goodsNum;

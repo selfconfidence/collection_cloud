@@ -28,28 +28,29 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </sql>
 
     <select id="myOrderList" resultType="com.manyun.admin.domain.vo.CntOrderVo">
-        SELECT
+        select
             co.id,
-            co.order_no orderNo,
-            cu.nick_name nickName,
+            co.order_no orderno,
+            cu.nick_name nickname,
             cu.phone,
-            co.collection_name collectionName,
-            co.goods_type goodsType,
-            co.goods_num goodsNum,
-            co.order_status orderStatus,
-            co.pay_type payType,
-            co.order_amount orderAmount,
-            co.pay_time payTime,
-            co.created_time createdTime,
-            co.updated_time updatedTime
-        FROM
+            co.bui_id buiId,
+            co.collection_name collectionname,
+            co.goods_type goodstype,
+            co.goods_num goodsnum,
+            co.order_status orderstatus,
+            co.pay_type paytype,
+            co.order_amount orderamount,
+            co.pay_time paytime,
+            co.created_time createdtime,
+            co.updated_time updatedtime
+        from
 	        cnt_order co
-	    INNER JOIN
+	    inner join
 	        cnt_user cu
-	    ON
+	    on
 	        co.user_id = cu.user_id
 	    where
-	        co.user_id=#{userId}
+	        co.user_id=#{userid}
     </select>
 
 </mapper>

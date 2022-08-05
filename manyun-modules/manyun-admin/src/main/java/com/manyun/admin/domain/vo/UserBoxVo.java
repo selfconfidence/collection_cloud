@@ -5,14 +5,13 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 @Data
-@ApiModel("我的藏品视图对象")
-public class UserCollectionVo {
+@ApiModel("我的盲盒视图对象")
+public class UserBoxVo {
 
     @ApiModelProperty("主键")
     private String id;
@@ -23,32 +22,29 @@ public class UserCollectionVo {
     @ApiModelProperty("用户电话号")
     private String phone;
 
-    @ApiModelProperty(value = "藏品id",hidden = true)
-    private String collectionId;
+    @ApiModelProperty(value = "盲盒id",hidden = true)
+    private String boxId;
 
-    @ApiModelProperty("藏品名称")
-    private String collectionName;
+    @ApiModelProperty("盲盒标题")
+    private String boxTitle;
 
     @ApiModelProperty("藏品主图")
     private List<MediaVo> mediaVos;
 
-    @ApiModelProperty("藏品编号;上链后")
-    private String collectionNumber;
+    @ApiModelProperty("盲盒详情")
+    private String boxInfo;
 
-    @ApiModelProperty("藏品哈希;上链后")
-    private String collectionHash;
+    @ApiModelProperty("藏品原价")
+    private BigDecimal sourcePrice;
 
-    @ApiModelProperty("链上地址;上链后")
-    private String linkAddr;
+    @ApiModelProperty("盲盒现价")
+    private BigDecimal realPrice;
 
-    @ApiModelProperty("是否上链;1=未上链,2=已上链")
-    private Integer isLink;
+    @ApiModelProperty("1未开启,2已开启")
+    private Integer boxOpen;
 
     @ApiModelProperty("来源")
     private String sourceInfo;
-
-    @ApiModelProperty("认证机构;上链后")
-    private String realCompany;
 
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("创建时间")

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntUserBoxMapper">
+
+    <resultMap type="CntUserBox" id="CntUserBoxResult">
+        <result property="id"    column="id"    />
+        <result property="boxOpen"    column="box_open"    />
+        <result property="userId"    column="user_id"    />
+        <result property="boxId"    column="box_id"    />
+        <result property="isExist"    column="is_exist"    />
+        <result property="sourceInfo"    column="source_info"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCntUserBoxVo">
+        select id, box_open, user_id, box_id, is_exist, source_info, created_by, created_time, updated_by, updated_time from cnt_user_box
+    </sql>
+
+    <select id="myBoxList" resultType="com.manyun.admin.domain.vo.UserBoxVo">
+        select
+            cub.id,
+            cu.nick_name nickname,
+            cu.phone,
+            cub.box_id boxid,
+            cb.box_title boxtitle,
+            cb.box_info boxinfo,
+            cb.source_price sourceprice,
+            cb.real_price realprice,
+            cub.box_open boxopen,
+            cub.source_info sourceinfo,
+            cub.created_time createdTime,
+            cub.updated_time updatedTime
+        from
+	        cnt_user_box cub
+	inner join cnt_user cu on cub.user_id = cu.user_id
+	inner join cnt_box cb on cub.box_id = cb.id
+	where  cub.user_id=#{userid}
+    </select>
+
+</mapper>
