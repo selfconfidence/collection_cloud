@@ -266,15 +266,15 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         BigDecimal realPrice = collectionServiceObjectFactory.getObject().getById(userCollection.getCollectionId()).getRealPrice();
 
         myChainService.accountCollectionUp(CallCommitDto.builder()
-                        .userCollectionId(userCollection.getId())
-                        .artId(userCollection.getLinkAddr())
-                        .artName(userCollection.getCollectionName())
-                        .artSize("80")
-                        .location(userCollection.getSourceInfo())
-                        .price(realPrice.toString())
-                        .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy MM dd")))
-                        .sellway(userCollection.getSourceInfo())
-                        .owner(userCollection.getUserId())
+                .userCollectionId(userCollection.getId())
+                .artId(userCollection.getLinkAddr())
+                .artName(userCollection.getCollectionName())
+                .artSize("80")
+                .location(userCollection.getLinkAddr())
+                .price(realPrice.toString())
+                .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM")))
+                .sellway(userCollection.getSourceInfo())
+                .owner(userCollection.getUserId())
                         .build(), (hash)->{
                     userCollection.setIsLink(OK_LINK.getCode());
                     userCollection.setRealCompany("蚂蚁链");
