@@ -306,4 +306,16 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         userCollectionMapper.deleteMaterial(userId,collectionId,deleteNum);
     }
 
+
+    @Override
+    public String showUserCollection(String userId, String buiId, String info) {
+        UserCollection userCollection = getOne(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getIsExist, NOT_EXIST.getCode()).eq(UserCollection::getId, buiId).eq(UserCollection::getUserId, userId).eq(UserCollection::getIsLink, OK_LINK.getCode()));
+        Assert.isTrue(Objects.nonNull(userCollection),"藏品有误,请检查藏品状态!");
+        userCollection.setIsExist(USE_EXIST.getCode());
+        userCollection.updateD(userId);
+        userCollection.setSourceInfo(info);
+        updateById(userCollection);
+        return userCollection.getCollectionId();
+    }
+
 }

@@ -335,6 +335,13 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         for (AuctionSend auctionSend : auctionSendList) {
             auctionSend.setAuctionSendStatus(AuctionSendStatus.BID_BREAK.getCode());
             auctionSend.updateD(auctionSend.getUserId());
+            String info = "已违约，从拍卖市场退回";
+            if (auctionSend.getGoodsType() == 1) {
+                userCollectionService.showUserCollection(auctionSend.getUserId(), auctionSend.getMyGoodsId(), info);
+            }
+            if (auctionSend.getGoodsType() == 2) {
+                userBoxService.showUserBox(auctionSend.getUserId(), auctionSend.getMyGoodsId(), info);
+            }
         }
         updateBatchById(auctionSendList);
 

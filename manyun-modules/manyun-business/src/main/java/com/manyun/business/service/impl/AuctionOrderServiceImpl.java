@@ -119,7 +119,7 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
     @Transactional(rollbackFor = Exception.class)
     public synchronized void notifyPaySuccess(String outHost, String userId) {
         AuctionOrder auctionOrder = getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getOrderNo, outHost));
-        String info = StrUtil.format("购买成功,本次消费{}", auctionOrder.getOrderAmount().toString());
+        String info = StrUtil.format("购买成功,本次消费{}，来源为拍卖市场", auctionOrder.getOrderAmount().toString());
         Assert.isTrue(Objects.nonNull(auctionOrder),"找不到对应订单编号!");
         Assert.isTrue(AuctionStatus.WAIT_PAY.getCode().equals(auctionOrder.getAuctionStatus()),"订单状态有误,请核实!");
         //更改订单状态

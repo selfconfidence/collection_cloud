@@ -29,4 +29,6 @@ public interface IUserBoxService extends IService<UserBox> {
     void tranBox(String tranUserId, String toUserId, String buiId);
 
     String hideUserBox(String buiId, String userId, String info);
+
+    String showUserBox(String buiId, String userId, String info);
 }

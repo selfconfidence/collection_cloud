@@ -176,4 +176,15 @@ public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> impl
         updateById(userBox);
         return userBox.getBoxId();
     }
+
+    @Override
+    public String showUserBox(String buiId, String userId, String info) {
+        UserBox userBox = getOne(Wrappers.<UserBox>lambdaQuery().eq(UserBox::getIsExist, NOT_EXIST.getCode()).eq(UserBox::getUserId, userId).eq(UserBox::getId, buiId).eq(UserBox::getBoxOpen, BoxOpenType.NO_OPEN.getCode()));
+        Assert.isTrue(Objects.nonNull(userBox),"盲盒有误,请核实盲盒是否存在!");
+        userBox.setIsExist(USE_EXIST.getCode());
+        userBox.setSourceInfo(info);
+        userBox.updateD(userId);
+        updateById(userBox);
+        return userBox.getBoxId();
+    }
 }

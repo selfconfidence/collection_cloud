@@ -36,4 +36,6 @@ public interface IUserCollectionService extends IService<UserCollection> {
 
     void resetUpLink(String userId, String userCollectionId);
 
+    String showUserCollection(String userId, String buiId, String info);
+
 }

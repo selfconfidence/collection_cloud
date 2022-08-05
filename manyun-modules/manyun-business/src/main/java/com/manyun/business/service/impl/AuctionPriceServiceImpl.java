@@ -100,6 +100,12 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     @Autowired
     private IAuctionMarginService auctionMarginService;
 
+    @Autowired
+    private IUserCollectionService userCollectionService;
+
+    @Autowired
+    private IUserBoxService userBoxService;
+
 
     //判断是否出过价
 
@@ -235,6 +241,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .toUserId(winAuctionPrice.getUserId()).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));
         auctionSend.setAuctionSendStatus(AuctionSendStatus.WAIT_PAY.getCode());
         auctionSend.setEndPayTime(LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class)));
+
+        auctionSendService.updateById(auctionSend);
 
         //成功后退还未拍中者保证金
         //拍中者暂不退还，支付成功再退
@@ -498,6 +506,14 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
             List<AuctionPrice> priceList = list(Wrappers.<AuctionPrice>lambdaQuery().eq(AuctionPrice::getAuctionSendId, auctionSend.getId()));
             if (priceList.isEmpty()) {
                 auctionSend.setAuctionSendStatus(AuctionSendStatus.BID_PASS.getCode());
+                String info = "已流拍，从拍卖市场退回";
+                //从拍卖市场退回
+                if (auctionSend.getGoodsType() == 1) {
+                    userCollectionService.showUserCollection(auctionSend.getUserId(), auctionSend.getMyGoodsId(),info);
+                }
+                if (auctionSend.getGoodsType() == 2) {
+                    userBoxService.showUserBox(auctionSend.getUserId(), auctionSend.getMyGoodsId(), info);
+                }
             }
         }
         auctionSendService.updateBatchById(sendList);
