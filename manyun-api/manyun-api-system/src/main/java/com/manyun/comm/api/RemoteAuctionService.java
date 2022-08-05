@@ -20,7 +20,7 @@ public interface RemoteAuctionService {
     @GetMapping("/auctionOrder/timeCancelAuction")
     R timeCancelAuction(@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 
-    @GetMapping("/auctionOrder/checkAuctionEnd")
+    @GetMapping("/auctionPrice/checkAuctionEnd")
     R checkAuctionEnd(@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 
     @GetMapping("/auctionSend/timeStartAuction")

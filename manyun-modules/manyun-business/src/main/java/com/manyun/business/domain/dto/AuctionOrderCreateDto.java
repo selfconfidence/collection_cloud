@@ -33,5 +33,7 @@ public class AuctionOrderCreateDto implements Serializable {
 
     private BigDecimal nowPrice;
 
+    private BigDecimal orderAmount;
+
 
 }

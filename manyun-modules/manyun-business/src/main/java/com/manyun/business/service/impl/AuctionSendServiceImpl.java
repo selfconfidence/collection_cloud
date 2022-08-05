@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
 import com.manyun.business.domain.entity.*;
@@ -79,6 +80,9 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
     @Autowired
     private ObjectFactory<IAuctionPriceService> auctionPriceServiceObjectFactory;
 
+    @Autowired
+    private ObjectFactory<IAuctionOrderService> auctionOrderServiceObjectFactory;
+
     /**
      * 查询保证金比例
      * @return
@@ -124,6 +128,7 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         BigDecimal commission = auctionSendForm.getStartPrice().multiply(systemService.getVal(BusinessConstants.SystemTypeConstant.COMMISSION_SCALE, BigDecimal.class)).setScale(2, RoundingMode.DOWN);
         Integer preTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_PRE_TIME, Integer.class);
         Integer bidTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_BID_TIME, Integer.class);
+        Integer delayTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_DELAY_TIME, Integer.class);
         AuctionSend auctionSend = Builder.of(AuctionSend::new)
                 .with(AuctionSend::setId, IdUtil.getSnowflakeNextIdStr())
                 .with(AuctionSend::setUserId, userId)
@@ -141,7 +146,7 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
                 .with(AuctionSend::setMargin, auctionSendForm.getStartPrice()
                         .multiply(systemService.getVal(BusinessConstants.SystemTypeConstant.MARGIN_SCALE, BigDecimal.class)).setScale(2, RoundingMode.HALF_UP))
                 .with(AuctionSend::setStartTime, LocalDateTime.now().plusMinutes(preTime))
-                .with(AuctionSend::setEndTime,LocalDateTime.now().plusMinutes(preTime + bidTime)).build();
+                .with(AuctionSend::setEndTime,LocalDateTime.now().plusMinutes(preTime + bidTime + delayTime)).build();
         auctionSend.createD(userId);
         save(auctionSend);
     }
@@ -215,6 +220,7 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
     private LambdaQueryWrapper<AuctionSend> getAuctionSendQueryWrappers(AuctionMarketQuery marketQuery) {
         LambdaQueryWrapper<AuctionSend> lambdaQueryWrapper = Wrappers.<AuctionSend>lambdaQuery();
         lambdaQueryWrapper.eq(AuctionSend::getGoodsType, marketQuery.getGoodsType());
+        lambdaQueryWrapper.ne(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_PASS.getCode());
 
         lambdaQueryWrapper.eq(StrUtil.isNotBlank(marketQuery.getCateId()), AuctionSend::getCateId, marketQuery.getCateId());
         lambdaQueryWrapper.like(StrUtil.isNotBlank(marketQuery.getCommName()), AuctionSend::getGoodsName, marketQuery.getCommName());
@@ -280,6 +286,12 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         auctionVo.setStartTime(auctionSend.getStartTime());
         auctionVo.setEndTime(auctionSend.getEndTime());
         auctionVo.setAuctionPriceRange(systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_PRICE_RANGE, BigDecimal.class));
+        auctionVo.setAuctionSendStatus(auctionSend.getAuctionSendStatus());
+        if (StringUtils.isNotBlank(auctionSend.getAuctionOrderId())) {
+            AuctionOrder auctionOrder = auctionOrderServiceObjectFactory.getObject().getById(auctionSend.getAuctionOrderId());
+            auctionVo.setEndPayTime(auctionOrder.getEndTime());
+        }
+
         return auctionVo;
     }
 
@@ -405,7 +417,7 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
     @Override
     @Transactional(rollbackFor = Exception.class)
     public synchronized void timeStartAuction() {
-        List<AuctionSend> list = list(Wrappers.<AuctionSend>lambdaQuery().eq(AuctionSend::getAuctionSendStatus, AuctionSendStatus.WAIT_START));
+        List<AuctionSend> list = list(Wrappers.<AuctionSend>lambdaQuery().eq(AuctionSend::getAuctionSendStatus, AuctionSendStatus.WAIT_START.getCode()));
         if (list.isEmpty()) return;
         for (AuctionSend auctionSend : list) {
             if (LocalDateTime.now().isAfter(auctionSend.getStartTime())) {

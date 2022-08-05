@@ -24,6 +24,9 @@ public class CntBoxOrderVo {
     @ApiModelProperty("藏品id")
     private String buiId;
 
+    @ApiModelProperty("订单状态")
+    private String orderStatus;
+
     @ApiModelProperty("藏品原价")
     private BigDecimal sourcePrice;
 

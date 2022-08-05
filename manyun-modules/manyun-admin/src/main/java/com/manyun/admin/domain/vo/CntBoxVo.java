@@ -28,9 +28,6 @@ public class CntBoxVo {
     @ApiModelProperty("实际支付的价格")
     private BigDecimal realPrice;
 
-    @ApiModelProperty("1未开启,2已开启")
-    private Integer boxOpen;
-
     @ApiModelProperty("盲盒状态;0=下架,1=正常,2=售罄")
     private Integer statusBy;
 
