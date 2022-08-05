@@ -36,4 +36,6 @@ public interface ICntConsignmentService extends IService<CntConsignment> {
 
     void reLoadConsignments(List<CntConsignment> cntConsignments);
 
+    void cancelSchedulingConsignment();
+
 }

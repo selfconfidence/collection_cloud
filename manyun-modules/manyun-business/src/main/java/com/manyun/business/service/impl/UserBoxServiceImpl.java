@@ -187,4 +187,14 @@ public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> impl
         updateById(userBox);
         return userBox.getBoxId();
     }
+
+//    @Override
+//    public String showUserBox(String buiId, String sendUserId, String format) {
+//        UserBox userBox = getOne(Wrappers.<UserBox>lambdaQuery().eq(UserBox::getUserId, sendUserId).eq(UserBox::getId, buiId));
+//        userBox.setIsExist(USE_EXIST.getCode());
+//        userBox.setSourceInfo(StrUtil.join("\n", userBox.getSourceInfo(),format));
+//        userBox.updateD(sendUserId);
+//        updateById(userBox);
+//        return userBox.getBoxId();
+//    }
 }

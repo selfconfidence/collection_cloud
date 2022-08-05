@@ -128,15 +128,31 @@ public class CntUserController extends BaseController {
 
     // 修改登录密码
     @PostMapping("/changeLogin")
-    @ApiOperation("修改登录密码")
+    @ApiOperation("修改登录密码--废弃")
+    @Deprecated
     public R changeLogin(@RequestBody @Valid UserChangeLoginForm userChangeLoginForm){
+        Assert.isTrue(false,"changeLogin is deprecated ==> change changeCodeLogin newApi");
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         userService.changeLogin(notNullLoginBusinessUser.getUserId(),userChangeLoginForm);
         return R.ok();
     }
+
+    // 修改登录密码
+    @PostMapping("/changeCodeLogin")
+    @ApiOperation("修改登录密码")
+    public R changeCodeLogin(@RequestBody @Valid UserChangeCodeLoginForm userChangeCodeLoginForm){
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        String phone = notNullLoginBusinessUser.getCntUser().getPhone();
+        String phoneCode = (String) redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(phone));
+        Assert.isTrue(userChangeCodeLoginForm.getPhoneCode().equals(phoneCode),"验证码输入错误,请核实!");
+        CntUser cntUser = userService.getById(notNullLoginBusinessUser.getUserId());
+        cntUser.setLoginPass(userChangeCodeLoginForm.getPassWord());
+        userService.updateById(cntUser);
+        return R.ok();
+    }
     // 修改支付密码
     @PostMapping("/changePayPass")
-    @ApiOperation("修改支付密码")
+    @ApiOperation(value = "修改支付密码")
     public R changePayPass(@RequestBody @Valid UserChangePayPass userChangePayPass){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         String phone = notNullLoginBusinessUser.getCntUser().getPhone();

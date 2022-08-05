@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 @Data
@@ -26,6 +27,10 @@ public class UserRegForm implements Serializable {
 
     @ApiModelProperty("邀请码 - 没有则不填")
     private String pleaseCode;
+
+    @ApiModelProperty("登录密码")
+    @NotBlank(message = "登录密码不可为空")
+    private String loginPassWord;
 
 
 }

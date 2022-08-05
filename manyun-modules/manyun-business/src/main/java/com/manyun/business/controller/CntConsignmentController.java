@@ -87,5 +87,13 @@ public class CntConsignmentController {
         return R.ok(cntConsignmentService.consignmentPageOrder(notNullLoginBusinessUser.getUserId(),consignmentOrderQuery));
     }
 
+
+    @GetMapping("/cancelSchedulingConsignment")
+    @ApiOperation("取消寄售市场中的资产")
+    public R cancelSchedulingConsignment(){
+        cntConsignmentService.cancelSchedulingConsignment();
+        return R.ok();
+    }
+
 }
 

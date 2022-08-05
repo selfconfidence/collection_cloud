@@ -38,4 +38,5 @@ public interface IUserCollectionService extends IService<UserCollection> {
 
     String showUserCollection(String userId, String buiId, String info);
 
+//    String showUserCollection(String buiId, String userId, String info);
 }

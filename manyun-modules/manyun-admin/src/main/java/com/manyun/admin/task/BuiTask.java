@@ -1,6 +1,7 @@
 package com.manyun.admin.task;
 
 import com.manyun.comm.api.RemoteAuctionService;
+import com.manyun.comm.api.RemoteConsignmentService;
 import com.manyun.comm.api.RemoteOrderService;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.utils.StringUtils;
@@ -24,6 +25,9 @@ public class BuiTask
 
     @Resource
     private RemoteAuctionService remoteAuctionService;
+
+    @Resource
+    private RemoteConsignmentService remoteConsignmentService;
 
     /**
      * 藏品盲盒,提前一个小时发售全局进行推送用户.
@@ -71,5 +75,11 @@ public class BuiTask
     }
 
 
+    /**
+     * 定时调度寄售时限周期退回源
+     */
+    public void backConsignmentByTime(){
+        remoteConsignmentService.cancelSchedulingConsignment(SecurityConstants.INNER);
+    }
 
 }

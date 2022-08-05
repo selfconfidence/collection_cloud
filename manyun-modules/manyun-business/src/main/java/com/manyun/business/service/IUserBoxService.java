@@ -30,5 +30,5 @@ public interface IUserBoxService extends IService<UserBox> {
 
     String hideUserBox(String buiId, String userId, String info);
 
-    String showUserBox(String buiId, String userId, String info);
+    String showUserBox(String buiId, String sendUserId, String format);
 }

@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.manyun.business.design.mychain.MyChainService;
 import com.manyun.business.domain.dto.*;
 import com.manyun.business.domain.entity.UserCollection;
@@ -23,6 +24,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -110,7 +112,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                 userCollection.setIsLink(OK_LINK.getCode());
                 userCollection.setRealCompany("蚂蚁链");
                 // 编号特殊生成
-                userCollection.setCollectionNumber(StrUtil.format("CNT_{}",IdUtil.nanoId()));
+                userCollection.setCollectionNumber(StrUtil.format("CNT_{}",RandomUtil.randomNumbers(6)));
                 //userCollection.setLinkAddr(hash);
                 userCollection.setCollectionHash(hash);
                 userCollection.updateD(userCollection.getUserId());
@@ -118,7 +120,6 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
             });
         }
     }
-
 
 
 
@@ -279,7 +280,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                     userCollection.setIsLink(OK_LINK.getCode());
                     userCollection.setRealCompany("蚂蚁链");
                     // 编号特殊生成
-                    userCollection.setCollectionNumber(StrUtil.format("CNT_{}", IdUtil.nanoId()));
+                    userCollection.setCollectionNumber(StrUtil.format("CNT_{}",RandomUtil.randomNumbers(6)));
                     //userCollection.setLinkAddr(hash);
                     userCollection.setCollectionHash(hash);
                     userCollection.updateD(userCollection.getUserId());
@@ -289,6 +290,16 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
 
     }
 
+//    @Override
+//    public String showUserCollection(String buiId, String userId, String info) {
+//        UserCollection userCollection = getOne(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getId, buiId).eq(UserCollection::getUserId, userId));
+//       // Assert.isTrue(Objects.nonNull(userCollection),"藏品有误,检查藏品是否上链!");
+//        userCollection.setIsExist(USE_EXIST.getCode());
+//        userCollection.updateD(userId);
+//        userCollection.setSourceInfo(StrUtil.join("\n", userCollection.getSourceInfo(),info));
+//        updateById(userCollection);
+//        return userCollection.getCollectionId();
+//    }
 
 
     /**

@@ -33,17 +33,20 @@ import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.exception.ServiceException;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.manyun.common.core.constant.BusinessConstants.SystemTypeConstant.CONSIGNMENT_DE_TIME;
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
 import static com.manyun.common.core.enums.AliPayEnum.CONSIGNMENT_ALI_PAY;
 import static com.manyun.common.core.enums.ConsignmentStatus.*;
@@ -60,6 +63,7 @@ import static com.manyun.common.core.enums.WxPayEnum.CONSIGNMENT_WECHAT_PAY;
  * @since 2022-06-30
  */
 @Service
+@Slf4j
 public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper, CntConsignment> implements ICntConsignmentService {
 
 
@@ -245,6 +249,44 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
 
         }
            updateBatchById(cntConsignments);
+    }
+
+    /**
+     * 取消寄售市场中的资产
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public  synchronized void  cancelSchedulingConsignment() {
+        // 小时为单位
+        Integer time = systemService.getVal(CONSIGNMENT_DE_TIME, Integer.class);
+        List<CntConsignment> cntConsignments = list(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getConsignmentStatus,PUSH_CONSIGN.getCode()).lt(CntConsignment::getCreatedTime, LocalDateTime.now().minusHours(time)));
+        // 开始对这些寄售资产进行取消操作
+        for (CntConsignment cntConsignment : cntConsignments) {
+            try {
+                cancelConsignment(cntConsignment);
+            }catch (Exception e){
+                log.error("寄售市场撤回寄售资产错误信息:{},资产编号:{}",e.getMessage(),cntConsignment.getId());
+            }
+
+        }
+    }
+
+    private void cancelConsignment(CntConsignment cntConsignment) {
+       // 1. 回滚到 用户资产中间表
+        Integer isType = cntConsignment.getIsType();
+        //验证是 藏品信息 还是 盲盒信息
+        if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(isType))
+            //藏品
+            userCollectionService.showUserCollection(cntConsignment.getSendUserId(),cntConsignment.getBuiId(),StrUtil.format("寄售的藏品超出时限,已被退回!"));
+        if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(isType))
+            // 盲盒
+            userBoxService.showUserBox(cntConsignment.getBuiId(),cntConsignment.getSendUserId(),StrUtil.format("寄售的盲盒超出时限,已被退回!"));
+
+        // 2. 删除当前寄售订单
+        removeById(cntConsignment.getId());
+       // 3. 记录日志
+
+       // 4. 推送
     }
 
     /**

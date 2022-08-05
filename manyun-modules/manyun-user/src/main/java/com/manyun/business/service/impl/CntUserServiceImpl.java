@@ -117,7 +117,9 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     @Override
     public void changeLogin(String userId, UserChangeLoginForm userChangeLoginForm) {
         CntUser cntUser = getById(userId);
+        if (Objects.nonNull(cntUser.getLoginPass()))
         Assert.isTrue(userChangeLoginForm.getOldPass().equals(cntUser.getLoginPass()),"旧密码输出错误,请核实!");
+
         cntUser.setLoginPass(userChangeLoginForm.getNewPass());
         cntUser.updateD(userId);
         updateById(cntUser);
@@ -191,6 +193,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         initUser(cntUser);
         cntUser.setPhone(userRegForm.getPhone());
         bindParentCode(cntUser,userRegForm.getPleaseCode());
+        cntUser.setLoginPass(userRegForm.getLoginPassWord());
         // 初始化钱包
         remoteBuiMoneyService.initUserMoney(cntUser.getId(),SecurityConstants.INNER);
         save(cntUser);

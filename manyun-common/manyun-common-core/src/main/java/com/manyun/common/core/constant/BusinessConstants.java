@@ -55,6 +55,12 @@ public interface BusinessConstants {
          */
         String  CONSIGNMENT_ORDER_TIME =  "consignment_order_time";
 
+
+        /**
+         *  寄售订单超时时间 小时为单位
+         */
+        String  CONSIGNMENT_DE_TIME = "CONSIGNMENT_DE_TIME";
+
         /**
          * 拍卖出售须知
          */
