@@ -221,6 +221,8 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         LambdaQueryWrapper<AuctionSend> lambdaQueryWrapper = Wrappers.<AuctionSend>lambdaQuery();
         lambdaQueryWrapper.eq(AuctionSend::getGoodsType, marketQuery.getGoodsType());
         lambdaQueryWrapper.ne(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_PASS.getCode());
+        lambdaQueryWrapper.ne(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_BREAK.getCode());
+        lambdaQueryWrapper.ne(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_SUCCESS.getCode());
 
         lambdaQueryWrapper.eq(StrUtil.isNotBlank(marketQuery.getCateId()), AuctionSend::getCateId, marketQuery.getCateId());
         lambdaQueryWrapper.like(StrUtil.isNotBlank(marketQuery.getCommName()), AuctionSend::getGoodsName, marketQuery.getCommName());
@@ -276,7 +278,7 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         Integer delayTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_DELAY_TIME, Integer.class);
         AuctionSend auctionSend = getById(auctionSendId);
         AuctionVo auctionVo = Builder.of(AuctionVo::new).build();
-        auctionVo.setCommission(auctionSend.getCommission());
+        auctionVo.setCommission(auctionSend.getCommission().setScale(2, RoundingMode.DOWN));
         auctionVo.setMargin(auctionSend.getMargin());
         auctionVo.setNowPrice(auctionSend.getNowPrice());
         auctionVo.setSoldPrice(auctionSend.getSoldPrice());
