@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.domain.dto.AuctionOrderCreateDto;
+import com.manyun.business.domain.dto.LogInfoDto;
 import com.manyun.business.domain.entity.AuctionOrder;
 import com.manyun.business.domain.entity.AuctionPrice;
 import com.manyun.business.domain.entity.AuctionSend;
@@ -26,12 +27,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.POLL_SOURCE;
+import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.PULL_SOURCE;
+import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.MONEY_TYPE;
 
 /**
  * <p>
@@ -62,6 +69,9 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
     @Autowired
     @Lazy
     private IAuctionPriceService auctionPriceService;
+
+    @Autowired
+    private ILogsService logsService;
 
     @Override
     public TableDataInfo<AuctionOrderVo> myAuctionOrderList(AuctionOrderQuery orderQuery, String userId) {
@@ -144,13 +154,15 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
         Money buyerMoney = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
         buyerMoney.setMoneyBalance(buyerMoney.getMoneyBalance().add(auctionOrder.getMargin()));
         moneyService.updateById(buyerMoney);
+        logsService.saveLogs(LogInfoDto.builder().buiId(userId).jsonTxt("退还保证金").formInfo(auctionSend.getMargin().toString()).isType(PULL_SOURCE).modelType(MONEY_TYPE).build());
 
         //扣除佣金,剩余钱加给卖方   需要后台审核
-        /*AuctionSend auctionSend = auctionSendService.getById(auctionOrder.getSendAuctionId());
         Money sellerMoney = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, auctionSend.getUserId()));
         BigDecimal subtract = auctionOrder.getNowPrice().subtract(auctionOrder.getCommission());
         sellerMoney.setMoneyBalance(sellerMoney.getMoneyBalance().add(subtract));
-        moneyService.updateById(sellerMoney);*/
+        moneyService.updateById(sellerMoney);
+        logsService.saveLogs(LogInfoDto.builder().buiId(userId).jsonTxt("拍卖成功").formInfo(auctionOrder.getNowPrice().toString()).isType(PULL_SOURCE).modelType(MONEY_TYPE).build());
+        logsService.saveLogs(LogInfoDto.builder().buiId(userId).jsonTxt("扣除佣金").formInfo(auctionOrder.getCommission().toString()).isType(POLL_SOURCE).modelType(MONEY_TYPE).build());
 
         Integer goodsType = auctionOrder.getGoodsType();
 
@@ -193,13 +205,6 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
             return item;
         }).collect(Collectors.toList());
         updateBatchById(updateOrder);
-
-
-        // 订单取消，扣除保证金
-        /*for (AuctionOrder auctionOrder : updateOrder) {
-            Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, auctionOrder.getUserId()));
-            money.setMoneyBalance(money.getMoneyBalance().subtract(auctionOrder.getMargin()));
-        }*/
 
     }
 

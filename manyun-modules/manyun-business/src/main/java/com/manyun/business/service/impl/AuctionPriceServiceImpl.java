@@ -9,6 +9,7 @@ import com.manyun.business.design.delay.DelayAbsAspect;
 import com.manyun.business.design.delay.DelayQueue;
 import com.manyun.business.design.pay.RootPay;
 import com.manyun.business.domain.dto.AuctionOrderCreateDto;
+import com.manyun.business.domain.dto.LogInfoDto;
 import com.manyun.business.domain.dto.PayInfoDto;
 import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.form.AuctionPayFixedForm;
@@ -42,11 +43,12 @@ import java.lang.System;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.PULL_SOURCE;
+import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.MONEY_TYPE;
 import static com.manyun.common.core.enums.PayTypeEnum.MONEY_TAPE;
 
 import static com.manyun.common.core.enums.AliPayEnum.*;
@@ -105,6 +107,9 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
     @Autowired
     private IUserBoxService userBoxService;
+
+    @Autowired
+    private ILogsService logsService;
 
 
     //判断是否出过价
@@ -254,6 +259,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
             Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
             money.setMoneyBalance(money.getMoneyBalance().add(auctionSend.getMargin()));
             moneyService.updateById(money);
+            logsService.saveLogs(LogInfoDto.builder().buiId(userId).jsonTxt("退还保证金").formInfo(auctionSend.getMargin().toString()).isType(PULL_SOURCE).modelType(MONEY_TYPE).build());
         }
         updateBatchById(list);
     }
