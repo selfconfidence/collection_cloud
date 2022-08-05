@@ -10,6 +10,7 @@ import com.google.common.collect.Sets;
 import com.manyun.business.domain.dto.OrderCreateDto;
 import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.query.OrderQuery;
+import com.manyun.business.domain.vo.MediaVo;
 import com.manyun.business.domain.vo.OrderVo;
 import com.manyun.business.mapper.OrderMapper;
 import com.manyun.business.service.*;
@@ -67,6 +68,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Autowired
     private ObjectFactory<ICntConsignmentService> cntConsignmentServiceObjectFactory;
 
+    @Autowired
+    private IMediaService mediaService;
+
     @Override
     public TableDataInfo<OrderVo> pageQueryList(OrderQuery orderQuery, String userId) {
         List<Order> orderList = list(Wrappers.<Order>lambdaQuery()
@@ -83,8 +87,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(order.getGoodsType())) {
             CntCollection collection = collectionService.getObject().getById(order.getBuiId());
             CntCreationd creation = creationdService.getById(collection.getBindCreation());
+            List<MediaVo> mediaVos = mediaService.initMediaVos(order.getBuiId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
+            orderVo.setGoodsImg(mediaVos.get(0).getMediaUrl());
             orderVo.setBindCreation(creation.getCreationName());
             orderVo.setCreationImg(creation.getHeadImage());
+        }
+        if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(order.getGoodsType())) {
+            List<MediaVo> mediaVos = mediaService.initMediaVos(order.getBuiId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
+            orderVo.setGoodsImg(mediaVos.get(0).getMediaUrl());
         }
         return orderVo;
     }
