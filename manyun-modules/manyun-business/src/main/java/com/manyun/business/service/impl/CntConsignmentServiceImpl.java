@@ -271,16 +271,25 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         }
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public synchronized void cancelConsignmentById(String id,String sendUserId) {
+        CntConsignment consignment = getOne(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getId, id).eq(CntConsignment::getSendUserId, sendUserId).eq(CntConsignment::getConsignmentStatus, PUSH_CONSIGN.getCode()));
+        // 判定条件是否符合
+        Assert.isTrue(Objects.nonNull(consignment),"取消寄售资产有误,请核实当前寄售状态!");
+        cancelConsignment(consignment);
+    }
+
     private void cancelConsignment(CntConsignment cntConsignment) {
        // 1. 回滚到 用户资产中间表
         Integer isType = cntConsignment.getIsType();
         //验证是 藏品信息 还是 盲盒信息
         if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(isType))
             //藏品
-            userCollectionService.showUserCollection(cntConsignment.getSendUserId(),cntConsignment.getBuiId(),StrUtil.format("寄售的藏品超出时限,已被退回!"));
+            userCollectionService.showUserCollection(cntConsignment.getSendUserId(),cntConsignment.getBuiId(),StrUtil.format("寄售的藏品,已被退回!"));
         if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(isType))
             // 盲盒
-            userBoxService.showUserBox(cntConsignment.getBuiId(),cntConsignment.getSendUserId(),StrUtil.format("寄售的盲盒超出时限,已被退回!"));
+            userBoxService.showUserBox(cntConsignment.getBuiId(),cntConsignment.getSendUserId(),StrUtil.format("寄售的盲盒,已被退回!"));
 
         // 2. 删除当前寄售订单
         removeById(cntConsignment.getId());

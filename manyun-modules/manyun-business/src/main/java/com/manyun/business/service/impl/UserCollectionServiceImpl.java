@@ -129,6 +129,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
 
     @Override
     public String autoCollectionNum() {
+
         String intAutoNum = redisService.getIntAutoNum(COLLECTION_AUTO_NUM).toString();
         String poiLent = systemService.getVal(COLLECTION_POT, String.class);
       return  poiLent.substring(0, poiLent.length() - intAutoNum.length()).concat(intAutoNum);
@@ -162,7 +163,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                .userCollectionId(userCollection.getId())
                .artId(userCollection.getLinkAddr())
                .owner(userCollection.getUserId())
-               .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy MM dd"))).build(), (hash) ->{
+               .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM"))).build(), (hash) ->{
            // 得到 hash
            userCollection.setIsLink(OK_LINK.getCode());
            userCollection.setRealCompany("蚂蚁链");

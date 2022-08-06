@@ -34,6 +34,7 @@ public class StepServiceImpl extends ServiceImpl<StepMapper, Step> implements IS
             BeanUtil.copyProperties(stepDto,step);
             step.setId(IdUtil.getSnowflakeNextIdStr());
             step.createD(stepDto.getUserId());
+            steps.add(step);
         }
         saveBatch(steps);
     }

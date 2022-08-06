@@ -38,4 +38,5 @@ public interface ICntConsignmentService extends IService<CntConsignment> {
 
     void cancelSchedulingConsignment();
 
+    void cancelConsignmentById(String id,String sendUserId);
 }

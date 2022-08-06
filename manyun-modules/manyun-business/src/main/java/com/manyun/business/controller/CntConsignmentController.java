@@ -13,6 +13,7 @@ import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.security.annotation.InnerAuth;
 import com.manyun.common.security.utils.SecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -90,8 +91,17 @@ public class CntConsignmentController {
 
     @GetMapping("/cancelSchedulingConsignment")
     @ApiOperation("取消寄售市场中的资产")
+    @InnerAuth
     public R cancelSchedulingConsignment(){
         cntConsignmentService.cancelSchedulingConsignment();
+        return R.ok();
+    }
+
+    @GetMapping("/cancelConsignmentById/{id}")
+    @ApiOperation(value = "寄售方取消寄售市场中的资产",notes = "id 为寄售订单的id")
+    public R cancelConsignmentById(@PathVariable String id){
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        cntConsignmentService.cancelConsignmentById(id,notNullLoginBusinessUser.getUserId());
         return R.ok();
     }
 
