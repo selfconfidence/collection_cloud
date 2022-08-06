@@ -1,6 +1,7 @@
 package com.manyun.business.controller;
 
 
+import cn.hutool.core.lang.Assert;
 import com.manyun.business.domain.form.TranAccForm;
 import com.manyun.business.service.ISystemService;
 import com.manyun.business.service.ITranService;
@@ -51,6 +52,7 @@ public class TranController {
     @ApiOperation("进行转赠")
     public synchronized R  tranTypeToPoint(@RequestBody @Valid TranAccForm tranAccForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        Assert.isTrue("1".equals(systemService.getVal(BusinessConstants.SystemTypeConstant.TRAN_ACC, String.class)),"转赠未开启!");
         tranService.tranTypeToPoint(notNullLoginBusinessUser.getUserId(),tranAccForm);
         return R.ok();
     }

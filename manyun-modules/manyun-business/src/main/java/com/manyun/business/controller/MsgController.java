@@ -9,6 +9,7 @@ import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.security.utils.SecurityUtils;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ import org.springframework.stereotype.Controller;
  */
 @RestController
 @RequestMapping("/msg")
-@ApiOperation("消息相关Apis")
+@Api(tags = "消息相关Apis")
 public class MsgController {
 
     @Autowired
