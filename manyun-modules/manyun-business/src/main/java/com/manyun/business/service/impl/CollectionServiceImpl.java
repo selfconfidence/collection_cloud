@@ -424,14 +424,14 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     }
 
     private List<StepVo> initStepVo(String collectionId, String collectionModelType) {
-        List<Step> stepList = stepService.list(Wrappers.<Step>lambdaQuery().eq(Step::getBuiId, collectionId).eq(Step::getModelType, collectionModelType));
+        List<Step> stepList = stepService.list(Wrappers.<Step>lambdaQuery().eq(Step::getBuiId, collectionId).eq(Step::getModelType, collectionModelType).orderByDesc(Step::getCreatedTime));
        return stepList.parallelStream().map(item ->{
            StepVo stepVo = Builder.of(StepVo::new).build();
            BeanUtil.copyProperties(item, stepVo );
            CntUserDto cntUserDto = userService.commUni(item.getUserId(), SecurityConstants.INNER).getData();
            stepVo.setHeadImage(cntUserDto.getHeadImage());
            stepVo.setUserHostId(cntUserDto.getUserId());
-           stepVo.setHeadImage(cntUserDto.getHeadImage());
+           stepVo.setNickName(cntUserDto.getNickName());
            return stepVo;
        } ).collect(Collectors.toList());
 

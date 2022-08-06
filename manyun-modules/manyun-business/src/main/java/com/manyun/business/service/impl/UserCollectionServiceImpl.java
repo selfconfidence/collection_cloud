@@ -2,7 +2,6 @@ package com.manyun.business.service.impl;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
@@ -118,7 +117,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                 userCollection.setIsLink(OK_LINK.getCode());
                 userCollection.setRealCompany("蚂蚁链");
                 // 编号特殊生成 借助 redis 原子性操作
-                userCollection.setCollectionNumber(StrUtil.format("CNT_{}",autoCollectionNum()));
+                userCollection.setCollectionNumber(StrUtil.format("CNT_{}",autoCollectionNum(userCollection.getCollectionId())));
                 //userCollection.setLinkAddr(hash);
                 userCollection.setCollectionHash(hash);
                 userCollection.updateD(userCollection.getUserId());
@@ -128,9 +127,8 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
     }
 
     @Override
-    public String autoCollectionNum() {
-
-        String intAutoNum = redisService.getIntAutoNum(COLLECTION_AUTO_NUM).toString();
+    public String autoCollectionNum(String collectionId) {
+        String intAutoNum = redisService.getIntAutoNum(COLLECTION_AUTO_NUM.concat(collectionId)).toString();
         String poiLent = systemService.getVal(COLLECTION_POT, String.class);
       return  poiLent.substring(0, poiLent.length() - intAutoNum.length()).concat(intAutoNum);
     }
@@ -145,7 +143,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
      * @param formatTran
      */
     // 转让,需要额外处理了,这个链 属于转增级别的链
-   public void tranCollection(String tranUserId,String toUserId,UserCollection tranUserCollection,String format,String formatTran){
+   public void tranCollection(String tranUserId,String toUserId,UserCollection tranUserCollection,String format,String formatTran,String oldCollectionHash,String oldCollectionNumber){
        UserCollection userCollection = Builder.of(UserCollection::new).build();
        userCollection.setId(IdUtil.getSnowflake().nextIdStr());
        userCollection.setCollectionId(tranUserCollection.getCollectionId());
@@ -168,13 +166,13 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
            userCollection.setIsLink(OK_LINK.getCode());
            userCollection.setRealCompany("蚂蚁链");
            // 编号特殊生成
-           userCollection.setCollectionNumber(StrUtil.format("CNT_{}", autoCollectionNum()));
+           userCollection.setCollectionNumber(oldCollectionNumber);
           // userCollection.setLinkAddr(hash);
            userCollection.setCollectionHash(hash);
            userCollection.updateD(userCollection.getUserId());
            updateById(userCollection);
            // 流转记录
-           stepService.saveBatch(StepDto.builder().buiId(tranUserCollection.getCollectionId()).userId(tranUserId).modelType(COLLECTION_MODEL_TYPE).reMark("转让方").formHash(hash).formInfo(formatTran).build()
+           stepService.saveBatch(StepDto.builder().buiId(tranUserCollection.getCollectionId()).userId(tranUserId).modelType(COLLECTION_MODEL_TYPE).reMark("转让方").formHash(oldCollectionHash).formInfo(formatTran).build()
                    ,StepDto.builder().buiId(tranUserCollection.getCollectionId()).userId(toUserId).modelType(COLLECTION_MODEL_TYPE).formHash(hash).reMark("受让方").formInfo(format).build()
            );
        });
@@ -239,9 +237,11 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                 LogInfoDto.builder().jsonTxt(format).buiId(toUserId).modelType(COLLECTION_MODEL_TYPE).isType(PULL_SOURCE).formInfo(Integer.valueOf(1).toString()).build()
                 ,LogInfoDto.builder().jsonTxt(formatTran).buiId(tranUserId).modelType(COLLECTION_MODEL_TYPE).isType(POLL_SOURCE).formInfo(Integer.valueOf(1).toString()).build()
         );
+        String oldCollectionHash = userCollection.getCollectionHash();
+        String oldCollectionNumber = userCollection.getCollectionNumber();
         // 此接口更改为转赠链接口
         //bindCollection(toUserId,userCollection.getCollectionId(),userCollection.getCollectionName(),format,Integer.valueOf(1));
-        tranCollection(tranUserId,toUserId,userCollection,format,formatTran);
+        tranCollection(tranUserId,toUserId,userCollection,format,formatTran,oldCollectionHash,oldCollectionNumber);
 
 
         msgService.saveMsgThis(MsgThisDto.builder().userId(tranUserId).msgForm(formatTran).msgTitle(formatTran).build());
@@ -293,7 +293,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                     userCollection.setIsLink(OK_LINK.getCode());
                     userCollection.setRealCompany("蚂蚁链");
                     // 编号特殊生成
-                    userCollection.setCollectionNumber(StrUtil.format("CNT_{}",autoCollectionNum()));
+                    userCollection.setCollectionNumber(StrUtil.format("CNT_{}",autoCollectionNum(userCollection.getCollectionId())));
                     //userCollection.setLinkAddr(hash);
                     userCollection.setCollectionHash(hash);
                     userCollection.updateD(userCollection.getUserId());

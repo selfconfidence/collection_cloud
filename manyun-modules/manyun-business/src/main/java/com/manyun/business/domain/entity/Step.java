@@ -60,7 +60,7 @@ public class Step implements Serializable {
 
     public void createD(String createId){
         this.createdBy = createId;
-        this.createdTime = LocalDateTime.now();
+        this.createdTime = LocalDateTime.now().plusSeconds(1);
         if (this.createdTime != null)
             this.updatedTime = this.createdTime;
         this.updatedBy = this.createdBy;
