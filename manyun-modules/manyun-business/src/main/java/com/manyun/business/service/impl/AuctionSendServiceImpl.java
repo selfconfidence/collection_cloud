@@ -92,6 +92,11 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         return R.ok(systemService.getVal(BusinessConstants.SystemTypeConstant.MARGIN_SCALE, BigDecimal.class));
     }
 
+    @Override
+    public R<BigDecimal> auctionSendCommission() {
+        return R.ok(systemService.getVal(BusinessConstants.SystemTypeConstant.COMMISSION_SCALE, BigDecimal.class));
+    }
+
     /**
      * 送拍到拍卖市场
      * @param auctionSendForm
@@ -125,7 +130,7 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         }
 
         //佣金
-        BigDecimal commission = auctionSendForm.getStartPrice().multiply(systemService.getVal(BusinessConstants.SystemTypeConstant.COMMISSION_SCALE, BigDecimal.class)).setScale(2, RoundingMode.DOWN);
+        //BigDecimal commission = auctionSendForm.getStartPrice().multiply(systemService.getVal(BusinessConstants.SystemTypeConstant.COMMISSION_SCALE, BigDecimal.class)).setScale(2, RoundingMode.DOWN);
         Integer preTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_PRE_TIME, Integer.class);
         Integer bidTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_BID_TIME, Integer.class);
         Integer delayTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_DELAY_TIME, Integer.class);
@@ -142,7 +147,7 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
                 .with(AuctionSend::setNowPrice, auctionSendForm.getStartPrice())
                 .with(AuctionSend::setSoldPrice, auctionSendForm.getSoldPrice())
                 .with(AuctionSend::setConcernedNum, concernedNum)
-                .with(AuctionSend::setCommission, commission)
+                .with(AuctionSend::setCommission, systemService.getVal(BusinessConstants.SystemTypeConstant.COMMISSION_SCALE, BigDecimal.class))
                 .with(AuctionSend::setMargin, auctionSendForm.getStartPrice()
                         .multiply(systemService.getVal(BusinessConstants.SystemTypeConstant.MARGIN_SCALE, BigDecimal.class)).setScale(2, RoundingMode.HALF_UP))
                 .with(AuctionSend::setStartTime, LocalDateTime.now().plusMinutes(preTime))
@@ -278,7 +283,7 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         Integer delayTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_DELAY_TIME, Integer.class);
         AuctionSend auctionSend = getById(auctionSendId);
         AuctionVo auctionVo = Builder.of(AuctionVo::new).build();
-        auctionVo.setCommission(auctionSend.getCommission().setScale(2, RoundingMode.DOWN));
+        auctionVo.setCommission(systemService.getVal(BusinessConstants.SystemTypeConstant.COMMISSION_SCALE, BigDecimal.class));
         auctionVo.setMargin(auctionSend.getMargin());
         auctionVo.setNowPrice(auctionSend.getNowPrice());
         auctionVo.setSoldPrice(auctionSend.getSoldPrice());

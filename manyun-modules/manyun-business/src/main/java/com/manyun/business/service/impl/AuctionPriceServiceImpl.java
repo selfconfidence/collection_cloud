@@ -458,6 +458,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
         //修改竞拍状态，相当于锁单
         auctionSend.setAuctionSendStatus(AuctionSendStatus.WAIT_PAY.getCode());
+        auctionSend.setNowPrice(auctionSend.getSoldPrice());
         auctionSendService.updateById(auctionSend);
         AuctionPrice auctionPrice = new AuctionPrice();
         auctionPrice.setId(IdUtil.getSnowflakeNextIdStr());
@@ -476,6 +477,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .goodsType(auctionSend.getGoodsType())
                 .nowPrice(auctionSend.getSoldPrice())
                 .payType(auctionPayFixedForm.getPayType())
+                .orderAmount(auctionSend.getSoldPrice())
+                .auctionPriceId(auctionPrice.getId())
                 .sendAuctionId(auctionPayFixedForm.getAuctionSendId())
                 .fromUserId(auctionSend.getUserId())
                 .toUserId(userId).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));

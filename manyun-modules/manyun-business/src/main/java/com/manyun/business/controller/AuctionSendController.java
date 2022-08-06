@@ -55,6 +55,12 @@ public class AuctionSendController {
         return auctionSendService.auctionSendConfig();
     }
 
+    @GetMapping("/auctionSendCommission")
+    @ApiOperation("获取佣金比例")
+    public R<BigDecimal> auctionSendCommission() {
+        return auctionSendService.auctionSendCommission();
+    }
+
     @PostMapping("/reAuctionSend")
     @ApiOperation("重新送拍")
     public R reAuctionSend(@Valid @RequestBody AuctionSendForm auctionSendForm, String auctionSendId) {

@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -109,7 +110,9 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
         String orderNo = IdUtil.objectId();
         auctionOrder.setOrderNo(orderNo);
         //修改订单为待支付状态
-        auctionOrder.setCommission(auctionSend.getCommission());
+        auctionOrder.setBuiId(auctionSend.getMyGoodsId());
+        BigDecimal commission = auctionSend.getNowPrice().multiply(systemService.getVal(BusinessConstants.SystemTypeConstant.COMMISSION_SCALE, BigDecimal.class)).setScale(2, RoundingMode.DOWN);
+        auctionOrder.setCommission(commission);
         auctionOrder.setMargin(auctionSend.getMargin());
         auctionOrder.setAuctionStatus(AuctionStatus.WAIT_PAY.getCode());
         auctionOrder.setPayTime(LocalDateTime.now());
@@ -167,18 +170,19 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
         Integer goodsType = auctionOrder.getGoodsType();
 
         //绑定藏品关系
-        if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(goodsType)) {
-            // 盲盒
-            userBoxService.bindBox(auctionOrder.getToUserId(),auctionOrder.getGoodsId(),info,1);
+        if (goodsType == 1) {
+            // 藏品
+            //userCollectionService.bindCollection(auctionOrder.getToUserId(),auctionOrder.getGoodsName(),auctionOrder.getGoodsId(),info,1);
+            userCollectionService.tranCollection(auctionOrder.getFromUserId(),auctionOrder.getToUserId(),auctionOrder.getBuiId());
             return;
         }
 
-        if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(goodsType)) {
-            // 藏品
-            //userCollectionService.bindCollection(auctionOrder.getToUserId(),auctionOrder.getGoodsName(),auctionOrder.getGoodsId(),info,1);
-            userCollectionService.tranCollection(auctionOrder.getFromUserId(),auctionOrder.getToUserId(),auctionOrder.getGoodsId());
+        if (goodsType == 2) {
+            // 盲盒
+            userBoxService.bindBox(auctionOrder.getToUserId(),auctionOrder.getBuiId(),info,1);
             return;
         }
+
         throw new IllegalStateException("not fount order good_type = " + goodsType);
 
     }

@@ -53,6 +53,9 @@ public class AuctionOrder implements Serializable {
     @ApiModelProperty("出价id")
     private String auctionPriceId;
 
+    @ApiModelProperty("我的藏品id")
+    private String buiId;
+
     @ApiModelProperty("当前价")
     private BigDecimal nowPrice;
 
