@@ -44,6 +44,7 @@ public class AuctionSendController {
 
 
     @GetMapping("/isAuction")
+
     @ApiOperation("是否开启拍卖市场（1开启，0关闭）")
     public R<String> isAuction() {
         return R.ok(systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_ACC, String.class));

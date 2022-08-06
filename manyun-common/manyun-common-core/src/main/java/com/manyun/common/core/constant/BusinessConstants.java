@@ -65,6 +65,11 @@ public interface BusinessConstants {
         String  CONSIGNMENT_DE_TIME = "CONSIGNMENT_DE_TIME";
 
         /**
+         * 是否开启拍卖（1开启，0关闭）
+         */
+        String AUCTION_ACC = "auction_acc";
+
+        /**
          * 拍卖出售须知
          */
         String AUCTION_SELL_INFO = "auction_sell_info";
