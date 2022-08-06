@@ -8,6 +8,7 @@ import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.pays.abs.impl.AliComm;
 import com.manyun.common.pays.abs.impl.WxComm;
+import com.manyun.common.redis.service.RedisService;
 import io.swagger.annotations.*;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ public class BannerController {
 
     @Autowired
     private IBannerService bannerService;
+
 
 
 

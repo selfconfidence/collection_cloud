@@ -4,10 +4,8 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.manyun.business.design.mychain.MyChainService;
 import com.manyun.business.domain.dto.*;
 import com.manyun.business.domain.entity.UserCollection;
@@ -16,6 +14,7 @@ import com.manyun.business.mapper.UserCollectionMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.redis.service.RedisService;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,13 +23,14 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
 import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.POLL_SOURCE;
 import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.PULL_SOURCE;
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE;
+import static com.manyun.common.core.constant.BusinessConstants.RedisDict.COLLECTION_AUTO_NUM;
+import static com.manyun.common.core.constant.BusinessConstants.SystemTypeConstant.COLLECTION_POT;
 import static com.manyun.common.core.enums.CollectionLink.NOT_LINK;
 import static com.manyun.common.core.enums.CollectionLink.OK_LINK;
 import static com.manyun.common.core.enums.CommAssetStatus.NOT_EXIST;
@@ -65,6 +65,12 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
 
     @Autowired
     private ObjectFactory<ICollectionService> collectionServiceObjectFactory;
+
+    @Autowired
+    private RedisService redisService;
+
+    @Autowired
+    private ISystemService systemService;
 
     /**
      * 直接上链即可,转让的新增个函数进行处理
@@ -111,8 +117,8 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                     .build(), (hash)->{
                 userCollection.setIsLink(OK_LINK.getCode());
                 userCollection.setRealCompany("蚂蚁链");
-                // 编号特殊生成
-                userCollection.setCollectionNumber(StrUtil.format("CNT_{}",RandomUtil.randomNumbers(6)));
+                // 编号特殊生成 借助 redis 原子性操作
+                userCollection.setCollectionNumber(StrUtil.format("CNT_{}",autoCollectionNum()));
                 //userCollection.setLinkAddr(hash);
                 userCollection.setCollectionHash(hash);
                 userCollection.updateD(userCollection.getUserId());
@@ -121,6 +127,12 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         }
     }
 
+    @Override
+    public String autoCollectionNum() {
+        String intAutoNum = redisService.getIntAutoNum(COLLECTION_AUTO_NUM).toString();
+        String poiLent = systemService.getVal(COLLECTION_POT, String.class);
+      return  poiLent.substring(0, poiLent.length() - intAutoNum.length()).concat(intAutoNum);
+    }
 
 
     /**
@@ -155,7 +167,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
            userCollection.setIsLink(OK_LINK.getCode());
            userCollection.setRealCompany("蚂蚁链");
            // 编号特殊生成
-           userCollection.setCollectionNumber(StrUtil.format("CNT_{}", IdUtil.nanoId()));
+           userCollection.setCollectionNumber(StrUtil.format("CNT_{}", autoCollectionNum()));
           // userCollection.setLinkAddr(hash);
            userCollection.setCollectionHash(hash);
            userCollection.updateD(userCollection.getUserId());
@@ -280,7 +292,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                     userCollection.setIsLink(OK_LINK.getCode());
                     userCollection.setRealCompany("蚂蚁链");
                     // 编号特殊生成
-                    userCollection.setCollectionNumber(StrUtil.format("CNT_{}",RandomUtil.randomNumbers(6)));
+                    userCollection.setCollectionNumber(StrUtil.format("CNT_{}",autoCollectionNum()));
                     //userCollection.setLinkAddr(hash);
                     userCollection.setCollectionHash(hash);
                     userCollection.updateD(userCollection.getUserId());

@@ -62,6 +62,14 @@ public class RedisService
     }
 
     /**
+     * 递增整数
+     */
+    public  Long getIntAutoNum(String key){
+            // 存在就递增
+          return   redisTemplate.opsForValue().increment(key);
+    }
+
+    /**
      * 设置有效时间
      *
      * @param key Redis键

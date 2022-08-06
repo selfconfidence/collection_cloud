@@ -240,7 +240,7 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
             userCollection.setIsLink(OK_LINK.getCode());
             userCollection.setRealCompany("蚂蚁链");
             // 编号特殊生成
-            userCollection.setCollectionNumber(StrUtil.format("CNT_{}",IdUtil.nanoId()));
+            userCollection.setCollectionNumber(StrUtil.format("CNT_{}",userCollectionService.autoCollectionNum()));
             userCollection.setCollectionHash(hash);
             userCollection.updateD(userCollection.getUserId());
             userCollectionService.updateById(userCollection);
