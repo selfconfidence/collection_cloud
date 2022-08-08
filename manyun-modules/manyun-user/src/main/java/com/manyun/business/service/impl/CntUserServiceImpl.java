@@ -365,7 +365,8 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
             // 2. 初始化并的改变大小
             // 将二维码保存到本地
             // 3. 画二维码
-            PosterUtil.drawImage(bufferedImage, qrCode, 300, 300, (int) Math.round(width*0.37), (int) Math.round(height*0.75));
+            //PosterUtil.drawImage(bufferedImage, qrCode, 300, 300, (int) Math.round(width*0.37), (int) Math.round(height*0.75));
+            PosterUtil.drawImage(bufferedImage, qrCode, 300, 300, (int) Math.round(width/2 - 300/2), (int) Math.round(height*0.75));
 
             // 海报 保存到本地/var/opt/  线上使用 "d:\\upload\\"
             String linuxPath = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.LOCAL_PATH, SecurityConstants.INNER).getData();
