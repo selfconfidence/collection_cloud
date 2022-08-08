@@ -35,6 +35,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="collectionName != null  and collectionName != ''"> and collection_name like concat('%', #{collectionName}, '%')</if>
             <if test="statusBy != null "> and status_by = #{statusBy}</if>
         </where>
+        order by created_time desc
     </select>
 
     <select id="selectCntCollectionDetailsById" resultType="com.manyun.admin.domain.vo.CntCollectionDetailsVo">

@@ -18,4 +18,7 @@ public class AuctionCollectionAllVo implements Serializable {
 
     @ApiModelProperty("藏品拍卖相关信息")
     private AuctionVo auctionVo;
+
+    @ApiModelProperty("藏品编号;购买后")
+    private String collectionNumber;
 }

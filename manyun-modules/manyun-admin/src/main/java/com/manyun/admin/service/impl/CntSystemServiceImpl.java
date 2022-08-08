@@ -1,16 +1,19 @@
 package com.manyun.admin.service.impl;
 
 import java.util.List;
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.github.pagehelper.PageHelper;
+import com.manyun.admin.domain.CntUser;
+import com.manyun.admin.domain.dto.PosterDto;
 import com.manyun.admin.domain.query.SystemQuery;
 import com.manyun.admin.domain.vo.CntSystemVo;
+import com.manyun.admin.service.ICntUserService;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.enums.CntSystemEnum;
 import com.manyun.common.core.utils.DateUtils;
-import com.manyun.common.core.utils.uuid.IdUtils;
+import com.manyun.common.core.utils.bean.BeanUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
@@ -21,6 +24,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.admin.mapper.CntSystemMapper;
 import com.manyun.admin.domain.CntSystem;
 import com.manyun.admin.service.ICntSystemService;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 平台规则Service业务层处理
@@ -33,6 +37,9 @@ public class CntSystemServiceImpl extends ServiceImpl<CntSystemMapper,CntSystem>
 {
     @Autowired
     private CntSystemMapper cntSystemMapper;
+
+    @Autowired
+    private ICntUserService userService;
 
     /**
      * 查询平台规则详情
@@ -81,6 +88,38 @@ public class CntSystemServiceImpl extends ServiceImpl<CntSystemMapper,CntSystem>
         cntSystem.setUpdatedBy(SecurityUtils.getUsername());
         cntSystem.setUpdatedTime(DateUtils.getNowDate());
         return updateById(cntSystem)==true?1:0;
+    }
+
+    /**
+     * 更新邀请海报
+     * @param posterDto
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int updatePoster(PosterDto posterDto) {
+        CntSystem cntSystem = Builder.of(CntSystem::new).
+                with(CntSystem::setSystemVal,posterDto.getSystemVal()).
+                with(CntSystem::setCreatedBy,SecurityUtils.getUsername()).
+                with(CntSystem::setCreatedTime,DateUtils.getNowDate()).build();
+        if(!update(cntSystem,Wrappers.<CntSystem>lambdaUpdate().eq(CntSystem::getSystemType, CntSystemEnum.EVENT_POSTER))){
+            return 0;
+        }
+        return userService.update(Builder.of(CntUser::new)
+                .with(CntUser::setInviteUrl,"")
+                .with(CntUser::setUpdatedBy,SecurityUtils.getUsername())
+                .with(CntUser::setUpdatedTime,DateUtils.getNowDate()).build(),Wrappers.<CntUser>lambdaUpdate())==true?1:0;
+    }
+
+    /**
+     * 查询邀请海报详情
+     */
+    @Override
+    public PosterDto queryPosterInfo() {
+        PosterDto posterDto=Builder.of(PosterDto::new).build();
+        CntSystem cntSystem = getOne(Wrappers.<CntSystem>lambdaQuery().eq(CntSystem::getSystemType, CntSystemEnum.EVENT_POSTER));
+        BeanUtils.copyProperties(cntSystem,posterDto);
+        return posterDto;
     }
 
 }

@@ -35,7 +35,7 @@ public class CntBanner implements Serializable
     @ApiModelProperty("轮播类型;1=首页轮播,2=竞拍轮播")
     private Integer bannerType;
 
-    @ApiModelProperty("跳转链接")
+    @ApiModelProperty("跳转链接 QUICK_VIEW 跳转拍卖中心,BANNER_VIEW 查询轮播简介,BOX_VIEW 跳转邀请好友得盲盒")
     private String jumpLink;
 
     @ApiModelProperty("创建人")

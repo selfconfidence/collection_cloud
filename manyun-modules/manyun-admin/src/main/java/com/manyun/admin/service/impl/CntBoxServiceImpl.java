@@ -112,7 +112,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         String info = StrUtil.format("盲盒名称为:{}已存在!", cntBoxAlterVo.getBoxTitle());
         Assert.isFalse(boxList.size()>0,info);
         //校验
-        R check = check(cntBoxAlterVo.getPostTime(), cntBoxAlterVo.getPublishTime(),boxAlterCombineDto.getCntLableAlterVo());
+        R check = check(cntBoxAlterVo,boxAlterCombineDto.getCntLableAlterVo());
         if(200!=check.getCode()){
             return R.fail(check.getCode(),check.getMsg());
         }
@@ -178,7 +178,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         String info = StrUtil.format("盲盒名称为:{}已存在!", boxAlterVo.getBoxTitle());
         Assert.isFalse(boxList.size()>0,info);
         //校验
-        R check = check(boxAlterVo.getPostTime(), boxAlterVo.getPublishTime(),boxAlterCombineDto.getCntLableAlterVo());
+        R check = check(boxAlterVo,boxAlterCombineDto.getCntLableAlterVo());
         if(200!=check.getCode()){
             return R.fail(check.getCode(),check.getMsg());
         }
@@ -238,8 +238,10 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         return R.ok();
     }
 
-    public R check(Integer postTime, Date publishTime, CntLableAlterVo lableAlterVo){
+    public R check(CntBoxAlterVo boxAlterVo, CntLableAlterVo lableAlterVo){
         //验证提前购分钟是否在范围内
+        Integer postTime = boxAlterVo.getPostTime();
+        Date publishTime = boxAlterVo.getPublishTime();
         if(postTime!=null){
             if(postTime<10 || postTime>1000){
                 return R.fail("提前购时间请输入大于等于10,小于1000的整数!");
@@ -256,6 +258,14 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         if(Objects.nonNull(lableAlterVo)){
             if(lableAlterVo.getLableIds().length>3){
                 return R.fail("藏品标签最多可选中三个!");
+            }
+        }
+        //验证流通数量不能大于发售数量
+        Integer balance = boxAlterVo.getBalance();
+        Integer selfBalance = boxAlterVo.getSelfBalance();
+        if(balance!=null && selfBalance!=null){
+            if(selfBalance>balance){
+                return R.fail("流通数量不能大于发售数量!");
             }
         }
         return R.ok();
@@ -288,9 +298,11 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
      * 查询盲盒订单列表
      */
     @Override
-    public List<CntBoxOrderVo> boxOrderList(OrderQuery orderQuery)
+    public TableDataInfo<CntBoxOrderVo> boxOrderList(OrderQuery orderQuery)
     {
-        return cntBoxMapper.boxOrderList(orderQuery);
+        PageHelper.startPage(orderQuery.getPageNum(),orderQuery.getPageSize());
+        List<CntBoxOrderVo> cntBoxOrderVos = cntBoxMapper.boxOrderList(orderQuery);
+        return TableDataInfoUtil.pageTableDataInfo(cntBoxOrderVos,cntBoxOrderVos);
     }
 
 }

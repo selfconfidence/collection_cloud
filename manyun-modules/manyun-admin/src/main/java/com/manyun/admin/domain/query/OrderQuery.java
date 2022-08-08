@@ -1,5 +1,6 @@
 package com.manyun.admin.domain.query;
 
+import com.manyun.common.core.web.page.PageQuery;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -7,7 +8,7 @@ import lombok.Data;
 
 @ApiModel("订单条件查询对象")
 @Data
-public class OrderQuery
+public class OrderQuery extends PageQuery
 {
 
     @ApiModelProperty("订单号")

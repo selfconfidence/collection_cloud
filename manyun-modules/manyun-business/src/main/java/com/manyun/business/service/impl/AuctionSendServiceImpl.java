@@ -246,9 +246,11 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
     public AuctionCollectionAllVo auctionCollectionInfo(String collectionId, String auctionSendId) {
         //点击详情，判断时间，修改状态
         checkStatus(auctionSendId);
+        AuctionSend auctionSend = getById(auctionSendId);
         AuctionCollectionAllVo auctionCollectionAllVo = Builder.of(AuctionCollectionAllVo::new)
                 .with(AuctionCollectionAllVo::setCollectionVo, collectionService.getBaseCollectionVo(collectionId))
                 .with(AuctionCollectionAllVo::setCollectionInfoVo,providerCollectionInfoVo(collectionId))
+                .with(AuctionCollectionAllVo::setCollectionNumber,userCollectionService.getById(auctionSend.getMyGoodsId()).getCollectionNumber())
                 .with(AuctionCollectionAllVo::setAuctionVo,providerAuctionCollectionVo(auctionSendId)).build();
 
         return auctionCollectionAllVo;

@@ -1,8 +1,5 @@
 package com.manyun.admin.controller;
 
-import java.util.List;
-import java.io.IOException;
-import javax.servlet.http.HttpServletResponse;
 
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.PageQuery;
@@ -19,12 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
-import com.manyun.common.security.annotation.RequiresPermissions;
 import com.manyun.admin.domain.CntAgreement;
 import com.manyun.admin.service.ICntAgreementService;
 import com.manyun.common.core.web.controller.BaseController;
-import com.manyun.common.core.web.domain.AjaxResult;
-import com.manyun.common.core.utils.poi.ExcelUtil;
 import com.manyun.common.core.web.page.TableDataInfo;
 
 @RestController
@@ -77,4 +71,12 @@ public class CntAgreementController extends BaseController
     {
         return toResult(cntAgreementService.deleteCntAgreementByIds(ids));
     }
+
+    @PostMapping(value = "/{agreementType}")
+    @ApiOperation(value = "根据类型查询协议详情",notes = "(type = 1 用户协议，type = 2 关于我们,type = 3 隐私协议)")
+    public R<CntAgreement> getInfoByType(@PathVariable("agreementType") String agreementType)
+    {
+        return R.ok(cntAgreementService.getInfoByType(agreementType));
+    }
+
 }

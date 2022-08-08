@@ -10,10 +10,7 @@ import com.manyun.admin.domain.dto.MyCollectionDto;
 import com.manyun.admin.domain.dto.MyOrderDto;
 import com.manyun.admin.domain.dto.UpdateBalanceDto;
 import com.manyun.admin.domain.query.UserMoneyQuery;
-import com.manyun.admin.domain.vo.CntOrderVo;
-import com.manyun.admin.domain.vo.UserBoxVo;
-import com.manyun.admin.domain.vo.UserCollectionVo;
-import com.manyun.admin.domain.vo.UserMoneyVo;
+import com.manyun.admin.domain.vo.*;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.TableDataInfo;
 
@@ -45,12 +42,12 @@ public interface ICntUserService extends IService<CntUser>
     /**
      * 我的订单
      */
-    List<CntOrderVo> myOrderList(MyOrderDto orderDto);
+    TableDataInfo<CntOrderVo> myOrderList(MyOrderDto orderDto);
 
     /**
      * 我的藏品
      */
-    List<UserCollectionVo> myCollectionList(MyCollectionDto collectionDto);
+    TableDataInfo<UserCollectionVo> myCollectionList(MyCollectionDto collectionDto);
 
     /**
      * 修改余额
@@ -60,5 +57,10 @@ public interface ICntUserService extends IService<CntUser>
     /**
      * 我的盲盒
      */
-    List<UserBoxVo> myBoxList(MyBoxDto boxDto);
+    TableDataInfo<UserBoxVo> myBoxList(MyBoxDto boxDto);
+
+    /***
+     * 查询近七日每日新增数
+     */
+    List<UserAddStatisticsVo> userAddStatistics();
 }

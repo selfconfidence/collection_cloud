@@ -5,6 +5,7 @@ import com.manyun.admin.domain.vo.MyChainxVo;
 import com.manyun.admin.service.MyChainxSystemService;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
+import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -30,11 +31,9 @@ public class MyChainxSystemController extends BaseController {
 
     @GetMapping("/list")
     @ApiOperation("查询重试上链列表")
-    public TableDataInfo<MyChainxVo> list()
+    public TableDataInfo<MyChainxVo> list(PageQuery pageQuery)
     {
-        startPage();
-        List<MyChainxVo> list = chainxSystemService.list();
-        return getDataTable(list);
+        return chainxSystemService.list(pageQuery);
     }
 
     @PutMapping

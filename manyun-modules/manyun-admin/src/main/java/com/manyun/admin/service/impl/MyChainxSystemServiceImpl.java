@@ -1,6 +1,7 @@
 package com.manyun.admin.service.impl;
 
 
+import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.dto.MyChainxDto;
 import com.manyun.admin.domain.vo.MyChainxVo;
 import com.manyun.admin.service.ICntMediaService;
@@ -9,6 +10,9 @@ import com.manyun.admin.service.MyChainxSystemService;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,11 +42,13 @@ public class MyChainxSystemServiceImpl  implements  MyChainxSystemService
      * 查询重试上链藏品列表
      */
     @Override
-    public List<MyChainxVo> list() {
-        return userCollectionService.myChainxList().stream().map(m->{
+    public TableDataInfo<MyChainxVo> list(PageQuery pageQuery) {
+        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
+        List<MyChainxVo> myChainxVos = userCollectionService.myChainxList();
+        return TableDataInfoUtil.pageTableDataInfo(myChainxVos.stream().map(m->{
             m.setMediaVos(mediaService.initMediaVos(m.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
             return m;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()),myChainxVos);
     }
 
     /**

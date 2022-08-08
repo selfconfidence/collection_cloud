@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntPleaseBoxMapper">
+
+    <resultMap type="CntPleaseBox" id="CntPleaseBoxResult">
+        <result property="id"    column="id"    />
+        <result property="pleaseNumber"    column="please_number"    />
+        <result property="boxId"    column="box_id"    />
+        <result property="selfBalance"    column="self_balance"    />
+        <result property="balance"    column="balance"    />
+        <result property="isUse"    column="is_use"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCntPleaseBoxVo">
+        select id, please_number, box_id, self_balance, balance, is_use, created_by, created_time, updated_by, updated_time from cnt_please_box
+    </sql>
+
+    <select id="selectCntPleaseBoxList" parameterType="PleaseBoxQuery" resultType="com.manyun.admin.domain.vo.CntPleaseBoxVo">
+        select
+            pb.id,
+            pb.please_number pleaseNumber,
+            b.box_title boxTitle,
+            pb.self_balance selfBalance,
+            pb.balance balance,
+            pb.is_use isUse,
+            pb.created_time createdTime,
+            pb.updated_time updatedTime
+        from
+            cnt_please_box pb
+        left join
+            cnt_box b
+        on pb.box_id=b.id
+        <where>
+            <if test="boxTitle != null  and boxTitle != ''"> and b.box_title like concat('%', #{boxTitle}, '%')</if>
+            <if test="isUse != null "> and pb.is_use = #{isUse}</if>
+        </where>
+        order by pb.created_time desc
+    </select>
+
+</mapper>

@@ -3,6 +3,8 @@ package com.manyun.admin.service;
 import com.manyun.admin.domain.dto.MyChainxDto;
 import com.manyun.admin.domain.vo.MyChainxVo;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.core.web.page.TableDataInfo;
 
 import java.util.List;
 
@@ -17,7 +19,7 @@ public interface MyChainxSystemService {
     /**
      * 查询重试上链藏品列表
      */
-    public List<MyChainxVo> list();
+    public TableDataInfo<MyChainxVo> list(PageQuery pageQuery);
 
     /**
      * 重新上链

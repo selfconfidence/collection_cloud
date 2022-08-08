@@ -35,6 +35,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="statusBy != null "> and status_by = #{statusBy}</if>
             <if test="publishTime != null "> and publish_time = #{publishTime}</if>
         </where>
+        order by created_time desc
     </select>
 
     <select id="boxOrderList" parameterType="OrderQuery" resultType="com.manyun.admin.domain.vo.CntBoxOrderVo">
@@ -58,6 +59,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <if test="orderNo != null  and orderNo != ''"> and o.order_no = #{orderNo}</if>
         <if test="userId != null  and userId != ''"> and o.user_id = #{userId}</if>
         <if test="orderStatus != null "> and o.order_status = #{orderStatus}</if>
+        order by b.created_time desc
     </select>
 
 </mapper>
