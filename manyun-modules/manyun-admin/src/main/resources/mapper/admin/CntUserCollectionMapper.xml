@@ -49,6 +49,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             cuc.user_id=cu.user_id
         where
             cuc.user_id=#{userid}
+            order by cuc.created_time desc
     </select>
 
     <select id="myChainxList" resultType="com.manyun.admin.domain.vo.MyChainxVo">
@@ -69,6 +70,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             cuc.user_id=cu.user_id
         where
             cuc.is_link=1
+            order by cuc.created_time desc
     </select>
 
 </mapper>

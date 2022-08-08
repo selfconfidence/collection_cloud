@@ -62,4 +62,11 @@ public interface ICntAgreementService extends IService<CntAgreement>
      * @return 结果
      */
     public int deleteCntAgreementById(String id);
+
+    /**
+     * 根据类型查询协议详情
+     * @param agreementType
+     * @return
+     */
+    public CntAgreement getInfoByType(String agreementType);
 }

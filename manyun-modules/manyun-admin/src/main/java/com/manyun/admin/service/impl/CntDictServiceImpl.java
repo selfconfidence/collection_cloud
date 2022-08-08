@@ -58,10 +58,22 @@ public class CntDictServiceImpl implements CntDictService
     @Override
     public R collectionDict()
     {
-        return R.ok(collectionService.list().stream().map(m ->{
+        return R.ok(collectionService.list(Wrappers.<CntCollection>lambdaQuery().orderByDesc(CntCollection::getCreatedTime)).stream().map(m ->{
             CntCollectionDictVo cntCollectionDictVo=new CntCollectionDictVo();
             BeanUtil.copyProperties(m,cntCollectionDictVo);
             return cntCollectionDictVo;
+        }).collect(Collectors.toList()));
+    }
+
+    /***
+     * 查询盲盒字典
+     */
+    @Override
+    public R boxDict() {
+        return R.ok(boxService.list(Wrappers.<CntBox>lambdaQuery().orderByDesc(CntBox::getCreatedTime)).stream().map(m ->{
+            CntBoxDictVo boxDictVo=new CntBoxDictVo();
+            BeanUtil.copyProperties(m,boxDictVo);
+            return boxDictVo;
         }).collect(Collectors.toList()));
     }
 
@@ -72,7 +84,7 @@ public class CntDictServiceImpl implements CntDictService
     @Override
     public R collectionCateDict()
     {
-        return R.ok(cateService.list(Wrappers.<CntCate>lambdaQuery().eq(CntCate::getCateType,Long.valueOf(CateType.COLLECTION_CATE.getCode()))).stream().map(m ->{
+        return R.ok(cateService.list(Wrappers.<CntCate>lambdaQuery().eq(CntCate::getCateType,Long.valueOf(CateType.COLLECTION_CATE.getCode())).orderByDesc(CntCate::getCreatedTime)).stream().map(m ->{
             CollectionCateDictVo collectionCateDictVo=new CollectionCateDictVo();
             BeanUtil.copyProperties(m,collectionCateDictVo);
             return collectionCateDictVo;
@@ -85,7 +97,7 @@ public class CntDictServiceImpl implements CntDictService
     @Override
     public R creationdDict()
     {
-        return R.ok(creationdService.list().stream().map(m ->{
+        return R.ok(creationdService.list(Wrappers.<CnfCreationd>lambdaQuery().orderByDesc(CnfCreationd::getCreatedTime)).stream().map(m ->{
             CreationdDictVo creationdDictVo=new CreationdDictVo();
             BeanUtil.copyProperties(m,creationdDictVo);
             return creationdDictVo;
@@ -98,7 +110,7 @@ public class CntDictServiceImpl implements CntDictService
     @Override
     public R lableDict()
     {
-        return R.ok(lableService.list().stream().map(m ->{
+        return R.ok(lableService.list(Wrappers.<CntLable>lambdaQuery().orderByDesc(CntLable::getCreatedTime)).stream().map(m ->{
             LableDictVo lableDictVo=new LableDictVo();
             BeanUtil.copyProperties(m,lableDictVo);
             return lableDictVo;
@@ -113,7 +125,7 @@ public class CntDictServiceImpl implements CntDictService
     {
         List<CustomerServiceDictVo> customerServiceDictVos=new ArrayList<>();
         customerServiceDictVos.add(Builder.of(CustomerServiceDictVo::new).with(CustomerServiceDictVo::setId,0).with(CustomerServiceDictVo::setMenuName,"父菜单").build());
-        customerServiceDictVos.addAll(customerServiceService.list(Wrappers.<CntCustomerService>lambdaQuery().eq(CntCustomerService::getMenuStatus,"0").eq(CntCustomerService::getParentId,0)).stream().map(m ->{
+        customerServiceDictVos.addAll(customerServiceService.list(Wrappers.<CntCustomerService>lambdaQuery().eq(CntCustomerService::getMenuStatus,"0").eq(CntCustomerService::getParentId,0).orderByDesc(CntCustomerService::getCreateTime)).stream().map(m ->{
             CustomerServiceDictVo customerServiceDictVo=new CustomerServiceDictVo();
             BeanUtil.copyProperties(m,customerServiceDictVo);
             return customerServiceDictVo;
@@ -127,7 +139,7 @@ public class CntDictServiceImpl implements CntDictService
     @Override
     public R drawRulesDict(DrawRulesDictQuery drawRulesDictQuery)
     {
-        return R.ok(cntTarService.list(Wrappers.<CntTar>lambdaQuery().eq(CntTar::getTarType,drawRulesDictQuery.getTarType())).stream().map(m->{
+        return R.ok(cntTarService.list(Wrappers.<CntTar>lambdaQuery().eq(CntTar::getTarType,drawRulesDictQuery.getTarType()).orderByDesc(CntTar::getCreatedTime)).stream().map(m->{
             DrawRulesDictVo drawRulesDictVo=new DrawRulesDictVo();
             BeanUtil.copyProperties(m,drawRulesDictVo);
             return drawRulesDictVo;
@@ -144,7 +156,7 @@ public class CntDictServiceImpl implements CntDictService
                 .list(
                         Wrappers.<CntCollection>lambdaQuery()
                                 .gt(CntCollection::getPublishTime, new Date())
-                                .isNotNull(CntCollection::getPostTime)).stream().map(m -> {
+                                .isNotNull(CntCollection::getPostTime).orderByDesc(CntCollection::getCreatedTime)).stream().map(m -> {
                     TqgGoodsDictVo tqgGoodsDictVo = new TqgGoodsDictVo();
                     tqgGoodsDictVo.setId(m.getId());
                     tqgGoodsDictVo.setBuiName(m.getCollectionName());
@@ -154,7 +166,7 @@ public class CntDictServiceImpl implements CntDictService
                 .list(
                         Wrappers.<CntBox>lambdaQuery()
                                 .gt(CntBox::getPublishTime, new Date())
-                                .isNotNull(CntBox::getPostTime)).stream().map(m -> {
+                                .isNotNull(CntBox::getPostTime).orderByDesc(CntBox::getCreatedTime)).stream().map(m -> {
                     TqgGoodsDictVo tqgGoodsDictVo = new TqgGoodsDictVo();
                     tqgGoodsDictVo.setId(m.getId());
                     tqgGoodsDictVo.setBuiName(m.getBoxTitle());
@@ -169,14 +181,14 @@ public class CntDictServiceImpl implements CntDictService
     @Override
     public R postExistDict() {
         List<TqgGoodsDictVo> tqgGoodsDictVos = collectionService
-                .list().stream().map(m -> {
+                .list(Wrappers.<CntCollection>lambdaQuery().orderByDesc(CntCollection::getCreatedTime)).stream().map(m -> {
                     TqgGoodsDictVo tqgGoodsDictVo = new TqgGoodsDictVo();
                     tqgGoodsDictVo.setId(m.getId());
                     tqgGoodsDictVo.setBuiName(m.getCollectionName());
                     return tqgGoodsDictVo;
                 }).collect(Collectors.toList());
         tqgGoodsDictVos.addAll(boxService
-                .list().stream().map(m -> {
+                .list(Wrappers.<CntBox>lambdaQuery().orderByDesc(CntBox::getCreatedTime)).stream().map(m -> {
                     TqgGoodsDictVo tqgGoodsDictVo = new TqgGoodsDictVo();
                     tqgGoodsDictVo.setId(m.getId());
                     tqgGoodsDictVo.setBuiName(m.getBoxTitle());
@@ -190,7 +202,7 @@ public class CntDictServiceImpl implements CntDictService
      */
     @Override
     public R actionTarDict(ActionTarDictQuery tarDictQuery) {
-        return R.ok(collectionService.list(Wrappers.<CntCollection>lambdaQuery().ne(CntCollection::getId,tarDictQuery.getCollectionId())).parallelStream().map(m ->{
+        return R.ok(collectionService.list(Wrappers.<CntCollection>lambdaQuery().ne(CntCollection::getId,tarDictQuery.getCollectionId()).orderByDesc(CntCollection::getCreatedTime)).parallelStream().map(m ->{
             CntCollectionDictVo cntCollectionDictVo=new CntCollectionDictVo();
             BeanUtil.copyProperties(m,cntCollectionDictVo);
             return cntCollectionDictVo;

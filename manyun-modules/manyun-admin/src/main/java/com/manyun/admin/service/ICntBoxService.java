@@ -64,6 +64,6 @@ public interface ICntBoxService extends IService<CntBox>
     /**
      * 查询盲盒订单列表
      */
-    List<CntBoxOrderVo> boxOrderList(OrderQuery orderQuery);
+    TableDataInfo<CntBoxOrderVo> boxOrderList(OrderQuery orderQuery);
 
 }

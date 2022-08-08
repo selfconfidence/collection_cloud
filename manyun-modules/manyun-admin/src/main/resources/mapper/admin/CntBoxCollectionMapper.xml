@@ -27,6 +27,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <where>
             <if test="boxId != null  and boxId != ''"> and box_id = #{boxId}</if>
         </where>
+        order by created_time desc
     </select>
 
 </mapper>

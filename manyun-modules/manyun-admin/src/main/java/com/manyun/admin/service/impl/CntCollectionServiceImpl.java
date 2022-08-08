@@ -119,7 +119,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         String info = StrUtil.format("藏品名称为:{}已存在!", collectionAlterVo.getCollectionName());
         Assert.isFalse(cntCollectionList.size()>0,info);
         //校验
-        R check = check(collectionAlterVo.getPostTime(), collectionAlterVo.getPublishTime(),collectionAlterCombineDto.getCntLableAlterVo());
+        R check = check(collectionAlterVo,collectionAlterCombineDto.getCntLableAlterVo());
         if(200!=check.getCode()){
             return R.fail(check.getCode(),check.getMsg());
         }
@@ -195,7 +195,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         String info = StrUtil.format("藏品名称为:{}已存在!", collectionAlterVo.getCollectionName());
         Assert.isFalse(cntCollectionList.size()>0,info);
         //校验
-        R check = check(collectionAlterVo.getPostTime(), collectionAlterVo.getPublishTime(),collectionAlterCombineDto.getCntLableAlterVo());
+        R check = check(collectionAlterVo,collectionAlterCombineDto.getCntLableAlterVo());
         if(200!=check.getCode()){
             return R.fail(check.getCode(),check.getMsg());
         }
@@ -279,8 +279,10 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         return R.ok();
     }
 
-    public R check(Integer postTime, Date publishTime,CntLableAlterVo lableAlterVo){
+    public R check(CntCollectionAlterVo collectionAlterVo,CntLableAlterVo lableAlterVo){
         //验证提前购分钟是否在范围内
+        Integer postTime = collectionAlterVo.getPostTime();
+        Date publishTime = collectionAlterVo.getPublishTime();
         if(postTime!=null){
             if(postTime<10 || postTime>1000){
                 return R.fail("提前购时间请输入大于等于10,小于1000的整数!");
@@ -297,6 +299,14 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         if(Objects.nonNull(lableAlterVo)){
             if(lableAlterVo.getLableIds().length>3){
                 return R.fail("藏品标签最多可选中三个!");
+            }
+        }
+        //验证流通数量不能大于发售数量
+        Integer balance = collectionAlterVo.getBalance();
+        Integer selfBalance = collectionAlterVo.getSelfBalance();
+        if(balance!=null && selfBalance!=null){
+            if(selfBalance>balance){
+                return R.fail("流通数量不能大于发售数量!");
             }
         }
         return R.ok();

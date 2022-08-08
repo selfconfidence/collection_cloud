@@ -1,8 +1,12 @@
 package com.manyun.admin.service.impl;
 
+import java.nio.file.Watchable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
+import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.manyun.common.core.utils.DateUtils;
@@ -64,6 +68,8 @@ public class CntAgreementServiceImpl extends ServiceImpl<CntAgreementMapper,CntA
     @Override
     public int insertCntAgreement(CntAgreement cntAgreement)
     {
+        CntAgreement agreement = getOne(Wrappers.<CntAgreement>lambdaQuery().eq(CntAgreement::getAgreementType, cntAgreement.getAgreementType()));
+        Assert.isFalse(Objects.nonNull(agreement),"该协议类型已存在,请在现有数据中维护!");
         cntAgreement.setId(IdUtils.getSnowflakeNextIdStr());
         cntAgreement.setCreatedBy(SecurityUtils.getUsername());
         cntAgreement.setCreatedTime(DateUtils.getNowDate());
@@ -79,6 +85,8 @@ public class CntAgreementServiceImpl extends ServiceImpl<CntAgreementMapper,CntA
     @Override
     public int updateCntAgreement(CntAgreement cntAgreement)
     {
+        CntAgreement agreement = getOne(Wrappers.<CntAgreement>lambdaQuery().eq(CntAgreement::getAgreementType, cntAgreement.getAgreementType()).ne(CntAgreement::getId,cntAgreement.getId()));
+        Assert.isFalse(Objects.nonNull(agreement),"该协议类型已存在,请在现有数据中维护!");
         cntAgreement.setUpdatedBy(SecurityUtils.getUsername());
         cntAgreement.setUpdatedTime(DateUtils.getNowDate());
         return updateById(cntAgreement)==true?1:0;
@@ -107,4 +115,15 @@ public class CntAgreementServiceImpl extends ServiceImpl<CntAgreementMapper,CntA
     {
         return removeById(id)==true?1:0;
     }
+
+    /**
+     * 根据类型查询协议详情
+     * @param agreementType
+     * @return
+     */
+    @Override
+    public CntAgreement getInfoByType(String agreementType) {
+        return getOne(Wrappers.<CntAgreement>lambdaQuery().eq(CntAgreement::getAgreementType,agreementType));
+    }
+
 }

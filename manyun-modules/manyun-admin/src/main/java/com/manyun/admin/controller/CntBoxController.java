@@ -84,9 +84,7 @@ public class CntBoxController extends BaseController
     @ApiOperation("盲盒订单列表")
     public TableDataInfo<CntBoxOrderVo> boxOrderList(OrderQuery orderQuery)
     {
-        startPage();
-        List<CntBoxOrderVo> list = cntBoxService.boxOrderList(orderQuery);
-        return getDataTable(list);
+        return cntBoxService.boxOrderList(orderQuery);
     }
 
 }

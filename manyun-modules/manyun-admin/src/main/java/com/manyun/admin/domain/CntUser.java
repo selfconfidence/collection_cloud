@@ -52,6 +52,9 @@ public class CntUser implements Serializable
     @ApiModelProperty("支付密码")
     private String payPass;
 
+    @ApiModelProperty("邀请海报地址")
+    private String inviteUrl;
+
     @ApiModelProperty("创建人")
     private String createdBy;
 
@@ -163,6 +166,14 @@ public class CntUser implements Serializable
 
     public void setPayPass(String payPass) {
         this.payPass = payPass;
+    }
+
+    public String getInviteUrl() {
+        return inviteUrl;
+    }
+
+    public void setInviteUrl(String inviteUrl) {
+        this.inviteUrl = inviteUrl;
     }
 
     public String getCreatedBy() {
