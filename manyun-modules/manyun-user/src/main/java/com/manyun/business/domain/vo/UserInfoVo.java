@@ -37,7 +37,8 @@ public class UserInfoVo  implements Serializable {
     @ApiModelProperty("用户头像")
     private String headImage;
 
-
+    @ApiModelProperty("支付密码")
+    private String payPassword;
 
 
 }
