@@ -130,6 +130,27 @@ public interface BusinessConstants {
          */
         String COLLECTION_POT = "COLLECTION_POT";
 
+
+        /**
+         * 邀请海报链接
+         */
+        String INVITE_URL = "invite_url";
+
+        /**
+         * 注册链接
+         */
+        String REG_URL = "reg_url";
+
+        /**
+         * 网关地址
+         */
+        String GATEWAY_URL = "gateway_url";
+
+        /**
+         * 上传图片本地保存地址
+         */
+        String LOCAL_PATH = "local_path";
+
     }
 
 

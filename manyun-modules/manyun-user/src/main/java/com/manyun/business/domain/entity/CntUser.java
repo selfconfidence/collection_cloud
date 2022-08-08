@@ -63,6 +63,9 @@ public class CntUser implements Serializable {
     @ApiModelProperty("创建人")
     private String createdBy;
 
+    @ApiModelProperty("邀请海报")
+    private String inviteUrl;
+
     @ApiModelProperty("创建时间")
     private LocalDateTime createdTime;
 

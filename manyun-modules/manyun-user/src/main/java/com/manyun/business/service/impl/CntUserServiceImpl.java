@@ -1,11 +1,18 @@
 package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.*;
 import cn.hutool.crypto.SecureUtil;
+import cn.hutool.extra.qrcode.QrCodeUtil;
+import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import com.alibaba.nacos.shaded.com.google.protobuf.Timestamp;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.config.AliRealConfig;
+import com.manyun.business.config.InviteUtil.PosterUtil;
 import com.manyun.business.config.UnionRealConfig;
 import com.manyun.business.domain.form.*;
 import com.manyun.business.domain.vo.UserInfoVo;
@@ -17,21 +24,37 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.business.service.IUserPleaseService;
 import com.manyun.business.domain.entity.CntUser;
 import com.manyun.comm.api.RemoteBuiMoneyService;
+import com.manyun.comm.api.RemoteFileService;
 import com.manyun.comm.api.RemoteSystemService;
+import com.manyun.comm.api.domain.SysFile;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.domain.form.JgLoginTokenForm;
 import com.manyun.comm.api.domain.form.UserRealMoneyForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
+import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.jg.JgAuthLoginUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
+import javax.json.JsonObject;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+
 
 import static com.manyun.common.core.constant.BusinessConstants.SystemTypeConstant.USER_DEFAULT_LINK;
 import static com.manyun.common.core.enums.UserRealStatus.NO_REAL;
@@ -62,6 +85,9 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
 
     @Autowired
     private RemoteSystemService remoteSystemService;
+
+    @Autowired
+    private RemoteFileService fileService;
 
     @Autowired
     private JgAuthLoginUtil jgAuthLoginUtil;
@@ -304,5 +330,74 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         if (StrUtil.isNotBlank(userInfoVo.getPhone()) && userInfoVo.getPhone().length() >= 11)
             userInfoVo.setPhone(DesensitizedUtil.mobilePhone(userInfoVo.getPhone()));
         return userInfoVo;
+    }
+
+    /**
+     * 分享邀请海报
+     * @param userId
+     * @return
+     */
+    @Override
+    public R<String> inviteUser(String userId) {
+        CntUser cntUser = getById(userId);
+        if (StringUtils.isNotBlank(cntUser.getInviteUrl())) {
+            return R.ok(cntUser.getInviteUrl());
+        }
+        //背景，海报图
+        String background = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.INVITE_URL, SecurityConstants.INNER).getData();
+        int width = 0;
+        int height = 0;
+        try {
+            URL backgroundUrl = new URL(background);
+            BufferedImage read = ImageIO.read(backgroundUrl.openStream());
+            width = read.getWidth();
+            height = read.getHeight();
+
+            BufferedImage bufferedImage = PosterUtil.drawInitAndChangeSize(background, backgroundUrl.openConnection().getInputStream(),width, height);
+
+            // 画 二维码 并改变大小
+            // 1. 先 获取二维码(二维码携带一个参数)
+
+            String regUrl = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.REG_URL, SecurityConstants.INNER).getData() + "?" + cntUser.getPleaseCode();
+            // + "?" + cntUser.getPleaseCode()
+            // 生成二维码并指定宽高
+            BufferedImage qrCode = QrCodeUtil.generate(regUrl, 300, 300);
+            // 2. 初始化并的改变大小
+            // 将二维码保存到本地
+            // 3. 画二维码
+            PosterUtil.drawImage(bufferedImage, qrCode, 300, 300, (int) Math.round(width*0.37), (int) Math.round(height*0.75));
+
+            // 海报 保存到本地/var/opt/  线上使用 "d:\\upload\\"
+            String linuxPath = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.LOCAL_PATH, SecurityConstants.INNER).getData();
+            File file1 = new File(linuxPath);
+            if (!file1.exists() && !file1.isDirectory()) {
+                file1.mkdirs();
+            }
+            String localPath = linuxPath + System.currentTimeMillis() + ".png";
+            PosterUtil.save(bufferedImage, "png", localPath);
+            HashMap<String, Object> paramMap = new HashMap<>();
+            File file = FileUtil.file(localPath);
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            paramMap.put("file", file);
+
+            String gatewayUrl = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.GATEWAY_URL, SecurityConstants.INNER).getData();
+
+            String post = HttpUtil.post(gatewayUrl, paramMap);
+            JSONObject responseJson = JSONUtil.toBean(post, JSONObject.class);
+            Object data = responseJson.get("data");
+            file.delete();
+            cntUser.setInviteUrl(data.toString());
+            updateById(cntUser);
+
+            return R.ok(data.toString());
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return R.fail(e.getMessage());
+        }
+
     }
 }

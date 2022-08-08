@@ -213,6 +213,14 @@ public class CntUserController extends BaseController {
     }
 
 
+    @PostMapping("/inviteUser")
+    @ApiOperation(value = "分享邀请海报")
+    public R<String> inviteUser() {
+        String userId = SecurityUtils.getNotNullLoginBusinessUser().getUserId();
+        return userService.inviteUser(userId);
+    }
+
+
 
 
 

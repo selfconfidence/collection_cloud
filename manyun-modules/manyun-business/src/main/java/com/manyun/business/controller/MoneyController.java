@@ -94,8 +94,8 @@ public class MoneyController extends BaseController {
     @PostMapping("/updateUserMoney")
     @ApiOperation(value = "实名认证绑定数据",hidden = true)
     @InnerAuth
-    public void updateUserMoney(@RequestBody UserRealMoneyForm userRealMoneyForm) {
-        moneyService.updateUserMoney(userRealMoneyForm);
+    public R updateUserMoney(@RequestBody UserRealMoneyForm userRealMoneyForm) {
+        return moneyService.updateUserMoney(userRealMoneyForm);
     }
 
 

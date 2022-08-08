@@ -17,12 +17,10 @@ import com.manyun.business.service.ILogsService;
 import com.manyun.business.service.IMoneyService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.comm.api.domain.form.UserRealMoneyForm;
-import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.domain.Builder;
-import com.manyun.common.core.utils.DateUtils;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
-import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -139,7 +137,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
     }
 
     @Override
-    public void updateUserMoney(UserRealMoneyForm userRealMoneyForm) {
+    public R updateUserMoney(UserRealMoneyForm userRealMoneyForm) {
 
         Money moneyUser = getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userRealMoneyForm.getUserId()));
         moneyUser.setCartNo(userRealMoneyForm.getCartNo());
@@ -147,6 +145,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         moneyUser.setBankCart(userRealMoneyForm.getBankcard());
         moneyUser.updateD(userRealMoneyForm.getUserId());
         updateById(moneyUser);
+        return R.ok();
     }
 
 }

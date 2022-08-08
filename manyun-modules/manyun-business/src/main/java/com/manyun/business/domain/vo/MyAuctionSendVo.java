@@ -25,6 +25,9 @@ public class MyAuctionSendVo {
     @ApiModelProperty("商品id")
     private String goodsId;
 
+    @ApiModelProperty("我的藏品id")
+    private String myGoodsId;
+
     @ApiModelProperty("商品名称")
     private String goodsName;
 

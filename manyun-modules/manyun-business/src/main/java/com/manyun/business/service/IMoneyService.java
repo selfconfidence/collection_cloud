@@ -7,6 +7,7 @@ import com.manyun.business.domain.query.MoneyLogQuery;
 import com.manyun.business.domain.vo.AccountInfoVo;
 import com.manyun.business.domain.vo.MoneyLogVo;
 import com.manyun.comm.api.domain.form.UserRealMoneyForm;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.TableDataInfo;
 
 import java.math.BigDecimal;
@@ -31,5 +32,5 @@ public interface IMoneyService extends IService<Money> {
 
     void initUserMoney(String userId);
 
-    void updateUserMoney(UserRealMoneyForm userRealMoneyForm);
+    R updateUserMoney(UserRealMoneyForm userRealMoneyForm);
 }
