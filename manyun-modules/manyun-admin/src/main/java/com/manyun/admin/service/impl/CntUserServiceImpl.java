@@ -9,10 +9,7 @@ import com.manyun.admin.domain.dto.MyCollectionDto;
 import com.manyun.admin.domain.dto.MyOrderDto;
 import com.manyun.admin.domain.dto.UpdateBalanceDto;
 import com.manyun.admin.domain.query.UserMoneyQuery;
-import com.manyun.admin.domain.vo.CntOrderVo;
-import com.manyun.admin.domain.vo.UserBoxVo;
-import com.manyun.admin.domain.vo.UserCollectionVo;
-import com.manyun.admin.domain.vo.UserMoneyVo;
+import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.service.*;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
@@ -89,24 +86,28 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> imple
      * 我的订单
      */
     @Override
-    public List<CntOrderVo> myOrderList(MyOrderDto orderDto)
+    public TableDataInfo<CntOrderVo> myOrderList(MyOrderDto orderDto)
     {
-        return orderService.myOrderList(orderDto.getUserId()).parallelStream().map(m->{
+        PageHelper.startPage(orderDto.getPageNum(),orderDto.getPageSize());
+        List<CntOrderVo> cntOrderVos = orderService.myOrderList(orderDto.getUserId());
+        return TableDataInfoUtil.pageTableDataInfo(cntOrderVos.parallelStream().map(m->{
             m.setMediaVos(mediaService.initMediaVos(m.getBuiId(),m.getGoodsType()==0?BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE:BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
             return m;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()),cntOrderVos);
     }
 
     /**
      * 我的藏品
      */
     @Override
-    public List<UserCollectionVo> myCollectionList(MyCollectionDto collectionDto)
+    public TableDataInfo<UserCollectionVo> myCollectionList(MyCollectionDto collectionDto)
     {
-       return userCollectionService.myCollectionList(collectionDto.getUserId()).parallelStream().map(m->{
-           m.setMediaVos(mediaService.initMediaVos(m.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
-           return m;
-       }).collect(Collectors.toList());
+        PageHelper.startPage(collectionDto.getPageNum(),collectionDto.getPageSize());
+        List<UserCollectionVo> userCollectionVos = userCollectionService.myCollectionList(collectionDto.getUserId());
+        return TableDataInfoUtil.pageTableDataInfo(userCollectionVos.parallelStream().map(m->{
+            m.setMediaVos(mediaService.initMediaVos(m.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
+            return m;
+        }).collect(Collectors.toList()),userCollectionVos);
     }
 
     /**
@@ -115,11 +116,21 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> imple
      * @return
      */
     @Override
-    public List<UserBoxVo> myBoxList(MyBoxDto boxDto) {
-        return userBoxService.myBoxList(boxDto.getUserId()).parallelStream().map(m->{
+    public TableDataInfo<UserBoxVo> myBoxList(MyBoxDto boxDto) {
+        PageHelper.startPage(boxDto.getPageNum(),boxDto.getPageSize());
+        List<UserBoxVo> userBoxVos = userBoxService.myBoxList(boxDto.getUserId());
+        return TableDataInfoUtil.pageTableDataInfo(userBoxVos.parallelStream().map(m->{
             m.setMediaVos(mediaService.initMediaVos(m.getBoxId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
             return m;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()),userBoxVos);
+    }
+
+    /***
+     * 查询近七日每日新增数
+     */
+    @Override
+    public List<UserAddStatisticsVo> userAddStatistics() {
+        return cntUserMapper.userAddStatistics();
     }
 
     /**

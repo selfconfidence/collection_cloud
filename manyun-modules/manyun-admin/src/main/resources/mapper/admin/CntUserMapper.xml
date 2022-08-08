@@ -45,11 +45,36 @@
             m.created_time createdTime
         from
             cnt_user u
-        inner join cnt_money m on u.id = m.user_id
+        left join cnt_money m on u.id = m.user_id
         <where>
             <if test="realName != null  and realName != ''"> and m.real_name like concat('%', #{realName}, '%')</if>
             <if test="phone != null  and phone != ''"> and u.phone = #{phone}</if>
         </where>
+        order by u.created_time desc
+    </select>
+
+    <select id="userAddStatistics" resultType="com.manyun.admin.domain.vo.UserAddStatisticsVo">
+        select
+            a.date,
+            ifnull( b.count, 0 ) as count
+        from
+	    (
+	    select
+		    date_sub( curdate(), interval 6 day ) as date union all
+	    select
+		    date_sub( curdate(), interval 5 day ) as date union all
+	    select
+		    date_sub( curdate(), interval 4 day ) as date union all
+	    select
+		    date_sub( curdate(), interval 3 day ) as date union all
+	    select
+		    date_sub( curdate(), interval 2 day ) as date union all
+	    select
+		    date_sub( curdate(), interval 1 day ) as date union all
+	    select
+		    curdate() as date
+	    ) a
+	    left join ( select date( created_time ) as datetime, count( id ) as count from cnt_user group by date( created_time ) ) b on a.date = b.datetime;
     </select>
 
 </mapper>

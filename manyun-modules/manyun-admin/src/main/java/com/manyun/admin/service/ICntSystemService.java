@@ -1,8 +1,8 @@
 package com.manyun.admin.service;
 
-import java.util.List;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntSystem;
+import com.manyun.admin.domain.dto.PosterDto;
 import com.manyun.admin.domain.query.SystemQuery;
 import com.manyun.admin.domain.vo.CntSystemVo;
 import com.manyun.common.core.web.page.TableDataInfo;
@@ -39,4 +39,15 @@ public interface ICntSystemService extends IService<CntSystem>
      */
     public int updateCntSystem(CntSystemVo cntSystemVo);
 
+    /**
+     * 更新活动海报
+     * @param posterDto
+     * @return
+     */
+    public int updatePoster(PosterDto posterDto);
+
+    /**
+     * 查询活动海报详情
+     */
+    public PosterDto queryPosterInfo();
 }

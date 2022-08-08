@@ -37,6 +37,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <where>
             <if test="publishOther != null  and publishOther != ''"> and ci.publish_other like concat('%', #{publishOther}, '%')</if>
         </where>
+        order by ci.created_time desc
     </select>
 
 </mapper>

@@ -50,25 +50,25 @@ public class CntUserController extends BaseController
         return toResult(cntUserService.updateCntUser(cntUser));
     }
 
-    @PostMapping("/myOrderList")
+    @GetMapping("/myOrderList")
     @ApiOperation("我的订单")
-    public R<List<CntOrderVo>> myOrderList(@RequestBody MyOrderDto orderDto)
+    public TableDataInfo<CntOrderVo> myOrderList(MyOrderDto orderDto)
     {
-        return R.ok(cntUserService.myOrderList(orderDto));
+        return cntUserService.myOrderList(orderDto);
     }
 
-    @PostMapping("/myCollectionList")
+    @GetMapping("/myCollectionList")
     @ApiOperation("我的藏品")
-    public R<List<UserCollectionVo>> myCollectionList(@RequestBody MyCollectionDto collectionDto)
+    public TableDataInfo<UserCollectionVo> myCollectionList(MyCollectionDto collectionDto)
     {
-        return R.ok(cntUserService.myCollectionList(collectionDto));
+        return cntUserService.myCollectionList(collectionDto);
     }
 
-    @PostMapping("/myBoxList")
+    @GetMapping("/myBoxList")
     @ApiOperation("我的盲盒")
-    public R<List<UserBoxVo>> myBoxList(@RequestBody MyBoxDto boxDto)
+    public TableDataInfo<UserBoxVo> myBoxList(MyBoxDto boxDto)
     {
-        return R.ok(cntUserService.myBoxList(boxDto));
+        return cntUserService.myBoxList(boxDto);
     }
 
     @PostMapping("/updateBalance")

@@ -69,6 +69,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="payType != null  and payType != ''"> and o.pay_type = #{payType}</if>
             <if test="createOrderTime != null  and createOrderTime != ''"> and o.created_time = #{createOrderTime}</if>
         </where>
+        order by js.created_time desc
     </select>
 
 </mapper>

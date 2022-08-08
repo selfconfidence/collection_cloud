@@ -21,6 +21,11 @@ public interface CntDictService
     R collectionDict();
 
     /***
+     * 查询盲盒字典
+     */
+    R boxDict();
+
+    /***
      * 查询藏品系列字典
      */
     R collectionCateDict();
@@ -59,4 +64,6 @@ public interface CntDictService
      * 活动合成材料字典
      */
     R actionTarDict(ActionTarDictQuery tarDictQuery);
+
+
 }
