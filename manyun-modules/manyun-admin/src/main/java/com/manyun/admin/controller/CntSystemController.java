@@ -65,20 +65,20 @@ public class CntSystemController extends BaseController
 
 
     /**
-     * 查询活动海报详情
+     * 查询邀请海报详情
      */
     @GetMapping("queryPosterInfo")
-    @ApiOperation("查询活动海报详情")
+    @ApiOperation("查询邀请海报详情")
     public R<PosterDto> queryPosterInfo()
     {
         return R.ok(cntSystemService.queryPosterInfo());
     }
 
     /**
-     * 更新活动海报
+     * 更新邀请海报
      */
     @PostMapping("updatePoster")
-    @ApiOperation("更新活动海报")
+    @ApiOperation("更新邀请海报")
     public R updatePoster(@RequestBody PosterDto posterDto)
     {
         return toResult(cntSystemService.updatePoster(posterDto));

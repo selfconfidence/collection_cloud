@@ -40,14 +40,14 @@ public interface ICntSystemService extends IService<CntSystem>
     public int updateCntSystem(CntSystemVo cntSystemVo);
 
     /**
-     * 更新活动海报
+     * 更新邀请海报
      * @param posterDto
      * @return
      */
     public int updatePoster(PosterDto posterDto);
 
     /**
-     * 查询活动海报详情
+     * 查询邀请海报详情
      */
     public PosterDto queryPosterInfo();
 }
