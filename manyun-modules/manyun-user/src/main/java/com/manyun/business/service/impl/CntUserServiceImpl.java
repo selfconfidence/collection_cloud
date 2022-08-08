@@ -215,6 +215,8 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
      */
     @Override
     public void regUser(UserRegForm userRegForm) {
+        CntUser user = getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPhone, userRegForm.getPhone()));
+        Assert.isTrue(Objects.isNull(user),"您已注册,请登录！");
         CntUser cntUser = Builder.of(CntUser::new).build();
         initUser(cntUser);
         cntUser.setPhone(userRegForm.getPhone());
