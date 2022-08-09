@@ -15,6 +15,7 @@ import com.manyun.business.config.AliRealConfig;
 import com.manyun.business.config.InviteUtil.PosterUtil;
 import com.manyun.business.config.UnionRealConfig;
 import com.manyun.business.domain.form.*;
+import com.manyun.business.domain.vo.InviteUserVo;
 import com.manyun.business.domain.vo.UserInfoVo;
 import com.manyun.business.domain.vo.UserLevelVo;
 import com.manyun.business.domain.vo.UserPleaseBoxVo;
@@ -340,10 +341,13 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
      * @return
      */
     @Override
-    public R<String> inviteUser(String userId) {
+    public R<InviteUserVo> inviteUser(String userId) {
         CntUser cntUser = getById(userId);
+        InviteUserVo inviteUserVo = new InviteUserVo();
+        inviteUserVo.setInviteCode(cntUser.getPleaseCode());
         if (StringUtils.isNotBlank(cntUser.getInviteUrl())) {
-            return R.ok(cntUser.getInviteUrl());
+            inviteUserVo.setInviteUrl(cntUser.getInviteUrl());
+            return R.ok(inviteUserVo);
         }
         //背景，海报图
         String background = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.INVITE_URL, SecurityConstants.INNER).getData();
@@ -393,8 +397,9 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
             file.delete();
             cntUser.setInviteUrl(data.toString());
             updateById(cntUser);
+            inviteUserVo.setInviteUrl(data.toString());
 
-            return R.ok(data.toString());
+            return R.ok(inviteUserVo);
 
 
         } catch (Exception e) {

@@ -3,6 +3,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.manyun.business.domain.entity.CntUser;
 import com.manyun.business.domain.form.*;
+import com.manyun.business.domain.vo.InviteUserVo;
 import com.manyun.business.domain.vo.UserInfoVo;
 import com.manyun.business.domain.vo.UserLevelVo;
 import com.manyun.business.domain.vo.UserPleaseBoxVo;
@@ -215,7 +216,7 @@ public class CntUserController extends BaseController {
 
     @PostMapping("/inviteUser")
     @ApiOperation(value = "分享邀请海报")
-    public R<String> inviteUser() {
+    public R<InviteUserVo> inviteUser() {
         String userId = SecurityUtils.getNotNullLoginBusinessUser().getUserId();
         return userService.inviteUser(userId);
     }
