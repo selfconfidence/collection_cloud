@@ -14,7 +14,7 @@
         <!--基础模块数据支撑-->
         <module>manyun-base</module>
 
-        <module>manyun-demo</module>
+      <!--  <module>manyun-demo</module>-->
         <module>manyun-user</module>
 
     </modules>

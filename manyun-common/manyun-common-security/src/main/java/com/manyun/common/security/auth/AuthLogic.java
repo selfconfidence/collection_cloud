@@ -1,5 +1,6 @@
 package com.manyun.common.security.auth;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -410,6 +411,12 @@ public class AuthLogic
         return authorities.stream().filter(StringUtils::hasText)
                 .anyMatch(x -> ALL_PERMISSION.contains(x) || PatternMatchUtils.simpleMatch(x, permission));
     }
+
+/*
+    public static void main(String[] args) {
+        System.out.println(Arrays.asList("*:*:*").stream().filter(StringUtils::hasText).anyMatch(x -> ALL_PERMISSION.contains(x) || PatternMatchUtils.simpleMatch(x, "system:menu:list")));
+    }
+*/
 
     /**
      * 判断是否包含角色

@@ -55,7 +55,7 @@ public enum  CodeStatus {
          */
         THIS_CARD_ALREADY_USE(412,"该身份证已经被实名"),
         REALNAME_INCORRECT(410,"身份验证失败"),
-        NOT_LOGIN(401, "当前用户未登录"),
+        NOT_LOGIN(700, "当前用户未登录"),
         ADD_NOT_LOGIN(40100, "不能多登录"),
         USER_ALREADY_REG(401, "该用户已经注册"),
         NO_THIS_USER(400, "没有此用户"),
