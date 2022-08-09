@@ -2,6 +2,7 @@ package com.manyun.business.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.form.*;
+import com.manyun.business.domain.vo.InviteUserVo;
 import com.manyun.business.domain.vo.UserInfoVo;
 import com.manyun.business.domain.vo.UserLevelVo;
 import com.manyun.business.domain.vo.UserPleaseBoxVo;
@@ -53,5 +54,5 @@ public interface ICntUserService extends IService<CntUser> {
 
     R userRealName(UserRealForm userRealForm, String userId);
 
-    R<String> inviteUser(String userId);
+    R<InviteUserVo> inviteUser(String userId);
 }

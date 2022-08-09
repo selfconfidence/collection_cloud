@@ -35,15 +35,13 @@ public class AgreementController {
     private IAgreementService agreementService;
 
     @GetMapping("/info/{type}")
-    @ApiOperation(value = "协议等一些信息",notes = "(type = 1 用户协议，type = 2 关于我们,type = 3 隐私协议)")
+    @ApiOperation(value = "协议等一些信息",notes = "(type = 1 用户协议，type = 2 关于我们,type = 3 隐私协议, type = 4,推广规则)")
     public R<AgreementVo> info(@PathVariable Integer type){
         Agreement serviceOne = agreementService.getOne(Wrappers.<Agreement>lambdaQuery().eq(Agreement::getAgreementType, type));
         AgreementVo agreementVo = Builder.of(AgreementVo::new).build();
         BeanUtil.copyProperties(serviceOne,agreementVo);
         return R.ok(agreementVo);
     }
-
-
 
 
 }
