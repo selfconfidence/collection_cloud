@@ -45,6 +45,8 @@ public class ConsignmentCollectionListVo implements Serializable {
     @ApiModelProperty("寄售价格")
     private BigDecimal consignmentPrice;
 
+    @ApiModelProperty("藏品编号|寄售专属")
+    private String collectionNumber;
 
 
 }

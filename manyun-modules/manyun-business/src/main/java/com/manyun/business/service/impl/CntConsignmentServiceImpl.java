@@ -10,10 +10,7 @@ import com.github.pagehelper.PageHelper;
 import com.manyun.business.design.pay.RootPay;
 import com.manyun.business.domain.dto.OrderCreateDto;
 import com.manyun.business.domain.dto.PayInfoDto;
-import com.manyun.business.domain.entity.Box;
-import com.manyun.business.domain.entity.CntCollection;
-import com.manyun.business.domain.entity.CntConsignment;
-import com.manyun.business.domain.entity.Order;
+import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.form.ConsignmentSellForm;
 import com.manyun.business.domain.form.UserConsignmentForm;
 import com.manyun.business.domain.query.ConsignmentOrderQuery;
@@ -397,6 +394,9 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         collectionListVo.setCreatedTime(cntConsignment.getCreatedTime());
         collectionListVo.setConsignmentPrice(cntConsignment.getConsignmentPrice());
         collectionListVo.setServerCharge(cntConsignment.getServerCharge());
+
+        UserCollection userCollection = userCollectionService.getById(cntConsignment.getBuiId());
+        collectionListVo.setCollectionNumber(userCollection.getCollectionNumber());
         // 需要验证订单 才可以拿到此值
         if (LOCK_CONSIGN.getCode().equals(cntConsignment.getConsignmentStatus()) && StrUtil.isNotBlank(cntConsignment.getOrderId())){
             // 订单查询 将剩余支付时间补足即可

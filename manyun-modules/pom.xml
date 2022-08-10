@@ -15,7 +15,7 @@
         <module>manyun-base</module>
 
       <!--  <module>manyun-demo</module>-->
-        <module>manyun-user</module>
+        <module>manyun-business</module>
 
     </modules>
 
