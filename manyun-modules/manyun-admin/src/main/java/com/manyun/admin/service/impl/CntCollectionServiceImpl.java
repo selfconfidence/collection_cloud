@@ -254,7 +254,6 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                     cntCollectionInfo.setPublishOther("");
                     cntCollectionInfo.setPublishAuther("");
                 }
-                cntCollectionInfo.setCustomerTail(collectionInfoAlterVo.getCustomerTail());
                 cntCollectionInfo.setLookInfo(collectionInfoAlterVo.getLookInfo());
                 cntCollectionInfo.setUpdatedBy(SecurityUtils.getUsername());
                 cntCollectionInfo.setUpdatedTime(DateUtils.getNowDate());
