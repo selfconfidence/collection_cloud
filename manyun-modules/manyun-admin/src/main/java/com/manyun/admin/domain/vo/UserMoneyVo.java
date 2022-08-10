@@ -29,12 +29,6 @@ public class UserMoneyVo {
     @ApiModelProperty("真实姓名")
     private String realName;
 
-    @ApiModelProperty("身份证正面图片链接")
-    private String cartJust;
-
-    @ApiModelProperty("身份证反面图片链接")
-    private String cartBack;
-
     @ApiModelProperty("银行类型")
     private String bankName;
 

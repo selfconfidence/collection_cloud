@@ -48,7 +48,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	    inner join
 	        cnt_user cu
 	    on
-	        co.user_id = cu.user_id
+	        co.user_id = cu.id
 	    where
 	        co.user_id=#{userid}
 	    order by co.created_time desc

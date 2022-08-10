@@ -50,10 +50,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             cnt_consignment js
         left join
             cnt_user cs
-        on js.send_user_id=cs.user_id
+        on js.send_user_id=cs.id
         left join
             cnt_user mr
-        on js.pay_user_id=mr.user_id
+        on js.pay_user_id=mr.id
         left join
             cnt_order o
         on js.order_id=o.order_no

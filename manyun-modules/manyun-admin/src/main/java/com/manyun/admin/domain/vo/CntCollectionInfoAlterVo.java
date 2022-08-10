@@ -9,12 +9,6 @@ import lombok.Data;
 @ApiModel("藏品绑定详情接收参数视图")
 public class CntCollectionInfoAlterVo {
 
-    @ApiModelProperty("发行方")
-    private String publishOther;
-
-    @ApiModelProperty("发行方头像")
-    private String publishAuther;
-
     @ApiModelProperty("购买须知")
     private String customerTail;
 
