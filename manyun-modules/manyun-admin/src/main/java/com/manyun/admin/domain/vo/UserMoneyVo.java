@@ -1,4 +1,5 @@
 package com.manyun.admin.domain.vo;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -17,34 +18,29 @@ public class UserMoneyVo {
     @ApiModelProperty("帐号状态（0正常 1停用）")
     private String status;
 
-    @ApiModelProperty("用户id;平台内部生成,短编号")
-    private String userId;
-
     @ApiModelProperty("用户昵称")
     private String nickName;
 
-    @ApiModelProperty("用户电话号")
+    @ApiModelProperty("联系方式")
     private String phone;
+
+    @ApiModelProperty("用户头像")
+    private String headImage;
+
+    @ApiModelProperty("邀请码")
+    private String pleaseCode;
 
     @ApiModelProperty("真实姓名")
     private String realName;
 
-    @ApiModelProperty("银行类型")
-    private String bankName;
-
-    @ApiModelProperty("账号")
+    @ApiModelProperty("卡号")
     private String bankCart;
-
-    @ApiModelProperty("开户所在地")
-    private String bankOpen;
 
     @ApiModelProperty("钱包余量")
     private BigDecimal moneyBalance;
 
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("创建时间")
     private Date createdTime;
-
-    @ApiModelProperty("登录时间")
-    private Date loginTime;
 
 }

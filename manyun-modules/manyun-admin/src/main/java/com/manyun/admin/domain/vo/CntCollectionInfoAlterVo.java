@@ -9,9 +9,6 @@ import lombok.Data;
 @ApiModel("藏品绑定详情接收参数视图")
 public class CntCollectionInfoAlterVo {
 
-    @ApiModelProperty("购买须知")
-    private String customerTail;
-
     @ApiModelProperty("藏品故事")
     private String lookInfo;
 
