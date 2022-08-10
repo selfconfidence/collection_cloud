@@ -19,6 +19,9 @@ public class ConsignmentCollectionListVo implements Serializable {
     @ApiModelProperty("寄售编号")
     private String id;
 
+    @ApiModelProperty("寄售方藏品的中间编号")
+    private String buiId;
+
     @ApiModelProperty("藏品相关视图-按需拿取即可")
     private CollectionVo collectionVo;
 

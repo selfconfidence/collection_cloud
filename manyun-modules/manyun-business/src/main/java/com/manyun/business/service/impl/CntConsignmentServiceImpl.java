@@ -397,6 +397,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
 
         UserCollection userCollection = userCollectionService.getById(cntConsignment.getBuiId());
         collectionListVo.setCollectionNumber(userCollection.getCollectionNumber());
+        collectionListVo.setBuiId(userCollection.getId());
         // 需要验证订单 才可以拿到此值
         if (LOCK_CONSIGN.getCode().equals(cntConsignment.getConsignmentStatus()) && StrUtil.isNotBlank(cntConsignment.getOrderId())){
             // 订单查询 将剩余支付时间补足即可

@@ -76,7 +76,7 @@ public class CntUserController extends BaseController {
     @ApiOperation(value = "用户验证码登录",notes = "验证码登录",hidden = true)
     @InnerAuth
     public R<CntUserDto> codeLogin(@RequestBody LoginPhoneCodeForm loginPhoneCodeForm){
-        String phoneCode = (String) redisService.redisTemplate.opsForValue().getAndDelete(PHONE_CODE.concat(loginPhoneCodeForm.getPhone()));
+        String phoneCode = redisService.redisTemplate.opsForValue().getAndDelete(PHONE_CODE.concat(loginPhoneCodeForm.getPhone())).toString();
         Assert.isTrue(loginPhoneCodeForm.getPhoneCode().equals(phoneCode),"验证码输入错误,请核实!");
         CntUser cntUser =   userService.codeLogin(loginPhoneCodeForm.getPhone());
         CntUserDto cntUserDto = Builder.of(CntUserDto::new).build();
