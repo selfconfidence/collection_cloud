@@ -53,6 +53,13 @@ public class CntDictController extends BaseController
         return cntDictService.creationdDict();
     }
 
+    @GetMapping("/issuanceDict")
+    @ApiOperation("发行发字典")
+    public R issuanceDict()
+    {
+        return cntDictService.issuanceDict();
+    }
+
     @GetMapping("/lableDict")
     @ApiOperation("标签字典")
     public R lableDict()

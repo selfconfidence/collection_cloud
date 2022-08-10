@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CnfIssuanceMapper">
+
+    <resultMap type="CnfIssuance" id="CnfIssuanceResult">
+        <result property="id"    column="id"    />
+        <result property="publishOther"    column="publish_other"    />
+        <result property="publishAuther"    column="publish_auther"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCnfIssuanceVo">
+        select id, publish_other, publish_auther, created_by, created_time, updated_by, updated_time from cnf_issuance
+    </sql>
+
+    <select id="selectCnfIssuanceList" parameterType="CnfIssuance" resultMap="CnfIssuanceResult">
+        <include refid="selectCnfIssuanceVo"/>
+        <where>
+            <if test="publishOther != null  and publishOther != ''"> and publish_other like concat('%', #{publishOther}, '%')</if>
+        </where>
+    </select>
+
+</mapper>

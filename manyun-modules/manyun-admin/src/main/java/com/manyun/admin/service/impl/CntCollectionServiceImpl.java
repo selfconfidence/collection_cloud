@@ -65,6 +65,9 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
     @Autowired
     private MyChainxSystemService myChainxSystemService;
 
+    @Autowired
+    private ICnfIssuanceService issuanceService;
+
     /**
      * 查询藏品详情
      *
@@ -131,17 +134,29 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         if (!save(cntCollection)) {
             return R.fail();
         }
+
+        //发行方
+        String issuanceId = collectionAlterCombineDto.getIssuanceId();
         //藏品详情
         CntCollectionInfoAlterVo collectionInfoAlterVo = collectionAlterCombineDto.getCntCollectionInfoAlterVo();
-        if (Objects.nonNull(collectionInfoAlterVo)) {
-            CntCollectionInfo cntCollectionInfo = new CntCollectionInfo();
+        CntCollectionInfo cntCollectionInfo = new CntCollectionInfo();
+        cntCollectionInfo.setId(IdUtils.getSnowflakeNextIdStr());
+        cntCollectionInfo.setCollectionId(idStr);
+        cntCollectionInfo.setCreatedBy(SecurityUtils.getUsername());
+        cntCollectionInfo.setCreatedTime(DateUtils.getNowDate());
+        if(Objects.nonNull(collectionInfoAlterVo)){
             BeanUtil.copyProperties(collectionInfoAlterVo, cntCollectionInfo);
-            cntCollectionInfo.setId(IdUtils.getSnowflakeNextIdStr());
-            cntCollectionInfo.setCollectionId(idStr);
-            cntCollectionInfo.setCreatedBy(SecurityUtils.getUsername());
-            cntCollectionInfo.setCreatedTime(DateUtils.getNowDate());
-            collectionInfoService.save(cntCollectionInfo);
         }
+        if(StringUtils.isNotBlank(issuanceId)){
+            CnfIssuance cnfIssuance = issuanceService.getById(issuanceId);
+            if(Objects.nonNull(cnfIssuance)){
+                cntCollectionInfo.setPublishId(issuanceId);
+                cntCollectionInfo.setPublishOther(cnfIssuance.getPublishOther());
+                cntCollectionInfo.setPublishAuther(cnfIssuance.getPublishAuther());
+            }
+        }
+        collectionInfoService.save(cntCollectionInfo);
+
         //标签
         CntLableAlterVo cntLableAlterVo = collectionAlterCombineDto.getCntLableAlterVo();
         if (Objects.nonNull(cntLableAlterVo)) {
@@ -206,29 +221,44 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         if (!updateById(cntCollection)) {
             return R.fail();
         }
+
+        //发行方
+        String issuanceId = collectionAlterCombineDto.getIssuanceId();
         //藏品详情
         CntCollectionInfoAlterVo collectionInfoAlterVo = collectionAlterCombineDto.getCntCollectionInfoAlterVo();
         if (Objects.nonNull(collectionInfoAlterVo)) {
             List<CntCollectionInfo> cntCollectionInfos = collectionInfoService.list(Wrappers.<CntCollectionInfo>lambdaQuery().eq(CntCollectionInfo::getCollectionId, collectionId));
+            CnfIssuance cnfIssuance = issuanceService.getById(issuanceId);
             if (cntCollectionInfos.size() == 0) {
                 CntCollectionInfo cntCollectionInfo = new CntCollectionInfo();
                 BeanUtil.copyProperties(collectionInfoAlterVo, cntCollectionInfo);
                 cntCollectionInfo.setId(IdUtils.getSnowflakeNextIdStr());
                 cntCollectionInfo.setCollectionId(collectionId);
+                if(Objects.nonNull(cnfIssuance)){
+                    cntCollectionInfo.setPublishId(issuanceId);
+                    cntCollectionInfo.setPublishOther(cnfIssuance.getPublishOther());
+                    cntCollectionInfo.setPublishAuther(cnfIssuance.getPublishAuther());
+                }
                 cntCollectionInfo.setCreatedBy(SecurityUtils.getUsername());
                 cntCollectionInfo.setCreatedTime(DateUtils.getNowDate());
                 collectionInfoService.save(cntCollectionInfo);
             } else {
-                collectionInfoService.updateById(
-                        Builder
-                                .of(CntCollectionInfo::new)
-                                .with(CntCollectionInfo::setId, cntCollectionInfos.get(0).getId())
-                                .with(CntCollectionInfo::setCustomerTail, collectionInfoAlterVo.getCustomerTail())
-                                .with(CntCollectionInfo::setPublishOther, collectionInfoAlterVo.getPublishOther())
-                                .with(CntCollectionInfo::setUpdatedBy, SecurityUtils.getUsername())
-                                .with(CntCollectionInfo::setUpdatedTime, DateUtils.getNowDate())
-                                .build()
-                );
+                CntCollectionInfo cntCollectionInfo = new CntCollectionInfo();
+                cntCollectionInfo.setId(cntCollectionInfos.get(0).getId());
+                if(Objects.nonNull(cnfIssuance)){
+                    cntCollectionInfo.setPublishId(issuanceId);
+                    cntCollectionInfo.setPublishOther(cnfIssuance.getPublishOther());
+                    cntCollectionInfo.setPublishAuther(cnfIssuance.getPublishAuther());
+                }else {
+                    cntCollectionInfo.setPublishId("");
+                    cntCollectionInfo.setPublishOther("");
+                    cntCollectionInfo.setPublishAuther("");
+                }
+                cntCollectionInfo.setCustomerTail(collectionInfoAlterVo.getCustomerTail());
+                cntCollectionInfo.setLookInfo(collectionInfoAlterVo.getLookInfo());
+                cntCollectionInfo.setUpdatedBy(SecurityUtils.getUsername());
+                cntCollectionInfo.setUpdatedTime(DateUtils.getNowDate());
+                collectionInfoService.updateById(cntCollectionInfo);
             }
         }
         //标签

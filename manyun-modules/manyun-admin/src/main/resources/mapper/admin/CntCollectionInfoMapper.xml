@@ -21,23 +21,4 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, collection_id, publish_auther, publish_other, customer_tail, look_info, created_by, created_time, updated_by, updated_time from cnt_collection_info
     </sql>
 
-    <select id="selectCollectionRelatedInfoList" parameterType="CollectionInfoQuery" resultType="com.manyun.admin.domain.vo.CntCollectionInfoVo">
-        select
-            ci.id,
-            c.collection_name collectionName,
-            ci.publish_other publishOther,
-            ci.publish_auther publishAuther,
-            ci.look_info lookInfo,
-            ci.customer_tail customerTail
-        from
-            cnt_collection_info ci
-        left join
-            cnt_collection c
-        on ci.collection_id=c.id
-        <where>
-            <if test="publishOther != null  and publishOther != ''"> and ci.publish_other like concat('%', #{publishOther}, '%')</if>
-        </where>
-        order by ci.created_time desc
-    </select>
-
 </mapper>

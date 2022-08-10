@@ -54,13 +54,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             cp.balance balance,
             cp.self_balance selfBalance,
             cpxq.customer_tail customerTail,
-            cpxq.look_info lookInfo
+            cpxq.look_info lookInfo,
+			ci.id	issuanceId
         from
 	        cnt_collection cp
         left join
 	        cnt_collection_info cpxq
 	    on
 	        cp.id=cpxq.collection_id
+		left join
+				cnf_issuance ci
+		on
+	        cpxq.publish_id=ci.id
 	    where cp.id = #{id}
     </select>
 
