@@ -364,7 +364,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
             // 画 二维码 并改变大小
             // 1. 先 获取二维码(二维码携带一个参数)
 
-            String regUrl = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.REG_URL, SecurityConstants.INNER).getData() + "?" + cntUser.getPleaseCode();
+            String regUrl = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.REG_URL, SecurityConstants.INNER).getData() + "?pleaseCode=" + cntUser.getPleaseCode();
             // + "?" + cntUser.getPleaseCode()
             // 生成二维码并指定宽高
             BufferedImage qrCode = QrCodeUtil.generate(regUrl, 300, 300);
@@ -376,17 +376,13 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
 
             // 海报 保存到本地/var/opt/  线上使用 "d:\\upload\\"
             String linuxPath = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.LOCAL_PATH, SecurityConstants.INNER).getData();
-            File file1 = new File(linuxPath);
-            if (!file1.exists() && !file1.isDirectory()) {
-                file1.mkdirs();
+            File file = new File(linuxPath);
+            if (!file.exists() && !file.isDirectory()) {
+                file.mkdirs();
             }
             String localPath = linuxPath + System.currentTimeMillis() + ".png";
             PosterUtil.save(bufferedImage, "png", localPath);
             HashMap<String, Object> paramMap = new HashMap<>();
-            File file = FileUtil.file(localPath);
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
             paramMap.put("file", file);
 
             String gatewayUrl = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.GATEWAY_URL, SecurityConstants.INNER).getData();
@@ -398,7 +394,6 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
             cntUser.setInviteUrl(data.toString());
             updateById(cntUser);
             inviteUserVo.setInviteUrl(data.toString());
-
             return R.ok(inviteUserVo);
 
 
