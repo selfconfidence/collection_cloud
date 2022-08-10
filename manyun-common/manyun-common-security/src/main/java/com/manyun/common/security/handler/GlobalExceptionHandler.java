@@ -86,7 +86,7 @@ public class GlobalExceptionHandler
     public AjaxResult handleServiceException(IllegalArgumentException e, HttpServletRequest request)
     {
         log.error(e.getMessage(), e);
-        return AjaxResult.error(CodeStatus.FAIL.getCode(), e.getMessage());
+        return AjaxResult.error(CodeStatus.FAIL.getCode(), msgEmpty(e.getMessage()));
     }
     /**
      * 拦截未知的运行时异常
@@ -96,7 +96,12 @@ public class GlobalExceptionHandler
     {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',发生未知异常.", requestURI, e);
-        return AjaxResult.error(CodeStatus.FAIL.getCode(), e.getMessage());
+        return AjaxResult.error(CodeStatus.FAIL.getCode(), msgEmpty(e.getMessage()));
+    }
+
+
+    private String msgEmpty(String msg){
+        return StringUtils.isNotBlank(msg)?msg:"操作失败";
     }
 
     /**

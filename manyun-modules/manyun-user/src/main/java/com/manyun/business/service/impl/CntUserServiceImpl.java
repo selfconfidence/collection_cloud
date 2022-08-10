@@ -98,7 +98,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     public CntUser login(LoginPhoneForm loginPhoneForm) {
         CntUser cntUser = getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPhone, loginPhoneForm.getPhone()));
         Assert.isTrue(Objects.nonNull(cntUser),"暂未找到该手机号!");
-        Assert.isTrue(loginPhoneForm.getPassword().equals(cntUser.getLoginPass()),"密码输出错误!");
+        Assert.isTrue(loginPhoneForm.getPassword().equals(cntUser.getLoginPass()),"密码输入错误!");
         return cntUser;
     }
 
@@ -145,7 +145,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     public void changeLogin(String userId, UserChangeLoginForm userChangeLoginForm) {
         CntUser cntUser = getById(userId);
         if (Objects.nonNull(cntUser.getLoginPass()))
-        Assert.isTrue(userChangeLoginForm.getOldPass().equals(cntUser.getLoginPass()),"旧密码输出错误,请核实!");
+        Assert.isTrue(userChangeLoginForm.getOldPass().equals(cntUser.getLoginPass()),"旧密码输入错误,请核实!");
 
         cntUser.setLoginPass(userChangeLoginForm.getNewPass());
         cntUser.updateD(userId);

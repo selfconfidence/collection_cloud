@@ -49,7 +49,7 @@ public class R<T> extends IResult<T> implements Serializable
 
     public static <T> R<T> ok()
     {
-        return restResult(null, SUCCESS, null);
+        return restResult(null, SUCCESS,  CodeStatus.SUCCESS.getMessage());
     }
 
     public static <T> R<T> ok(T data)

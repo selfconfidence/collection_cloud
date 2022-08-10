@@ -103,9 +103,9 @@
             <if test="id != null">
                 uc.id = #{id}
             </if>
-            <if test="true">
+<!--            <if test="true">
                 and   uc.is_exist = 1
-            </if>
+            </if>-->
         </where>
         order by uc.created_time desc
     </select>
