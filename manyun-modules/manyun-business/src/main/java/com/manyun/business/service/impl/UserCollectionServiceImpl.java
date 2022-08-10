@@ -189,8 +189,8 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
      */
 
     @Override
-    public List<UserCollectionVo> userCollectionPageList(String userId) {
-        return userCollectionMapper.userCollectionPageList(userId);
+    public List<UserCollectionVo> userCollectionPageList(String userId,String commName) {
+        return userCollectionMapper.userCollectionPageList(userId,commName);
     }
 
 

@@ -106,8 +106,8 @@ public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> impl
     }
 
     @Override
-    public List<UserBoxVo> pageUserBox(String userId) {
-        return userBoxMapper.pageUserBox(userId);
+    public List<UserBoxVo> pageUserBox(String userId,String commName) {
+        return userBoxMapper.pageUserBox(userId,commName);
     }
 
 

@@ -22,7 +22,7 @@ public interface IUserBoxService extends IService<UserBox> {
 
     void bindBox(String userId, String buiId, String sourceInfo, Integer goodsNum);
 
-    List<UserBoxVo> pageUserBox(String userId);
+    List<UserBoxVo> pageUserBox(String userId,String commName);
 
     Boolean existUserBox(String userId, String id);
 

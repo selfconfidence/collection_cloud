@@ -18,6 +18,7 @@ import com.manyun.business.domain.dto.PayInfoDto;
 import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.form.CollectionSellForm;
 import com.manyun.business.domain.query.CollectionQuery;
+import com.manyun.business.domain.query.UseAssertQuery;
 import com.manyun.business.domain.vo.*;
 import com.manyun.business.mapper.*;
 import com.manyun.business.service.*;
@@ -199,14 +200,14 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
 
     /**
      * 分页查询用户的 所有藏品信息
-     * @param pageQuery
+     * @param useAssertQuery
      * @param userId
      * @return
      */
     @Override
-    public TableDataInfo<UserCollectionVo> userCollectionPageList(PageQuery pageQuery, String userId) {
-        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
-        List<UserCollectionVo> userCollectionVos =  userCollectionService.userCollectionPageList(userId);
+    public TableDataInfo<UserCollectionVo> userCollectionPageList(UseAssertQuery useAssertQuery, String userId) {
+        PageHelper.startPage(useAssertQuery.getPageNum(),useAssertQuery.getPageSize());
+        List<UserCollectionVo> userCollectionVos =  userCollectionService.userCollectionPageList(userId,useAssertQuery.getCommName());
         // 组合数据
         return TableDataInfoUtil.pageTableDataInfo(userCollectionVos.parallelStream().map(item -> {item.setMediaVos(mediaService.initMediaVos(item.getCollectionId(),COLLECTION_MODEL_TYPE)); return item;}).collect(Collectors.toList()),userCollectionVos);
     }

@@ -17,5 +17,5 @@ import java.util.List;
  */
 public interface UserBoxMapper extends BaseMapper<UserBox> {
 
-    List<UserBoxVo> pageUserBox(@Param("userId") String userId);
+    List<UserBoxVo> pageUserBox(@Param("userId") String userId,@Param("commName") String commName);
 }

@@ -17,6 +17,7 @@ import com.manyun.business.domain.dto.PayInfoDto;
 import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.form.BoxSellForm;
 import com.manyun.business.domain.query.BoxQuery;
+import com.manyun.business.domain.query.UseAssertQuery;
 import com.manyun.business.domain.vo.*;
 import com.manyun.business.mapper.BoxMapper;
 import com.manyun.business.service.*;
@@ -214,9 +215,9 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
      * @return
      */
     @Override
-    public TableDataInfo<UserBoxVo> userBoxPageList(PageQuery pageQuery, String userId) {
-        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
-        List<UserBoxVo> userBoxList = userBoxService.pageUserBox(userId);
+    public TableDataInfo<UserBoxVo> userBoxPageList(UseAssertQuery useAssertQuery, String userId) {
+        PageHelper.startPage(useAssertQuery.getPageNum(),useAssertQuery.getPageSize());
+        List<UserBoxVo> userBoxList = userBoxService.pageUserBox(userId,useAssertQuery.getCommName());
         // 数据组合
         List<UserBoxVo> tarData = userBoxList.parallelStream().map(item -> {
             item.setMediaVos(mediaService.initMediaVos(item.getBoxId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));

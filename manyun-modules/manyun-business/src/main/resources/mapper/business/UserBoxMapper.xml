@@ -44,6 +44,10 @@
                 c.user_id = #{userId}
             </if>
 
+             <if test="commName != null">
+               and  b.box_title like  CONCAT('%',#{commName},'%')
+             </if>
+
              <if test="true">
                  and   c.is_exist = 1
              </if>

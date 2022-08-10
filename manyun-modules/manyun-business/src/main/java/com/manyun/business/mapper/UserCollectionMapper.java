@@ -18,7 +18,7 @@ import java.util.List;
  */
 public interface UserCollectionMapper extends BaseMapper<UserCollection> {
 
-    List<UserCollectionVo> userCollectionPageList(@Param("userId") String userId);
+    List<UserCollectionVo> userCollectionPageList(@Param("userId") String userId,@Param("commName") String commName);
     UserCollectionVo userCollectionById(@Param("id") String id);
 
 

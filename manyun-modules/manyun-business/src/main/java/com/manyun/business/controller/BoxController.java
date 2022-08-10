@@ -1,6 +1,7 @@
 package com.manyun.business.controller;
 import com.manyun.business.domain.form.BoxSellForm;
 import com.manyun.business.domain.query.BoxQuery;
+import com.manyun.business.domain.query.UseAssertQuery;
 import com.manyun.business.domain.vo.BoxListVo;
 import com.manyun.business.domain.vo.BoxVo;
 import com.manyun.business.domain.vo.PayVo;
@@ -80,9 +81,9 @@ public class BoxController extends BaseController {
 
     @PostMapping("/userBoxPageList")
     @ApiOperation("查询用户的盲盒列表")
-    public R<TableDataInfo<UserBoxVo>> userBoxPageList(@RequestBody PageQuery pageQuery){
+    public R<TableDataInfo<UserBoxVo>> userBoxPageList(@RequestBody UseAssertQuery useAssertQuery){
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        return R.ok(boxService.userBoxPageList(pageQuery,loginBusinessUser.getUserId()));
+        return R.ok(boxService.userBoxPageList(useAssertQuery,loginBusinessUser.getUserId()));
     }
 
     @GetMapping("/openBox/{userBoxId}")
