@@ -39,10 +39,7 @@ public class CntCollectionDetailsVo
     private String bindCreation;
 
     @ApiModelProperty("发行方")
-    private String publishOther;
-
-    @ApiModelProperty("发行方头像")
-    private String publishAuther;
+    private String issuanceId;
 
     @ApiModelProperty("标签编号")
     private List<String> lableIds;

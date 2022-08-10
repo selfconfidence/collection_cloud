@@ -36,6 +36,11 @@ public interface CntDictService
     R creationdDict();
 
     /***
+     * 查询发行方字典
+     */
+    R issuanceDict();
+
+    /***
      * 查询标签字典
      */
     R lableDict();
@@ -64,6 +69,5 @@ public interface CntDictService
      * 活动合成材料字典
      */
     R actionTarDict(ActionTarDictQuery tarDictQuery);
-
 
 }

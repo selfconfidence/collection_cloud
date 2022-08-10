@@ -6,17 +6,14 @@ import com.manyun.admin.domain.*;
 import com.manyun.admin.domain.query.ActionTarDictQuery;
 import com.manyun.admin.domain.query.DrawRulesDictQuery;
 import com.manyun.admin.domain.vo.*;
-import com.manyun.admin.mapper.*;
 import com.manyun.admin.service.*;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.CateType;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,6 +36,9 @@ public class CntDictServiceImpl implements CntDictService
 
     @Autowired
     private ICnfCreationdService creationdService;
+
+    @Autowired
+    private ICnfIssuanceService issuanceService;
 
     @Autowired
     private ICntLableService lableService;
@@ -101,6 +101,19 @@ public class CntDictServiceImpl implements CntDictService
             CreationdDictVo creationdDictVo=new CreationdDictVo();
             BeanUtil.copyProperties(m,creationdDictVo);
             return creationdDictVo;
+        }).collect(Collectors.toList()));
+    }
+
+    /***
+     * 查询发行方字典
+     */
+    @Override
+    public R issuanceDict()
+    {
+        return R.ok(issuanceService.list(Wrappers.<CnfIssuance>lambdaQuery().orderByDesc(CnfIssuance::getCreatedTime)).stream().map(m ->{
+            CnfIssuanceDictVo issuanceDictVo=new CnfIssuanceDictVo();
+            BeanUtil.copyProperties(m,issuanceDictVo);
+            return issuanceDictVo;
         }).collect(Collectors.toList()));
     }
 

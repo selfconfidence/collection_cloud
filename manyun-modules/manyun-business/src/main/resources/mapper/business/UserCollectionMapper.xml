@@ -63,6 +63,9 @@
         <if test="userId != null">
             uc.user_id = #{userId}
         </if>
+                <if test="commName != null">
+                 and   uc.collection_name like  CONCAT('%',#{commName},'%')
+                </if>
         <if test="true">
             and   uc.is_exist = 1
          </if>

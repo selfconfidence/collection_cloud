@@ -22,7 +22,7 @@ public interface IUserCollectionService extends IService<UserCollection> {
 
     String autoCollectionNum(String collectionId);
 
-    List<UserCollectionVo> userCollectionPageList(String userId);
+    List<UserCollectionVo> userCollectionPageList(String userId,String commName);
 
     UserCollectionVo userCollectionById(String id);
 

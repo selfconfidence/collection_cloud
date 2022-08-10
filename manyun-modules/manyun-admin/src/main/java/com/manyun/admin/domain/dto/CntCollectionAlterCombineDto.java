@@ -18,6 +18,9 @@ public class CntCollectionAlterCombineDto {
     @ApiModelProperty("藏品详情")
     private CntCollectionInfoAlterVo cntCollectionInfoAlterVo;
 
+    @ApiModelProperty("发行方")
+    private String issuanceId;
+
     @ApiModelProperty("标签")
     private CntLableAlterVo cntLableAlterVo;
 

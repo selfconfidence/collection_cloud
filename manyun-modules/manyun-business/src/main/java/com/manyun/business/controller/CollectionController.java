@@ -4,6 +4,7 @@ package com.manyun.business.controller;
 import com.github.pagehelper.PageHelper;
 import com.manyun.business.domain.form.CollectionSellForm;
 import com.manyun.business.domain.query.CollectionQuery;
+import com.manyun.business.domain.query.UseAssertQuery;
 import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.ICollectionService;
 import com.manyun.comm.api.model.LoginBusinessUser;
@@ -72,9 +73,9 @@ public class CollectionController extends BaseController{
 
     @PostMapping("/userCollectionPageList")
     @ApiOperation("用户查询自己的藏品信息")
-    public R<TableDataInfo<UserCollectionVo>> userCollectionPageList(@RequestBody PageQuery pageQuery){
+    public R<TableDataInfo<UserCollectionVo>> userCollectionPageList(@RequestBody UseAssertQuery useAssertQuery){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        return R.ok(collectionService.userCollectionPageList(pageQuery,notNullLoginBusinessUser.getUserId()));
+        return R.ok(collectionService.userCollectionPageList(useAssertQuery,notNullLoginBusinessUser.getUserId()));
     }
 
     @GetMapping("/cateCollectionAll")

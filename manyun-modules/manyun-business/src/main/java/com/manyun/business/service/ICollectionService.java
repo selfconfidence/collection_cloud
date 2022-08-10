@@ -3,6 +3,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.entity.CntCollection;
 import com.manyun.business.domain.form.CollectionSellForm;
 import com.manyun.business.domain.query.CollectionQuery;
+import com.manyun.business.domain.query.UseAssertQuery;
 import com.manyun.business.domain.vo.*;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
@@ -28,7 +29,7 @@ public interface ICollectionService extends IService<CntCollection> {
 
     PayVo sellCollection(String userId, CollectionSellForm collectionSellForm);
 
-    TableDataInfo<UserCollectionVo> userCollectionPageList(PageQuery pageQuery, String userId);
+    TableDataInfo<UserCollectionVo> userCollectionPageList(UseAssertQuery useAssertQuery, String userId);
 
     List<UserCateVo> cateCollectionByUserId(String userId);
 

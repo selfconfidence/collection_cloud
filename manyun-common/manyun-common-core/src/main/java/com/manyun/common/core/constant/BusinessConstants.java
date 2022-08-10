@@ -181,7 +181,7 @@ public interface BusinessConstants {
     interface RedisDict{
         String PHONE_CODE = "phone:code:";
         // 验证码过期时间 60 秒
-        Integer EXP_TIME = Integer.valueOf(60);
+        Integer EXP_TIME = Integer.valueOf(10);
         // 持续递增编号key
         String COLLECTION_AUTO_NUM = "collection:auto:numbers:";
     }
