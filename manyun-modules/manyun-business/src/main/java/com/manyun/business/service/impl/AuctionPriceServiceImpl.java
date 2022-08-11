@@ -461,6 +461,12 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         auctionSend.setAuctionSendStatus(AuctionSendStatus.WAIT_PAY.getCode());
         auctionSend.setNowPrice(auctionSend.getSoldPrice());
         auctionSendService.updateById(auctionSend);
+        AuctionPrice one = getOne(Wrappers.<AuctionPrice>lambdaQuery().eq(AuctionPrice::getAuctionSendId, auctionSend.getId())
+                .eq(AuctionPrice::getUserId, userId).eq(AuctionPrice::getIsNew, 1));
+        if (one != null) {
+            one.setIsNew(2);
+            updateById(one);
+        }
         AuctionPrice auctionPrice = new AuctionPrice();
         auctionPrice.setId(IdUtil.getSnowflakeNextIdStr());
         auctionPrice.setAuctionStatus(AuctionStatus.BID_BIDING.getCode());
