@@ -18,6 +18,8 @@
             <result property="headImage" column="head_image"/>
             <result property="creationName" column="creation_name"/>
             <result property="creationInfo" column="creation_info"/>
+            <result property="linkAddr" column="link_addr"/>
+
         </association>
 
         <association property="cateVo" javaType="com.manyun.business.domain.vo.CateVo">
@@ -48,6 +50,7 @@
         cr.head_image,
         cr.creation_name,
         cr.creation_info,
+        cr.link_addr,
         ca.id ct_id,
         ca.cate_name,
         ca.cate_image,
@@ -88,6 +91,7 @@
         cr.head_image,
         cr.creation_name,
         cr.creation_info,
+        cr.link_addr,
         ca.id ct_id,
         ca.cate_name,
         ca.cate_image,
