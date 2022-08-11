@@ -421,6 +421,8 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         userCollectionForVo.setUserCollectionVo(userCollectionVo);
         userCollectionForVo.setStepVos(initStepVo(userCollectionVo.getCollectionId(),COLLECTION_MODEL_TYPE));
         userCollectionForVo.setCollectionInfoVo(providerCollectionInfoVo(userCollectionVo.getCollectionId()));
+
+        userCollectionForVo.setLableVos(initLableVos(userCollectionVo.getCollectionId()));
         return userCollectionForVo;
     }
 

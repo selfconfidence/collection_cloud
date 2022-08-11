@@ -20,6 +20,8 @@ public class UserCollectionForVo implements Serializable {
     @ApiModelProperty("流转记录")
     private List<StepVo> stepVos;
 
+    @ApiModelProperty("藏品标签")
+    private List<LableVo> lableVos;
 
     @ApiModelProperty("藏品详情")
     private CollectionInfoVo collectionInfoVo;
