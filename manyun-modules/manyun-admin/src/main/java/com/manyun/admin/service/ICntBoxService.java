@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntBox;
+import com.manyun.admin.domain.dto.BoxStateDto;
 import com.manyun.admin.domain.dto.CntBoxAlterCombineDto;
 import com.manyun.admin.domain.query.BoxQuery;
 import com.manyun.admin.domain.query.OrderQuery;
@@ -54,16 +55,14 @@ public interface ICntBoxService extends IService<CntBox>
     public R updateCntBox(CntBoxAlterCombineDto boxAlterCombineDto);
 
     /**
-     * 批量删除盲盒;盲盒主体
-     *
-     * @param ids 需要删除的盲盒;盲盒主体主键集合
-     * @return 结果
-     */
-    public int deleteCntBoxByIds(String[] ids);
-
-    /**
      * 查询盲盒订单列表
      */
     TableDataInfo<CntBoxOrderVo> boxOrderList(OrderQuery orderQuery);
 
+    /**
+     * 修改状态
+     * @param boxStateDto
+     * @return
+     */
+    int updateState(BoxStateDto boxStateDto);
 }

@@ -14,7 +14,9 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.*;
+import com.manyun.admin.domain.dto.BoxStateDto;
 import com.manyun.admin.domain.dto.CntBoxAlterCombineDto;
+import com.manyun.admin.domain.dto.CollectionStateDto;
 import com.manyun.admin.domain.query.BoxQuery;
 import com.manyun.admin.domain.query.OrderQuery;
 import com.manyun.admin.domain.vo.*;
@@ -112,7 +114,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         String info = StrUtil.format("盲盒名称为:{}已存在!", cntBoxAlterVo.getBoxTitle());
         Assert.isFalse(boxList.size()>0,info);
         //校验
-        R check = check(cntBoxAlterVo,boxAlterCombineDto.getCntLableAlterVo());
+        R check = check(cntBoxAlterVo,boxAlterCombineDto.getCntLableAlterVo(),boxAlterCombineDto.getMediaAlterVo());
         if(200!=check.getCode()){
             return R.fail(check.getCode(),check.getMsg());
         }
@@ -178,7 +180,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         String info = StrUtil.format("盲盒名称为:{}已存在!", boxAlterVo.getBoxTitle());
         Assert.isFalse(boxList.size()>0,info);
         //校验
-        R check = check(boxAlterVo,boxAlterCombineDto.getCntLableAlterVo());
+        R check = check(boxAlterVo,boxAlterCombineDto.getCntLableAlterVo(),boxAlterCombineDto.getMediaAlterVo());
         if(200!=check.getCode()){
             return R.fail(check.getCode(),check.getMsg());
         }
@@ -238,7 +240,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         return R.ok();
     }
 
-    public R check(CntBoxAlterVo boxAlterVo, CntLableAlterVo lableAlterVo){
+    public R check(CntBoxAlterVo boxAlterVo, CntLableAlterVo lableAlterVo, MediaAlterVo mediaAlterVo){
         //验证提前购分钟是否在范围内
         Integer postTime = boxAlterVo.getPostTime();
         Date publishTime = boxAlterVo.getPublishTime();
@@ -268,31 +270,13 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
                 return R.fail("流通数量不能大于发售数量!");
             }
         }
+        //验证图片
+        if(Objects.isNull(mediaAlterVo) || StringUtils.isBlank(mediaAlterVo.getImg())){
+            return R.fail("盲盒主图不能为空!");
+        }
         return R.ok();
     }
 
-    /**
-     * 批量删除盲盒;盲盒主体
-     *
-     * @param ids 需要删除的盲盒;盲盒主体主键
-     * @return 结果
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int deleteCntBoxByIds(String[] ids)
-    {
-        if (ids.length == 0) {
-            return 0;
-        }
-        if (!removeByIds(Arrays.asList(ids))) {
-            return 0;
-        } else {
-            collectionLableService.remove(Wrappers.<CntCollectionLable>lambdaQuery().in(CntCollectionLable::getCollectionId, ids));
-            mediaService.remove(Wrappers.<CntMedia>lambdaQuery().in(CntMedia::getBuiId, ids).eq(CntMedia::getModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
-            boxCollectionService.remove(Wrappers.<CntBoxCollection>lambdaQuery().in(CntBoxCollection::getBoxId, ids));
-        }
-        return 1;
-    }
 
     /**
      * 查询盲盒订单列表
@@ -303,6 +287,21 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         PageHelper.startPage(orderQuery.getPageNum(),orderQuery.getPageSize());
         List<CntBoxOrderVo> cntBoxOrderVos = cntBoxMapper.boxOrderList(orderQuery);
         return TableDataInfoUtil.pageTableDataInfo(cntBoxOrderVos,cntBoxOrderVos);
+    }
+
+
+    /**
+     * 修改状态
+     * @param boxStateDto
+     * @return
+     */
+    @Override
+    public int updateState(BoxStateDto boxStateDto) {
+        CntBox cntBox=new CntBox();
+        BeanUtil.copyProperties(boxStateDto,cntBox);
+        cntBox.setUpdatedBy(SecurityUtils.getUsername());
+        cntBox.setUpdatedTime(DateUtils.getNowDate());
+        return updateById(cntBox)==true?1:0;
     }
 
 }

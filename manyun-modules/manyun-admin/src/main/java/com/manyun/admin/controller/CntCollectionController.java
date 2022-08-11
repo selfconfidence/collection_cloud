@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.manyun.admin.domain.dto.AirdropDto;
 import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
+import com.manyun.admin.domain.dto.CollectionStateDto;
+import com.manyun.admin.domain.dto.UpdateBalanceDto;
 import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.common.core.domain.R;
@@ -68,13 +70,11 @@ public class CntCollectionController extends BaseController
         return cntCollectionService.updateCntCollection(collectionAlterCombineDto);
     }
 
-    //@RequiresPermissions("admin:collection:remove")
-    @Log(title = "删除藏品管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{ids}")
-    @ApiOperation("删除藏品管理")
-    public R remove(@PathVariable String[] ids)
+    @PostMapping("/updateState")
+    @ApiOperation("修改状态")
+    public R updateState(@Valid @RequestBody CollectionStateDto collectionStateDto)
     {
-        return toResult(cntCollectionService.deleteCntCollectionByIds(ids));
+        return toResult(cntCollectionService.updateState(collectionStateDto));
     }
 
     @PostMapping("/airdrop")

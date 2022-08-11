@@ -2,7 +2,9 @@ package com.manyun.admin.controller;
 
 import java.util.List;
 
+import com.manyun.admin.domain.dto.BoxStateDto;
 import com.manyun.admin.domain.dto.CntBoxAlterCombineDto;
+import com.manyun.admin.domain.dto.CollectionStateDto;
 import com.manyun.admin.domain.query.BoxQuery;
 import com.manyun.admin.domain.query.OrderQuery;
 import com.manyun.admin.domain.vo.CntBoxDetailsVo;
@@ -71,13 +73,11 @@ public class CntBoxController extends BaseController
         return cntBoxService.updateCntBox(boxAlterCombineDto);
     }
 
-    //@RequiresPermissions("admin:box:remove")
-    @Log(title = "删除盲盒", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{ids}")
-    @ApiOperation("删除盲盒")
-    public R remove(@PathVariable String[] ids)
+    @PostMapping("/updateState")
+    @ApiOperation("修改状态")
+    public R updateState(@Valid @RequestBody BoxStateDto boxStateDto)
     {
-        return toResult(cntBoxService.deleteCntBoxByIds(ids));
+        return toResult(cntBoxService.updateState(boxStateDto));
     }
 
     @GetMapping("/boxOrderList")

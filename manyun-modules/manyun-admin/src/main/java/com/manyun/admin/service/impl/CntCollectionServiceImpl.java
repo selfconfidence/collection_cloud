@@ -13,6 +13,7 @@ import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.*;
 import com.manyun.admin.domain.dto.AirdropDto;
 import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
+import com.manyun.admin.domain.dto.CollectionStateDto;
 import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.mapper.*;
@@ -122,7 +123,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         String info = StrUtil.format("藏品名称为:{}已存在!", collectionAlterVo.getCollectionName());
         Assert.isFalse(cntCollectionList.size()>0,info);
         //校验
-        R check = check(collectionAlterVo,collectionAlterCombineDto.getCntLableAlterVo());
+        R check = check(collectionAlterVo,collectionAlterCombineDto.getCntLableAlterVo(),collectionAlterCombineDto.getMediaAlterVo());
         if(200!=check.getCode()){
             return R.fail(check.getCode(),check.getMsg());
         }
@@ -210,7 +211,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         String info = StrUtil.format("藏品名称为:{}已存在!", collectionAlterVo.getCollectionName());
         Assert.isFalse(cntCollectionList.size()>0,info);
         //校验
-        R check = check(collectionAlterVo,collectionAlterCombineDto.getCntLableAlterVo());
+        R check = check(collectionAlterVo,collectionAlterCombineDto.getCntLableAlterVo(),collectionAlterCombineDto.getMediaAlterVo());
         if(200!=check.getCode()){
             return R.fail(check.getCode(),check.getMsg());
         }
@@ -308,7 +309,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         return R.ok();
     }
 
-    public R check(CntCollectionAlterVo collectionAlterVo,CntLableAlterVo lableAlterVo){
+    public R check(CntCollectionAlterVo collectionAlterVo,CntLableAlterVo lableAlterVo ,MediaAlterVo mediaAlterVo){
         //验证提前购分钟是否在范围内
         Integer postTime = collectionAlterVo.getPostTime();
         Date publishTime = collectionAlterVo.getPublishTime();
@@ -338,30 +339,11 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                 return R.fail("流通数量不能大于发售数量!");
             }
         }
+        //验证图片
+        if(Objects.isNull(mediaAlterVo) || StringUtils.isBlank(mediaAlterVo.getImg())){
+            return R.fail("藏品主图不能为空!");
+        }
         return R.ok();
-    }
-
-    /**
-     * 批量删除藏品
-     *
-     * @param ids 需要删除的藏品主键
-     * @return 结果
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int deleteCntCollectionByIds(String[] ids)
-    {
-        if (ids.length == 0) {
-            return 0;
-        }
-        if (!removeByIds(Arrays.asList(ids))) {
-            return 0;
-        } else {
-            collectionInfoService.remove(Wrappers.<CntCollectionInfo>lambdaQuery().in(CntCollectionInfo::getCollectionId, ids));
-            collectionLableService.remove(Wrappers.<CntCollectionLable>lambdaQuery().in(CntCollectionLable::getCollectionId, ids));
-            mediaService.remove(Wrappers.<CntMedia>lambdaQuery().in(CntMedia::getBuiId, ids).eq(CntMedia::getModelType, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
-        }
-        return 1;
     }
 
     /***
@@ -408,6 +390,20 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                         .build()
         );
         return R.ok(Builder.of(AirdropVo::new).with(AirdropVo::setUserId,cntUsers.get(0).getUserId()).with(AirdropVo::setUsercollectionId,idStr).build());
+    }
+
+    /**
+     * 修改状态
+     * @param collectionStateDto
+     * @return
+     */
+    @Override
+    public int updateState(CollectionStateDto collectionStateDto) {
+        CntCollection cntCollection=new CntCollection();
+        BeanUtil.copyProperties(collectionStateDto,cntCollection);
+        cntCollection.setUpdatedBy(SecurityUtils.getUsername());
+        cntCollection.setUpdatedTime(DateUtils.getNowDate());
+        return updateById(cntCollection)==true?1:0;
     }
 
 }

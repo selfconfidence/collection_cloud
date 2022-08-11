@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntCollection;
 import com.manyun.admin.domain.dto.AirdropDto;
 import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
+import com.manyun.admin.domain.dto.CollectionStateDto;
 import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.common.core.domain.R;
@@ -51,18 +52,17 @@ public interface ICntCollectionService extends IService<CntCollection>
      */
     public R updateCntCollection(CntCollectionAlterCombineDto collectionAlterCombineDto);
 
-    /**
-     * 批量删除藏品
-     *
-     * @param ids 需要删除的藏品主键集合
-     * @return 结果
-     */
-    public int deleteCntCollectionByIds(String[] ids);
-
     /***
      * 空投
      * @param airdropDto 空投请求参数
      * @return
      */
     R airdrop(AirdropDto airdropDto);
+
+    /**
+     * 修改状态
+     * @param collectionStateDto
+     * @return
+     */
+    int updateState(CollectionStateDto collectionStateDto);
 }
