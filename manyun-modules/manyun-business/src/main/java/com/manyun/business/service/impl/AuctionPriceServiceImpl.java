@@ -417,6 +417,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     public synchronized PayVo payMargin(String payUserId, AuctionPayMarginForm auctionPayMarginForm) {
 
         AuctionSend auctionSend = auctionSendService.getById(auctionPayMarginForm.getAuctionSendId());
+        Assert.isFalse(payUserId.equals(auctionSend.getUserId()), "不可对自己送拍的支付保证金");
         //用户余额
         BigDecimal margin = auctionSend.getStartPrice().multiply(systemService.getVal(BusinessConstants.SystemTypeConstant.MARGIN_SCALE, BigDecimal.class)).setScale(2, RoundingMode.HALF_UP);
         Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, payUserId));
