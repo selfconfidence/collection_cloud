@@ -1,5 +1,6 @@
 package com.manyun.business.design.pay;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -42,6 +43,7 @@ public class MoneyPay implements RootPayServer {
             BigDecimal moneyPayMoney = moneyService.ordePay(payInfoDto.getOutHost(), payInfoDto.getUserId(), payInfoDto.getRealPayMoney(), formInfo);
             if (moneyPayMoney.compareTo(NumberUtil.add(0D)) >= 1){
                 //TODO 银联.....
+                Assert.isFalse(true,"余额不足,请核实！");
             }
             return Builder.of(PayVo::new).with(PayVo::setBody, null).with(PayVo::setPayType, payInfoDto.getPayType()).with(PayVo::setOutHost, payInfoDto.getOutHost()).build();
 
