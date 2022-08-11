@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 /**
  * <p>
@@ -16,6 +17,7 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @TableName("cnf_creationd")
 @ApiModel(value = "CnfCreationd对象", description = "创作者表")
+@Data
 public class CntCreationd implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -50,81 +52,4 @@ public class CntCreationd implements Serializable {
     private LocalDateTime updatedTime;
 
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getHeadImage() {
-        return headImage;
-    }
-
-    public void setHeadImage(String headImage) {
-        this.headImage = headImage;
-    }
-
-    public String getCreationName() {
-        return creationName;
-    }
-
-    public void setCreationName(String creationName) {
-        this.creationName = creationName;
-    }
-
-    public String getCreationInfo() {
-        return creationInfo;
-    }
-
-    public void setCreationInfo(String creationInfo) {
-        this.creationInfo = creationInfo;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public LocalDateTime getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(LocalDateTime createdTime) {
-        this.createdTime = createdTime;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public LocalDateTime getUpdatedTime() {
-        return updatedTime;
-    }
-
-    public void setUpdatedTime(LocalDateTime updatedTime) {
-        this.updatedTime = updatedTime;
-    }
-
-    @Override
-    public String toString() {
-        return "CnfCreationd{" +
-        "id=" + id +
-        ", headImage=" + headImage +
-        ", creationName=" + creationName +
-        ", creationInfo=" + creationInfo +
-        ", createdBy=" + createdBy +
-        ", createdTime=" + createdTime +
-        ", updatedBy=" + updatedBy +
-        ", updatedTime=" + updatedTime +
-        "}";
-    }
 }
