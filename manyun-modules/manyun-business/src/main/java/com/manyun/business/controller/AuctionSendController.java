@@ -123,6 +123,19 @@ public class AuctionSendController {
         return R.ok(systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_SELL_INFO, String.class));
     }
 
+    @GetMapping("/marginInfo")
+    @ApiOperation(value = "保证金说明")
+    public R<String> marginInfo() {
+        return R.ok(systemService.getVal(BusinessConstants.SystemTypeConstant.MARGIN_INFO, String.class));
+    }
+
+    @GetMapping("/commissionInfo")
+    @ApiOperation(value = "佣金说明")
+    public R<String> commissionInfo() {
+        return R.ok(systemService.getVal(BusinessConstants.SystemTypeConstant.COMMISSION_INFO, String.class));
+    }
+
+
 
 }
 

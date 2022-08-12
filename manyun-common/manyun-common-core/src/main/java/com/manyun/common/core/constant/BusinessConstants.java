@@ -100,9 +100,19 @@ public interface BusinessConstants {
         String AUCTION_PRICE_RANGE = "auction_price_range";
 
         /**
+         * 保证金说明
+         */
+        String MARGIN_INFO = "margin_info";
+
+        /**
          * 保证金比例
          */
         String MARGIN_SCALE = "margin_scale";
+
+        /**
+         * 佣金说明
+         */
+        String COMMISSION_INFO = "commission_info";
 
         /**
          * 佣金比例
