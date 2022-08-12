@@ -426,6 +426,15 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         return userCollectionForVo;
     }
 
+    @Override
+    public CollectionOrderAllVo orderInfo(String id) {
+        CollectionAllVo collectionAllVo = info(id);
+        CollectionOrderAllVo collectionOrderAllVo = Builder.of(CollectionOrderAllVo::new).build();
+        BeanUtil.copyProperties(collectionAllVo,collectionOrderAllVo);
+        // 这个用户的上链信息
+        return collectionOrderAllVo;
+    }
+
     private List<StepVo> initStepVo(String collectionId, String collectionModelType) {
         List<Step> stepList = stepService.list(Wrappers.<Step>lambdaQuery().eq(Step::getBuiId, collectionId).eq(Step::getModelType, collectionModelType).orderByDesc(Step::getCreatedTime));
        return stepList.parallelStream().map(item ->{

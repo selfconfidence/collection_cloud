@@ -17,6 +17,9 @@ public class ConsignmentOrderVo implements Serializable {
     @ApiModelProperty("寄售编号")
     private String id;
 
+    @ApiModelProperty("(盲盒|藏品) 中间表编号")
+    private String buiId;
+
     @ApiModelProperty("类型 0藏品，1盲盒")
     private Integer type;
 

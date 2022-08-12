@@ -3,6 +3,7 @@ package com.manyun.business.controller;
 import com.github.pagehelper.PageHelper;
 import com.manyun.business.domain.query.OrderQuery;
 import com.manyun.business.domain.vo.CollectionAllVo;
+import com.manyun.business.domain.vo.CollectionOrderAllVo;
 import com.manyun.business.domain.vo.OrderVo;
 import com.manyun.business.service.ICollectionService;
 import com.manyun.business.service.IOrderService;
@@ -54,7 +55,6 @@ public class OrderController extends BaseController {
     @ApiOperation(value = "查询藏品详情信息",notes = "根据藏品编号查询藏品详情信息")
     public R<CollectionAllVo> info(@PathVariable String id){
        // System.out.println(111);
-
         return R.ok(collectionService.info(id));
     }
 
