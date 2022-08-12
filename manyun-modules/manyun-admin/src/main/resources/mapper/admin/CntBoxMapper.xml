@@ -31,7 +31,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectSearchBoxList" parameterType="BoxQuery" resultMap="CntBoxResult">
         <include refid="selectCntBoxVo"/>
         <where>
-            <if test="boxOpen != null "> and box_open = #{boxOpen}</if>
             <if test="statusBy != null "> and status_by = #{statusBy}</if>
             <if test="publishTime != null "> and publish_time = #{publishTime}</if>
         </where>
