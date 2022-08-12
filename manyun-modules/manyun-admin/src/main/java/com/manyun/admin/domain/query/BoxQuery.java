@@ -12,9 +12,6 @@ import java.util.Date;
 @Data
 public class BoxQuery extends PageQuery {
 
-    @ApiModelProperty("1未开启,2已开启")
-    private Integer boxOpen;
-
     @ApiModelProperty("盲盒状态;0=下架,1=正常,2=售罄 ")
     private Integer statusBy;
 

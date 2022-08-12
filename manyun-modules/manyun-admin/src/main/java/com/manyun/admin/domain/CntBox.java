@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -26,9 +28,11 @@ public class CntBox implements Serializable
     @ApiModelProperty("分类编号")
     private String cateId;
 
+    @TableField(updateStrategy = FieldStrategy.IGNORED )
     @ApiModelProperty("可以提前购的盲盒子 - 如果为null 就代表不是提前购")
     private Integer postTime;
 
+    @TableField(updateStrategy = FieldStrategy.IGNORED )
     @ApiModelProperty("抽签编号 如果为null不需要抽签,否则需要抽签")
     private String tarId;
 

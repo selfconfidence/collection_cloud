@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -25,6 +27,7 @@ public class CntCollection implements Serializable
     @ApiModelProperty("藏品名称")
     private String collectionName;
 
+    @TableField(updateStrategy = FieldStrategy.IGNORED )
     @ApiModelProperty("抽签编号")
     private String tarId;
 
@@ -70,6 +73,7 @@ public class CntCollection implements Serializable
     @ApiModelProperty("系列编号")
     private String cateId;
 
+    @TableField(updateStrategy = FieldStrategy.IGNORED )
     @ApiModelProperty("可以提前购的盲盒子")
     private Integer postTime;
 

@@ -195,7 +195,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         }
         auctionPrice.setUserId(businessUser.getUserId());
         auctionPrice.setAuctionSendId(auctionPriceForm.getAuctionSendId());
-        auctionPrice.setUserName(businessUser.getUsername());
+        auctionPrice.setUserName(remoteBuiUserService.commUni(userId, SecurityConstants.INNER).getData().getNickName());
         auctionPrice.setCreatedTime(LocalDateTime.now());
         //改状态为最新
         List<AuctionPrice> oldPriceList = list(Wrappers.<AuctionPrice>lambdaQuery()
@@ -472,7 +472,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         auctionPrice.setAuctionStatus(AuctionStatus.BID_BIDING.getCode());
         auctionPrice.setUserId(businessUser.getUserId());
         auctionPrice.setAuctionSendId(auctionPayFixedForm.getAuctionSendId());
-        auctionPrice.setUserName(businessUser.getUsername());
+        auctionPrice.setUserName(remoteBuiUserService.commUni(userId, SecurityConstants.INNER).getData().getNickName());
         auctionPrice.setCreatedTime(LocalDateTime.now());
         auctionPrice.setEndPayTime(LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class)));
         auctionPrice.setBidPrice(auctionSend.getSoldPrice());
@@ -522,13 +522,25 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
             List<AuctionPrice> priceList = list(Wrappers.<AuctionPrice>lambdaQuery().eq(AuctionPrice::getAuctionSendId, auctionSend.getId()));
             if (priceList.isEmpty()) {
                 auctionSend.setAuctionSendStatus(AuctionSendStatus.BID_PASS.getCode());
+                List<AuctionMargin> list = auctionMarginService.list(Wrappers.<AuctionMargin>lambdaQuery().eq(AuctionMargin::getAuctionSendId, auctionSend.getId()));
+                if (!list.isEmpty()) {
+                    for (AuctionMargin auctionMargin : list) {
+                        Money buyerMoney = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, auctionMargin.getUserId()));
+                        buyerMoney.setMoneyBalance(buyerMoney.getMoneyBalance().add(auctionMargin.getMargin()));
+                        moneyService.updateById(buyerMoney);
+                        logsService.saveLogs(LogInfoDto.builder().buiId(auctionMargin.getUserId()).jsonTxt("退还保证金").formInfo(auctionMargin.getMargin().toString()).isType(PULL_SOURCE).modelType(MONEY_TYPE).build());
+                    }
+                }
+
+
                 String info = "已流拍，从拍卖市场退回";
+
                 //从拍卖市场退回
                 if (auctionSend.getGoodsType() == 1) {
                     userCollectionService.showUserCollection(auctionSend.getUserId(), auctionSend.getMyGoodsId(),info);
                 }
                 if (auctionSend.getGoodsType() == 2) {
-                    userBoxService.showUserBox(auctionSend.getUserId(), auctionSend.getMyGoodsId(), info);
+                    userBoxService.showUserBox(auctionSend.getMyGoodsId(), auctionSend.getUserId(), info);
                 }
             }
         }

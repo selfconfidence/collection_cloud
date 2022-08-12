@@ -9,6 +9,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="collectionId"    column="collection_id"    />
         <result property="publishAuther"    column="publish_auther"    />
         <result property="publishOther"    column="publish_other"    />
+        <result property="publishInfo"    column="publish_info"    />
+        <result property="publishId"    column="publish_id"    />
         <result property="customerTail"    column="customer_tail"    />
         <result property="lookInfo"    column="look_info"    />
         <result property="createdBy"    column="created_by"    />
@@ -18,7 +20,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectCntCollectionInfoVo">
-        select id, collection_id, publish_auther, publish_other, customer_tail, look_info, created_by, created_time, updated_by, updated_time from cnt_collection_info
+        select id, collection_id, publish_auther, publish_other, publish_info, publish_id, customer_tail, look_info, created_by, created_time, updated_by, updated_time from cnt_collection_info
     </sql>
 
 </mapper>

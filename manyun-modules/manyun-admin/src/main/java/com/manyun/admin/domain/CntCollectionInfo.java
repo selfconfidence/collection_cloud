@@ -29,6 +29,9 @@ public class CntCollectionInfo implements Serializable
     @ApiModelProperty("发行方头像")
     private String publishAuther;
 
+    @ApiModelProperty("发行方简介")
+    private String publishInfo;
+
     @ApiModelProperty("发行方id")
     private String publishId;
 
@@ -93,6 +96,14 @@ public class CntCollectionInfo implements Serializable
     public void setPublishOther(String publishOther)
     {
         this.publishOther = publishOther;
+    }
+
+    public String getPublishInfo() {
+        return publishInfo;
+    }
+
+    public void setPublishInfo(String publishInfo) {
+        this.publishInfo = publishInfo;
     }
 
     public String getPublishOther()
@@ -161,6 +172,7 @@ public class CntCollectionInfo implements Serializable
             .append("collectionId", getCollectionId())
             .append("publishId", getPublishId())
             .append("publishAuther", getPublishAuther())
+            .append("publishInfo", getPublishInfo())
             .append("publishOther", getPublishOther())
             .append("customerTail", getCustomerTail())
             .append("lookInfo", getLookInfo())

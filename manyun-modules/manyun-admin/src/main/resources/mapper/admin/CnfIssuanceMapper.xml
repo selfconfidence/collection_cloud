@@ -8,6 +8,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="id"    column="id"    />
         <result property="publishOther"    column="publish_other"    />
         <result property="publishAuther"    column="publish_auther"    />
+        <result property="publishInfo"    column="publish_info"    />
         <result property="createdBy"    column="created_by"    />
         <result property="createdTime"    column="created_time"    />
         <result property="updatedBy"    column="updated_by"    />
@@ -15,7 +16,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectCnfIssuanceVo">
-        select id, publish_other, publish_auther, created_by, created_time, updated_by, updated_time from cnf_issuance
+        select id, publish_other, publish_auther, publish_info, created_by, created_time, updated_by, updated_time from cnf_issuance
     </sql>
 
     <select id="selectCnfIssuanceList" parameterType="CnfIssuance" resultMap="CnfIssuanceResult">

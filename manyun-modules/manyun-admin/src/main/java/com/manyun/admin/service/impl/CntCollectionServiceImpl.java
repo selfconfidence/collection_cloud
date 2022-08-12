@@ -154,6 +154,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                 cntCollectionInfo.setPublishId(issuanceId);
                 cntCollectionInfo.setPublishOther(cnfIssuance.getPublishOther());
                 cntCollectionInfo.setPublishAuther(cnfIssuance.getPublishAuther());
+                cntCollectionInfo.setPublishInfo(cnfIssuance.getPublishInfo());
             }
         }
         collectionInfoService.save(cntCollectionInfo);
@@ -239,6 +240,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                     cntCollectionInfo.setPublishId(issuanceId);
                     cntCollectionInfo.setPublishOther(cnfIssuance.getPublishOther());
                     cntCollectionInfo.setPublishAuther(cnfIssuance.getPublishAuther());
+                    cntCollectionInfo.setPublishInfo(cnfIssuance.getPublishInfo());
                 }
                 cntCollectionInfo.setCreatedBy(SecurityUtils.getUsername());
                 cntCollectionInfo.setCreatedTime(DateUtils.getNowDate());
@@ -254,6 +256,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                     cntCollectionInfo.setPublishId("");
                     cntCollectionInfo.setPublishOther("");
                     cntCollectionInfo.setPublishAuther("");
+                    cntCollectionInfo.setPublishInfo("");
                 }
                 cntCollectionInfo.setLookInfo(collectionInfoAlterVo.getLookInfo());
                 cntCollectionInfo.setUpdatedBy(SecurityUtils.getUsername());
@@ -378,7 +381,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                 Builder
                         .of(CntUserCollection::new)
                         .with(CntUserCollection::setId, idStr)
-                        .with(CntUserCollection::setUserId, cntUsers.get(0).getUserId())
+                        .with(CntUserCollection::setUserId, cntUsers.get(0).getId())
                         .with(CntUserCollection::setCollectionId, collection.getId())
                         .with(CntUserCollection::setCollectionName, collection.getCollectionName())
                         .with(CntUserCollection::setLinkAddr, IdUtils.getSnowflake().nextIdStr())
@@ -389,7 +392,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                         .with(CntUserCollection::setCreatedTime,DateUtils.getNowDate())
                         .build()
         );
-        return R.ok(Builder.of(AirdropVo::new).with(AirdropVo::setUserId,cntUsers.get(0).getUserId()).with(AirdropVo::setUsercollectionId,idStr).build());
+        return R.ok(Builder.of(AirdropVo::new).with(AirdropVo::setUserId,cntUsers.get(0).getId()).with(AirdropVo::setUsercollectionId,idStr).build());
     }
 
     /**
