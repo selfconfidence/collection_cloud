@@ -195,7 +195,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         }
         auctionPrice.setUserId(businessUser.getUserId());
         auctionPrice.setAuctionSendId(auctionPriceForm.getAuctionSendId());
-        auctionPrice.setUserName(businessUser.getUsername());
+        auctionPrice.setUserName(remoteBuiUserService.commUni(userId, SecurityConstants.INNER).getData().getNickName());
         auctionPrice.setCreatedTime(LocalDateTime.now());
         //改状态为最新
         List<AuctionPrice> oldPriceList = list(Wrappers.<AuctionPrice>lambdaQuery()
@@ -472,7 +472,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         auctionPrice.setAuctionStatus(AuctionStatus.BID_BIDING.getCode());
         auctionPrice.setUserId(businessUser.getUserId());
         auctionPrice.setAuctionSendId(auctionPayFixedForm.getAuctionSendId());
-        auctionPrice.setUserName(businessUser.getUsername());
+        auctionPrice.setUserName(remoteBuiUserService.commUni(userId, SecurityConstants.INNER).getData().getNickName());
         auctionPrice.setCreatedTime(LocalDateTime.now());
         auctionPrice.setEndPayTime(LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class)));
         auctionPrice.setBidPrice(auctionSend.getSoldPrice());
