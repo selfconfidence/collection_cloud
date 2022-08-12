@@ -522,7 +522,19 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
             List<AuctionPrice> priceList = list(Wrappers.<AuctionPrice>lambdaQuery().eq(AuctionPrice::getAuctionSendId, auctionSend.getId()));
             if (priceList.isEmpty()) {
                 auctionSend.setAuctionSendStatus(AuctionSendStatus.BID_PASS.getCode());
+                List<AuctionMargin> list = auctionMarginService.list(Wrappers.<AuctionMargin>lambdaQuery().eq(AuctionMargin::getAuctionSendId, auctionSend.getId()));
+                if (!list.isEmpty()) {
+                    for (AuctionMargin auctionMargin : list) {
+                        Money buyerMoney = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, auctionMargin.getUserId()));
+                        buyerMoney.setMoneyBalance(buyerMoney.getMoneyBalance().add(auctionMargin.getMargin()));
+                        moneyService.updateById(buyerMoney);
+                        logsService.saveLogs(LogInfoDto.builder().buiId(auctionMargin.getUserId()).jsonTxt("退还保证金").formInfo(auctionMargin.getMargin().toString()).isType(PULL_SOURCE).modelType(MONEY_TYPE).build());
+                    }
+                }
+
+
                 String info = "已流拍，从拍卖市场退回";
+
                 //从拍卖市场退回
                 if (auctionSend.getGoodsType() == 1) {
                     userCollectionService.showUserCollection(auctionSend.getUserId(), auctionSend.getMyGoodsId(),info);
