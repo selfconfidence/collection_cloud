@@ -528,7 +528,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                     userCollectionService.showUserCollection(auctionSend.getUserId(), auctionSend.getMyGoodsId(),info);
                 }
                 if (auctionSend.getGoodsType() == 2) {
-                    userBoxService.showUserBox(auctionSend.getUserId(), auctionSend.getMyGoodsId(), info);
+                    userBoxService.showUserBox(auctionSend.getMyGoodsId(), auctionSend.getUserId(), info);
                 }
             }
         }
