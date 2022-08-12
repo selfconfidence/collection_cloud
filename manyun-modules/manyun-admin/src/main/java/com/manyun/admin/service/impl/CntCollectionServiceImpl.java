@@ -154,6 +154,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                 cntCollectionInfo.setPublishId(issuanceId);
                 cntCollectionInfo.setPublishOther(cnfIssuance.getPublishOther());
                 cntCollectionInfo.setPublishAuther(cnfIssuance.getPublishAuther());
+                cntCollectionInfo.setPublishInfo(cnfIssuance.getPublishInfo());
             }
         }
         collectionInfoService.save(cntCollectionInfo);
@@ -239,6 +240,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                     cntCollectionInfo.setPublishId(issuanceId);
                     cntCollectionInfo.setPublishOther(cnfIssuance.getPublishOther());
                     cntCollectionInfo.setPublishAuther(cnfIssuance.getPublishAuther());
+                    cntCollectionInfo.setPublishInfo(cnfIssuance.getPublishInfo());
                 }
                 cntCollectionInfo.setCreatedBy(SecurityUtils.getUsername());
                 cntCollectionInfo.setCreatedTime(DateUtils.getNowDate());
@@ -254,6 +256,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                     cntCollectionInfo.setPublishId("");
                     cntCollectionInfo.setPublishOther("");
                     cntCollectionInfo.setPublishAuther("");
+                    cntCollectionInfo.setPublishInfo("");
                 }
                 cntCollectionInfo.setLookInfo(collectionInfoAlterVo.getLookInfo());
                 cntCollectionInfo.setUpdatedBy(SecurityUtils.getUsername());

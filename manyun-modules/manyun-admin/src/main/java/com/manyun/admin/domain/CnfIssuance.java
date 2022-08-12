@@ -24,6 +24,9 @@ public class CnfIssuance implements Serializable
     @ApiModelProperty("发行方头像")
     private String publishAuther;
 
+    @ApiModelProperty("发行方简介")
+    private String publishInfo;
+
     @ApiModelProperty("创建人")
     private String createdBy;
 
@@ -70,6 +73,14 @@ public class CnfIssuance implements Serializable
         this.createdBy = createdBy;
     }
 
+    public String getPublishInfo() {
+        return publishInfo;
+    }
+
+    public void setPublishInfo(String publishInfo) {
+        this.publishInfo = publishInfo;
+    }
+
     public String getCreatedBy()
     {
         return createdBy;
@@ -108,6 +119,7 @@ public class CnfIssuance implements Serializable
             .append("id", getId())
             .append("publishOther", getPublishOther())
             .append("publishAuther", getPublishAuther())
+            .append("publishInfo", getPublishInfo())
             .append("createdBy", getCreatedBy())
             .append("createdTime", getCreatedTime())
             .append("updatedBy", getUpdatedBy())
