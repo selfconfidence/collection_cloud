@@ -164,8 +164,8 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
         BigDecimal subtract = auctionOrder.getNowPrice().subtract(auctionOrder.getCommission());
         sellerMoney.setMoneyBalance(sellerMoney.getMoneyBalance().add(subtract));
         moneyService.updateById(sellerMoney);
-        logsService.saveLogs(LogInfoDto.builder().buiId(userId).jsonTxt("拍卖成功").formInfo(auctionOrder.getNowPrice().toString()).isType(PULL_SOURCE).modelType(MONEY_TYPE).build());
-        logsService.saveLogs(LogInfoDto.builder().buiId(userId).jsonTxt("扣除佣金").formInfo(auctionOrder.getCommission().toString()).isType(POLL_SOURCE).modelType(MONEY_TYPE).build());
+        logsService.saveLogs(LogInfoDto.builder().buiId(auctionSend.getUserId()).jsonTxt("拍卖成功").formInfo(auctionOrder.getNowPrice().toString()).isType(PULL_SOURCE).modelType(MONEY_TYPE).build());
+        logsService.saveLogs(LogInfoDto.builder().buiId(auctionSend.getUserId()).jsonTxt("扣除佣金").formInfo(auctionOrder.getCommission().toString()).isType(POLL_SOURCE).modelType(MONEY_TYPE).build());
 
         Integer goodsType = auctionOrder.getGoodsType();
 
