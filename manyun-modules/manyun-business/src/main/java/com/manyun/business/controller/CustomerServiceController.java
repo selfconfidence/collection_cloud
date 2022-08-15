@@ -5,6 +5,7 @@ import com.manyun.business.domain.form.OpinionForm;
 import com.manyun.business.domain.vo.ArticleVo;
 import com.manyun.business.domain.vo.CustomerServiceVo;
 import com.manyun.business.service.ICustomerService;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
@@ -48,16 +49,16 @@ public class CustomerServiceController extends BaseController {
 
     @PostMapping("/saveOpinion")
     @ApiOperation("保存产品建议信息")
-    public AjaxResult saveOpinion(@Valid @RequestBody OpinionForm opinionForm){
+    public R saveOpinion(@Valid @RequestBody OpinionForm opinionForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        return toAjax(customerService.saveOpinion(opinionForm,notNullLoginBusinessUser));
+        return customerService.saveOpinion(opinionForm,notNullLoginBusinessUser)==1?R.ok():R.fail();
     }
 
     @PostMapping("/saveFeedback")
     @ApiOperation("保存反馈举报信息")
-    public AjaxResult saveFeedback(@Valid @RequestBody FeedbackForm feedbackForm){
+    public R saveFeedback(@Valid @RequestBody FeedbackForm feedbackForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        return toAjax(customerService.saveFeedback(feedbackForm,notNullLoginBusinessUser));
+        return customerService.saveFeedback(feedbackForm,notNullLoginBusinessUser)==1?R.ok():R.fail();
     }
 
 }
