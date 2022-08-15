@@ -10,7 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
 
 /**
  * <p>
@@ -33,8 +36,11 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
     /**
      * 能购买的
      */
+//    @Autowired
+//    private ICntPostSellService postSellService;
+
     @Autowired
-    private ICntPostSellService postSellService;
+    private ICntPostConfigService postConfigService;
 
     @Autowired
     private IUserCollectionService userCollectionService;
@@ -50,15 +56,31 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
      * @param buiId
      * @return
      */
+//    @Override
+//    public boolean isConfigPostCustomer(String userId, String buiId) {
+//        //1.查询 配置购买表中 有没有这个  buiId
+//        // 1.1 有的话，就查 拥有表中的藏品和目前用户拥有的藏品进行比较,存在 返回true ; 否则 false
+//        List<CntPostSell> tbPostSells = postSellService.list(Wrappers.<CntPostSell>lambdaQuery().eq(CntPostSell::getBuiId, buiId));
+//        if (!tbPostSells.isEmpty()){
+//            // 此接口可以进行特别优化
+//            List<CntPostExist> tbPostExists = postExistService.list();
+//            List<UserCollection> userCollections = userCollectionService.list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getUserId, userId).in(UserCollection::getCollectionId, tbPostExists.stream().map(item -> item.getCollectionId()).collect(Collectors.toSet())));
+//            return !userCollections.isEmpty();
+//        }
+//        // 1.2 没有的话，直接返回 false
+//        return Boolean.FALSE;
+//    }
+
     @Override
     public boolean isConfigPostCustomer(String userId, String buiId) {
         //1.查询 配置购买表中 有没有这个  buiId
         // 1.1 有的话，就查 拥有表中的藏品和目前用户拥有的藏品进行比较,存在 返回true ; 否则 false
-        List<CntPostSell> tbPostSells = postSellService.list(Wrappers.<CntPostSell>lambdaQuery().eq(CntPostSell::getBuiId, buiId));
-        if (!tbPostSells.isEmpty()){
+        CntPostConfig cntPostConfig = postConfigService.getOne(Wrappers.<CntPostConfig>lambdaQuery().select(CntPostConfig::getBuiId,CntPostConfig::getId).eq(CntPostConfig::getBuiId, buiId));
+        //List<CntPostSell> tbPostSells = postSellService.list(Wrappers.<CntPostSell>lambdaQuery().eq(CntPostSell::getBuiId, buiId));
+        if (Objects.nonNull(cntPostConfig)){
             // 此接口可以进行特别优化
-            List<CntPostExist> tbPostExists = postExistService.list();
-            List<UserCollection> userCollections = userCollectionService.list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getUserId, userId).in(UserCollection::getCollectionId, tbPostExists.stream().map(item -> item.getCollectionId()).collect(Collectors.toSet())));
+            List<CntPostExist> tbPostExists = postExistService.list(Wrappers.<CntPostExist>lambdaQuery().select(CntPostExist::getCollectionId).eq(CntPostExist::getConfigId, cntPostConfig.getId()));
+            List<UserCollection> userCollections = userCollectionService.list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getIsExist,USE_EXIST.getCode()).eq(UserCollection::getUserId, userId).in(UserCollection::getCollectionId, tbPostExists.stream().map(item -> item.getCollectionId()).collect(Collectors.toSet())));
             return !userCollections.isEmpty();
         }
         // 1.2 没有的话，直接返回 false
@@ -72,14 +94,31 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
      * @param buiId
      * @return
      */
+//    @Override
+//    public boolean isConfigPostBoxCustomer(String userId, String buiId) {
+//        //1.查询 配置购买表中 有没有这个  buiId
+//        // 1.1 有的话，就查 拥有表中的藏品和目前用户拥有的藏品进行比较,存在 返回true ; 否则 false
+//        List<CntPostSell> tbPostSells = postSellService.list(Wrappers.<CntPostSell>lambdaQuery().eq(CntPostSell::getBuiId, buiId));
+//        if (!tbPostSells.isEmpty()){
+//            // 此接口可以进行特别优化
+//            List<CntPostExist> tbPostExists = postExistService.list();
+//            List<UserBox> userBoxList = userBoxService.list(Wrappers.<UserBox>lambdaQuery().eq(UserBox::getUserId, userId).in(UserBox::getBoxId, tbPostExists.stream().map(item -> item.getCollectionId()).collect(Collectors.toSet())));
+//            return !userBoxList.isEmpty();
+//        }
+//        // 1.2 没有的话，直接返回 false
+//        return Boolean.FALSE;
+//    }
     @Override
+    @Deprecated
     public boolean isConfigPostBoxCustomer(String userId, String buiId) {
         //1.查询 配置购买表中 有没有这个  buiId
         // 1.1 有的话，就查 拥有表中的藏品和目前用户拥有的藏品进行比较,存在 返回true ; 否则 false
-        List<CntPostSell> tbPostSells = postSellService.list(Wrappers.<CntPostSell>lambdaQuery().eq(CntPostSell::getBuiId, buiId));
-        if (!tbPostSells.isEmpty()){
+        CntPostConfig cntPostConfig = postConfigService.getOne(Wrappers.<CntPostConfig>lambdaQuery().select(CntPostConfig::getBuiId,CntPostConfig::getId).eq(CntPostConfig::getBuiId, buiId));
+
+        // List<CntPostSell> tbPostSells = postSellService.list(Wrappers.<CntPostSell>lambdaQuery().eq(CntPostSell::getBuiId, buiId));
+        if (Objects.nonNull(cntPostConfig)){
             // 此接口可以进行特别优化
-            List<CntPostExist> tbPostExists = postExistService.list();
+            List<CntPostExist> tbPostExists = postExistService.list(Wrappers.<CntPostExist>lambdaQuery().select(CntPostExist::getCollectionId).eq(CntPostExist::getConfigId, cntPostConfig.getId()));
             List<UserBox> userBoxList = userBoxService.list(Wrappers.<UserBox>lambdaQuery().eq(UserBox::getUserId, userId).in(UserBox::getBoxId, tbPostExists.stream().map(item -> item.getCollectionId()).collect(Collectors.toSet())));
             return !userBoxList.isEmpty();
         }

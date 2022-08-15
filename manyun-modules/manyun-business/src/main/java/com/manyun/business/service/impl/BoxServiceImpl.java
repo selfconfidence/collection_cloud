@@ -335,7 +335,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
                //1.1.1 判定下当前时间 就可以购买了 publishTimeFlag = false
                // 1.1.2 如果当前时间还不满足 就拦截提示 好了
             // 1.2 不满足就 直接拦截,提示.
-            if (cntPostExcelService.isExcelPostCustomer(userId, box.getId()) || postConfigService.isConfigPostBoxCustomer(userId, box.getId())){
+            if (cntPostExcelService.isExcelPostCustomer(userId, box.getId()) || postConfigService.isConfigPostCustomer(userId, box.getId())){
                 if (LocalDateTime.now().compareTo(box.getPublishTime().minusMinutes(box.getPostTime())) >=0){
                     publishTimeFlag = Boolean.FALSE;
                 }
