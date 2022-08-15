@@ -407,4 +407,12 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         }
 
     }
+
+    @Override
+    public void checkPaySecure(String paySecure, String userId) {
+        CntUser cntUser = getById(userId);
+        Assert.isTrue(StrUtil.isNotBlank(cntUser.getPayPass()),"未设置支付密码,请核实!");
+        Assert.isTrue(paySecure.equals(cntUser.getPayPass()),"支付密码校验失败!");
+
+    }
 }

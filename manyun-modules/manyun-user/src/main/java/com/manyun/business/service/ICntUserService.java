@@ -55,4 +55,6 @@ public interface ICntUserService extends IService<CntUser> {
     R userRealName(UserRealForm userRealForm, String userId);
 
     R<InviteUserVo> inviteUser(String userId);
+
+    void checkPaySecure(String paySecure, String userId);
 }

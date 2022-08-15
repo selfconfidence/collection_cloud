@@ -225,6 +225,14 @@ public class CntUserController extends BaseController {
         return userService.inviteUser(userId);
     }
 
+    @PostMapping("checkPaySecure")
+    @ApiOperation("检查支付密码是否一致")
+    public R checkPaySecure(@RequestParam("paySecure") String paySecure){
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        userService.checkPaySecure(paySecure,notNullLoginBusinessUser.getUserId());
+        return R.ok();
+    }
+
 
 
 

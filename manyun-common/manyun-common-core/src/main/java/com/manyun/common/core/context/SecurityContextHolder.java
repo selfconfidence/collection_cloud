@@ -11,7 +11,7 @@ import com.manyun.common.core.utils.StringUtils;
  * 获取当前线程变量中的 用户id、用户名称、Token等信息 
  * 注意： 必须在网关通过请求头的方法传入，同时在HeaderInterceptor拦截器设置值。 否则这里无法获取
  *
- * @author ruoyi
+ * @author yanwei
  */
 public class SecurityContextHolder
 {
