@@ -1,6 +1,7 @@
 package com.manyun.business.controller;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import com.alibaba.fastjson2.JSONObject;
 import com.manyun.business.domain.entity.CntUser;
 import com.manyun.business.domain.form.*;
 import com.manyun.business.domain.vo.InviteUserVo;
@@ -227,7 +228,8 @@ public class CntUserController extends BaseController {
 
     @PostMapping("checkPaySecure")
     @ApiOperation("检查支付密码是否一致")
-    public R checkPaySecure(@RequestParam("paySecure") String paySecure){
+    public R checkPaySecure(@RequestBody JSONObject jsonObject){
+        String paySecure = jsonObject.getString("paySecure");
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         userService.checkPaySecure(paySecure,notNullLoginBusinessUser.getUserId());
         return R.ok();
