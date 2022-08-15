@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
@@ -80,8 +81,11 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
         if (Objects.nonNull(cntPostConfig)){
             // 此接口可以进行特别优化
             List<CntPostExist> tbPostExists = postExistService.list(Wrappers.<CntPostExist>lambdaQuery().select(CntPostExist::getCollectionId).eq(CntPostExist::getConfigId, cntPostConfig.getId()));
-            List<UserCollection> userCollections = userCollectionService.list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getIsExist,USE_EXIST.getCode()).eq(UserCollection::getUserId, userId).in(UserCollection::getCollectionId, tbPostExists.stream().map(item -> item.getCollectionId()).collect(Collectors.toSet())));
-            return !userCollections.isEmpty();
+            Set<String> collectionIds = tbPostExists.stream().map(item -> item.getCollectionId()).collect(Collectors.toSet());
+            List<UserCollection> userCollections = userCollectionService.list(Wrappers.<UserCollection>lambdaQuery().select(UserCollection::getId).eq(UserCollection::getIsExist,USE_EXIST.getCode()).eq(UserCollection::getUserId, userId).in(UserCollection::getCollectionId,collectionIds ));
+            // 去重
+            Set<String> userCollectionIds = userCollections.stream().map(item -> item.getId()).collect(Collectors.toSet());
+            return userCollectionIds.size() >= collectionIds.size();
         }
         // 1.2 没有的话，直接返回 false
         return Boolean.FALSE;
