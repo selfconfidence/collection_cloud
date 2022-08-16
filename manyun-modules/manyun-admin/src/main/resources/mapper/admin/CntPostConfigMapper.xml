@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntPostConfigMapper">
+
+    <resultMap type="CntPostConfig" id="CntPostConfigResult">
+        <result property="id"    column="id"    />
+        <result property="configName"    column="config_name"    />
+        <result property="reMark"    column="re_mark"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+        <result property="buiId"    column="bui_id"    />
+        <result property="isType"    column="is_type"    />
+    </resultMap>
+
+    <sql id="selectCntPostConfigVo">
+        select id, config_name, re_mark, created_by, created_time, updated_by, updated_time, bui_id, is_type from cnt_post_config
+    </sql>
+
+    <select id="selectCntPostConfigList" parameterType="PostConfigQuery" resultType="com.manyun.admin.domain.dto.CntPostConfigBeanDto">
+        select
+            pc.id,
+            pc.config_name configName,
+            pc.re_mark reMark,
+            pc.is_type isType,
+            co.collection_name collectionName,
+            cb.box_title boxTitle,
+            pc.created_time createdTime,
+            pc.updated_time updatedTime
+        from
+            cnt_post_config pc
+        left join
+            cnt_collection co
+        on
+            pc.bui_id=co.id
+        left join
+            cnt_box cb
+        on
+            pc.bui_id=cb.id
+        <where>
+            <if test="configName != null  and configName != ''"> and pc.config_name like concat('%', #{configName}, '%')</if>
+        </where>
+        order by pc.created_time desc
+    </select>
+
+</mapper>

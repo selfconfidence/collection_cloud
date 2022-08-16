@@ -29,9 +29,6 @@ public class CntBoxAlterVo {
     @ApiModelProperty("盲盒标题")
     private String boxTitle;
 
-    @ApiModelProperty("已售")
-    private Integer selfBalance;
-
     @ApiModelProperty("库存")
     private Integer balance;
 

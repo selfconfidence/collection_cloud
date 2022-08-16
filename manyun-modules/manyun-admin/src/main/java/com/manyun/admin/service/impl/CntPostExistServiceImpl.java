@@ -6,17 +6,16 @@ import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.github.pagehelper.PageHelper;
+import com.manyun.admin.domain.query.PostExistQuery;
 import com.manyun.admin.domain.vo.CntPostExistVo;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.admin.mapper.CntPostExistMapper;
 import com.manyun.admin.domain.CntPostExist;
 import com.manyun.admin.service.ICntPostExistService;
@@ -48,19 +47,15 @@ public class CntPostExistServiceImpl extends ServiceImpl<CntPostExistMapper,CntP
     /**
      * 查询提前购配置已经拥有列表
      *
-     * @param pageQuery
+     * @param postExistQuery
      * @return 提前购配置已经拥有
      */
     @Override
-    public TableDataInfo<CntPostExistVo> selectCntPostExistList(PageQuery pageQuery)
+    public TableDataInfo<CntPostExistVo> selectCntPostExistList(PostExistQuery postExistQuery)
     {
-        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
-        List<CntPostExist> cntPostExists = cntPostExistMapper.selectCntPostExistList(new CntPostExist());
-        return TableDataInfoUtil.pageTableDataInfo(cntPostExists.parallelStream().map(m->{
-            CntPostExistVo cntPostExistVo=new CntPostExistVo();
-            BeanUtil.copyProperties(m,cntPostExistVo);
-            return cntPostExistVo;
-        }).collect(Collectors.toList()),cntPostExists);
+        PageHelper.startPage(postExistQuery.getPageNum(),postExistQuery.getPageSize());
+        List<CntPostExistVo> cntPostExists = cntPostExistMapper.selectCntPostExistList(postExistQuery);
+        return TableDataInfoUtil.pageTableDataInfo(cntPostExists,cntPostExists);
     }
 
     /**

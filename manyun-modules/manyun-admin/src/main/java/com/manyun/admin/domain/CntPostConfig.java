@@ -9,23 +9,20 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import java.io.Serializable;
 
-@ApiModel("提前购配置可以购买对象")
-@TableName("cnt_post_sell")
-public class CntPostSell implements Serializable
+@ApiModel("提前购配置-只能有一条对象")
+@TableName("cnt_post_config")
+public class CntPostConfig implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键")
     private String id;
 
-    @ApiModelProperty("业务编号;（盲盒 & 藏品）编号")
-    private String buiId;
+    @ApiModelProperty("配置名称")
+    private String configName;
 
-    @ApiModelProperty("配置编号")
-    private String configId;
-
-    @ApiModelProperty("业务名称")
-    private String buiName;
+    @ApiModelProperty("备注")
+    private String reMark;
 
     @ApiModelProperty("创建人")
     private String createdBy;
@@ -41,6 +38,12 @@ public class CntPostSell implements Serializable
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedTime;
 
+    @ApiModelProperty("(藏品|盲盒)编号(提前购验证模板)")
+    private String buiId;
+
+    @ApiModelProperty("0=藏品,1=盲盒")
+    private Integer isType;
+
     public void setId(String id)
     {
         this.id = id;
@@ -50,36 +53,26 @@ public class CntPostSell implements Serializable
     {
         return id;
     }
-    public void setBuiId(String buiId)
+    public void setConfigName(String configName)
     {
-        this.buiId = buiId;
+        this.configName = configName;
     }
 
-    public String getBuiId()
+    public String getConfigName()
     {
-        return buiId;
-    }
-    public void setConfigId(String configId)
-    {
-        this.configId = configId;
-    }
-
-    public String getConfigId()
-    {
-        return configId;
-    }
-    public void setBuiName(String buiName)
-    {
-        this.buiName = buiName;
-    }
-
-    public String getBuiName()
-    {
-        return buiName;
+        return configName;
     }
     public void setCreatedBy(String createdBy)
     {
         this.createdBy = createdBy;
+    }
+
+    public String getReMark() {
+        return reMark;
+    }
+
+    public void setReMark(String reMark) {
+        this.reMark = reMark;
     }
 
     public String getCreatedBy()
@@ -113,18 +106,37 @@ public class CntPostSell implements Serializable
     {
         return updatedTime;
     }
+    public void setBuiId(String buiId)
+    {
+        this.buiId = buiId;
+    }
+
+    public String getBuiId()
+    {
+        return buiId;
+    }
+    public void setIsType(Integer isType)
+    {
+        this.isType = isType;
+    }
+
+    public Integer getIsType()
+    {
+        return isType;
+    }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("id", getId())
-            .append("buiId", getBuiId())
-            .append("configId", getConfigId())
-            .append("buiName", getBuiName())
+            .append("configName", getConfigName())
+            .append("reMark", getReMark())
             .append("createdBy", getCreatedBy())
             .append("createdTime", getCreatedTime())
             .append("updatedBy", getUpdatedBy())
             .append("updatedTime", getUpdatedTime())
+            .append("buiId", getBuiId())
+            .append("isType", getIsType())
             .toString();
     }
 }

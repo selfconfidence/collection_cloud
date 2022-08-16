@@ -27,6 +27,9 @@ public class CntPostExist implements Serializable
     @ApiModelProperty("业务名称")
     private String buiName;
 
+    @ApiModelProperty("备注")
+    private String reMark;
+
     @ApiModelProperty("创建人")
     private String createdBy;
 
@@ -82,6 +85,14 @@ public class CntPostExist implements Serializable
         this.createdBy = createdBy;
     }
 
+    public String getReMark() {
+        return reMark;
+    }
+
+    public void setReMark(String reMark) {
+        this.reMark = reMark;
+    }
+
     public String getCreatedBy()
     {
         return createdBy;
@@ -121,6 +132,7 @@ public class CntPostExist implements Serializable
             .append("collectionId", getCollectionId())
             .append("configId", getConfigId())
             .append("buiName", getBuiName())
+            .append("reMark", getReMark())
             .append("createdBy", getCreatedBy())
             .append("createdTime", getCreatedTime())
             .append("updatedBy", getUpdatedBy())

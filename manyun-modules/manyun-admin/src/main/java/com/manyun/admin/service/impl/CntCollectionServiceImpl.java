@@ -334,14 +334,6 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                 return R.fail("藏品标签最多可选中三个!");
             }
         }
-        //验证流通数量不能大于发售数量
-        Integer balance = collectionAlterVo.getBalance();
-        Integer selfBalance = collectionAlterVo.getSelfBalance();
-        if(balance!=null && selfBalance!=null){
-            if(selfBalance>balance){
-                return R.fail("流通数量不能大于发售数量!");
-            }
-        }
         //验证图片
         if(Objects.isNull(mediaAlterVo) || StringUtils.isBlank(mediaAlterVo.getImg())){
             return R.fail("藏品主图不能为空!");

@@ -1,7 +1,7 @@
 package com.manyun.admin.controller;
 
-import java.util.List;
 
+import com.manyun.admin.domain.query.PostExistQuery;
 import com.manyun.admin.domain.vo.CntPostExistVo;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.PageQuery;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
-import com.manyun.common.security.annotation.RequiresPermissions;
 import com.manyun.admin.domain.CntPostExist;
 import com.manyun.admin.service.ICntPostExistService;
 import com.manyun.common.core.web.controller.BaseController;
@@ -44,9 +43,9 @@ public class CntPostExistController extends BaseController
     //@RequiresPermissions("admin:exist:list")
     @GetMapping("/list")
     @ApiOperation("查询提前购配置已经拥有列表")
-    public TableDataInfo<CntPostExistVo> list(PageQuery pageQuery)
+    public TableDataInfo<CntPostExistVo> list(PostExistQuery postExistQuery)
     {
-        return cntPostExistService.selectCntPostExistList(pageQuery);
+        return cntPostExistService.selectCntPostExistList(postExistQuery);
     }
 
     /**
