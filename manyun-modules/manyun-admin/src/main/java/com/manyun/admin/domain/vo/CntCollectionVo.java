@@ -35,7 +35,4 @@ public class CntCollectionVo {
     @ApiModelProperty("已售")
     private Integer selfBalance;
 
-    @ApiModelProperty("是否预售：1预售中，2已开售")
-    private Integer preStatus;
-
 }

@@ -91,11 +91,6 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         return TableDataInfoUtil.pageTableDataInfo(cntBoxList.parallelStream().map(item -> {
                     CntBoxVo cntBoxVo = new CntBoxVo();
                     BeanUtil.copyProperties(item, cntBoxVo);
-                    if (item.getPublishTime().after(DateUtils.toDate(LocalDateTime.now()))) {
-                        cntBoxVo.setPreStatus(1);
-                    } else {
-                        cntBoxVo.setPreStatus(2);
-                    }
                     cntBoxVo.setMediaVos(mediaService.initMediaVos(item.getId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
                     return cntBoxVo;
                 }).collect(Collectors.toList()),cntBoxList);

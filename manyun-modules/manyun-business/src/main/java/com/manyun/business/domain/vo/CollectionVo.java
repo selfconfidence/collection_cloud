@@ -57,5 +57,8 @@ public class CollectionVo implements Serializable {
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdTime;
 
+    @ApiModelProperty("是否预售：1预售中，2已开售")
+    private Integer preStatus;
+
 
 }

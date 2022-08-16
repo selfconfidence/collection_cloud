@@ -395,6 +395,11 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     private CollectionVo providerCollectionVo(CntCollection CntCollection){
         CollectionVo collectionVo = Builder.of(CollectionVo::new).build();
         BeanUtil.copyProperties(CntCollection,collectionVo);
+        if (CntCollection.getPublishTime().isAfter(LocalDateTime.now())) {
+            collectionVo.setPreStatus(1);
+        } else {
+            collectionVo.setPreStatus(2);
+        }
         collectionVo.setLableVos(initLableVos(CntCollection.getId()));
         collectionVo.setMediaVos(initMediaVos(CntCollection.getId()));
         collectionVo.setCnfCreationdVo(initCnfCreationVo(CntCollection.getBindCreation()));

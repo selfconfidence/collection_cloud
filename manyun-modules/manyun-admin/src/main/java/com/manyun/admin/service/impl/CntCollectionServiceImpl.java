@@ -101,11 +101,6 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
 
             CntCollectionVo cntCollectionVo = new CntCollectionVo();
             BeanUtil.copyProperties(m, cntCollectionVo);
-            if (m.getPublishTime().after(DateUtils.toDate(LocalDateTime.now()))) {
-                cntCollectionVo.setPreStatus(1);
-            } else {
-                cntCollectionVo.setPreStatus(2);
-            }
             cntCollectionVo.setMediaVos(mediaService.initMediaVos(m.getId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
             return cntCollectionVo;
         }).collect(Collectors.toList()), cntCollectionList);

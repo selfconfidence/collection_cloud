@@ -366,6 +366,11 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
     private BoxListVo initBoxListVo(Box box){
         BoxListVo boxListVo = Builder.of(BoxListVo::new).build();
         BeanUtil.copyProperties(box,boxListVo);
+        if (box.getPublishTime().isAfter(LocalDateTime.now())) {
+            boxListVo.setPreStatus(1);
+        } else {
+            boxListVo.setPreStatus(2);
+        }
         // 需要集成图片服务
         boxListVo.setMediaVos(mediaService.initMediaVos(box.getId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
         return boxListVo;
