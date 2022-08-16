@@ -6,7 +6,7 @@ package com.manyun.common.core.enums;
 public enum CntSystemEnum
 {
 
-    EVENT_POSTER("event_poster");
+    INVITE_URL("invite_url");
 
     private final String type;
 
