@@ -1,5 +1,7 @@
 package com.manyun.admin.service.impl;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -96,8 +98,14 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         PageHelper.startPage(collectionQuery.getPageNum(),collectionQuery.getPageSize());
         List<CntCollection> cntCollectionList = cntCollectionMapper.selectSearchCollectionList(collectionQuery);
         return TableDataInfoUtil.pageTableDataInfo(cntCollectionList.parallelStream().map(m->{
+
             CntCollectionVo cntCollectionVo = new CntCollectionVo();
             BeanUtil.copyProperties(m, cntCollectionVo);
+            if (m.getPublishTime().after(DateUtils.toDate(LocalDateTime.now()))) {
+                cntCollectionVo.setPreStatus(1);
+            } else {
+                cntCollectionVo.setPreStatus(2);
+            }
             cntCollectionVo.setMediaVos(mediaService.initMediaVos(m.getId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
             return cntCollectionVo;
         }).collect(Collectors.toList()), cntCollectionList);

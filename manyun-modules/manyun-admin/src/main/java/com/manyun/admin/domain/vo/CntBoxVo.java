@@ -49,4 +49,7 @@ public class CntBoxVo {
     @ApiModelProperty("更新时间")
     private Date updatedTime;
 
+    @ApiModelProperty("是否预售：1预售中，2已开售")
+    private Integer preStatus;
+
 }
