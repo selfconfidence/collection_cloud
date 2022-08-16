@@ -4,14 +4,14 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-@ApiModel("提前购配置的商品字典")
+@ApiModel("提前购配置字典")
 @Data
-public class TqgGoodsDictVo {
+public class PostConfigDictVo {
 
     @ApiModelProperty("主键")
     private String id;
 
-    @ApiModelProperty("名称")
-    private String buiName;
+    @ApiModelProperty("配置名称")
+    private String configName;
 
 }

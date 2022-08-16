@@ -2,6 +2,7 @@ package com.manyun.admin.service;
 
 import com.manyun.admin.domain.query.ActionTarDictQuery;
 import com.manyun.admin.domain.query.DrawRulesDictQuery;
+import com.manyun.admin.domain.query.PostConfigDictQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.common.core.domain.R;
 
@@ -55,13 +56,19 @@ public interface CntDictService
      */
     R drawRulesDict(DrawRulesDictQuery drawRulesDictQuery);
 
-    /***
-     * 提前购配置可以购买字典
+    /**
+     * 提前购配置字典
+     * @return
      */
-    R postSellDict();
+    R postConfigDict();
 
     /***
-     * 提前购配置已经拥有字典
+     * 提前购配置的商品字典
+     */
+    R postConfigGoodsDict(PostConfigDictQuery postConfigDictQuery);
+
+    /***
+     * 提前购已拥有的
      */
     R postExistDict();
 

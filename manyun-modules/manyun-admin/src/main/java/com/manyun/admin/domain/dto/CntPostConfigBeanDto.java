@@ -1,27 +1,34 @@
-package com.manyun.admin.domain.vo;
+package com.manyun.admin.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
 import java.util.Date;
 
-@ApiModel("提前购配置可以购买返回视图")
+@ApiModel("提前购配置查询结果")
 @Data
-public class CntPostSellVo
+public class CntPostConfigBeanDto
 {
 
     @ApiModelProperty("主键")
     private String id;
 
-    @ApiModelProperty("业务编号;（盲盒 & 藏品）编号")
-    private String buiId;
+    @ApiModelProperty("配置名称")
+    private String configName;
 
-    @ApiModelProperty("配置编号")
-    private String configId;
+    @ApiModelProperty("备注")
+    private String reMark;
 
-    @ApiModelProperty("业务名称")
-    private String buiName;
+    @ApiModelProperty("商品类型 0=藏品,1=盲盒")
+    private Integer isType;
+
+    @ApiModelProperty("藏品名称")
+    private String collectionName;
+
+    @ApiModelProperty("盲盒标题")
+    private String boxTitle;
 
     @ApiModelProperty("创建时间")
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")

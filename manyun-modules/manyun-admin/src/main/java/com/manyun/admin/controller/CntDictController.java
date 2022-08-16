@@ -3,6 +3,7 @@ package com.manyun.admin.controller;
 
 import com.manyun.admin.domain.query.ActionTarDictQuery;
 import com.manyun.admin.domain.query.DrawRulesDictQuery;
+import com.manyun.admin.domain.query.PostConfigDictQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.service.CntDictService;
 import com.manyun.common.core.domain.R;
@@ -81,15 +82,22 @@ public class CntDictController extends BaseController
         return cntDictService.drawRulesDict(drawRulesDictQuery);
     }
 
-    @GetMapping("/postSellDict")
-    @ApiOperation("提前购配置可以购买字典")
-    public R postSellDict()
+    @GetMapping("/postConfigDict")
+    @ApiOperation("提前购配置字典")
+    public R postConfigDict()
     {
-        return cntDictService.postSellDict();
+        return cntDictService.postConfigDict();
+    }
+
+    @PostMapping("/postConfigGoodsDict")
+    @ApiOperation("提前购配置的商品字典")
+    public R postConfigGoodsDict(@Valid @RequestBody PostConfigDictQuery postConfigDictQuery)
+    {
+        return cntDictService.postConfigGoodsDict(postConfigDictQuery);
     }
 
     @GetMapping("/postExistDict")
-    @ApiOperation("提前购配置已经拥有字典")
+    @ApiOperation("提前购已拥配置的藏品字典")
     public R postExistDict()
     {
         return cntDictService.postExistDict();

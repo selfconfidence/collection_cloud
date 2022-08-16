@@ -6,25 +6,25 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import java.util.Date;
 
-@ApiModel("提前购配置已经拥有对象")
+@ApiModel("提前购配置返回视图")
 @Data
-public class CntPostExistVo
+public class CntPostConfigVo
 {
 
     @ApiModelProperty("主键")
     private String id;
 
-    @ApiModelProperty("业务名称")
-    private String buiName;
+    @ApiModelProperty("配置名称")
+    private String configName;
 
     @ApiModelProperty("备注")
     private String reMark;
 
-    @ApiModelProperty("藏品名称")
-    private String collectionName;
+    @ApiModelProperty("商品类型 0=藏品,1=盲盒")
+    private Integer isType;
 
-    @ApiModelProperty("配置名称")
-    private String configName;
+    @ApiModelProperty("商品名称")
+    private String buiName;
 
     @ApiModelProperty("创建时间")
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")

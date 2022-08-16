@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.admin.domain.*;
 import com.manyun.admin.domain.query.ActionTarDictQuery;
 import com.manyun.admin.domain.query.DrawRulesDictQuery;
+import com.manyun.admin.domain.query.PostConfigDictQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.service.*;
 import com.manyun.common.core.domain.Builder;
@@ -51,6 +52,9 @@ public class CntDictServiceImpl implements CntDictService
 
     @Autowired
     private ICntBoxService boxService;
+
+    @Autowired
+    private ICntPostConfigService postConfigService;
 
     /***
      * 查询藏品字典
@@ -160,54 +164,58 @@ public class CntDictServiceImpl implements CntDictService
     }
 
     /***
-     * 提前购配置可以购买字典
+     * 提前购配置字典
      */
     @Override
-    public R postSellDict()
-    {
-        List<TqgGoodsDictVo> tqgGoodsDictVos = collectionService
-                .list(
-                        Wrappers.<CntCollection>lambdaQuery()
-                                .gt(CntCollection::getPublishTime, new Date())
-                                .isNotNull(CntCollection::getPostTime).orderByDesc(CntCollection::getCreatedTime)).stream().map(m -> {
-                    TqgGoodsDictVo tqgGoodsDictVo = new TqgGoodsDictVo();
-                    tqgGoodsDictVo.setId(m.getId());
-                    tqgGoodsDictVo.setBuiName(m.getCollectionName());
-                    return tqgGoodsDictVo;
-                }).collect(Collectors.toList());
-        tqgGoodsDictVos.addAll(boxService
-                .list(
-                        Wrappers.<CntBox>lambdaQuery()
-                                .gt(CntBox::getPublishTime, new Date())
-                                .isNotNull(CntBox::getPostTime).orderByDesc(CntBox::getCreatedTime)).stream().map(m -> {
-                    TqgGoodsDictVo tqgGoodsDictVo = new TqgGoodsDictVo();
-                    tqgGoodsDictVo.setId(m.getId());
-                    tqgGoodsDictVo.setBuiName(m.getBoxTitle());
-                    return tqgGoodsDictVo;
-                }).collect(Collectors.toList()));
-        return R.ok(tqgGoodsDictVos);
+    public R postConfigDict() {
+        return R.ok(postConfigService.list(Wrappers.<CntPostConfig>lambdaQuery().orderByDesc(CntPostConfig::getCreatedTime)).stream().map(m -> {
+            PostConfigDictVo postConfigDictVo=new PostConfigDictVo();
+            BeanUtil.copyProperties(m,postConfigDictVo);
+            return postConfigDictVo;
+        }));
+    }
+
+
+    /***
+     * 提前购配置的商品字典
+     */
+    @Override
+    public R postConfigGoodsDict(PostConfigDictQuery postConfigDictQuery) {
+        return R.ok(
+                postConfigDictQuery.getIsType()==0?collectionService
+                        .list(
+                                Wrappers.<CntCollection>lambdaQuery()
+                                        .gt(CntCollection::getPublishTime, new Date())
+                                        .isNotNull(CntCollection::getPostTime).orderByDesc(CntCollection::getCreatedTime)).stream().map(m -> {
+                            TqgGoodsDictVo tqgGoodsDictVo = new TqgGoodsDictVo();
+                            tqgGoodsDictVo.setId(m.getId());
+                            tqgGoodsDictVo.setBuiName(m.getCollectionName());
+                            return tqgGoodsDictVo;
+                        }).collect(Collectors.toList()):boxService
+                        .list(
+                                Wrappers.<CntBox>lambdaQuery()
+                                        .gt(CntBox::getPublishTime, new Date())
+                                        .isNotNull(CntBox::getPostTime).orderByDesc(CntBox::getCreatedTime)).stream().map(m -> {
+                            TqgGoodsDictVo tqgGoodsDictVo = new TqgGoodsDictVo();
+                            tqgGoodsDictVo.setId(m.getId());
+                            tqgGoodsDictVo.setBuiName(m.getBoxTitle());
+                            return tqgGoodsDictVo;
+                        }).collect(Collectors.toList())
+                );
     }
 
     /***
-     * 提前购配置已经拥有字典
+     * 提前购已拥有的
      */
     @Override
     public R postExistDict() {
-        List<TqgGoodsDictVo> tqgGoodsDictVos = collectionService
+        return R.ok(collectionService
                 .list(Wrappers.<CntCollection>lambdaQuery().orderByDesc(CntCollection::getCreatedTime)).stream().map(m -> {
                     TqgGoodsDictVo tqgGoodsDictVo = new TqgGoodsDictVo();
                     tqgGoodsDictVo.setId(m.getId());
                     tqgGoodsDictVo.setBuiName(m.getCollectionName());
                     return tqgGoodsDictVo;
-                }).collect(Collectors.toList());
-        tqgGoodsDictVos.addAll(boxService
-                .list(Wrappers.<CntBox>lambdaQuery().orderByDesc(CntBox::getCreatedTime)).stream().map(m -> {
-                    TqgGoodsDictVo tqgGoodsDictVo = new TqgGoodsDictVo();
-                    tqgGoodsDictVo.setId(m.getId());
-                    tqgGoodsDictVo.setBuiName(m.getBoxTitle());
-                    return tqgGoodsDictVo;
                 }).collect(Collectors.toList()));
-        return R.ok(tqgGoodsDictVos);
     }
 
     /***
