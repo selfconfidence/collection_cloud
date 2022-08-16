@@ -102,7 +102,7 @@ public class CntSystemServiceImpl extends ServiceImpl<CntSystemMapper,CntSystem>
                 with(CntSystem::setSystemVal,posterDto.getSystemVal()).
                 with(CntSystem::setCreatedBy,SecurityUtils.getUsername()).
                 with(CntSystem::setCreatedTime,DateUtils.getNowDate()).build();
-        if(!update(cntSystem,Wrappers.<CntSystem>lambdaUpdate().eq(CntSystem::getSystemType, CntSystemEnum.EVENT_POSTER))){
+        if(!update(cntSystem,Wrappers.<CntSystem>lambdaUpdate().eq(CntSystem::getSystemType, CntSystemEnum.INVITE_URL))){
             return 0;
         }
         return userService.update(Builder.of(CntUser::new)
@@ -117,7 +117,7 @@ public class CntSystemServiceImpl extends ServiceImpl<CntSystemMapper,CntSystem>
     @Override
     public PosterDto queryPosterInfo() {
         PosterDto posterDto=Builder.of(PosterDto::new).build();
-        CntSystem cntSystem = getOne(Wrappers.<CntSystem>lambdaQuery().eq(CntSystem::getSystemType, CntSystemEnum.EVENT_POSTER));
+        CntSystem cntSystem = getOne(Wrappers.<CntSystem>lambdaQuery().eq(CntSystem::getSystemType, CntSystemEnum.INVITE_URL));
         BeanUtils.copyProperties(cntSystem,posterDto);
         return posterDto;
     }
