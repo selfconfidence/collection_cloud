@@ -415,4 +415,12 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         Assert.isTrue(paySecure.equals(cntUser.getPayPass()),"支付密码校验失败!");
 
     }
+
+    @Override
+    public void saveJpush(String userId, String uuId) {
+        CntUser cntUser = getById(userId);
+        cntUser.updateD(userId);
+        cntUser.setJgPush(uuId);
+        updateById(cntUser);
+    }
 }

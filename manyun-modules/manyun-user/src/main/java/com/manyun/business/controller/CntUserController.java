@@ -17,6 +17,7 @@ import com.manyun.comm.api.model.LoginPhoneCodeForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.redis.service.RedisService;
 import com.manyun.common.security.annotation.InnerAuth;
@@ -226,7 +227,7 @@ public class CntUserController extends BaseController {
         return userService.inviteUser(userId);
     }
 
-    @PostMapping("checkPaySecure")
+    @PostMapping("/checkPaySecure")
     @ApiOperation("检查支付密码是否一致")
     public R checkPaySecure(@RequestBody JSONObject jsonObject){
         String paySecure = jsonObject.getString("paySecure");
@@ -235,6 +236,16 @@ public class CntUserController extends BaseController {
         return R.ok();
     }
 
+
+    @PostMapping("/saveJpush")
+    @ApiOperation(value = "保存用户激光推送的 uuid",notes = "{\"uuId\":\"123jshadjhsa123\"}")
+    public R saveJpush(@RequestBody JSONObject jsonObject){
+        String uuId = null;
+        Assert.isTrue(StringUtils.isNotBlank((uuId = jsonObject.getString("uuId"))),"uuId 不可为空");
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        userService.saveJpush(notNullLoginBusinessUser.getUserId(),uuId);
+        return R.ok();
+    }
 
 
 

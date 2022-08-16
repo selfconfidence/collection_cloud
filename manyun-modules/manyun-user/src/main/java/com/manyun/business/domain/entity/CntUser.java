@@ -30,6 +30,10 @@ public class CntUser implements Serializable {
     @ApiModelProperty("用户昵称")
     private String nickName;
 
+    @ApiModelProperty("激光推送编号 uuid")
+    private String jgPush;
+
+
     @ApiModelProperty("用户电话号")
     private String phone;
 

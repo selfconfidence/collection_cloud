@@ -57,4 +57,7 @@ public interface ICntUserService extends IService<CntUser> {
     R<InviteUserVo> inviteUser(String userId);
 
     void checkPaySecure(String paySecure, String userId);
+
+    void saveJpush(String userId, String uuId);
+
 }
