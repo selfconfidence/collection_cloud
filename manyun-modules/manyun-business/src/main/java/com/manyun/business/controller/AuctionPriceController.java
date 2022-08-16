@@ -127,5 +127,13 @@ public class AuctionPriceController {
         return R.ok();
     }
 
+    @GetMapping("/checkDelayWinner")
+    @ApiOperation(value = "定时调度结束延迟拍卖流程",hidden = true)
+    @InnerAuth
+    public R checkDelayWinner() {
+        auctionPriceService.checkDelayWinner();
+        return R.ok();
+    }
+
 }
 

@@ -566,6 +566,23 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
     }
 
+    /**
+     * 定时检测延拍中的拍中者（delayque无法回调）
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public synchronized void checkDelayWinner() {
+        List<AuctionSend> sendList = auctionSendService.list(Wrappers.<AuctionSend>lambdaQuery().le(
+                AuctionSend::getEndTime, LocalDateTime.now())
+                .eq(AuctionSend::getIsDelay, 2)
+                .eq(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_BIDING.getCode()));
+        if (sendList.isEmpty()) return;
+        for (AuctionSend auctionSend : sendList) {
+            winnerOperation(auctionSend);
+        }
+        auctionSendService.updateBatchById(sendList);
+    }
+
 
 
 }

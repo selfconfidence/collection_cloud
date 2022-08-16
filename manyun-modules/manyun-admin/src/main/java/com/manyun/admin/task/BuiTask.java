@@ -74,6 +74,13 @@ public class BuiTask
         remoteAuctionService.checkWinner(SecurityConstants.INNER);
     }
 
+    /**
+     * 定时调度检查延迟拍卖流程
+     */
+    public void checkDelayWinner() {
+        remoteAuctionService.checkDelayWinner(SecurityConstants.INNER);
+    }
+
 
     /**
      * 定时调度寄售时限周期退回源
