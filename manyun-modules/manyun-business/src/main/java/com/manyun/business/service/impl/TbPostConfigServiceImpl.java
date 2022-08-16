@@ -1,4 +1,5 @@
 package com.manyun.business.service.impl;
+import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 import com.manyun.business.domain.entity.*;
@@ -40,8 +41,8 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
 //    @Autowired
 //    private ICntPostSellService postSellService;
 
-    @Autowired
-    private ICntPostConfigService postConfigService;
+/*    @Autowired
+    private ICntPostConfigService postConfigService;*/
 
     @Autowired
     private IUserCollectionService userCollectionService;
@@ -74,6 +75,7 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
 
     @Override
     public boolean isConfigPostCustomer(String userId, String buiId) {
+        ICntPostConfigService postConfigService = SpringUtil.getBean(ICntPostConfigService.class);
         //1.查询 配置购买表中 有没有这个  buiId
         // 1.1 有的话，就查 拥有表中的藏品和目前用户拥有的藏品进行比较,存在 返回true ; 否则 false
         CntPostConfig cntPostConfig = postConfigService.getOne(Wrappers.<CntPostConfig>lambdaQuery().select(CntPostConfig::getBuiId,CntPostConfig::getId).eq(CntPostConfig::getBuiId, buiId));
@@ -116,6 +118,7 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
     @Deprecated
     public boolean isConfigPostBoxCustomer(String userId, String buiId) {
         //1.查询 配置购买表中 有没有这个  buiId
+        ICntPostConfigService postConfigService = SpringUtil.getBean(ICntPostConfigService.class);
         // 1.1 有的话，就查 拥有表中的藏品和目前用户拥有的藏品进行比较,存在 返回true ; 否则 false
         CntPostConfig cntPostConfig = postConfigService.getOne(Wrappers.<CntPostConfig>lambdaQuery().select(CntPostConfig::getBuiId,CntPostConfig::getId).eq(CntPostConfig::getBuiId, buiId));
 

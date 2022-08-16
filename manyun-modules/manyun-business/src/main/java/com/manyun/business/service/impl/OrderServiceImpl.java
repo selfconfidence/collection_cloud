@@ -102,6 +102,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Override
     public List<Order> checkUnpaidOrder(String userId) {
         return list(Wrappers.<Order>lambdaQuery()
+                .select(Order::getId)
                 .eq(StringUtils.isNotBlank(userId), Order::getUserId, userId)
                 .eq(Order::getOrderStatus, WAIT_ORDER.getCode()));
     }
