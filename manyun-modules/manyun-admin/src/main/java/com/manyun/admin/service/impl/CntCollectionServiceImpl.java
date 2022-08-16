@@ -357,6 +357,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         Assert.isTrue(cntUsers.size() > 0, "用户不存在!");
         CntCollection collection = getById(airdropDto.getCollectionId());
         Assert.isTrue(Objects.nonNull(collection), "藏品不存在!");
+        Assert.isFalse(cntUsers.get(0).getIsReal()==1, "当前用户未实名,请先实名认证!");
         String collectionId = collection.getId();
         Integer selfBalance = collection.getSelfBalance();
         Integer balance = collection.getBalance();
