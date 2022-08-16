@@ -45,4 +45,6 @@ public interface IAuctionPriceService extends IService<AuctionPrice> {
     AuctionBoxAllVo priceBoxInfo(String boxId, String auctionSendId);
 
     void checkWinner();
+
+    void checkDelayWinner();
 }

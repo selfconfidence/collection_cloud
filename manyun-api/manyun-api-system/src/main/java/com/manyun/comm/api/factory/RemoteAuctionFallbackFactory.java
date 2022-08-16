@@ -34,6 +34,11 @@ public class RemoteAuctionFallbackFactory implements FallbackFactory<RemoteAucti
             public R checkWinner(String source) {
                 return null;
             }
+
+            @Override
+            public R checkDelayWinner(String source) {
+                return null;
+            }
         };
     }
 }
