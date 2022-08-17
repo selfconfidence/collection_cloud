@@ -27,7 +27,8 @@ public class Cate implements Serializable {
     @ApiModelProperty("主键")
     private String id;
 
-
+    @ApiModelProperty("夫级别分类编号_顶层默认为0")
+    private String parentId;
 
     @ApiModelProperty("系列_分类 1=藏品系列，2=盲盒分类")
     private Integer cateType;

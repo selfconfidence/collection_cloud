@@ -89,6 +89,13 @@ public class CollectionController extends BaseController{
         return R.ok(collectionService.cateCollectionByUserId(notNullLoginBusinessUser.getUserId()));
     }
 
+    @GetMapping("/cateCollectionChildList/{parentId}")
+    @ApiOperation(value = "查询所有夫级(品牌馆)系列分组的藏品信息",notes = "version 1.0.1")
+    public R<List<CateCollectionVo>> cateCollectionChildList(@PathVariable String parentId){
+        String userId = SecurityUtils.getNotNullLoginBusinessUser().getUserId();
+        return R.ok(collectionService.cateCollectionChildList(userId,parentId));
+    }
+
     @GetMapping("/userCollectionInfo/{id}")
     @ApiOperation(value = "用户查询自己得藏品详情信息",notes = "用户拥有藏品得编号,不是藏品编号")
     public R<UserCollectionForVo> userCollectionInfo(@PathVariable String id){

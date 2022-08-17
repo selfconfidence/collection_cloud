@@ -18,4 +18,9 @@ public interface ICateService extends IService<Cate> {
 
     List<CateVo> cateAll(Integer type);
 
+    List<CateVo> cateTopLevel(Integer type);
+
+    List<CateVo> childCate(String parentId, Integer type);
+
+    List<CateVo> cateChildAll(Integer type);
 }
