@@ -425,7 +425,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         userCollectionVo.setMediaVos(initMediaVos(userCollectionVo.getCollectionId()));
         // 增加流转记录信息
         userCollectionForVo.setUserCollectionVo(userCollectionVo);
-        userCollectionForVo.setStepVos(initStepVo(userCollectionVo.getCollectionId(),COLLECTION_MODEL_TYPE));
+        userCollectionForVo.setStepVos(initStepVo(userCollectionVo.getLinkAddr(),COLLECTION_MODEL_TYPE));
         userCollectionForVo.setCollectionInfoVo(providerCollectionInfoVo(userCollectionVo.getCollectionId()));
 
         userCollectionForVo.setLableVos(initLableVos(userCollectionVo.getCollectionId()));
@@ -441,8 +441,8 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         return collectionOrderAllVo;
     }
 
-    private List<StepVo> initStepVo(String collectionId, String collectionModelType) {
-        List<Step> stepList = stepService.list(Wrappers.<Step>lambdaQuery().eq(Step::getBuiId, collectionId).eq(Step::getModelType, collectionModelType).orderByDesc(Step::getCreatedTime));
+    private List<StepVo> initStepVo(String linkAddr, String collectionModelType) {
+        List<Step> stepList = stepService.list(Wrappers.<Step>lambdaQuery().eq(Step::getBuiId, linkAddr).eq(Step::getModelType, collectionModelType).orderByDesc(Step::getCreatedTime));
        return stepList.parallelStream().map(item ->{
            StepVo stepVo = Builder.of(StepVo::new).build();
            BeanUtil.copyProperties(item, stepVo );

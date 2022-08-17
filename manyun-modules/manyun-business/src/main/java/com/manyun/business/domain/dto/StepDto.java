@@ -32,7 +32,7 @@ public class StepDto implements Serializable {
     private String userId;
 
 
-    @ApiModelProperty("业务编号")
+    @ApiModelProperty("业务编号-（盲盒还是中间表编号） 藏品为中间表编号的 向下传递的唯一编号值 linkAddr")
     private String buiId;
 
     @ApiModelProperty("备用字段")

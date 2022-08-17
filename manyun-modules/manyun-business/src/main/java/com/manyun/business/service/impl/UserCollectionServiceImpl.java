@@ -172,8 +172,8 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
            userCollection.updateD(userCollection.getUserId());
            updateById(userCollection);
            // 流转记录
-           stepService.saveBatch(StepDto.builder().buiId(tranUserCollection.getCollectionId()).userId(tranUserId).modelType(COLLECTION_MODEL_TYPE).reMark("转让方").formHash(oldCollectionHash).formInfo(formatTran).build()
-                   ,StepDto.builder().buiId(tranUserCollection.getCollectionId()).userId(toUserId).modelType(COLLECTION_MODEL_TYPE).formHash(hash).reMark("受让方").formInfo(format).build()
+           stepService.saveBatch(StepDto.builder().buiId(userCollection.getLinkAddr()).userId(tranUserId).modelType(COLLECTION_MODEL_TYPE).reMark("转让方").formHash(oldCollectionHash).formInfo(formatTran).build()
+                   ,StepDto.builder().buiId(userCollection.getLinkAddr()).userId(toUserId).modelType(COLLECTION_MODEL_TYPE).formHash(hash).reMark("受让方").formInfo(format).build()
            );
        });
 
