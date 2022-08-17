@@ -11,6 +11,7 @@ import com.manyun.business.domain.dto.OrderCreateDto;
 import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.query.OrderQuery;
 import com.manyun.business.domain.vo.MediaVo;
+import com.manyun.business.domain.vo.OrderInfoVo;
 import com.manyun.business.domain.vo.OrderVo;
 import com.manyun.business.mapper.OrderMapper;
 import com.manyun.business.service.*;
@@ -158,18 +159,21 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 更改订单状态, 绑定对应的 （藏品/盲盒）
         order.setOrderStatus(OVER_ORDER.getCode());
         order.updateD(order.getUserId());
-        updateById(order);
         // 开始绑定 根据购买的藏品/盲盒进行绑定
         Integer goodsType = order.getGoodsType();
         if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(goodsType)) {
             // 盲盒
-            userBoxService.bindBox(order.getUserId(),order.getBuiId(),info,order.getGoodsNum());
+            String userBoxId = userBoxService.bindOrderBox(order.getUserId(), order.getBuiId(), info, order.getGoodsNum());
+            order.setUserBuiId(userBoxId);
+            updateById(order);
             return;
         }
 
         if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(goodsType)) {
            // 藏品
-            userCollectionService.bindCollection(order.getUserId(),order.getBuiId(),order.getCollectionName(),info,order.getGoodsNum());
+            String userCollectionId = userCollectionService.bindOrderCollection(order.getUserId(), order.getBuiId(), order.getCollectionName(), info, order.getGoodsNum());
+            order.setUserBuiId(userCollectionId);
+            updateById(order);
             return;
         }
         throw new IllegalStateException("not fount order good_type = " + goodsType);
@@ -271,6 +275,25 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         cntConsignment.setToPay(WAIT_TO_PAY.getCode());
         consignmentService.updateById(cntConsignment);
 
+    }
+
+    @Override
+    public OrderInfoVo info(String id) {
+        Order order = getById(id);
+        OrderInfoVo orderInfoVo = Builder.of(OrderInfoVo::new).build();
+        BeanUtil.copyProperties(order, orderInfoVo );
+       // 根据状态区分查询不同的数据结构给移动端
+        //盲盒始终唯一
+        if (order.getGoodsType().equals(BusinessConstants.ModelTypeConstant.BOX_TAYPE))
+            orderInfoVo.setBoxVo(boxService.getObject().info(order.getBuiId(),null));
+
+        if (order.getGoodsType().equals(BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE) && StrUtil.isNotBlank(order.getUserBuiId()))
+            orderInfoVo.setUserCollectionForVo(collectionService.getObject().userCollectionInfo(order.getUserBuiId()));
+
+        else if (order.getGoodsType().equals(BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE) && StrUtil.isBlank(order.getUserBuiId()))
+           orderInfoVo.setCollectionAllVo(collectionService.getObject().info(order.getBuiId()));
+
+        return orderInfoVo;
     }
 
 

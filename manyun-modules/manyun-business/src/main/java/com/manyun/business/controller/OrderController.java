@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.manyun.business.domain.query.OrderQuery;
 import com.manyun.business.domain.vo.CollectionAllVo;
 import com.manyun.business.domain.vo.CollectionOrderAllVo;
+import com.manyun.business.domain.vo.OrderInfoVo;
 import com.manyun.business.domain.vo.OrderVo;
 import com.manyun.business.service.ICollectionService;
 import com.manyun.business.service.IOrderService;
@@ -56,6 +57,12 @@ public class OrderController extends BaseController {
     public R<CollectionAllVo> info(@PathVariable String id){
        // System.out.println(111);
         return R.ok(collectionService.info(id));
+    }
+
+    @GetMapping("/orderInfo/{id}")
+    @ApiOperation(value = "查询订单的详情",notes = "结构比较复杂，按状态区分")
+    public R<OrderInfoVo> orderInfo(@PathVariable String id){
+        return R.ok(orderService.info(id));
     }
 
     @GetMapping("/timeCancel")

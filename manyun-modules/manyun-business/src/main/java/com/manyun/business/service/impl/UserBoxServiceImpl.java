@@ -76,6 +76,35 @@ public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> impl
     }
 
 
+    /**
+     * 绑定盲盒信息, 新增盲盒日志
+     * @param userId
+     * @param buiId
+     * @param sourceInfo
+     * @param goodsNum 数量
+     */
+    @Override
+    public String bindOrderBox(String userId, String buiId, String sourceInfo, Integer goodsNum) {
+        ArrayList<UserBox> userBoxList = Lists.newArrayList();
+        for (Integer i = 0; i < goodsNum; i++) {
+            UserBox userBox = Builder.of(UserBox::new).build();
+            userBox.setUserId(userId);
+            userBox.setBoxId(buiId);
+            userBox.setId(IdUtil.getSnowflake().nextIdStr());
+            userBox.createD(userId);
+            userBox.setIsExist(USE_EXIST.getCode());
+            userBox.setSourceInfo(sourceInfo);
+            userBox.setBoxOpen(BoxOpenType.NO_OPEN.getCode());
+            userBoxList.add(userBox);
+            //save(userBox);
+        }
+        saveBatch(userBoxList);
+
+        // 增加日志
+        logsService.saveLogs(LogInfoDto.builder().jsonTxt(sourceInfo).buiId(userId).modelType(BOX_MODEL_TYPE).isType(PULL_SOURCE).formInfo(goodsNum.toString()).build());
+        return userBoxList.get(0).getId();
+    }
+
 
     /**
      * 绑定盲盒信息, 新增盲盒日志

@@ -49,6 +49,10 @@ public class Order implements Serializable {
     @ApiModelProperty("业务编号")
     private String buiId;
 
+
+    @ApiModelProperty("用户与业务的唯一编号,没有购买就没有这个编号")
+    private String userBuiId;
+
     @ApiModelProperty("商品类型;0藏品，1盲盒")
     private Integer goodsType;
 

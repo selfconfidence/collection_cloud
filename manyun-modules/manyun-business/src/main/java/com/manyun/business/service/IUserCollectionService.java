@@ -17,7 +17,9 @@ import java.util.List;
  */
 public interface IUserCollectionService extends IService<UserCollection> {
 
-    void bindCollection(String userId, String buiId, String collectionName,String info, Integer goodsNum);
+    String bindOrderCollection(String userId, String buiId, String collectionName, String info, Integer goodsNum);
+
+    void bindCollection(String userId, String buiId, String collectionName, String info, Integer goodsNum);
 
 
     String autoCollectionNum(String collectionId);

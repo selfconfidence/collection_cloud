@@ -71,6 +71,63 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
     @Autowired
     private ISystemService systemService;
 
+
+    /**
+     * 直接上链即可,转让的新增个函数进行处理
+     *
+     * 绑定用户与藏品的相关联信息
+     * @param userId
+     * @param buiId
+     * @param info
+     * @param goodsNum
+     */
+    @Override
+    public String bindOrderCollection(String userId, String buiId, String collectionName,String info, Integer goodsNum) {
+        ArrayList<UserCollection> userCollections = Lists.newArrayList();
+        for (Integer i = 0; i < goodsNum; i++) {
+            UserCollection userCollection = Builder.of(UserCollection::new).build();
+            userCollection.setId(IdUtil.getSnowflake().nextIdStr());
+            userCollection.setCollectionId(buiId);
+            userCollection.setUserId(userId);
+            userCollection.setSourceInfo(info);
+            userCollection.setLinkAddr(IdUtil.getSnowflake().nextIdStr());
+            userCollection.setIsExist(USE_EXIST.getCode());
+            userCollection.setCollectionName(collectionName);
+            // 初始化 未上链过程
+            userCollection.setIsLink(NOT_LINK.getCode());
+            userCollection.createD(userId);
+            userCollections.add(userCollection);
+        }
+        saveBatch(userCollections);
+        // 增加日志
+        logsService.saveLogs(LogInfoDto.builder().jsonTxt(info).buiId(userId).modelType(COLLECTION_MODEL_TYPE).isType(PULL_SOURCE).formInfo(goodsNum.toString()).build());
+        // 开始上链 // 组装所有上链所需要数据结构 并且不能报错
+        for (UserCollection userCollection : userCollections) {
+            BigDecimal realPrice = collectionServiceObjectFactory.getObject().getById(userCollection.getCollectionId()).getRealPrice();
+            myChainService.accountCollectionUp(CallCommitDto.builder()
+                    .userCollectionId(userCollection.getId())
+                    .artId(userCollection.getLinkAddr())
+                    .artName(userCollection.getCollectionName())
+                    .artSize("80")
+                    .location(userCollection.getLinkAddr())
+                    .price(realPrice.toString())
+                    .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM")))
+                    .sellway(userCollection.getSourceInfo())
+                    .owner(userCollection.getUserId())
+                    .build(), (hash)->{
+                userCollection.setIsLink(OK_LINK.getCode());
+                userCollection.setRealCompany("蚂蚁链");
+                // 编号特殊生成 借助 redis 原子性操作
+                userCollection.setCollectionNumber(StrUtil.format("CNT_{}",autoCollectionNum(userCollection.getCollectionId())));
+                //userCollection.setLinkAddr(hash);
+                userCollection.setCollectionHash(hash);
+                userCollection.updateD(userCollection.getUserId());
+                updateById(userCollection);
+            });
+        }
+        return userCollections.get(0).getId();
+    }
+
     /**
      * 直接上链即可,转让的新增个函数进行处理
      *

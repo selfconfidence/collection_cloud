@@ -20,6 +20,8 @@ public interface IUserBoxService extends IService<UserBox> {
 
     void bindPleaseBoxDto(OpenPleaseBoxDto pleaseBoxDto);
 
+    String bindOrderBox(String userId, String buiId, String sourceInfo, Integer goodsNum);
+
     void bindBox(String userId, String buiId, String sourceInfo, Integer goodsNum);
 
     List<UserBoxVo> pageUserBox(String userId,String commName);
