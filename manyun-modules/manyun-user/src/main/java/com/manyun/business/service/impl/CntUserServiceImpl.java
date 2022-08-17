@@ -12,6 +12,7 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.nacos.shaded.com.google.protobuf.Timestamp;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.config.AliRealConfig;
+import com.manyun.business.config.AsyncUtil;
 import com.manyun.business.config.InviteUtil.PosterUtil;
 import com.manyun.business.config.UnionRealConfig;
 import com.manyun.business.domain.form.*;
@@ -340,6 +341,19 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
      * @param userId
      * @return
      */
+
+
+    public void asyncInviteUser(String userId) {
+        AsyncUtil.submit(() -> {
+            R<InviteUserVo> inviteUserVoR = inviteUser(userId);
+            inviteUserVoR.getData().getInviteUrl();
+            if (inviteUserVoR.getCode() != 200) {
+                log.error("异步生成图片失败");
+            }
+        });
+    }
+
+
     @Override
     public R<InviteUserVo> inviteUser(String userId) {
         CntUser cntUser = getById(userId);
@@ -407,6 +421,8 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         }
 
     }
+
+
 
     @Override
     public void checkPaySecure(String paySecure, String userId) {

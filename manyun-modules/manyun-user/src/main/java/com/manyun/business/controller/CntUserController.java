@@ -227,6 +227,13 @@ public class CntUserController extends BaseController {
         return userService.inviteUser(userId);
     }
 
+    @PostMapping("/asyncInviteUser")
+    @ApiOperation(value = "异步生成邀请海报")
+    public void asyncInviteUser() {
+        String userId = SecurityUtils.getNotNullLoginBusinessUser().getUserId();
+        userService.asyncInviteUser(userId);
+    }
+
     @PostMapping("/checkPaySecure")
     @ApiOperation("检查支付密码是否一致")
     public R checkPaySecure(@RequestBody JSONObject jsonObject){
