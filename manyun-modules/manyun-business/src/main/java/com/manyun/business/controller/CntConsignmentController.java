@@ -3,10 +3,7 @@ import com.manyun.business.domain.form.ConsignmentSellForm;
 import com.manyun.business.domain.form.UserConsignmentForm;
 import com.manyun.business.domain.query.ConsignmentOrderQuery;
 import com.manyun.business.domain.query.ConsignmentQuery;
-import com.manyun.business.domain.vo.ConsignmentBoxListVo;
-import com.manyun.business.domain.vo.ConsignmentCollectionListVo;
-import com.manyun.business.domain.vo.ConsignmentOrderVo;
-import com.manyun.business.domain.vo.PayVo;
+import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.ICntConsignmentService;
 import com.manyun.business.service.ISystemService;
 import com.manyun.comm.api.model.LoginBusinessUser;
@@ -23,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.io.RandomAccessFile;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * <p>
@@ -42,6 +40,13 @@ public class CntConsignmentController {
 
     @Autowired
     private ICntConsignmentService cntConsignmentService;
+
+
+    @GetMapping("/queryDict/{keyword}")
+    @ApiOperation(value = "/根据词条 查询寄售 藏品|盲盒 完整 标题信息",notes = "返回的都是 藏品|盲盒词条完整信息,已寄售状态的寄售业务名称")
+    public R<List<KeywordVo>> queryDict(@PathVariable String keyword){
+        return R.ok(cntConsignmentService.queryDict(keyword));
+    }
 
 
     @PostMapping("/consignmentAssets")

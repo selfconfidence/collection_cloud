@@ -109,7 +109,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
     @Override
     public TableDataInfo<BoxListVo> pageList(BoxQuery boxQuery) {
         PageHelper.startPage(boxQuery.getPageNum(),boxQuery.getPageSize());
-        List<Box> boxList = list(Wrappers.<Box>lambdaQuery().eq(StrUtil.isNotBlank(boxQuery.getCateId()),Box::getCateId,boxQuery.getCateId()).like(StrUtil.isNotBlank(boxQuery.getBoxName()), Box::getBoxTitle, boxQuery.getBoxName()).ne(Box::getStatusBy,DOWN_ACTION.getCode()).orderByDesc(Box::getCreatedTime));
+        List<Box> boxList = list(Wrappers.<Box>lambdaQuery().eq(StrUtil.isNotBlank(boxQuery.getCateId()),Box::getCateId,boxQuery.getCateId()).ne(Box::getStatusBy,DOWN_ACTION.getCode()).like(StrUtil.isNotBlank(boxQuery.getBoxName()), Box::getBoxTitle, boxQuery.getBoxName()).ne(Box::getStatusBy,DOWN_ACTION.getCode()).orderByDesc(Box::getCreatedTime));
         // 数据组合查询
         return TableDataInfoUtil.pageTableDataInfo(boxList.parallelStream().map(this::initBoxListVo).collect(Collectors.toList()),boxList);
     }
@@ -210,7 +210,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
 
     /**
      * 查询我的盲盒分页信息
-     * @param pageQuery
+     * @param
      * @param userId
      * @return
      */

@@ -27,6 +27,7 @@ import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.enums.BoxStatus;
 import com.manyun.common.core.enums.CollectionStatus;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
@@ -276,8 +277,8 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
 
     @Override
     public List<KeywordVo> queryDict(String keyword) {
-        List<String> collectIonNames = list(Wrappers.<CntCollection>lambdaQuery().select(CntCollection::getCollectionName).like(CntCollection::getCollectionName, keyword).orderByDesc(CntCollection::getCreatedTime).last(" limit 10")).parallelStream().map(item -> item.getCollectionName()).collect(Collectors.toList());
-        List<String> boxNames = boxService.list(Wrappers.<Box>lambdaQuery().select(Box::getBoxTitle).like(Box::getBoxTitle, keyword).orderByDesc(Box::getCreatedTime).last(" limit 10")).parallelStream().map(item -> item.getBoxTitle()).collect(Collectors.toList());
+        List<String> collectIonNames = list(Wrappers.<CntCollection>lambdaQuery().like(CntCollection::getCollectionName, keyword).ne(CntCollection::getStatusBy,DOWN_ACTION.getCode()).select(CntCollection::getCollectionName).orderByDesc(CntCollection::getCreatedTime).last(" limit 10")).parallelStream().map(item -> item.getCollectionName()).collect(Collectors.toList());
+        List<String> boxNames = boxService.list(Wrappers.<Box>lambdaQuery().select(Box::getBoxTitle).like(Box::getBoxTitle, keyword).ne(Box::getStatusBy, BoxStatus.DOWN_ACTION.getCode()).orderByDesc(Box::getCreatedTime).last(" limit 10")).parallelStream().map(item -> item.getBoxTitle()).collect(Collectors.toList());
         return  initKeywordVo(collectIonNames,boxNames);
     }
 

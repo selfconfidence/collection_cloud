@@ -2,11 +2,9 @@ package com.manyun.business.controller;
 import com.manyun.business.domain.form.BoxSellForm;
 import com.manyun.business.domain.query.BoxQuery;
 import com.manyun.business.domain.query.UseAssertQuery;
-import com.manyun.business.domain.vo.BoxListVo;
-import com.manyun.business.domain.vo.BoxVo;
-import com.manyun.business.domain.vo.PayVo;
-import com.manyun.business.domain.vo.UserBoxVo;
+import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.IBoxService;
+import com.manyun.business.service.ILogsService;
 import com.manyun.business.service.IUserBoxService;
 import com.manyun.comm.api.domain.dto.OpenPleaseBoxDto;
 import com.manyun.comm.api.model.LoginBusinessUser;
@@ -41,6 +39,8 @@ public class BoxController extends BaseController {
     @Autowired
     private IUserBoxService userBoxService;
 
+    @Autowired
+    private ILogsService logsService;
 
 
     @GetMapping("/queryDict/{keyword}")
@@ -74,7 +74,7 @@ public class BoxController extends BaseController {
 
     @PostMapping("/sellBox")
     @ApiOperation("购买普通盲盒")
-    public R<PayVo> sellBox(@Valid @RequestBody BoxSellForm boxSellForm){
+    public synchronized R<PayVo> sellBox(@Valid @RequestBody BoxSellForm boxSellForm){
         String userId = SecurityUtils.getBuiUserId();
         return R.ok(boxService.sellBox(boxSellForm,userId));
     }
@@ -92,6 +92,15 @@ public class BoxController extends BaseController {
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(boxService.openBox(userBoxId,notNullLoginBusinessUser.getUserId()));
     }
+
+    @PostMapping("/logsPage")
+    @ApiOperation("分页查询盲盒相关记录信息")
+    public R<TableDataInfo<BoxLogPageVo>> logsPage(@RequestBody PageQuery pageQuery){
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return R.ok(logsService.logsBoxPage(pageQuery,notNullLoginBusinessUser.getUserId()));
+    }
+
+
 
     @GetMapping("/openPleaseBox")
     @ApiOperation(value = "用户领取邀请福利,绑定盲盒", hidden = true)

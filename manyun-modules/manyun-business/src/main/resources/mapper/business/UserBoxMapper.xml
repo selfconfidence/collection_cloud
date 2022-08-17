@@ -49,7 +49,7 @@
              </if>
 
              <if test="true">
-                 and   c.is_exist = 1
+                 and   c.is_exist = 1 and c.box_open = 1
              </if>
         </where>
         order by c.created_time desc

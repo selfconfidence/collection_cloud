@@ -15,10 +15,7 @@ import com.manyun.business.domain.form.ConsignmentSellForm;
 import com.manyun.business.domain.form.UserConsignmentForm;
 import com.manyun.business.domain.query.ConsignmentOrderQuery;
 import com.manyun.business.domain.query.ConsignmentQuery;
-import com.manyun.business.domain.vo.ConsignmentBoxListVo;
-import com.manyun.business.domain.vo.ConsignmentCollectionListVo;
-import com.manyun.business.domain.vo.ConsignmentOrderVo;
-import com.manyun.business.domain.vo.PayVo;
+import com.manyun.business.domain.vo.*;
 import com.manyun.business.mapper.CntConsignmentMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -275,6 +272,17 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         // 判定条件是否符合
         Assert.isTrue(Objects.nonNull(consignment),"取消寄售资产有误,请核实当前寄售状态!");
         cancelConsignment(consignment);
+    }
+
+    @Override
+    public List<KeywordVo> queryDict(String keyword) {
+        List<CntConsignment> cntConsignments = list(Wrappers.<CntConsignment>lambdaQuery().select(CntConsignment::getBuiName,CntConsignment::getIsType).like(CntConsignment::getBuiName, keyword).eq(CntConsignment::getConsignmentStatus, PUSH_CONSIGN.getCode()).orderByDesc(CntConsignment::getCreatedTime).last(" limit 10"));
+       return cntConsignments.parallelStream().map(item ->{
+            KeywordVo keywordVo = Builder.of(KeywordVo::new).build();
+            keywordVo.setType(item.getIsType());
+            keywordVo.setCommTitle(item.getBuiName());
+            return keywordVo;
+        }).collect(Collectors.toList());
     }
 
     private void cancelConsignment(CntConsignment cntConsignment) {

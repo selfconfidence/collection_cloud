@@ -7,6 +7,7 @@ import com.manyun.business.domain.query.CollectionQuery;
 import com.manyun.business.domain.query.UseAssertQuery;
 import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.ICollectionService;
+import com.manyun.business.service.ILogsService;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
@@ -35,6 +36,9 @@ public class CollectionController extends BaseController{
 
     @Autowired
     private ICollectionService collectionService;
+
+    @Autowired
+    private ILogsService logsService;
 
     @GetMapping("/queryDict/{keyword}")
     @ApiOperation(value = "/根据词条 查询藏品完整 标题信息",notes = "返回的都是 盲盒词条完整信息 ")
@@ -66,7 +70,7 @@ public class CollectionController extends BaseController{
 
     @PostMapping("/sellCollection")
     @ApiOperation("购买藏品")
-    public R<PayVo> sellCollection(@RequestBody @Valid CollectionSellForm collectionSellForm){
+    public synchronized R<PayVo> sellCollection(@RequestBody @Valid CollectionSellForm collectionSellForm){
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(collectionService.sellCollection(loginBusinessUser.getUserId(),collectionSellForm));
     }
@@ -89,6 +93,13 @@ public class CollectionController extends BaseController{
     @ApiOperation(value = "用户查询自己得藏品详情信息",notes = "用户拥有藏品得编号,不是藏品编号")
     public R<UserCollectionForVo> userCollectionInfo(@PathVariable String id){
         return R.ok(collectionService.userCollectionInfo(id));
+    }
+
+    @PostMapping("/logsPage")
+    @ApiOperation("分页查询藏品相关记录信息")
+    public R<TableDataInfo<CollectionLogPageVo>> logsPage(@RequestBody PageQuery pageQuery){
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return R.ok(logsService.logsCollectionPage(pageQuery,notNullLoginBusinessUser.getUserId()));
     }
 
 }

@@ -6,10 +6,7 @@ import com.manyun.business.domain.form.ConsignmentSellForm;
 import com.manyun.business.domain.form.UserConsignmentForm;
 import com.manyun.business.domain.query.ConsignmentOrderQuery;
 import com.manyun.business.domain.query.ConsignmentQuery;
-import com.manyun.business.domain.vo.ConsignmentBoxListVo;
-import com.manyun.business.domain.vo.ConsignmentCollectionListVo;
-import com.manyun.business.domain.vo.ConsignmentOrderVo;
-import com.manyun.business.domain.vo.PayVo;
+import com.manyun.business.domain.vo.*;
 import com.manyun.common.core.web.page.TableDataInfo;
 
 import java.util.List;
@@ -39,4 +36,6 @@ public interface ICntConsignmentService extends IService<CntConsignment> {
     void cancelSchedulingConsignment();
 
     void cancelConsignmentById(String id,String sendUserId);
+
+    List<KeywordVo> queryDict(String keyword);
 }
