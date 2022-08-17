@@ -1,5 +1,7 @@
 package com.manyun.admin.service.impl;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -96,6 +98,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         PageHelper.startPage(collectionQuery.getPageNum(),collectionQuery.getPageSize());
         List<CntCollection> cntCollectionList = cntCollectionMapper.selectSearchCollectionList(collectionQuery);
         return TableDataInfoUtil.pageTableDataInfo(cntCollectionList.parallelStream().map(m->{
+
             CntCollectionVo cntCollectionVo = new CntCollectionVo();
             BeanUtil.copyProperties(m, cntCollectionVo);
             cntCollectionVo.setMediaVos(mediaService.initMediaVos(m.getId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
@@ -354,6 +357,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         Assert.isTrue(cntUsers.size() > 0, "用户不存在!");
         CntCollection collection = getById(airdropDto.getCollectionId());
         Assert.isTrue(Objects.nonNull(collection), "藏品不存在!");
+        Assert.isFalse(cntUsers.get(0).getIsReal()==1, "当前用户未实名,请先实名认证!");
         String collectionId = collection.getId();
         Integer selfBalance = collection.getSelfBalance();
         Integer balance = collection.getBalance();
