@@ -60,4 +60,6 @@ public interface ICntUserService extends IService<CntUser> {
 
     void saveJpush(String userId, String uuId);
 
+    void asyncInviteUser(String userId);
+
 }
