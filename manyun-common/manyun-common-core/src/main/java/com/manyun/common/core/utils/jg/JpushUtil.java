@@ -30,9 +30,9 @@ public class JpushUtil {
         return jpushClient;
     }
 
-    public  void sendMsg(String title,String msgContent, List<String> alias) {
+    public  void sendMsg(String title,String msgContent, List<String> registrationIdIds) {
         // For push, all you need do is to build PushPayload object.
-        List<PushPayload> payloadList = buildPushAlias(title,msgContent,alias);
+        List<PushPayload> payloadList = buildPushRegistrationIdIds(title,msgContent,registrationIdIds);
         for (PushPayload pushPayload : payloadList) {
             try {
                 PushResult result = jpushClient.sendPush(pushPayload);
@@ -53,24 +53,39 @@ public class JpushUtil {
     }
 
     // 全部 推送消息
-    public  PushPayload buildPushMsg(String msgContent) {
+    private   PushPayload buildPushMsg(String msgContent) {
         return PushPayload.messageAll(msgContent).alertAll(ALERT);
     }
 
     // 根据别名推送
-    public  List<PushPayload> buildPushAlias(String title,String msgContent, List<String> alias){
+    private  List<PushPayload> buildPushRegistrationIdIds(String title,String msgContent, List<String> registrationIdIds){
         // 全平台
         List<PushPayload> pushPayloads = Lists.newArrayList();
-        List<List<String>> aliasList = ListUtil.split(alias, 0B1111100111);
-        for (List<String> alia : aliasList) {
+        List<List<String>> registrationIdIdsList = ListUtil.split(registrationIdIds, 0B1111100111);
+        for (List<String> regId : registrationIdIdsList) {
             pushPayloads.add(PushPayload.newBuilder().setPlatform(Platform.all())
-                    // 别名 一次推送最多 1000 个。
-                    .setAudience(Audience.alias(alia))// 消息体
-                    .setNotification(Notification.alert(ALERT))
+                    .setAudience(Audience.registrationId(regId))// 消息体
+                    .setNotification(Notification.alert(msgContent))
                     .setMessage(Message.newBuilder().setTitle(title).setMsgContent(msgContent).build())
                     .build());
         }
        return pushPayloads;
+    }
+
+    // 根据uuid推送
+    private  List<PushPayload> buildPushUuid(String title,String msgContent, List<String> uuIds){
+        // 全平台
+        List<PushPayload> pushPayloads = Lists.newArrayList();
+        List<List<String>> aliasList = ListUtil.split(uuIds, 0B1111100111);
+        for (List<String> alia : aliasList) {
+            pushPayloads.add(PushPayload.newBuilder().setPlatform(Platform.all())
+                    // 别名 一次推送最多 1000 个。
+                    .setAudience(Audience.registrationId(alia))// 消息体
+                    .setNotification(Notification.alert(ALERT))
+                    .setMessage(Message.newBuilder().setTitle(title).setMsgContent(msgContent).build())
+                    .build());
+        }
+        return pushPayloads;
     }
 
 
