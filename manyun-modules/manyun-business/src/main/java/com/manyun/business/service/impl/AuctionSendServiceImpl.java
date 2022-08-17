@@ -158,8 +158,14 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
 
     @Override
     public List<KeywordVo> queryDict(String keyword) {
-        List<String> collectIonNames = list(Wrappers.<AuctionSend>lambdaQuery().eq(AuctionSend::getGoodsType,1).select(AuctionSend::getGoodsName).like(AuctionSend::getGoodsName, keyword).orderByDesc(AuctionSend::getCreatedTime).last(" limit 10")).parallelStream().map(item -> item.getGoodsName()).collect(Collectors.toList());
-        List<String> boxNames = list(Wrappers.<AuctionSend>lambdaQuery().eq(AuctionSend::getGoodsType, 2).select(AuctionSend::getGoodsName).like(AuctionSend::getGoodsName, keyword).orderByDesc(AuctionSend::getCreatedTime).last(" limit 10")).parallelStream().map(item -> item.getGoodsName()).collect(Collectors.toList());
+        List<String> collectIonNames = list(Wrappers.<AuctionSend>lambdaQuery().eq(AuctionSend::getGoodsType,1)
+                .eq(AuctionSend::getAuctionSendStatus, AuctionSendStatus.WAIT_START.getCode())
+                .or().eq(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_BIDING.getCode())
+                .select(AuctionSend::getGoodsName).like(AuctionSend::getGoodsName, keyword).orderByDesc(AuctionSend::getCreatedTime).last(" limit 10")).parallelStream().map(item -> item.getGoodsName()).collect(Collectors.toList());
+        List<String> boxNames = list(Wrappers.<AuctionSend>lambdaQuery().eq(AuctionSend::getGoodsType, 2)
+                .eq(AuctionSend::getAuctionSendStatus, AuctionSendStatus.WAIT_START.getCode())
+                .or().eq(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_BIDING.getCode()).
+                select(AuctionSend::getGoodsName).like(AuctionSend::getGoodsName, keyword).orderByDesc(AuctionSend::getCreatedTime).last(" limit 10")).parallelStream().map(item -> item.getGoodsName()).collect(Collectors.toList());
         return  initKeywordVo(collectIonNames,boxNames);
     }
 
