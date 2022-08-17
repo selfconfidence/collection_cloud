@@ -443,7 +443,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
 
     @Override
     public List<CateCollectionVo> cateCollectionChildList(String userId,String cateParentId) {
-        List<Cate> cateList = cateMapper.selectList(Wrappers.<Cate>lambdaQuery().eq(Cate::getParentId, cateParentId).orderByDesc(Cate::getCreatedTime));
+        List<Cate> cateList = cateMapper.selectList(Wrappers.<Cate>lambdaQuery().eq(Cate::getParentId, cateParentId).eq(Cate::getCateType,Integer.valueOf(1)).orderByDesc(Cate::getCreatedTime));
         List<CateCollectionVo> cateCollectionVoList = Lists.newArrayList();
         if (cateList.isEmpty())return cateCollectionVoList;
         for (Cate cate : cateList) {

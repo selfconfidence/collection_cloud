@@ -50,7 +50,7 @@ public class OrderInfoVo implements Serializable {
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime payTime;
 
-    @ApiModelProperty("藏品基础信息 goodsType = 0 && (orderStatus = 0)")
+    @ApiModelProperty("订单藏品基础信息 goodsType = 0 && (orderStatus = 0)")
     private OrderCollectionInfoVo orderCollectionInfoVo;
 
     @ApiModelProperty("盲盒信息,goodsType = 1")
