@@ -20,4 +20,7 @@ public interface RemoteBuiMoneyService {
     @PostMapping("/money/updateUserMoney")
      R updateUserMoney(@RequestBody UserRealMoneyForm userRealMoneyForm, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 
+    @GetMapping("/money/checkIdentity")
+    R checkIdentity(@PathVariable("identityNo") String identityNo, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+
 }

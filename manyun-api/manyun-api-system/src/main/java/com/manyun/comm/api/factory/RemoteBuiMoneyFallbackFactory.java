@@ -32,6 +32,11 @@ public class RemoteBuiMoneyFallbackFactory implements FallbackFactory<RemoteBuiM
             public R updateUserMoney(UserRealMoneyForm userRealMoneyForm, String source) {
                 return R.fail("操作失败:" + throwable.getMessage());
             }
+
+            @Override
+            public R checkIdentity(String identityNo, String source) {
+                return R.fail("操作失败:" + throwable.getMessage());
+            }
         };
     }
 }
