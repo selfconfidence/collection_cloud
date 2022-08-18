@@ -89,6 +89,7 @@ public class BoxController extends BaseController {
 
     @PostMapping("/sellBox")
     @ApiOperation("购买普通盲盒")
+    @Deprecated
     public synchronized R<PayVo> sellBox(@Valid @RequestBody BoxSellForm boxSellForm){
         String userId = SecurityUtils.getBuiUserId();
         return R.ok(boxService.sellBox(boxSellForm,userId));

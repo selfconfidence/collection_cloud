@@ -25,6 +25,6 @@ public interface RemoteBoxService {
      * 查询盲盒详细信息
      */
     @GetMapping("/box/innerInfo/{id}")
-    R<BoxListDto> innerInfo(@PathVariable String id,@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+    R<BoxListDto> innerInfo(@PathVariable("id") String id,@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 
 }

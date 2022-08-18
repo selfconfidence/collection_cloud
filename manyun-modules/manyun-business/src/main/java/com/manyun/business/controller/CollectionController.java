@@ -76,6 +76,7 @@ public class CollectionController extends BaseController{
 
     @PostMapping("/sellCollection")
     @ApiOperation("购买藏品")
+    @Deprecated
     public synchronized R<PayVo> sellCollection(@RequestBody @Valid CollectionSellForm collectionSellForm){
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(collectionService.sellCollection(loginBusinessUser.getUserId(),collectionSellForm));
