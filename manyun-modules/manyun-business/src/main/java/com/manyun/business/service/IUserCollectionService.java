@@ -4,6 +4,7 @@ import com.manyun.business.domain.dto.UserCollectionCountDto;
 import com.manyun.business.domain.entity.UserCollection;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.vo.UserCollectionVo;
+import com.manyun.common.core.domain.R;
 
 import java.util.List;
 
@@ -42,6 +43,8 @@ public interface IUserCollectionService extends IService<UserCollection> {
     void resetUpLink(String userId, String userCollectionId);
 
     String showUserCollection(String userId, String buiId, String info);
+
+    R<String> shareCollection(String userId, String myGoodsId);
 
 //    String showUserCollection(String buiId, String userId, String info);
 }

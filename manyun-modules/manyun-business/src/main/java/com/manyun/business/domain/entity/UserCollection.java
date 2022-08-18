@@ -71,6 +71,9 @@ public class UserCollection implements Serializable {
     @ApiModelProperty("更新时间")
     private LocalDateTime updatedTime;
 
+    @ApiModelProperty("分享藏品")
+    private String shareUrl;
+
 
     public void createD(String createId){
         this.createdBy = createId;

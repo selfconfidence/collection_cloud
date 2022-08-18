@@ -1,27 +1,44 @@
 package com.manyun.business.service.impl;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.qrcode.QrCodeUtil;
+import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
+import com.manyun.business.config.PosterUtil;
 import com.manyun.business.design.mychain.MyChainService;
 import com.manyun.business.domain.dto.*;
 import com.manyun.business.domain.entity.UserCollection;
+import com.manyun.business.domain.vo.MediaVo;
 import com.manyun.business.domain.vo.UserCollectionVo;
 import com.manyun.business.mapper.UserCollectionMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.comm.api.RemoteBuiUserService;
+import com.manyun.common.core.constant.BusinessConstants;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.redis.service.RedisService;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+
+import java.io.File;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -70,6 +87,12 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
 
     @Autowired
     private ISystemService systemService;
+
+    @Autowired
+    private RemoteBuiUserService remoteBuiUserService;
+
+    @Autowired
+    private IMediaService mediaService;
 
 
     /**
@@ -397,6 +420,82 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         userCollection.setSourceInfo(info);
         updateById(userCollection);
         return userCollection.getCollectionId();
+    }
+
+
+    @Override
+    public R<String> shareCollection(String userId, String myGoodsId) {
+        UserCollection userCollection = getById(myGoodsId);
+        List<MediaVo> mediaVos = mediaService.initMediaVos(userCollection.getCollectionId(), COLLECTION_MODEL_TYPE);
+        //String mediaUrl = userCollectionVo.getMediaVos().get(0).getMediaUrl();
+
+        //背景，海报图
+        String background = mediaVos.get(0).getMediaUrl();
+        //String background = "https://cnt-images.oss-cn-chengdu.aliyuncs.com/user/images/26d6bca223244eb78a9d8a3fe385ec8d";
+        int width = 0;
+        int height = 0;
+        try {
+            URL backgroundUrl = new URL(background);
+            BufferedImage read = ImageIO.read(backgroundUrl.openStream());
+            width = read.getWidth();
+            height = read.getHeight();
+
+            //BufferedImage bufferedImage = PosterUtil.drawInitAndChangeSize(background, backgroundUrl.openConnection().getInputStream(),width, height);
+
+            // 画 二维码 并改变大小
+            // 1. 先 获取二维码(二维码携带一个参数)
+
+            String regUrl = systemService.getVal(BusinessConstants.SystemTypeConstant.REG_URL, String.class) + "?pleaseCode=" + remoteBuiUserService.commUni(userId,SecurityConstants.INNER).getData().getPleaseCode();
+            // + "?" + cntUser.getPleaseCode()
+            // 生成二维码并指定宽高
+            BufferedImage qrCode = QrCodeUtil.generate(regUrl, (int)Math.round(height*0.2), (int)Math.round(height*0.2));
+
+
+            // 2. 初始化并的改变大小
+            // 将二维码保存到本地
+            // 3. 画二维码
+            //PosterUtil.drawImage(bufferedImage, qrCode, 300, 300, (int) Math.round(width*0.37), (int) Math.round(height*0.75));
+            PosterUtil.drawImage(read, qrCode, (int)Math.round(height*0.2), (int)Math.round(height*0.2), (int) Math.round(width/2 - height*0.2/2), (int) Math.round(height*0.75));
+
+            // 海报 保存到本地/var/opt/  线上使用 "d:\\upload\\"
+            String linuxPath = systemService.getVal(BusinessConstants.SystemTypeConstant.LOCAL_PATH, String.class);
+            File file1 = new File(linuxPath);
+            if (!file1.exists() && !file1.isDirectory()) {
+                file1.mkdirs();
+            }
+            String localPath = linuxPath + System.currentTimeMillis() + ".png";
+            PosterUtil.save(read, "png", localPath);
+
+            HashMap<String, Object> paramMap = new HashMap<>();
+            File file = FileUtil.file(localPath);
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            paramMap.put("file", file);
+
+            String gatewayUrl = systemService.getVal(BusinessConstants.SystemTypeConstant.GATEWAY_URL, String.class);
+
+            String post = HttpUtil.post(gatewayUrl, paramMap);
+            JSONObject responseJson = JSONUtil.toBean(post, JSONObject.class);
+            Object data = responseJson.get("data");
+            file.delete();
+            List<UserCollection> list = list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getUserId, userId).eq(UserCollection::getCollectionId, userCollection.getCollectionId()));
+            if (!list.isEmpty()) {
+                for (UserCollection collection : list) {
+                    collection.setShareUrl(data.toString());
+                }
+            }
+            //cntUser.setInviteUrl(data.toString());
+            //updateById(cntUser);
+            //inviteUserVo.setInviteUrl(data.toString());
+            updateBatchById(list);
+            return R.ok(data.toString());
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return R.fail(e.getMessage());
+        }
     }
 
 }

@@ -3,11 +3,13 @@ package com.manyun.business.controller;
 
 import com.github.pagehelper.PageHelper;
 import com.manyun.business.domain.form.CollectionSellForm;
+import com.manyun.business.domain.form.ShareCollectionForm;
 import com.manyun.business.domain.query.CollectionQuery;
 import com.manyun.business.domain.query.UseAssertQuery;
 import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.ICollectionService;
 import com.manyun.business.service.ILogsService;
+import com.manyun.business.service.IUserCollectionService;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
@@ -39,6 +41,9 @@ public class CollectionController extends BaseController{
 
     @Autowired
     private ILogsService logsService;
+
+    @Autowired
+    private IUserCollectionService userCollectionService;
 
     @GetMapping("/queryDict/{keyword}")
     @ApiOperation(value = "/根据词条 查询藏品完整 标题信息",notes = "返回的都是 盲盒词条完整信息 ")
@@ -107,6 +112,13 @@ public class CollectionController extends BaseController{
     public R<TableDataInfo<CollectionLogPageVo>> logsPage(@RequestBody PageQuery pageQuery){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(logsService.logsCollectionPage(pageQuery,notNullLoginBusinessUser.getUserId()));
+    }
+
+    @PostMapping("/shareCollection")
+    @ApiOperation("分享藏品")
+    public R<String> shareCollection(@RequestBody @Valid ShareCollectionForm shareCollectionForm) {
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return userCollectionService.shareCollection(notNullLoginBusinessUser.getUserId(),shareCollectionForm.getMyGoodsId() );
     }
 
 }
