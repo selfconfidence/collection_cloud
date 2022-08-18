@@ -11,7 +11,6 @@ import com.manyun.admin.domain.CntBox;
 import com.manyun.admin.domain.CntCollection;
 import com.manyun.admin.domain.query.CateQuery;
 import com.manyun.admin.domain.vo.CntCateVo;
-import com.manyun.admin.mapper.CntBoxMapper;
 import com.manyun.admin.service.ICntBoxService;
 import com.manyun.admin.service.ICntCollectionService;
 import com.manyun.common.core.domain.R;
@@ -74,6 +73,7 @@ public class CntCateServiceImpl extends ServiceImpl<CntCateMapper,CntCate> imple
             return cntCateVo;
         }).collect(Collectors.toList()),cntCateList);
     }
+
 
     /**
      * 新增藏品系列_分类

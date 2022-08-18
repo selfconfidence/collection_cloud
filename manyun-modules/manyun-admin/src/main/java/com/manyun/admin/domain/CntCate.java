@@ -21,6 +21,9 @@ public class CntCate implements Serializable
     @ApiModelProperty("主键")
     private String id;
 
+    @ApiModelProperty("夫级别分类编号_顶层默认为0")
+    private String parentId;
+
     @ApiModelProperty("1=藏品系列，2=盲盒分类")
     private Integer cateType;
 
@@ -56,6 +59,14 @@ public class CntCate implements Serializable
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
     }
 
     public Integer getCateType() {
@@ -134,6 +145,7 @@ public class CntCate implements Serializable
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("id", getId())
+            .append("parentId", getParentId())
             .append("cateType", getCateType())
             .append("cateName", getCateName())
             .append("cateImage", getCateImage())

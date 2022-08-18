@@ -53,7 +53,7 @@ public class TranController {
     public synchronized R  tranTypeToPoint(@RequestBody @Valid TranAccForm tranAccForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         Assert.isTrue("1".equals(systemService.getVal(BusinessConstants.SystemTypeConstant.TRAN_ACC, String.class)),"转赠未开启!");
-        tranService.tranTypeToPoint(notNullLoginBusinessUser.getUserId(),tranAccForm);
+        tranService.tranTypeToPoint(notNullLoginBusinessUser.getCntUser(),tranAccForm);
         return R.ok();
     }
 

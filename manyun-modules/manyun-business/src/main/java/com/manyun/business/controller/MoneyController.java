@@ -98,6 +98,13 @@ public class MoneyController extends BaseController {
         return moneyService.updateUserMoney(userRealMoneyForm);
     }
 
+    @GetMapping("/checkIdentity")
+    @ApiOperation(value = "检查是否已实名过", hidden = true)
+    @InnerAuth
+    public R checkIdentity(@PathVariable String identityNo) {
+        return moneyService.checkIdentity(identityNo);
+    }
+
 
 
 

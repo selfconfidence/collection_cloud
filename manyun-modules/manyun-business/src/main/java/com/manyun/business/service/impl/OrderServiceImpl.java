@@ -113,7 +113,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             orderVo.setCreationImg(creation.getHeadImage());
         }
         if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(order.getGoodsType())) {
-            List<MediaVo> mediaVos = mediaService.initMediaVos(order.getBuiId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
+            List<MediaVo> mediaVos = mediaService.initMediaVos(order.getBuiId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
             orderVo.setGoodsImg(mediaVos.get(0).getMediaUrl());
         }
         return orderVo;

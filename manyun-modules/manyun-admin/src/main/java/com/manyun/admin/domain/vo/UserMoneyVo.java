@@ -30,6 +30,9 @@ public class UserMoneyVo {
     @ApiModelProperty("邀请码")
     private String pleaseCode;
 
+    @ApiModelProperty("区块链地址")
+    private String linkAddr;
+
     @ApiModelProperty("真实姓名")
     private String realName;
 

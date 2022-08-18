@@ -4,18 +4,15 @@ package com.manyun.admin.controller;
 import com.manyun.admin.domain.query.ActionTarDictQuery;
 import com.manyun.admin.domain.query.DrawRulesDictQuery;
 import com.manyun.admin.domain.query.PostConfigDictQuery;
-import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.service.CntDictService;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
-import com.manyun.common.core.web.page.TableDataInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/dict")
@@ -45,6 +42,13 @@ public class CntDictController extends BaseController
     public R collectionCateDict()
     {
         return cntDictService.collectionCateDict();
+    }
+
+    @GetMapping("/boxCateDict")
+    @ApiOperation("查询盲盒系列字典")
+    public R boxCateDict()
+    {
+        return cntDictService.boxCateDict();
     }
 
     @GetMapping("/creationdDict")
@@ -108,6 +112,13 @@ public class CntDictController extends BaseController
     public R actionTarDict(@Valid @RequestBody ActionTarDictQuery tarDictQuery)
     {
         return cntDictService.actionTarDict(tarDictQuery);
+    }
+
+    @PostMapping("/cateDict")
+    @ApiOperation("藏品分类字典")
+    public R cateDict()
+    {
+        return cntDictService.cateDict();
     }
 
 }

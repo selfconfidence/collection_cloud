@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntPassonRecordMapper">
+
+    <resultMap type="CntPassonRecord" id="CntPassonRecordResult">
+        <result property="id"    column="id"    />
+        <result property="oldUserId"    column="old_user_id"    />
+        <result property="oldNickName"    column="old_nick_name"    />
+        <result property="oldUserPhone"    column="old_user_phone"    />
+        <result property="newUserId"    column="new_user_id"    />
+        <result property="newNickName"    column="new_nick_name"    />
+        <result property="newUserPhone"    column="new_user_phone"    />
+        <result property="goodsId"    column="goods_id"    />
+        <result property="goodsName"    column="goods_name"    />
+        <result property="pictureId"    column="picture_id"    />
+        <result property="pictureType"    column="picture_type"    />
+        <result property="price"    column="price"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCntPassonRecordVo">
+        select id, old_user_id, old_nick_name, old_user_phone, new_user_id, new_nick_name, new_user_phone, goods_id, goods_name, picture_id, picture_type, price, created_by, created_time, updated_by, updated_time from cnt_passon_record
+    </sql>
+
+    <select id="selectCntPassonRecordList" parameterType="CntPassonRecord" resultMap="CntPassonRecordResult">
+        <include refid="selectCntPassonRecordVo"/>
+        <where>
+            <if test="oldNickName != null  and oldNickName != ''"> and old_nick_name like concat('%', #{oldNickName}, '%')</if>
+            <if test="newNickName != null  and newNickName != ''"> and new_nick_name like concat('%', #{newNickName}, '%')</if>
+            <if test="goodsName != null  and goodsName != ''"> and goods_name like concat('%', #{goodsName}, '%')</if>
+        </where>
+    </select>
+
+</mapper>

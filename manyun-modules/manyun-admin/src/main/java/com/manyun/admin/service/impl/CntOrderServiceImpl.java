@@ -2,6 +2,9 @@ package com.manyun.admin.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.admin.domain.vo.CntOrderVo;
+import com.manyun.admin.domain.vo.OrderAmountsAddStatisticsVo;
+import com.manyun.admin.domain.vo.OrderTypePercentageVo;
+import com.manyun.admin.domain.vo.ValidOrderAddStatisticsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.manyun.admin.mapper.CntOrderMapper;
@@ -29,4 +32,29 @@ public class CntOrderServiceImpl extends ServiceImpl<CntOrderMapper,CntOrder> im
     public List<CntOrderVo> myOrderList(String userId) {
         return cntOrderMapper.myOrderList(userId);
     }
+
+    /**
+     *查询近七日每日新增有效订单数
+     */
+    @Override
+    public List<ValidOrderAddStatisticsVo> validOrderAddStatistics() {
+        return cntOrderMapper.validOrderAddStatistics();
+    }
+
+    /**
+     *查询近期日每日新增销售金额
+     */
+    @Override
+    public List<OrderAmountsAddStatisticsVo> orderAmountsAddStatistics() {
+        return cntOrderMapper.orderAmountsAddStatistics();
+    }
+
+    /**
+     *查询订单各种状态占订单总量比例
+     */
+    @Override
+    public List<OrderTypePercentageVo> orderTypePercentageList() {
+        return cntOrderMapper.orderTypePercentageList();
+    }
+
 }

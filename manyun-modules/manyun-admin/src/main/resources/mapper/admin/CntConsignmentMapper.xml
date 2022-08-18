@@ -29,7 +29,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, bui_name, bui_id, cate_id, real_bui_id, order_id, is_type, server_charge, consignment_price, send_user_id, pay_user_id, to_pay, consignment_status, form_info, created_by, created_time, updated_by, updated_time from cnt_consignment
     </sql>
 
-    <select id="selectOrderList" resultType="com.manyun.admin.domain.vo.CntConsignmentVo">
+    <select id="selectCollectionOrderList" resultType="com.manyun.admin.domain.vo.CntConsignmentVo">
         select
             js.id,
             js.is_type isType,
@@ -47,29 +47,102 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             o.created_time createOrderTime,
             o.pay_time payTime
         from
-            cnt_consignment js
+        cnt_consignment js
         left join
-            cnt_user cs
+        cnt_user cs
         on js.send_user_id=cs.id
         left join
-            cnt_user mr
+        cnt_user mr
         on js.pay_user_id=mr.id
         left join
-            cnt_order o
-        on js.order_id=o.order_no
+        cnt_order o
+        on js.order_id=o.id
         <where>
+            and js.is_type=0
             <if test="id != null  and id != ''"> and js.id = #{id}</if>
-            <if test="isType != null and isType!=''"> and js.is_type = #{isType}</if>
             <if test="buiName != null  and buiName != ''"> and js.bui_name like concat('%', #{buiName}, '%')</if>
             <if test="consignmentStatus != null  and consignmentStatus != ''"> and js.consignment_status = #{consignmentStatus}</if>
             <if test="collectorName != null  and collectorName != ''"> and cs.nick_name like concat('%', #{collectorName}, '%')</if>
             <if test="collectorPhone != null  and collectorPhone != ''"> and cs.phone = #{collectorPhone}</if>
             <if test="sellerName != null  and sellerName != ''"> and mr.nick_name like concat('%', #{sellerName}, '%')</if>
             <if test="sellerPhone != null  and sellerPhone != ''"> and mr.phone = #{sellerPhone}</if>
-            <if test="payType != null  and payType != ''"> and o.pay_type = #{payType}</if>
-            <if test="createOrderTime != null  and createOrderTime != ''"> and o.created_time = #{createOrderTime}</if>
+            <if test="payType != null"> and o.pay_type = #{payType}</if>
         </where>
         order by js.created_time desc
+    </select>
+
+    <select id="selectBoxOrderList" resultType="com.manyun.admin.domain.vo.CntConsignmentVo">
+        select
+            js.id,
+            js.is_type isType,
+            js.bui_name buiName,
+            js.consignment_price consignmentPrice,
+            js.server_charge serverCharge,
+            js.consignment_status consignmentStatus,
+            js.to_pay toPay,
+            cs.nick_name collectorName,
+            cs.phone collectorPhone,
+            mr.nick_name sellerName,
+            mr.phone sellerPhone,
+            o.pay_type payType,
+            o.order_amount orderAmount,
+            o.created_time createOrderTime,
+            o.pay_time payTime
+        from
+        cnt_consignment js
+        left join
+        cnt_user cs
+        on js.send_user_id=cs.id
+        left join
+        cnt_user mr
+        on js.pay_user_id=mr.id
+        left join
+        cnt_order o
+        on js.order_id=o.id
+        <where>
+            and js.is_type=1
+            <if test="id != null  and id != ''"> and js.id = #{id}</if>
+            <if test="buiName != null  and buiName != ''"> and js.bui_name like concat('%', #{buiName}, '%')</if>
+            <if test="consignmentStatus != null  and consignmentStatus != ''"> and js.consignment_status = #{consignmentStatus}</if>
+            <if test="collectorName != null  and collectorName != ''"> and cs.nick_name like concat('%', #{collectorName}, '%')</if>
+            <if test="collectorPhone != null  and collectorPhone != ''"> and cs.phone = #{collectorPhone}</if>
+            <if test="sellerName != null  and sellerName != ''"> and mr.nick_name like concat('%', #{sellerName}, '%')</if>
+            <if test="sellerPhone != null  and sellerPhone != ''"> and mr.phone = #{sellerPhone}</if>
+            <if test="payType != null"> and o.pay_type = #{payType}</if>
+        </where>
+        order by js.created_time desc
+    </select>
+
+    <select id="selectConsignmentOrderById" parameterType="com.manyun.admin.domain.dto.ConsignmentInfoDto" resultType="com.manyun.admin.domain.vo.CntConsignmentVo">
+        select
+            js.id,
+            js.is_type isType,
+            js.bui_name buiName,
+            js.consignment_price consignmentPrice,
+            js.server_charge serverCharge,
+            js.consignment_status consignmentStatus,
+            js.to_pay toPay,
+            cs.nick_name collectorName,
+            cs.phone collectorPhone,
+            mr.nick_name sellerName,
+            mr.phone sellerPhone,
+            o.pay_type payType,
+            o.order_amount orderAmount,
+            o.created_time createOrderTime,
+            o.pay_time payTime
+        from
+        cnt_consignment js
+        left join
+        cnt_user cs
+        on js.send_user_id=cs.id
+        left join
+        cnt_user mr
+        on js.pay_user_id=mr.id
+        left join
+        cnt_order o
+        on js.order_id=o.id
+        where js.is_type=#{isType}
+        and js.id=#{id}
     </select>
 
 </mapper>
