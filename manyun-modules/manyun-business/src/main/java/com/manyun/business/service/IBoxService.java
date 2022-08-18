@@ -2,6 +2,7 @@ package com.manyun.business.service;
 
 import com.manyun.business.domain.entity.Box;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.manyun.business.domain.form.BoxOrderSellForm;
 import com.manyun.business.domain.form.BoxSellForm;
 import com.manyun.business.domain.query.BoxQuery;
 import com.manyun.business.domain.query.UseAssertQuery;
@@ -39,4 +40,6 @@ public interface IBoxService extends IService<Box> {
     Integer tarBox(String id, String userId);
 
     BoxListVo getBaseBoxListVo(String boxId);
+
+    String sellOrderBox(BoxOrderSellForm boxOrderSellForm, String userId);
 }

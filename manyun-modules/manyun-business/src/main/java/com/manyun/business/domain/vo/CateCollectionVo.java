@@ -16,7 +16,7 @@ import java.util.List;
  * @author yanwei
  * @since 2022-06-17
  */
-@ApiModel(value = "系列藏品相关返回视图", description = "用户系列藏品相关返回视图")
+@ApiModel(value = "系列藏品相关返回视图", description = "系列藏品相关返回视图")
 @Data
 @ToString
 public class CateCollectionVo implements Serializable {

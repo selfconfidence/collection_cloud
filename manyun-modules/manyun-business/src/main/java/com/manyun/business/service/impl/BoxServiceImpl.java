@@ -15,6 +15,7 @@ import com.manyun.business.domain.dto.MsgThisDto;
 import com.manyun.business.domain.dto.OrderCreateDto;
 import com.manyun.business.domain.dto.PayInfoDto;
 import com.manyun.business.domain.entity.*;
+import com.manyun.business.domain.form.BoxOrderSellForm;
 import com.manyun.business.domain.form.BoxSellForm;
 import com.manyun.business.domain.query.BoxQuery;
 import com.manyun.business.domain.query.UseAssertQuery;
@@ -204,7 +205,36 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
 
         return payVo;
 
+    }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String sellOrderBox(BoxOrderSellForm boxOrderSellForm, String userId) {
+        // 总结校验 —— 支付方式
+        Box box = getById(boxOrderSellForm.getBoxId());
+        // 实际需要支付的金额
+        BigDecimal realPayMoney = NumberUtil.mul(boxOrderSellForm.getSellNum(), box.getRealPrice());
+        checkOrderSell(box,userId);
+        // 锁优化
+        int rows = boxMapper.updateLock(box.getId(),boxOrderSellForm.getSellNum());
+        Assert.isTrue(rows>=1,"您来晚了!");
+
+        //1. 先创建对应的订单
+        String outHost =   orderService.createOrder(OrderCreateDto.builder()
+                .orderAmount(realPayMoney)
+                .buiId(box.getId())
+                .goodsType(BusinessConstants.ModelTypeConstant.BOX_TAYPE)
+                .collectionName(box.getBoxTitle())
+                .goodsNum(boxOrderSellForm.getSellNum())
+                .userId(userId)
+                .build());
+        return orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, outHost)).getId();
+    }
+
+    private void checkOrderSell(Box box, String userId) {
+        commCheckSell(box, userId);
+        tarCheckBox(box,userId);
+        postCheckBox(box, userId);
 
     }
 
@@ -299,8 +329,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         return boxCollections.parallelStream().filter(item -> item.getId().equals(id)).findAny().get();
     }
 
-
-    private void checkSell(Box box,String userId,Integer payType,BigDecimal realPayMoney) {
+    private void commCheckSell(Box box,String userId){
         // 校验盲盒主体是否存在
         Assert.isTrue(Objects.nonNull(box),"盲盒编号有误,请核实!");
 
@@ -313,18 +342,42 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         List<Order> orders = orderService.checkUnpaidOrder(userId);
         Assert.isFalse(orders.size() > 0 ,"您有未支付订单，暂不可购买");
 
-       // 如果是余额支付,需要验证下是否充足
+    }
+
+
+    /**
+     * 余额检测
+     * @param
+     * @param userId
+     */
+    private void moneyCheckCollection(String userId,Integer payType,BigDecimal realPayMoney){
+        // 如果是余额支付,需要验证下是否充足
         if (MONEY_TAPE.getCode().equals(payType)) {
             Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
-           Assert.isTrue(money.getMoneyBalance().compareTo(realPayMoney) >=0,"余额不足,请核实!");
+            Assert.isTrue(money.getMoneyBalance().compareTo(realPayMoney) >=0,"余额不足,请核实!");
         }
 
-        // 是否需要抽？
+    }
+
+    /**
+     * 抽签检测
+     * @param
+     * @param userId
+     */
+    private void tarCheckBox(Box box,String userId){
         // 是否需要抽？
         if (StrUtil.isNotBlank(box.getTarId()))
             if (!CEN_YES_TAR.getCode().equals(tarService.tarStatus(userId,box.getId())))
                 Assert.isFalse(Boolean.TRUE,"未参与抽签,或暂未购买资格!");
 
+    }
+
+    /**
+     * 提前购检测 发售时间检测
+     * @param
+     * @param userId
+     */
+    private void postCheckBox(Box box,String userId){
         // 是否能够提前购？
         Boolean publishTimeFlag = Boolean.TRUE;
         // 如果是提前购 并且 购买的时机符合判定条件就进去判定 是否有资格提前购买
@@ -332,8 +385,8 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
             // 是提前购的属性
             //  表格是否满足提前购 && 配置是否满足提前购
             // 1.1 满足就 根据发售时间 - postTime(分钟) ;
-               //1.1.1 判定下当前时间 就可以购买了 publishTimeFlag = false
-               // 1.1.2 如果当前时间还不满足 就拦截提示 好了
+            //1.1.1 判定下当前时间 就可以购买了 publishTimeFlag = false
+            // 1.1.2 如果当前时间还不满足 就拦截提示 好了
             // 1.2 不满足就 直接拦截,提示.
             if (cntPostExcelService.isExcelPostCustomer(userId, box.getId()) || postConfigService.isConfigPostCustomer(userId, box.getId())){
                 if (LocalDateTime.now().compareTo(box.getPublishTime().minusMinutes(box.getPostTime())) >=0){
@@ -343,7 +396,15 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         }
 
         // 校验盲盒是否到了发行时间
-        if (publishTimeFlag)Assert.isTrue(LocalDateTime.now().compareTo(box.getPublishTime()) > 0,"发行时间未到,请核实!");
+        if (publishTimeFlag)Assert.isTrue(LocalDateTime.now().compareTo(box.getPublishTime()) >= 0,"发行时间未到,请核实!");
+
+
+    }
+    private void checkSell(Box box,String userId,Integer payType,BigDecimal realPayMoney) {
+         commCheckSell(box, userId);
+         moneyCheckCollection(userId, payType, realPayMoney);
+         tarCheckBox(box,userId);
+        postCheckBox(box, userId);
 
     }
 
@@ -357,6 +418,8 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
     public BoxListVo getBaseBoxListVo(String boxId){
         return initBoxListVo(getById(boxId));
     }
+
+
 
     /**
      * 转义数据

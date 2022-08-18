@@ -50,6 +50,7 @@ public class CateController extends BaseController {
 
     @GetMapping("/cateChildAll/{type}")
     @ApiOperation(value = "查询所有的二级分类",notes = "无需分页,1=藏品系列，2=盲盒分类\r version(1.0.1)")
+    @Deprecated
     public R<List<CateVo>>  cateChildAll(@PathVariable Integer type){
 
         return R.ok(cateService.cateChildAll(type));
@@ -65,6 +66,7 @@ public class CateController extends BaseController {
     @GetMapping("/childCate/{parentId}/{type}")
     @ApiOperation(value = "查询(品牌馆下面的子分类)列表",notes = "无需分页,1=藏品系列，2=盲盒分类\n" +
             " parentId是 夫节点的ID,不是夫节点的parentId \n  version(1.0.1)")
+    @Deprecated
     public R<List<CateVo>> childCate(@PathVariable String parentId,@PathVariable Integer type){
         return R.ok(cateService.childCate(parentId,type));
     }

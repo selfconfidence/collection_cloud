@@ -1,6 +1,7 @@
 package com.manyun.comm.api.factory;
 
 import com.manyun.comm.api.RemoteBoxService;
+import com.manyun.comm.api.domain.dto.BoxListDto;
 import com.manyun.comm.api.domain.dto.OpenPleaseBoxDto;
 import com.manyun.common.core.domain.R;
 import org.slf4j.Logger;
@@ -25,6 +26,11 @@ public class RemoteBoxFallbackFactory implements FallbackFactory<RemoteBoxServic
         return new RemoteBoxService() {
             @Override
             public R openPleaseBox(OpenPleaseBoxDto pleaseBoxDto, String source) {
+                return R.fail("操作失败:" + throwable.getMessage());
+            }
+
+            @Override
+            public R<BoxListDto> innerInfo(String id, String source) {
                 return R.fail("操作失败:" + throwable.getMessage());
             }
         };

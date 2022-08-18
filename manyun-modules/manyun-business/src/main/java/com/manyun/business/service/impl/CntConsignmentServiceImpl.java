@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.manyun.business.design.pay.RootPay;
+import com.manyun.business.domain.dto.MsgCommDto;
+import com.manyun.business.domain.dto.MsgThisDto;
 import com.manyun.business.domain.dto.OrderCreateDto;
 import com.manyun.business.domain.dto.PayInfoDto;
 import com.manyun.business.domain.entity.*;
@@ -84,6 +86,9 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
 
     @Autowired
     private RootPay rootPay;
+
+    @Autowired
+    private IMsgService msgService;
 
 
     /**
@@ -211,7 +216,10 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
                         .aliPayEnum(CONSIGNMENT_ALI_PAY)
                         .wxPayEnum(CONSIGNMENT_WECHAT_PAY)
                         .userId(payUserId).build());
-
+        Order order = orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, hostOut));
+        // 走这一步如果 是余额支付 那就说明扣款成功了！！！
+        order.setMoneyBln(payVo.getMoneyBln());
+        orderService.updateById(order);
         // 修改寄售信息
         consignment.updateD(payUserId);
         consignment.setPayUserId(payUserId);
@@ -219,12 +227,27 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         consignment.setConsignmentStatus(LOCK_CONSIGN.getCode());
         updateById(consignment);
 
-
         // 如果说是 余额支付的,并且 将对应的状态都进行修复下
-        if (MONEY_TAPE.getCode().equals(consignmentSellForm.getPayType()) && StrUtil.isBlank(payVo.getBody())){
+        if ( StrUtil.isBlank(payVo.getBody())){
             // 调用完成订单
             orderService.notifyPayConsignmentSuccess(payVo.getOutHost());
+            String title = "";
+            String form = "";
+            if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(order.getGoodsType())){
+                // 盲盒
+                Box box = boxService.getById(order.getBuiId());
+                title = StrUtil.format("购买了 {} 盲盒!", box.getBoxTitle());
+                form = StrUtil.format("使用余额{};购买了 {} 盲盒!",order.getOrderAmount(), box.getBoxTitle());
 
+            }
+            if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(order.getGoodsType())){
+                //藏品
+                CntCollection cntCollection = collectionService.getById(order.getBuiId());
+                title = StrUtil.format("从寄售市场购买了 {} 藏品!", cntCollection.getCollectionName());
+                form = StrUtil.format("使用余额{};从寄售市场购买了 {} 藏品!",order.getOrderAmount(), cntCollection.getCollectionName());
+            }
+            msgService.saveMsgThis(MsgThisDto.builder().userId(order.getUserId()).msgForm(form).msgTitle(title).build());
+            msgService.saveCommMsg(MsgCommDto.builder().msgTitle(title).msgForm(form).build());
         }
         return payVo;
     }

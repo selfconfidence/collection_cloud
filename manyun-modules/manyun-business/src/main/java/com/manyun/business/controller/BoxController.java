@@ -1,4 +1,6 @@
 package com.manyun.business.controller;
+import cn.hutool.core.bean.BeanUtil;
+import com.manyun.business.domain.form.BoxOrderSellForm;
 import com.manyun.business.domain.form.BoxSellForm;
 import com.manyun.business.domain.query.BoxQuery;
 import com.manyun.business.domain.query.UseAssertQuery;
@@ -6,8 +8,10 @@ import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.IBoxService;
 import com.manyun.business.service.ILogsService;
 import com.manyun.business.service.IUserBoxService;
+import com.manyun.comm.api.domain.dto.BoxListDto;
 import com.manyun.comm.api.domain.dto.OpenPleaseBoxDto;
 import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.PageQuery;
@@ -72,11 +76,29 @@ public class BoxController extends BaseController {
         return R.ok(boxService.info(id,loginBusinessUser.getUserId()));
     }
 
+    @GetMapping("/innerInfo/{id}")
+    @ApiOperation("根据盲盒编号,查询盲盒的详细信息 -需登录")
+    @InnerAuth
+    public R<BoxListDto> innerInfo(@PathVariable String id){
+        BoxVo boxVo = boxService.info(id, null);
+        BoxListVo boxListVo = boxVo.getBoxListVo();
+        BoxListDto listDto = Builder.of(BoxListDto::new).build();
+        BeanUtil.copyProperties(boxListVo, listDto );
+        return R.ok(listDto);
+    }
+
     @PostMapping("/sellBox")
     @ApiOperation("购买普通盲盒")
     public synchronized R<PayVo> sellBox(@Valid @RequestBody BoxSellForm boxSellForm){
         String userId = SecurityUtils.getBuiUserId();
         return R.ok(boxService.sellBox(boxSellForm,userId));
+    }
+
+    @PostMapping("/sellOrderBox")
+    @ApiOperation(value = "购买盲盒_预先_生成订单",notes = "用来预先 生成一个待支付订单,返回订单编号,用来二次提交支付\n version 1.0.1")
+    public synchronized R<String> sellOrderBox(@Valid @RequestBody BoxOrderSellForm boxOrderSellForm){
+        String userId = SecurityUtils.getBuiUserId();
+        return R.ok(boxService.sellOrderBox(boxOrderSellForm,userId));
     }
 
     @PostMapping("/userBoxPageList")

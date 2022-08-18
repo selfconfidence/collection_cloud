@@ -1,14 +1,20 @@
 package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.manyun.business.design.pay.RootPay;
+import com.manyun.business.domain.dto.MsgCommDto;
+import com.manyun.business.domain.dto.MsgThisDto;
 import com.manyun.business.domain.dto.OrderCreateDto;
+import com.manyun.business.domain.dto.PayInfoDto;
 import com.manyun.business.domain.entity.*;
+import com.manyun.business.domain.form.OrderPayForm;
 import com.manyun.business.domain.query.OrderQuery;
 import com.manyun.business.domain.vo.*;
 import com.manyun.business.mapper.OrderMapper;
@@ -19,10 +25,12 @@ import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -30,10 +38,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
 import static com.manyun.common.core.enums.ConsignmentStatus.LOCK_CONSIGN;
 import static com.manyun.common.core.enums.ConsignmentStatus.OVER_CONSIGN;
 import static com.manyun.common.core.enums.ConsignmentToPayStatus.WAIT_TO_PAY;
 import static com.manyun.common.core.enums.OrderStatus.*;
+import static com.manyun.common.core.enums.PayTypeEnum.MONEY_TAPE;
+import static com.manyun.common.core.enums.WxPayEnum.BOX_WECHAT_PAY;
 
 /**
  * <p>
@@ -44,6 +55,7 @@ import static com.manyun.common.core.enums.OrderStatus.*;
  * @since 2022-06-17
  */
 @Service
+@Slf4j
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements IOrderService {
 
     @Autowired
@@ -69,6 +81,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Autowired
     private IMediaService mediaService;
+
+    @Autowired
+    private  RootPay rootPay;
+
+    @Autowired
+    private IMsgService msgService;
+
+    @Autowired
+    private IMoneyService moneyService;
 
     @Override
     public TableDataInfo<OrderVo> pageQueryList(OrderQuery orderQuery, String userId) {
@@ -196,8 +217,23 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             // 寄售信息修改
             cntConsignmentServiceObjectFactory.getObject().reLoadConsignments(cntConsignments);
         }
+        for (Order order : orderList) {
+            String orderId = order.getId();
+            try {
+                if (cntConsignmentOrderIds.contains(order.getId())){
+                    // 寄售订单
+                    cancelOrder(orderId,Boolean.FALSE);
+                }else{
+                    // 普通订单
+                    cancelOrder(orderId,Boolean.TRUE);
+                }
+            }catch (Exception e){
+                log.error("定时订单取消失败订单编号为:{},错误原因为:{}",orderId,e.getMessage());
+            }
+
+        }
         // 批量更改订单状态
-        List<Order> updateSOrder = orderList.parallelStream().map(item -> {
+     /*   List<Order> updateSOrder = orderList.parallelStream().map(item -> {
             item.setOrderStatus(CANCEL_ORDER.getCode());
             item.updateD(item.getUserId());
             return item;
@@ -241,7 +277,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             }
             collectionService.getObject().updateBatchById(cntCollections);
         }
-
+*/
     }
 
     /**
@@ -299,12 +335,117 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         }
 
-
-
-
-
         orderInfoVo.setOrderCollectionInfoVo(collectionInfoVo);
         return orderInfoVo;
+    }
+
+
+    /**
+     * 统一下单
+     * @param orderPayForm
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public PayVo unifiedOrder(OrderPayForm orderPayForm,String userId) {
+        Order order = getById(orderPayForm.getOrderId());
+        checkUnified(order,userId);
+        // 判定用户的余额是否充足
+        PayVo payVo =  rootPay.execPayVo(
+                PayInfoDto.builder()
+                        .payType(orderPayForm.getPayType())
+                        .realPayMoney(order.getOrderAmount().subtract(order.getMoneyBln()))
+                        .outHost(order.getOrderNo())
+                        .aliPayEnum(BOX_ALI_PAY)
+                        .wxPayEnum(BOX_WECHAT_PAY)
+                        .userId(userId).build());
+        // 走这一步如果 是余额支付 那就说明扣款成功了！！！
+        order.setMoneyBln(payVo.getMoneyBln());
+        updateById(order);
+        if ( StrUtil.isBlank(payVo.getBody())){
+            // 调用完成订单
+            notifyPaySuccess(payVo.getOutHost());
+            String title = "";
+            String form = "";
+            if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(order.getGoodsType())){
+                // 盲盒
+                Box box = boxService.getObject().getById(order.getBuiId());
+                 title = StrUtil.format("购买了 {} 盲盒!", box.getBoxTitle());
+                 form = StrUtil.format("使用余额{};购买了 {} 盲盒!",order.getOrderAmount(), box.getBoxTitle());
+
+            }
+            if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(order.getGoodsType())){
+                //藏品
+                CntCollection cntCollection = collectionService.getObject().getById(order.getBuiId());
+                title = StrUtil.format("购买了 {} 藏品!", cntCollection.getCollectionName());
+                 form = StrUtil.format("使用余额{};购买了 {} 藏品!",order.getOrderAmount(), cntCollection.getCollectionName());
+            }
+            msgService.saveMsgThis(MsgThisDto.builder().userId(userId).msgForm(form).msgTitle(title).build());
+            msgService.saveCommMsg(MsgCommDto.builder().msgTitle(title).msgForm(form).build());
+        }
+        return payVo;
+    }
+
+
+    /**
+     * 取消订单
+     *
+     * 1. 订单状态变更
+     * 2. 订单余额直接退还
+     * 3. 将 (盲盒|藏品库存重新加上)
+     * 取消订单
+     * @param id
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelOrder(String id) {
+        // 是寄售吗? 还是普通?
+        ICntConsignmentService cntConsignmentServiceObjectFactoryObject = cntConsignmentServiceObjectFactory.getObject();
+        CntConsignment cntConsignment = cntConsignmentServiceObjectFactoryObject.getOne(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getOrderId,id).eq(CntConsignment::getConsignmentStatus, LOCK_CONSIGN.getCode()));
+        cancelOrder(id,Objects.isNull(cntConsignment));
+        cntConsignmentServiceObjectFactoryObject.reLoadConsignments(Arrays.asList(cntConsignment));
+
+    }
+    private void cancelOrder(String id,Boolean reloadAssert) {
+        Order order = getById(id);
+        Assert.isTrue(WAIT_ORDER.getCode().equals(order.getOrderStatus()),"待支付订单才可取消!");
+        order.setOrderStatus(CANCEL_ORDER.getCode());
+        order.updateD(order.getUserId());
+        updateById(order);
+        BigDecimal moneyBln = order.getMoneyBln();
+        if (Objects.nonNull(moneyBln) && moneyBln.compareTo(NumberUtil.add(0D)) >=1){
+            moneyService.orderBack(order.getUserId(),moneyBln,StrUtil.format("订单已取消,此产生的消费 {},已经退还余额!" , moneyBln));
+        }
+        // 刷新对应库存
+        if (reloadAssert)
+        batchUpdateAssert(order.getBuiId(),order.getGoodsType(),order.getGoodsNum());
+
+    }
+
+    private void batchUpdateAssert(String buiId, Integer goodsType, Integer goodsNum) {
+
+        if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(goodsType)){
+            // 盲盒
+            IBoxService boxServiceReal = boxService.getObject();
+            Box box = boxServiceReal.getById(buiId);
+            box.setBalance(box.getBalance() + goodsNum);
+            box.setSelfBalance(box.getSelfBalance() - goodsNum);
+            boxServiceReal.updateById(box);
+        }
+        if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(goodsType)){
+            // 藏品
+            ICollectionService collectionServiceReal = collectionService.getObject();
+            CntCollection cntCollection = collectionServiceReal.getById(buiId);
+            cntCollection.setBalance(cntCollection.getBalance() + goodsNum);
+            cntCollection.setSelfBalance(cntCollection.getSelfBalance() - goodsNum);
+            collectionServiceReal.updateById(cntCollection);
+        }
+    }
+
+    private void checkUnified(Order order, String userId) {
+        Assert.isTrue(userId.equals(order.getUserId()), "订单被篡改,请联系平台!" );
+        Assert.isTrue(WAIT_ORDER.getCode().equals(order.getOrderStatus()),"待支付订单才可支付!");
+        Assert.isTrue(order.getEndTime().compareTo(LocalDateTime.now()) >=0,"付款时间已截止,请核实订单状态!");
     }
 
 

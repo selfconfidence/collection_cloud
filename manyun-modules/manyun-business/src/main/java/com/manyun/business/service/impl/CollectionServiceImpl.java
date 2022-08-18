@@ -16,6 +16,7 @@ import com.manyun.business.domain.dto.MsgThisDto;
 import com.manyun.business.domain.dto.OrderCreateDto;
 import com.manyun.business.domain.dto.PayInfoDto;
 import com.manyun.business.domain.entity.*;
+import com.manyun.business.domain.form.CollectionOrderSellForm;
 import com.manyun.business.domain.form.CollectionSellForm;
 import com.manyun.business.domain.query.CollectionQuery;
 import com.manyun.business.domain.query.UseAssertQuery;
@@ -199,6 +200,44 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         return payVo;
     }
 
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String sellOrderCollection(String userId, CollectionOrderSellForm collectionOrderSellForm) {
+        // 总结校验 —— 支付方式
+        CntCollection  cntCollection = getById(collectionOrderSellForm.getCollectionId());
+        // 实际需要支付的金额
+        // 实际需要支付的金额
+        BigDecimal realPayMoney = NumberUtil.mul(collectionOrderSellForm.getSellNum(), cntCollection.getRealPrice());
+        checkPerOrderCollection(cntCollection,userId);
+        // 锁优化
+        int rows = cntCollectionMapper.updateLock(cntCollection.getId(),collectionOrderSellForm.getSellNum());
+        Assert.isTrue(rows>=1,"您来晚了!");
+
+        // 根据支付方式创建订单  通用适配方案 余额直接 减扣操作
+        //1. 先创建对应的订单
+        String outHost =   orderService.createOrder(OrderCreateDto.builder()
+                .orderAmount(realPayMoney)
+                .buiId(cntCollection.getId())
+                .goodsType(COLLECTION_TAYPE)
+                .collectionName(cntCollection.getCollectionName())
+                .goodsNum(collectionOrderSellForm.getSellNum())
+                .userId(userId)
+                .build());
+        return orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, outHost)).getId();
+    }
+
+    /**
+     * 预先生成订单检测方法
+     * @param cntCollection
+     * @param userId
+     */
+    private void checkPerOrderCollection(CntCollection cntCollection, String userId) {
+        commCheckCollection(cntCollection, userId);
+        tarCheckCollection(cntCollection, userId);
+        postCheckCollection(cntCollection, userId);
+    }
+
     /**
      * 分页查询用户的 所有藏品信息
      * @param useAssertQuery
@@ -337,7 +376,12 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     }
 
 
-    private void checkCollection(CntCollection cntCollection,String userId,Integer payType,BigDecimal realPayMoney) {
+    /**
+     * 通用检测方法
+     * @param cntCollection
+     * @param userId
+     */
+    private void commCheckCollection(CntCollection cntCollection,String userId){
         // 校验盲盒主体是否存在
         Assert.isTrue(Objects.nonNull(cntCollection),"藏品编号有误,请核实!");
         // 校验是否库存不够了
@@ -349,16 +393,43 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         List<Order> orders = orderService.checkUnpaidOrder(userId);
         Assert.isFalse(orders.size() > 0 ,"您有未支付订单，暂不可购买");
 
+    }
+
+    /**
+     * 余额检测
+     * @param
+     * @param userId
+     */
+    private void moneyCheckCollection(String userId,Integer payType,BigDecimal realPayMoney){
         // 如果是余额支付,需要验证下是否充足
         if (MONEY_TAPE.getCode().equals(payType)) {
             Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
             Assert.isTrue(money.getMoneyBalance().compareTo(realPayMoney) >=0,"余额不足,请核实!");
         }
+
+    }
+
+
+    /**
+     * 抽签检测
+     * @param
+     * @param userId
+     */
+    private void tarCheckCollection(CntCollection cntCollection,String userId){
         // 是否需要抽？
         if (StrUtil.isNotBlank(cntCollection.getTarId()))
             if (!CEN_YES_TAR.getCode().equals(tarService.tarStatus(userId,cntCollection.getId())))
-            Assert.isFalse(Boolean.TRUE,"未参与抽签,或暂未购买资格!");
+                Assert.isFalse(Boolean.TRUE,"未参与抽签,或暂未购买资格!");
 
+
+    }
+
+    /**
+     * 提前购检测 发售时间检测
+     * @param
+     * @param userId
+     */
+    private void postCheckCollection(CntCollection cntCollection,String userId){
         // 是否能够提前购？
         Boolean publishTimeFlag = Boolean.TRUE;
         // 如果是提前购 并且 购买的时机符合判定条件就进去判定 是否有资格提前购买
@@ -379,6 +450,14 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         // 校验盲盒是否到了发行时间
         if (publishTimeFlag)Assert.isTrue(LocalDateTime.now().compareTo(cntCollection.getPublishTime()) >= 0,"发行时间未到,请核实!");
 
+
+    }
+
+    private void checkCollection(CntCollection cntCollection,String userId,Integer payType,BigDecimal realPayMoney) {
+         commCheckCollection(cntCollection, userId);
+         moneyCheckCollection(userId, payType, realPayMoney);
+         tarCheckCollection(cntCollection, userId);
+         postCheckCollection(cntCollection, userId);
     }
 
     /**
@@ -459,6 +538,8 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         }
         return cateCollectionVoList;
     }
+
+
 
     private List<StepVo> initStepVo(String linkAddr, String collectionModelType) {
         List<Step> stepList = stepService.list(Wrappers.<Step>lambdaQuery().eq(Step::getBuiId, linkAddr).eq(Step::getModelType, collectionModelType).orderByDesc(Step::getCreatedTime));

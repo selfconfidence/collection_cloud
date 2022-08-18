@@ -41,11 +41,14 @@ public class OrderVo implements Serializable {
     @ApiModelProperty("订单状态;0待付款，1已完成，2已取消，-1支付未回调")
     private Integer orderStatus;
 
-    @ApiModelProperty("支付方式;0平台，1支付宝，2微信，3银联")
+    @ApiModelProperty("支付方式;0余额，1支付宝，2微信，3银联")
     private Integer payType;
 
     @ApiModelProperty("订单金额")
     private BigDecimal orderAmount;
+
+    @ApiModelProperty("组合支付专属, payType = 0 才有用 如果此值不是0.00 就说明使用了余额支付。")
+    private BigDecimal moneyBln;
 
     @ApiModelProperty("付款截止时间 yyyy-MM-dd HH:mm:ss")
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")

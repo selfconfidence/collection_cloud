@@ -9,6 +9,7 @@ import com.manyun.business.domain.vo.MoneyLogVo;
 import com.manyun.comm.api.domain.form.UserRealMoneyForm;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.TableDataInfo;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
@@ -22,7 +23,10 @@ import java.math.BigDecimal;
  */
 public interface IMoneyService extends IService<Money> {
 
-    BigDecimal ordePay(String outHost,String userId, BigDecimal realPayMoney, String formInfo);
+    @Transactional(rollbackFor = Exception.class)
+    void orderBack(String userId, BigDecimal moneyBln, String formInfo);
+
+    BigDecimal ordePay(String outHost, String userId, BigDecimal realPayMoney, String formInfo);
 
     AccountInfoVo accountInfo(String userId);
 

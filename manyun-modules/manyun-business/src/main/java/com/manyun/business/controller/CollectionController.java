@@ -2,6 +2,7 @@ package com.manyun.business.controller;
 
 
 import com.github.pagehelper.PageHelper;
+import com.manyun.business.domain.form.CollectionOrderSellForm;
 import com.manyun.business.domain.form.CollectionSellForm;
 import com.manyun.business.domain.form.ShareCollectionForm;
 import com.manyun.business.domain.query.CollectionQuery;
@@ -78,6 +79,14 @@ public class CollectionController extends BaseController{
     public synchronized R<PayVo> sellCollection(@RequestBody @Valid CollectionSellForm collectionSellForm){
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(collectionService.sellCollection(loginBusinessUser.getUserId(),collectionSellForm));
+    }
+
+
+    @PostMapping("/sellOrderCollection")
+    @ApiOperation(value = "购买藏品_预先_生成订单",notes = "用来预先 生成一个待支付订单,返回订单编号,用来二次提交支付\n version 1.0.1")
+    public synchronized R<String> sellOrderCollection(@RequestBody @Valid CollectionOrderSellForm collectionOrderSellForm){
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return R.ok(collectionService.sellOrderCollection(loginBusinessUser.getUserId(),collectionOrderSellForm));
     }
 
     @PostMapping("/userCollectionPageList")

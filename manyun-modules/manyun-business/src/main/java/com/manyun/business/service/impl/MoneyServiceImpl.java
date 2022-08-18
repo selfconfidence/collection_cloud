@@ -31,6 +31,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.POLL_SOURCE;
+import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.PULL_SOURCE;
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.MONEY_TYPE;
 
 /**
@@ -48,7 +49,18 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
     private ILogsService logsService;
 
 
-
+    /**
+     * 余额增加
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void orderBack(String userId,BigDecimal moneyBln,String formInfo){
+        Money money = getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
+        money.setMoneyBalance(money.getMoneyBalance().add(moneyBln));
+        money.updateD(userId);
+        logsService.saveLogs(LogInfoDto.builder().buiId(userId).jsonTxt(formInfo).formInfo( money.getMoneyBalance().toString()).isType(PULL_SOURCE).modelType(MONEY_TYPE).build());
+        updateById(money);
+    }
 
 
     /**

@@ -41,11 +41,14 @@ public class MoneyPay implements RootPayServer {
             // 钱包自行扣除进行支付 - 可以组合支付..... 不够可以组合支付！！！ -银联
             String formInfo = StrUtil.format("消费");
             BigDecimal moneyPayMoney = moneyService.ordePay(payInfoDto.getOutHost(), payInfoDto.getUserId(), payInfoDto.getRealPayMoney(), formInfo);
-            if (moneyPayMoney.compareTo(NumberUtil.add(0D)) >= 1){
+            BigDecimal moneyBln = payInfoDto.getRealPayMoney();
+            if (moneyPayMoney.compareTo(NumberUtil.add(0D)) >=1 ){
+                moneyBln = payInfoDto.getRealPayMoney().subtract(moneyPayMoney).abs();
                 //TODO 银联.....
-                Assert.isFalse(true,"余额不足,请核实！");
+                //moneyPayMoney
+                Assert.isFalse(true,"银联未对接;余额不足,请核实！");
             }
-            return Builder.of(PayVo::new).with(PayVo::setBody, null).with(PayVo::setPayType, payInfoDto.getPayType()).with(PayVo::setOutHost, payInfoDto.getOutHost()).build();
+            return Builder.of(PayVo::new).with(PayVo::setMoneyBln,moneyBln).with(PayVo::setBody, null).with(PayVo::setPayType, payInfoDto.getPayType()).with(PayVo::setOutHost, payInfoDto.getOutHost()).build();
 
         }
         throw new IllegalArgumentException("not fount pay_type = " + payInfoDto.getPayType());

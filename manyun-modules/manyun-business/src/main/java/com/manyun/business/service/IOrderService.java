@@ -3,9 +3,11 @@ package com.manyun.business.service;
 import com.manyun.business.domain.dto.OrderCreateDto;
 import com.manyun.business.domain.entity.Order;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.manyun.business.domain.form.OrderPayForm;
 import com.manyun.business.domain.query.OrderQuery;
 import com.manyun.business.domain.vo.OrderInfoVo;
 import com.manyun.business.domain.vo.OrderVo;
+import com.manyun.business.domain.vo.PayVo;
 import com.manyun.common.core.web.page.TableDataInfo;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,4 +51,8 @@ public interface IOrderService extends IService<Order> {
     void notifyPayConsignmentSuccess(String outHost);
 
     OrderInfoVo info(String id);
+
+    PayVo unifiedOrder(OrderPayForm orderPayForm,String userId);
+
+    void cancelOrder(String id);
 }

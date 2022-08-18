@@ -1,6 +1,7 @@
 package com.manyun.business.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.entity.CntCollection;
+import com.manyun.business.domain.form.CollectionOrderSellForm;
 import com.manyun.business.domain.form.CollectionSellForm;
 import com.manyun.business.domain.query.CollectionQuery;
 import com.manyun.business.domain.query.UseAssertQuery;
@@ -44,5 +45,7 @@ public interface ICollectionService extends IService<CntCollection> {
     CollectionOrderAllVo orderInfo(String id);
 
     List<CateCollectionVo> cateCollectionChildList(String userId,String cateParentId);
+
+    String sellOrderCollection(String userId, CollectionOrderSellForm collectionOrderSellForm);
 
 }

@@ -14,6 +14,7 @@ import com.manyun.business.service.IPleaseBoxService;
 import com.manyun.business.service.IUserPleaseService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.comm.api.RemoteBoxService;
+import com.manyun.comm.api.domain.dto.BoxListDto;
 import com.manyun.comm.api.domain.dto.OpenPleaseBoxDto;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
@@ -70,9 +71,11 @@ public class UserPleaseServiceImpl extends ServiceImpl<UserPleaseMapper, UserPle
         // 填充基础数据
         for (PleaseBox pleaseBox : pleaseBoxes) {
             // 前置数据填充完善
+            R<BoxListDto> boxListDtoR = remoteBoxService.innerInfo(pleaseBox.getBoxId(), SecurityConstants.INNER);
+            BoxListDto listDtoRData = boxListDtoR.getData();
             UserPleaseBoxVo pleaseBoxVo = Builder.of(UserPleaseBoxVo::new).build();
             pleaseBoxVo.setId(pleaseBox.getId());
-            pleaseBoxVo.setBoxName(pleaseBoxVo.getBoxName());
+            pleaseBoxVo.setBoxName(listDtoRData.getBoxTitle());
             pleaseBoxVo.setBlane(pleaseBox.getBalance());
             pleaseBoxVo.setPleaseNumber(pleaseBox.getPleaseNumber());
             pleaseBoxVo.setIsProcess(OK_PRO.getCode());

@@ -42,6 +42,9 @@ public class OrderInfoVo implements Serializable {
     @ApiModelProperty("订单金额")
     private BigDecimal orderAmount;
 
+    @ApiModelProperty("组合支付专属, payType = 0 才有用 如果此值不是0.00 就说明使用了余额支付。")
+    private BigDecimal moneyBln;
+
     @ApiModelProperty("付款截止时间 yyyy-MM-dd HH:mm:ss")
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endTime;

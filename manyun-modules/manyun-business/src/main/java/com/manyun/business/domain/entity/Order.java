@@ -50,6 +50,9 @@ public class Order implements Serializable {
     private String buiId;
 
 
+
+
+
     @ApiModelProperty("用户与业务的唯一编号,没有购买就没有这个编号")
     private String userBuiId;
 
@@ -65,6 +68,10 @@ public class Order implements Serializable {
     @ApiModelProperty("购买数量,默认为1")
     private Integer goodsNum;
 
+
+
+    @ApiModelProperty("组合支付专属,如果此值不是0.00 就说明使用了余额支付。")
+    private BigDecimal moneyBln;
 
     @ApiModelProperty("订单金额")
     private BigDecimal orderAmount;
