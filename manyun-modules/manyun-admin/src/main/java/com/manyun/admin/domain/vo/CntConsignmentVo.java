@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @ApiModel("订单管理列表返回视图")
@@ -54,10 +55,10 @@ public class CntConsignmentVo
 
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("下单时间")
-    private LocalDateTime createOrderTime;
+    private Date createOrderTime;
 
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("付款时间")
-    private LocalDateTime payTime;
+    private Date payTime;
 
 }

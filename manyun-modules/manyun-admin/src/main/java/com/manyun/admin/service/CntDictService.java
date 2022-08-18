@@ -3,10 +3,7 @@ package com.manyun.admin.service;
 import com.manyun.admin.domain.query.ActionTarDictQuery;
 import com.manyun.admin.domain.query.DrawRulesDictQuery;
 import com.manyun.admin.domain.query.PostConfigDictQuery;
-import com.manyun.admin.domain.vo.*;
 import com.manyun.common.core.domain.R;
-
-import java.util.List;
 
 /**
  * 字典Service接口
@@ -30,6 +27,11 @@ public interface CntDictService
      * 查询藏品系列字典
      */
     R collectionCateDict();
+
+    /***
+     * 查询盲盒系列字典
+     */
+    R boxCateDict();
 
     /***
      * 查询创作者字典
@@ -76,5 +78,10 @@ public interface CntDictService
      * 活动合成材料字典
      */
     R actionTarDict(ActionTarDictQuery tarDictQuery);
+
+    /***
+     * 藏品分类字典
+     */
+    R cateDict();
 
 }

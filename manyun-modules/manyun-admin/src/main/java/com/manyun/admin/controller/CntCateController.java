@@ -1,6 +1,5 @@
 package com.manyun.admin.controller;
 
-import java.util.List;
 
 import com.manyun.admin.domain.query.CateQuery;
 import com.manyun.admin.domain.vo.CntCateVo;

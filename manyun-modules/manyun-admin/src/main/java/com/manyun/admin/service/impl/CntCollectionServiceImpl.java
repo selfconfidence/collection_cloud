@@ -1,13 +1,10 @@
 package com.manyun.admin.service.impl;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -16,13 +13,13 @@ import com.manyun.admin.domain.*;
 import com.manyun.admin.domain.dto.AirdropDto;
 import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
 import com.manyun.admin.domain.dto.CollectionStateDto;
+import com.manyun.admin.domain.excel.BachAirdopExcel;
 import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.mapper.*;
 import com.manyun.admin.service.*;
 import com.manyun.comm.api.MyChainxSystemService;
 import com.manyun.common.core.constant.BusinessConstants;
-import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.DateUtils;
@@ -390,6 +387,90 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                         .build()
         );
         return R.ok(Builder.of(AirdropVo::new).with(AirdropVo::setUserId,cntUsers.get(0).getId()).with(AirdropVo::setUsercollectionId,idStr).build());
+    }
+
+    /**
+     * 批量空投
+     * @param bachAirdopExcels 批量空投请求参数
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public R postExcelList(List<BachAirdopExcel> bachAirdopExcels)
+    {
+        if (StringUtils.isNull(bachAirdopExcels) || bachAirdopExcels.size() == 0)
+        {
+            R.fail("导入批量空投数据不能为空!");
+        }
+        //获取用户
+        List<CntUser> cntUsers = userService.list(
+                Wrappers
+                        .<CntUser>lambdaQuery().eq(CntUser::getIsReal,2)
+                        .in(CntUser::getPhone, bachAirdopExcels.parallelStream()
+                                .map(BachAirdopExcel::getPhone).collect(Collectors.toList()))
+        );
+        Assert.isTrue(cntUsers.size() > 0, "用户不存在!");
+        //获取藏品
+        List<CntCollection> cntCollections = list(
+                Wrappers
+                        .<CntCollection>lambdaQuery()
+                        .in(CntCollection::getId, bachAirdopExcels.parallelStream().map(BachAirdopExcel::getCollectionId)
+                                .collect(Collectors.toList()))
+        ).parallelStream().filter(f->f.getSelfBalance()<f.getBalance()).collect(Collectors.toList());
+        Assert.isTrue(cntCollections.size() > 0, "藏品不存在!");
+
+        //筛选成功的和失败的
+        HashSet<String> errorList = new HashSet<String>();
+        List<CntUserCollection> successList = new ArrayList<CntUserCollection>();
+        bachAirdopExcels.parallelStream().forEach(e->{
+            Optional<CntUser> user = cntUsers.parallelStream().filter(f -> f.getPhone().equals(e.getPhone())).findFirst();
+            Optional<CntCollection> collection = cntCollections.parallelStream().filter(f -> f.getId().equals(e.getCollectionId())).findFirst();
+            if(user.isPresent() && collection.isPresent()){
+                successList.add(
+                        Builder
+                                .of(CntUserCollection::new)
+                                .with(CntUserCollection::setId, IdUtils.getSnowflakeNextIdStr())
+                                .with(CntUserCollection::setUserId, user.get().getId())
+                                .with(CntUserCollection::setCollectionId, collection.get().getId())
+                                .with(CntUserCollection::setCollectionName, collection.get().getCollectionName())
+                                .with(CntUserCollection::setLinkAddr, IdUtils.getSnowflake().nextIdStr())
+                                .with(CntUserCollection::setSourceInfo, "空投")
+                                .with(CntUserCollection::setIsExist,USE_EXIST.getCode())
+                                .with(CntUserCollection::setIsLink,NOT_LINK.getCode())
+                                .with(CntUserCollection::setCreatedBy,SecurityUtils.getUsername())
+                                .with(CntUserCollection::setCreatedTime,DateUtils.getNowDate())
+                                .build()
+                );
+            }else {
+                errorList.add(e.getPhone());
+            }
+        });
+        //扣减库存
+        successList.parallelStream().forEach(e->{
+            Optional<CntCollection> collection = cntCollections.parallelStream().filter(f -> f.getId().equals(e.getCollectionId())).findFirst();
+            if (collection.isPresent()){
+                updateById(
+                        Builder
+                                .of(CntCollection::new)
+                                .with(CntCollection::setId, collection.get().getId())
+                                .with(CntCollection::setSelfBalance, (collection.get().getSelfBalance() + 1))
+                                .with(CntCollection::setBalance, (collection.get().getBalance() - 1))
+                                .with(CntCollection::setUpdatedBy, SecurityUtils.getUsername())
+                                .with(CntCollection::setUpdatedTime,DateUtils.getNowDate())
+                                .build()
+                );
+            }
+        });
+        //增加用户藏品
+        userCollectionService.saveBatch(successList);
+        //拼接上链参数返回
+        List<AirdropVo> airdropVos = successList.parallelStream().map(m -> {
+            AirdropVo airdropVo = new AirdropVo();
+            airdropVo.setUserId(m.getUserId());
+            airdropVo.setUsercollectionId(m.getCollectionId());
+            return airdropVo;
+        }).collect(Collectors.toList());
+        return R.ok(airdropVos,"本次导入成功:"+successList.size()+",导入失败:"+errorList.size()+",导入失败的手机号为:"+StringUtils.join(errorList,","));
     }
 
     /**

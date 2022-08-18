@@ -31,7 +31,7 @@ public interface IUserCollectionService extends IService<UserCollection> {
 
     Boolean existUserCollection(String userId, String id);
 
-    void tranCollection(String tranUserId, String toUserId, String buiId);
+    String tranCollection(String tranUserId, String toUserId, String buiId);
 
     List<UserCollectionCountDto> selectUserCollectionCount(List<String> collectionIds, String userId);
 

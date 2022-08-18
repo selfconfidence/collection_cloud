@@ -7,6 +7,7 @@ import com.manyun.admin.domain.CntCollection;
 import com.manyun.admin.domain.dto.AirdropDto;
 import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
 import com.manyun.admin.domain.dto.CollectionStateDto;
+import com.manyun.admin.domain.excel.BachAirdopExcel;
 import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.common.core.domain.R;
@@ -65,4 +66,11 @@ public interface ICntCollectionService extends IService<CntCollection>
      * @return
      */
     int updateState(CollectionStateDto collectionStateDto);
+
+    /***
+     * 批量空投
+     * @param bachAirdopExcels 批量空投请求参数
+     * @return
+     */
+    R postExcelList(List<BachAirdopExcel> bachAirdopExcels);
 }

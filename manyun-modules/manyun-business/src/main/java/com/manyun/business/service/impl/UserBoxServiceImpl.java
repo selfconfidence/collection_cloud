@@ -159,7 +159,7 @@ public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> impl
      * @param buiId
      */
     @Override
-    public void tranBox(String tranUserId, String toUserId, String buiId) {
+    public String tranBox(String tranUserId, String toUserId, String buiId) {
         UserBox userBox = getById(buiId);
         Box box = boxMapper.selectById(userBox.getBoxId());
         String format = StrUtil.format("{}:用户赠送获得!",box.getBoxTitle());
@@ -187,6 +187,7 @@ public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> impl
         msgService.saveMsgThis(MsgThisDto.builder().userId(toUserId).msgForm(format).msgTitle(format).build());
         msgService.saveCommMsg(MsgCommDto.builder().msgTitle(format).msgForm(format).build());
 
+        return userBox.getBoxId();
     }
 
     /**

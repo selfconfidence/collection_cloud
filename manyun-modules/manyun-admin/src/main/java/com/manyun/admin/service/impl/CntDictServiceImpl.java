@@ -88,12 +88,27 @@ public class CntDictServiceImpl implements CntDictService
     @Override
     public R collectionCateDict()
     {
-        return R.ok(cateService.list(Wrappers.<CntCate>lambdaQuery().eq(CntCate::getCateType,Long.valueOf(CateType.COLLECTION_CATE.getCode())).orderByDesc(CntCate::getCreatedTime)).stream().map(m ->{
+        return R.ok(cateService.list(Wrappers.<CntCate>lambdaQuery().eq(CntCate::getCateType,Long.valueOf(CateType.COLLECTION_CATE.getCode())).ne(CntCate::getParentId,"0").orderByDesc(CntCate::getCreatedTime)).stream().map(m ->{
             CollectionCateDictVo collectionCateDictVo=new CollectionCateDictVo();
             BeanUtil.copyProperties(m,collectionCateDictVo);
             return collectionCateDictVo;
         }).collect(Collectors.toList()));
     }
+
+    /***
+     * 查询盲盒系列字典
+     * @return
+     */
+    @Override
+    public R boxCateDict()
+    {
+        return R.ok(cateService.list(Wrappers.<CntCate>lambdaQuery().eq(CntCate::getCateType,Long.valueOf(CateType.BOX_CATE.getCode())).orderByDesc(CntCate::getCreatedTime)).stream().map(m ->{
+            CollectionCateDictVo collectionCateDictVo=new CollectionCateDictVo();
+            BeanUtil.copyProperties(m,collectionCateDictVo);
+            return collectionCateDictVo;
+        }).collect(Collectors.toList()));
+    }
+
 
     /***
      * 查询创作者字典
@@ -167,7 +182,8 @@ public class CntDictServiceImpl implements CntDictService
      * 提前购配置字典
      */
     @Override
-    public R postConfigDict() {
+    public R postConfigDict()
+    {
         return R.ok(postConfigService.list(Wrappers.<CntPostConfig>lambdaQuery().orderByDesc(CntPostConfig::getCreatedTime)).stream().map(m -> {
             PostConfigDictVo postConfigDictVo=new PostConfigDictVo();
             BeanUtil.copyProperties(m,postConfigDictVo);
@@ -180,7 +196,8 @@ public class CntDictServiceImpl implements CntDictService
      * 提前购配置的商品字典
      */
     @Override
-    public R postConfigGoodsDict(PostConfigDictQuery postConfigDictQuery) {
+    public R postConfigGoodsDict(PostConfigDictQuery postConfigDictQuery)
+    {
         return R.ok(
                 postConfigDictQuery.getIsType()==0?collectionService
                         .list(
@@ -208,7 +225,8 @@ public class CntDictServiceImpl implements CntDictService
      * 提前购已拥有的
      */
     @Override
-    public R postExistDict() {
+    public R postExistDict()
+    {
         return R.ok(collectionService
                 .list(Wrappers.<CntCollection>lambdaQuery().orderByDesc(CntCollection::getCreatedTime)).stream().map(m -> {
                     TqgGoodsDictVo tqgGoodsDictVo = new TqgGoodsDictVo();
@@ -222,12 +240,29 @@ public class CntDictServiceImpl implements CntDictService
      * 活动合成材料字典
      */
     @Override
-    public R actionTarDict(ActionTarDictQuery tarDictQuery) {
+    public R actionTarDict(ActionTarDictQuery tarDictQuery)
+    {
         return R.ok(collectionService.list(Wrappers.<CntCollection>lambdaQuery().ne(CntCollection::getId,tarDictQuery.getCollectionId()).orderByDesc(CntCollection::getCreatedTime)).parallelStream().map(m ->{
             CntCollectionDictVo cntCollectionDictVo=new CntCollectionDictVo();
             BeanUtil.copyProperties(m,cntCollectionDictVo);
             return cntCollectionDictVo;
         }).collect(Collectors.toList()));
+    }
+
+    /***
+     * 藏品分类字典
+     */
+    @Override
+    public R cateDict()
+    {
+        List<CateDictVo> cateDictVos=new ArrayList<>();
+        cateDictVos.add(Builder.of(CateDictVo::new).with(CateDictVo::setId,"0").with(CateDictVo::setCateName,"系列大类").build());
+        cateDictVos.addAll(cateService.list(Wrappers.<CntCate>lambdaQuery().eq(CntCate::getCateType,1).eq(CntCate::getParentId,"0").orderByDesc(CntCate::getCreatedTime)).parallelStream().map(m ->{
+            CateDictVo cateDictVo=new CateDictVo();
+            BeanUtil.copyProperties(m,cateDictVo);
+            return cateDictVo;
+        }).collect(Collectors.toList()));
+        return R.ok(cateDictVos);
     }
 
 
