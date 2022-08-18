@@ -23,8 +23,12 @@ import com.manyun.business.domain.vo.*;
 import com.manyun.business.mapper.BoxMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.comm.api.RemoteBuiUserService;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.common.core.constant.BusinessConstants;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.BoxStatus;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
@@ -49,6 +53,7 @@ import static com.manyun.common.core.enums.BoxStatus.DOWN_ACTION;
 import static com.manyun.common.core.enums.PayTypeEnum.MONEY_TAPE;
 import static com.manyun.common.core.enums.TarStatus.CEN_YES_TAR;
 import static com.manyun.common.core.enums.TarStatus.NO_TAR;
+import static com.manyun.common.core.enums.UserRealStatus.OK_REAL;
 import static com.manyun.common.core.enums.WxPayEnum.BOX_WECHAT_PAY;
 
 /**
@@ -101,7 +106,8 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
     private IMsgService msgService;
 
 
-
+    @Autowired
+    private  RemoteBuiUserService userService;
     /**
      * 分页查询盲盒列表
      * @param boxQuery
@@ -235,7 +241,14 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         commCheckSell(box, userId);
         tarCheckBox(box,userId);
         postCheckBox(box, userId);
+        realCheckCollection(userId);
+    }
 
+    private void realCheckCollection(String userId) {
+
+        R<CntUserDto> cntUserDtoR = userService.commUni(userId, SecurityConstants.INNER);
+        CntUserDto data = cntUserDtoR.getData();
+        Assert.isTrue(OK_REAL.getCode().equals(data.getIsReal()),"暂未实名认证,请实名认证!");
     }
 
     /**
@@ -404,8 +417,8 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
          commCheckSell(box, userId);
          moneyCheckCollection(userId, payType, realPayMoney);
          tarCheckBox(box,userId);
-        postCheckBox(box, userId);
-
+         postCheckBox(box, userId);
+         realCheckCollection(userId);
     }
 
 

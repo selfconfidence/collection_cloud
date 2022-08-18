@@ -28,6 +28,7 @@ import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.BoxStatus;
 import com.manyun.common.core.enums.CollectionStatus;
 import com.manyun.common.core.web.page.PageQuery;
@@ -52,6 +53,7 @@ import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
 import static com.manyun.common.core.enums.PayTypeEnum.MONEY_TAPE;
 import static com.manyun.common.core.enums.TarStatus.CEN_YES_TAR;
 import static com.manyun.common.core.enums.TarStatus.NO_TAR;
+import static com.manyun.common.core.enums.UserRealStatus.OK_REAL;
 import static com.manyun.common.core.enums.WxPayEnum.BOX_WECHAT_PAY;
 
 /**
@@ -236,6 +238,14 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         commCheckCollection(cntCollection, userId);
         tarCheckCollection(cntCollection, userId);
         postCheckCollection(cntCollection, userId);
+        realCheckCollection(userId);
+    }
+
+    private void realCheckCollection(String userId) {
+
+        R<CntUserDto> cntUserDtoR = userService.commUni(userId, SecurityConstants.INNER);
+        CntUserDto data = cntUserDtoR.getData();
+        Assert.isTrue(OK_REAL.getCode().equals(data.getIsReal()),"暂未实名认证,请实名认证!");
     }
 
     /**
@@ -458,6 +468,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
          moneyCheckCollection(userId, payType, realPayMoney);
          tarCheckCollection(cntCollection, userId);
          postCheckCollection(cntCollection, userId);
+         realCheckCollection(userId);
     }
 
     /**
