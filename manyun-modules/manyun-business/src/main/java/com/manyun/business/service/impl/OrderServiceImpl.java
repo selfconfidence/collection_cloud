@@ -290,7 +290,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (order.getGoodsType().equals(BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE)){
             CollectionAllVo collectionAllVo = collectionService.getObject().info(order.getBuiId());
             collectionInfoVo.setCollectionVo(collectionAllVo.getCollectionVo());
-            collectionAllVo.setCollectionInfoVo(collectionInfoVo.getCollectionInfoVo());
+            collectionInfoVo.setCollectionInfoVo(collectionAllVo.getCollectionInfoVo());
             if (StrUtil.isNotBlank(order.getUserBuiId())){
                 UserCollectionForVo userCollectionForVo = collectionService.getObject().userCollectionInfo(order.getUserBuiId());
                 collectionInfoVo.setUserCollectionVo(userCollectionForVo.getUserCollectionVo());
