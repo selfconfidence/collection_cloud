@@ -49,4 +49,7 @@ public class CntBoxVo {
     @ApiModelProperty("更新时间")
     private Date updatedTime;
 
+    @ApiModelProperty("总量")
+    private Integer totalBalance;
+
 }
