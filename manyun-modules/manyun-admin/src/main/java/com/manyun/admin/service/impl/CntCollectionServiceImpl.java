@@ -101,6 +101,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
 
             CntCollectionVo cntCollectionVo = new CntCollectionVo();
             BeanUtil.copyProperties(m, cntCollectionVo);
+            cntCollectionVo.setTotalBalance(m.getBalance().intValue() + m.getSelfBalance().intValue());
             cntCollectionVo.setMediaVos(mediaService.initMediaVos(m.getId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
             return cntCollectionVo;
         }).collect(Collectors.toList()), cntCollectionList);

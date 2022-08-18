@@ -3,6 +3,7 @@ package com.manyun.admin.domain.vo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.checkerframework.checker.units.qual.A;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -34,5 +35,8 @@ public class CntCollectionVo {
 
     @ApiModelProperty("已售")
     private Integer selfBalance;
+
+    @ApiModelProperty("总量")
+    private Integer totalBalance;
 
 }
