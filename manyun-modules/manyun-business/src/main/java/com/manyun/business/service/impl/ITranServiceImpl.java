@@ -85,11 +85,11 @@ public class ITranServiceImpl implements ITranService {
                 .with(CntPassonRecord::setNewUserId, touserDto.getId())
                 .with(CntPassonRecord::setNewNickName, touserDto.getNickName())
                 .with(CntPassonRecord::setNewUserPhone, touserDto.getPhone())
-                .with(CntPassonRecord::setGoodsId, accFormType==1?collection.getId():box.getId())
-                .with(CntPassonRecord::setGoodsName, accFormType==1?collection.getCollectionName():box.getBoxTitle())
-                .with(CntPassonRecord::setPictureId, accFormType==1?collection.getId():box.getId())
+                .with(CntPassonRecord::setGoodsId, accFormType==0?collection.getId():box.getId())
+                .with(CntPassonRecord::setGoodsName, accFormType==0?collection.getCollectionName():box.getBoxTitle())
+                .with(CntPassonRecord::setPictureId, accFormType==0?collection.getId():box.getId())
                 .with(CntPassonRecord::setPictureType, accFormType.toString())
-                .with(CntPassonRecord::setPrice, accFormType==1?collection.getRealPrice():box.getRealPrice())
+                .with(CntPassonRecord::setPrice, accFormType==0?collection.getRealPrice():box.getRealPrice())
                 .build()
         );
     }
