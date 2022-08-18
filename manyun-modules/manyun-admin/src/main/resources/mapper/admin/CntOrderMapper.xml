@@ -54,4 +54,62 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	    order by co.created_time desc
     </select>
 
+    <select id="validOrderAddStatistics" resultType="com.manyun.admin.domain.vo.ValidOrderAddStatisticsVo">
+        select
+            a.date,
+            ifnull( b.count, 0 ) as count
+        from
+        (
+        select
+            date_sub( curdate(), interval 6 day ) as date union all
+        select
+            date_sub( curdate(), interval 5 day ) as date union all
+        select
+            date_sub( curdate(), interval 4 day ) as date union all
+        select
+            date_sub( curdate(), interval 3 day ) as date union all
+        select
+            date_sub( curdate(), interval 2 day ) as date union all
+        select
+            date_sub( curdate(), interval 1 day ) as date union all
+        select
+            curdate() as date
+        ) a
+        left join ( select date( created_time ) as datetime, count( id ) as count from cnt_order where order_status=1 group by date( created_time ) ) b on a.date = b.datetime;
+    </select>
+
+    <select id="orderAmountsAddStatistics" resultType="com.manyun.admin.domain.vo.OrderAmountsAddStatisticsVo">
+        select
+            a.date,
+            ifnull( b.orderAmounts, 0.00) as orderAmounts
+        from
+	    (
+	    select
+		    date_sub( curdate(), interval 6 day ) as date union all
+	    select
+		    date_sub( curdate(), interval 5 day ) as date union all
+	    select
+		    date_sub( curdate(), interval 4 day ) as date union all
+	    select
+		    date_sub( curdate(), interval 3 day ) as date union all
+	    select
+		    date_sub( curdate(), interval 2 day ) as date union all
+	    select
+		    date_sub( curdate(), interval 1 day ) as date union all
+	    select
+		    curdate() as date
+	    ) a
+	    left join ( select date( created_time ) as datetime, sum(order_amount) as orderAmounts from cnt_order where order_status=1 group by date( created_time ) ) b on a.date = b.datetime;
+    </select>
+
+    <select id="orderTypePercentageList" resultType="com.manyun.admin.domain.vo.OrderTypePercentageVo">
+        select
+            order_status as orderstatus,
+            count( order_status ) as totaltypepercentages
+        from
+	        cnt_order
+        group by
+	        order_status;
+    </select>
+
 </mapper>

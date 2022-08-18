@@ -401,7 +401,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         if (StringUtils.isNull(bachAirdopExcels) || bachAirdopExcels.size() == 0)
         {
             R.fail("导入批量空投数据不能为空!");
-        }
+         }
         //获取用户
         List<CntUser> cntUsers = userService.list(
                 Wrappers
@@ -470,7 +470,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
             airdropVo.setUsercollectionId(m.getCollectionId());
             return airdropVo;
         }).collect(Collectors.toList());
-        return R.ok(airdropVos,"本次导入成功:"+successList.size()+",导入失败:"+errorList.size()+",导入失败的手机号为:"+StringUtils.join(errorList,","));
+        return R.ok(airdropVos,(errorList.size()>0?"本次导入成功:"+successList.size()+",导入失败:"+errorList.size()+",导入失败的手机号为:"+StringUtils.join(errorList,","):"本次导入成功:"+successList.size()+",导入失败:"+errorList.size()));
     }
 
     /**
