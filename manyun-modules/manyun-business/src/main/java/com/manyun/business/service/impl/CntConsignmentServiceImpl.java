@@ -476,7 +476,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         if (StrUtil.isBlank(info) && StrUtil.isBlank(realBuiId))
            throw new ServiceException("not fount type [0-1] now type is "+type+"");
 
-        pushConsignment(userId,userConsignmentForm.getConsignmentMoney(), type, userConsignmentForm.getBuiId(), realBuiId, info,cateId,buiName);
+        pushConsignment(userId,userConsignmentForm.getConsignmentMoney(), type, buiId, realBuiId, info,cateId,buiName);
 
     }
 

@@ -39,6 +39,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
+import static com.manyun.common.core.enums.CollectionLink.NOT_LINK;
+import static com.manyun.common.core.enums.CollectionLink.OK_LINK;
+import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
 import static com.manyun.common.core.enums.ConsignmentStatus.LOCK_CONSIGN;
 import static com.manyun.common.core.enums.ConsignmentStatus.OVER_CONSIGN;
 import static com.manyun.common.core.enums.ConsignmentToPayStatus.WAIT_TO_PAY;
@@ -199,6 +202,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     }
 
+
+
     /**
      * 定时任务可调用,监视 锁仓时间 及时释放库存
      * 订单取消,将对应的库存 再次加上即可
@@ -294,15 +299,50 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.updateD(order.getUserId());
         updateById(order);*/
         // 1. 修改 当前订单状态  // 绑定到 买方
-        notifyPaySuccess(outHost);
+        Order order = getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, outHost));
+        String info = StrUtil.format("从平台购买,本次消费{},来源为平台寄售市场", order.getOrderAmount().toString());
+        Assert.isTrue(Objects.nonNull(order),"找不到对应订单编号!");
+        Assert.isTrue(WAIT_ORDER.getCode().equals(order.getOrderStatus()),"订单状态有误,请核实!");
+        ICntConsignmentService consignmentService = cntConsignmentServiceObjectFactory.getObject();
+        CntConsignment cntConsignment = consignmentService.getOne(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getOrderId, order.getId()));
+        Assert.isTrue(Objects.nonNull(cntConsignment), "找不到对应寄售交易信息,请核实!");
+        // 更改订单状态, 绑定对应的 （藏品/盲盒）
+        order.setOrderStatus(OVER_ORDER.getCode());
+        order.updateD(order.getUserId());
+        // 开始绑定 根据购买的藏品/盲盒进行绑定
+        Integer goodsType = order.getGoodsType();
+        if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(goodsType)) {
+            // 盲盒
+            String userBoxId = userBoxService.bindOrderBox(order.getUserId(), order.getBuiId(), info, order.getGoodsNum());
+            order.setUserBuiId(userBoxId);
+            updateById(order);
+        }
+        if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(goodsType)) {
+            // 藏品 寄售是转赠的意思
+
+            UserCollection userCollection = Builder.of(UserCollection::new).build();
+            userCollection.setId(IdUtil.getSnowflake().nextIdStr());
+            userCollection.setCollectionId(order.getBuiId());
+            userCollection.setUserId(order.getUserId());
+            userCollection.setSourceInfo(info);
+            userCollection.setIsExist(USE_EXIST.getCode());
+            userCollection.setCollectionName(order.getCollectionName());
+            // 初始化
+            userCollection.setIsLink(OK_LINK.getCode());
+            userCollection.createD(order.getUserId());
+            UserCollection sourceUserCollection = userCollectionService.getById(cntConsignment.getBuiId());
+            userCollection.setCollectionHash(sourceUserCollection.getCollectionHash());
+            userCollection.setCollectionNumber(sourceUserCollection.getCollectionNumber());
+            userCollection.setRealCompany(sourceUserCollection.getRealCompany());
+            userCollection.setLinkAddr(sourceUserCollection.getLinkAddr());
+            userCollectionService.save(userCollection);
+            order.setUserBuiId(userCollection.getId());
+            updateById(order);
+        }
 
         // 2. 寄售人已经解除绑定关系了 -- 无需判定
 
         // 3. 修改当前寄售信息，等待后台审核  打款
-        ICntConsignmentService consignmentService = cntConsignmentServiceObjectFactory.getObject();
-        Order order = getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, outHost));
-        CntConsignment cntConsignment = consignmentService.getOne(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getOrderId, order.getId()));
-        Assert.isTrue(Objects.nonNull(cntConsignment), "找不到对应寄售交易信息,请核实!");
         cntConsignment.updateD(cntConsignment.getSendUserId());
         cntConsignment.setConsignmentStatus(OVER_CONSIGN.getCode());
         cntConsignment.setFormInfo("买方已经支付!");
