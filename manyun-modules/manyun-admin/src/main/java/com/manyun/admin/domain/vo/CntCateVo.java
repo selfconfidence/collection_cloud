@@ -14,7 +14,7 @@ public class CntCateVo {
     @ApiModelProperty("主键")
     private String id;
 
-    @ApiModelProperty("父菜单名称")
+    @ApiModelProperty("父分类名称")
     private String parentName;
 
     @ApiModelProperty("系列名称")

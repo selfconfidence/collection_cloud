@@ -2,6 +2,7 @@ package com.manyun.admin.service.impl;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
@@ -9,6 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.CntBox;
 import com.manyun.admin.domain.CntCollection;
+import com.manyun.admin.domain.CntCustomerService;
 import com.manyun.admin.domain.query.CateQuery;
 import com.manyun.admin.domain.vo.CntCateVo;
 import com.manyun.admin.service.ICntBoxService;
@@ -67,9 +69,17 @@ public class CntCateServiceImpl extends ServiceImpl<CntCateMapper,CntCate> imple
     {
         PageHelper.startPage(cateQuery.getPageNum(),cateQuery.getPageSize());
         List<CntCate> cntCateList = cntCateMapper.selectSearchCateList(cateQuery);
-        return TableDataInfoUtil.pageTableDataInfo(cntCateList.parallelStream().map( e -> {
+        return TableDataInfoUtil.pageTableDataInfo(cntCateList.parallelStream().map(e -> {
             CntCateVo cntCateVo=new CntCateVo();
             BeanUtil.copyProperties(e,cntCateVo);
+            if("0".equals(e.getParentId())){
+                cntCateVo.setParentName("顶级分类");
+            }else {
+                Optional<CntCate> optional = list().parallelStream().filter(f -> f.getId().equals(e.getParentId())).findFirst();
+                if(optional.isPresent()){
+                    cntCateVo.setParentName(optional.get().getCateName());
+                }
+            }
             return cntCateVo;
         }).collect(Collectors.toList()),cntCateList);
     }

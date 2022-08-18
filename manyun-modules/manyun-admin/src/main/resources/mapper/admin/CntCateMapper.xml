@@ -6,6 +6,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <resultMap type="CntCate" id="CntCateResult">
         <result property="id"    column="id"    />
+        <result property="parentId"    column="parent_id"    />
         <result property="cateType"    column="cate_type"    />
         <result property="cateName"    column="cate_name"    />
         <result property="cateImage"    column="cate_image"    />
@@ -18,13 +19,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectCntCateVo">
-        select id, cate_type, cate_name, cate_image, cate_info, bind_creation, created_by, created_time, updated_by, updated_time from cnt_cate
+        select id, parent_id, cate_type, cate_name, cate_image, cate_info, bind_creation, created_by, created_time, updated_by, updated_time from cnt_cate
     </sql>
 
     <select id="selectSearchCateList" parameterType="CateQuery" resultMap="CntCateResult">
         <include refid="selectCntCateVo"/>
         <where>
             <if test="cateName != null  and cateName != ''"> and cate_name like concat('%', #{cateName}, '%')</if>
+            <if test="parentId != null  and parentId != ''"> and parent_id = #{parentId}</if>
         </where>
         order by created_time desc
     </select>

@@ -12,4 +12,7 @@ public class CateQuery extends PageQuery {
     @ApiModelProperty("类目名称")
     private String cateName;
 
+    @ApiModelProperty("父菜单名称")
+    private String parentId;
+
 }
