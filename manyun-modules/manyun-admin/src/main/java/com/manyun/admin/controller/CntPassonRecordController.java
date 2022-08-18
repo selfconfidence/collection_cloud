@@ -31,7 +31,7 @@ public class CntPassonRecordController extends BaseController
     /**
      * 查询转赠记录列表
      */
-    @RequiresPermissions("admin:record:list")
+    //@RequiresPermissions("admin:record:list")
     @GetMapping("/list")
     @ApiOperation("查询转赠记录列表")
     public TableDataInfo<CntPassonRecordVo> list(PassonRecordQuery passonRecordQuery)

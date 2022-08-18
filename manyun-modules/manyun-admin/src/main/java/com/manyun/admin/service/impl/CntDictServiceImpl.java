@@ -256,7 +256,7 @@ public class CntDictServiceImpl implements CntDictService
     public R cateDict()
     {
         List<CateDictVo> cateDictVos=new ArrayList<>();
-        cateDictVos.add(Builder.of(CateDictVo::new).with(CateDictVo::setId,"0").with(CateDictVo::setCateName,"系列大类").build());
+        cateDictVos.add(Builder.of(CateDictVo::new).with(CateDictVo::setId,"0").with(CateDictVo::setCateName,"顶级分类").build());
         cateDictVos.addAll(cateService.list(Wrappers.<CntCate>lambdaQuery().eq(CntCate::getCateType,1).eq(CntCate::getParentId,"0").orderByDesc(CntCate::getCreatedTime)).parallelStream().map(m ->{
             CateDictVo cateDictVo=new CateDictVo();
             BeanUtil.copyProperties(m,cateDictVo);
