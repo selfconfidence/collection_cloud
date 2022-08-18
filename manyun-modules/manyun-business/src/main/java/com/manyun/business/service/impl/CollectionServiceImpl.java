@@ -441,6 +441,25 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         return collectionOrderAllVo;
     }
 
+    @Override
+    public List<CateCollectionVo> cateCollectionChildList(String userId,String cateParentId) {
+        List<Cate> cateList = cateMapper.selectList(Wrappers.<Cate>lambdaQuery().eq(Cate::getParentId, cateParentId).eq(Cate::getCateType,Integer.valueOf(1)).orderByDesc(Cate::getCreatedTime));
+        List<CateCollectionVo> cateCollectionVoList = Lists.newArrayList();
+        if (cateList.isEmpty())return cateCollectionVoList;
+        for (Cate cate : cateList) {
+            CateCollectionVo cateCollectionVo = Builder.of(CateCollectionVo::new).build();
+            BeanUtil.copyProperties(cate, cateCollectionVo);
+            List<CntCollection> cateCollectionList = list(Wrappers.<CntCollection>lambdaQuery().eq(CntCollection::getCateId,cate.getId()));
+            List<CollectionVo> collectionVos = Lists.newArrayList();
+            for (CntCollection cntCollection : cateCollectionList) {
+                collectionVos.add(providerCollectionVo(cntCollection));
+            }
+            cateCollectionVo.setCollectionVos(collectionVos);
+            cateCollectionVoList.add(cateCollectionVo);
+        }
+        return cateCollectionVoList;
+    }
+
     private List<StepVo> initStepVo(String linkAddr, String collectionModelType) {
         List<Step> stepList = stepService.list(Wrappers.<Step>lambdaQuery().eq(Step::getBuiId, linkAddr).eq(Step::getModelType, collectionModelType).orderByDesc(Step::getCreatedTime));
        return stepList.parallelStream().map(item ->{

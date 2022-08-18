@@ -42,4 +42,7 @@ public interface ICollectionService extends IService<CntCollection> {
     UserCollectionForVo userCollectionInfo(String id);
 
     CollectionOrderAllVo orderInfo(String id);
+
+    List<CateCollectionVo> cateCollectionChildList(String userId,String cateParentId);
+
 }

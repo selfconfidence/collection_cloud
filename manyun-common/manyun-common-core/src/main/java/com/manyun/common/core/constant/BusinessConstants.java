@@ -26,6 +26,9 @@ public interface BusinessConstants {
         Integer BOX_TAYPE = Integer.valueOf(1);
         // 藏品业务 标识码
         Integer COLLECTION_TAYPE = Integer.valueOf(0);
+
+        //分页默认顶级分类
+        String CATE_PARENT_ID = "0";
     }
 
     /**

@@ -28,6 +28,10 @@ public class CateVo implements Serializable {
     @ApiModelProperty("主键")
     private String id;
 
+    @ApiModelProperty("夫节点编号")
+    private String parentId;
+
+
     @ApiModelProperty("系列名称")
     private String cateName;
 

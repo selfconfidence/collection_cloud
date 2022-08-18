@@ -45,8 +45,30 @@ public class CateController extends BaseController {
     @ApiOperation(value = "系列列表",notes = "无需分页,1=藏品系列，2=盲盒分类")
     //@ApiImplicitParam(name = "系列分类类型",value = "type",dataTypeClass = int.class,dataType = "int",required = true,paramType = "path")
     public R<List<CateVo>>  cateAll(@PathVariable Integer type){
-        return R.ok(cateService.cateAll(type));
+        return R.ok(cateService.cateChildAll(type));
     }
+
+    @GetMapping("/cateChildAll/{type}")
+    @ApiOperation(value = "查询所有的二级分类",notes = "无需分页,1=藏品系列，2=盲盒分类\r version(1.0.1)")
+    public R<List<CateVo>>  cateChildAll(@PathVariable Integer type){
+
+        return R.ok(cateService.cateChildAll(type));
+    }
+
+    @GetMapping("/cateTopLevel/{type}")
+    @ApiOperation(value = "(品牌馆)系列顶级分类列表",notes = "无需分页,1=藏品系列，2=盲盒分类\r version(1.0.1)")
+    //@ApiImplicitParam(name = "系列分类类型",value = "type",dataTypeClass = int.class,dataType = "int",required = true,paramType = "path")
+    public R<List<CateVo>>  cateTopLevel(@PathVariable Integer type){
+        return R.ok(cateService.cateTopLevel(type));
+    }
+
+    @GetMapping("/childCate/{parentId}/{type}")
+    @ApiOperation(value = "查询(品牌馆下面的子分类)列表",notes = "无需分页,1=藏品系列，2=盲盒分类\n" +
+            " parentId是 夫节点的ID,不是夫节点的parentId \n  version(1.0.1)")
+    public R<List<CateVo>> childCate(@PathVariable String parentId,@PathVariable Integer type){
+        return R.ok(cateService.childCate(parentId,type));
+    }
+
 
 
     @GetMapping("/msg/{id}/{time}/{name}")

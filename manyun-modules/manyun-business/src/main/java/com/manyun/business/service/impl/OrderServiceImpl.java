@@ -10,9 +10,7 @@ import com.google.common.collect.Sets;
 import com.manyun.business.domain.dto.OrderCreateDto;
 import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.query.OrderQuery;
-import com.manyun.business.domain.vo.MediaVo;
-import com.manyun.business.domain.vo.OrderInfoVo;
-import com.manyun.business.domain.vo.OrderVo;
+import com.manyun.business.domain.vo.*;
 import com.manyun.business.mapper.OrderMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -282,17 +280,30 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Order order = getById(id);
         OrderInfoVo orderInfoVo = Builder.of(OrderInfoVo::new).build();
         BeanUtil.copyProperties(order, orderInfoVo );
-       // 根据状态区分查询不同的数据结构给移动端
+        OrderCollectionInfoVo collectionInfoVo = Builder.of(OrderCollectionInfoVo::new).build();
+        // 根据状态区分查询不同的数据结构给移动端
         //盲盒始终唯一
-        if (order.getGoodsType().equals(BusinessConstants.ModelTypeConstant.BOX_TAYPE))
+        if (order.getGoodsType().equals(BusinessConstants.ModelTypeConstant.BOX_TAYPE)){
             orderInfoVo.setBoxVo(boxService.getObject().info(order.getBuiId(),null));
+        }
 
-        if (order.getGoodsType().equals(BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE) && StrUtil.isNotBlank(order.getUserBuiId()))
-            orderInfoVo.setUserCollectionForVo(collectionService.getObject().userCollectionInfo(order.getUserBuiId()));
+        if (order.getGoodsType().equals(BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE)){
+            CollectionAllVo collectionAllVo = collectionService.getObject().info(order.getBuiId());
+            collectionInfoVo.setCollectionVo(collectionAllVo.getCollectionVo());
+            collectionInfoVo.setCollectionInfoVo(collectionAllVo.getCollectionInfoVo());
+            if (StrUtil.isNotBlank(order.getUserBuiId())){
+                UserCollectionForVo userCollectionForVo = collectionService.getObject().userCollectionInfo(order.getUserBuiId());
+                collectionInfoVo.setUserCollectionVo(userCollectionForVo.getUserCollectionVo());
+                collectionInfoVo.setStepVos(userCollectionForVo.getStepVos());
+            }
 
-        else if (order.getGoodsType().equals(BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE) && StrUtil.isBlank(order.getUserBuiId()))
-           orderInfoVo.setCollectionAllVo(collectionService.getObject().info(order.getBuiId()));
+        }
 
+
+
+
+
+        orderInfoVo.setOrderCollectionInfoVo(collectionInfoVo);
         return orderInfoVo;
     }
 

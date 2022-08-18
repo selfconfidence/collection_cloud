@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.CATE_PARENT_ID;
+
 /**
  * <p>
  * 藏品系列_分类 服务实现类
@@ -44,6 +46,37 @@ public class CateServiceImpl extends ServiceImpl<CateMapper, Cate> implements IC
             cateVo.setCnfCreationdVo(initCnfCreationVo(item.getBindCreation()));
             return cateVo;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CateVo> cateTopLevel(Integer type) {
+        return findByParentCateVoList(CATE_PARENT_ID,type);
+    }
+
+    @Override
+    public List<CateVo> childCate(String parentId, Integer type) {
+        return findByParentCateVoList(parentId,type);
+    }
+
+    @Override
+    public List<CateVo> cateChildAll(Integer type) {
+        return  list(Wrappers.<Cate>lambdaQuery().eq(Cate::getCateType,type).ne(Cate::getParentId,CATE_PARENT_ID).orderByDesc(Cate::getCreatedTime))
+                .parallelStream().map(item ->{
+                    CateVo cateVo = Builder.of(CateVo::new).build();
+                    BeanUtil.copyProperties(item,cateVo);
+                    cateVo.setCnfCreationdVo(initCnfCreationVo(item.getBindCreation()));
+                    return cateVo;
+                }).collect(Collectors.toList());
+    }
+
+    private List<CateVo> findByParentCateVoList(String parentId,Integer type){
+        return  list(Wrappers.<Cate>lambdaQuery().eq(Cate::getCateType,type).eq(Cate::getParentId,parentId).orderByDesc(Cate::getCreatedTime))
+                .parallelStream().map(item ->{
+                    CateVo cateVo = Builder.of(CateVo::new).build();
+                    BeanUtil.copyProperties(item,cateVo);
+                    cateVo.setCnfCreationdVo(initCnfCreationVo(item.getBindCreation()));
+                    return cateVo;
+                }).collect(Collectors.toList());
     }
 
     /**
