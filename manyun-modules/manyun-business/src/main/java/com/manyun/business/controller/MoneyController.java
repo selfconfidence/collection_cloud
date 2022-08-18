@@ -98,7 +98,7 @@ public class MoneyController extends BaseController {
         return moneyService.updateUserMoney(userRealMoneyForm);
     }
 
-    @GetMapping
+    @GetMapping("/checkIdentity")
     @ApiOperation(value = "检查是否已实名过", hidden = true)
     @InnerAuth
     public R checkIdentity(@PathVariable String identityNo) {
