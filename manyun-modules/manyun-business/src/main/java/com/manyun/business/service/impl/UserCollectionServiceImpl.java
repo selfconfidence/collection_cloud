@@ -232,12 +232,19 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
        userCollection.setLinkAddr(tranUserCollection.getLinkAddr());
        userCollection.setIsExist(USE_EXIST.getCode());
        userCollection.setCollectionName(tranUserCollection.getCollectionName());
+       userCollection.setCollectionHash(oldCollectionHash);
+       userCollection.setCollectionNumber(oldCollectionNumber);
+       userCollection.setRealCompany("蚂蚁链");
        // 初始化 未上链过程
-       userCollection.setIsLink(NOT_LINK.getCode());
+       userCollection.setIsLink(OK_LINK.getCode());
        userCollection.createD(toUserId);
        save(userCollection);
+       stepService.saveBatch(StepDto.builder().buiId(userCollection.getLinkAddr()).userId(tranUserId).modelType(COLLECTION_MODEL_TYPE).reMark("转让方").formHash(oldCollectionHash).formInfo(formatTran).build()
+               ,StepDto.builder().buiId(userCollection.getLinkAddr()).userId(toUserId).modelType(COLLECTION_MODEL_TYPE).formHash(oldCollectionHash).reMark("受让方").formInfo(format).build()
+       );
+
        // 开始转赠
-       myChainService.tranForm(CallTranDto.builder()
+       /*myChainService.tranForm(CallTranDto.builder()
                .userCollectionId(userCollection.getId())
                .artId(userCollection.getLinkAddr())
                .owner(userCollection.getUserId())
@@ -255,7 +262,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
            stepService.saveBatch(StepDto.builder().buiId(userCollection.getLinkAddr()).userId(tranUserId).modelType(COLLECTION_MODEL_TYPE).reMark("转让方").formHash(oldCollectionHash).formInfo(formatTran).build()
                    ,StepDto.builder().buiId(userCollection.getLinkAddr()).userId(toUserId).modelType(COLLECTION_MODEL_TYPE).formHash(hash).reMark("受让方").formInfo(format).build()
            );
-       });
+       });*/
 
 
 
