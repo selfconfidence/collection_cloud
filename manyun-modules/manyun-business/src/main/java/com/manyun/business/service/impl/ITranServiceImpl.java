@@ -17,10 +17,8 @@ import com.manyun.common.core.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.annotation.Resource;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 /**
  * 转赠相关实现
@@ -46,7 +44,6 @@ public class ITranServiceImpl implements ITranService {
 
     @Autowired
     private ICntPassonRecordService passonRecordService;
-
 
 
     /**
@@ -90,6 +87,7 @@ public class ITranServiceImpl implements ITranService {
                 .with(CntPassonRecord::setPictureId, accFormType==0?collection.getId():box.getId())
                 .with(CntPassonRecord::setPictureType, accFormType.toString())
                 .with(CntPassonRecord::setPrice, accFormType==0?collection.getRealPrice():box.getRealPrice())
+                .with(CntPassonRecord::createD, cntUserDto.getId())
                 .build()
         );
     }
