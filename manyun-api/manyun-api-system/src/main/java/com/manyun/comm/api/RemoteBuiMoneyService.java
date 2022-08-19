@@ -27,5 +27,5 @@ public interface RemoteBuiMoneyService {
 
 
     @GetMapping("/money/userMoneyById/{userId}")
-    R<AccountInfoDto>  userMoneyById(@PathVariable("userId") String userId);
+    R<AccountInfoDto>  userMoneyById(@PathVariable("userId") String userId, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 }

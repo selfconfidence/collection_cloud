@@ -333,7 +333,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         CntUser cntUser = getById(userId);
         cntUser.setIsReal(OK_REAL.getCode());
         // 调用合约
-        AccountInfoDto accountInfoDto = remoteBuiMoneyService.userMoneyById(userId).getData();
+        AccountInfoDto accountInfoDto = remoteBuiMoneyService.userMoneyById(userId,SecurityConstants.INNER).getData();
         CallAccountDto callAccountDto = Builder.of(CallAccountDto::new).build();
         callAccountDto.setUserId(cntUser.getId());
         callAccountDto.setNickName(StrUtil.nullToDefault(callAccountDto.getNickName(), "CNT_"+cntUser.getUserId()));
