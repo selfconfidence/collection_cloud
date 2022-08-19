@@ -40,7 +40,7 @@ public class RemoteBuiMoneyFallbackFactory implements FallbackFactory<RemoteBuiM
             }
 
             @Override
-            public R<AccountInfoDto> userMoneyById(String userId) {
+            public R<AccountInfoDto> userMoneyById(String userId, String source) {
                 return R.fail("操作失败:" + throwable.getMessage());
             }
         };
