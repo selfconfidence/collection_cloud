@@ -1,6 +1,7 @@
 package com.manyun.comm.api.factory;
 
 import com.manyun.comm.api.RemoteBuiMoneyService;
+import com.manyun.comm.api.domain.dto.AccountInfoDto;
 import com.manyun.comm.api.domain.form.UserRealMoneyForm;
 import com.manyun.common.core.domain.R;
 import org.slf4j.Logger;
@@ -35,6 +36,11 @@ public class RemoteBuiMoneyFallbackFactory implements FallbackFactory<RemoteBuiM
 
             @Override
             public R checkIdentity(String identityNo, String source) {
+                return R.fail("操作失败:" + throwable.getMessage());
+            }
+
+            @Override
+            public R<AccountInfoDto> userMoneyById(String userId) {
                 return R.fail("操作失败:" + throwable.getMessage());
             }
         };

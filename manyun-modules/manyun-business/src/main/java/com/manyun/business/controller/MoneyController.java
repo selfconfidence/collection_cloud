@@ -1,4 +1,5 @@
 package com.manyun.business.controller;
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.domain.entity.Money;
 import com.manyun.business.domain.form.AccountInfoForm;
@@ -6,8 +7,10 @@ import com.manyun.business.domain.query.MoneyLogQuery;
 import com.manyun.business.domain.vo.AccountInfoVo;
 import com.manyun.business.domain.vo.MoneyLogVo;
 import com.manyun.business.service.IMoneyService;
+import com.manyun.comm.api.domain.dto.AccountInfoDto;
 import com.manyun.comm.api.domain.form.UserRealMoneyForm;
 import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.TableDataInfo;
@@ -50,6 +53,17 @@ public class MoneyController extends BaseController {
     public R<AccountInfoVo> accountInfo(){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(moneyService.accountInfo(notNullLoginBusinessUser.getUserId()));
+    }
+
+
+    @GetMapping("/userMoneyById/{userId}")
+    @ApiOperation(value = "根据用户编号查询钱包",notes = "返回钱包余额")
+    @InnerAuth
+    public R<AccountInfoDto>  userMoneyById(@PathVariable String userId){
+        AccountInfoVo accountInfoVo = moneyService.accountInfo(userId);
+        AccountInfoDto accountInfoDto = Builder.of(AccountInfoDto::new).build();
+        BeanUtil.copyProperties(accountInfoVo, accountInfoDto);
+        return R.ok(accountInfoDto);
     }
 
     @PostMapping("/updateAccountInfo")

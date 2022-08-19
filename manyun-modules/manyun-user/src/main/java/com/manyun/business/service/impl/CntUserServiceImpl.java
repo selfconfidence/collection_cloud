@@ -25,10 +25,13 @@ import com.manyun.business.service.ICntUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.business.service.IUserPleaseService;
 import com.manyun.business.domain.entity.CntUser;
+import com.manyun.comm.api.MyChainxSystemService;
 import com.manyun.comm.api.RemoteBuiMoneyService;
 import com.manyun.comm.api.RemoteFileService;
 import com.manyun.comm.api.RemoteSystemService;
 import com.manyun.comm.api.domain.SysFile;
+import com.manyun.comm.api.domain.dto.AccountInfoDto;
+import com.manyun.comm.api.domain.dto.CallAccountDto;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.domain.form.JgLoginTokenForm;
 import com.manyun.comm.api.domain.form.UserRealMoneyForm;
@@ -51,6 +54,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -89,7 +93,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     private RemoteSystemService remoteSystemService;
 
     @Autowired
-    private RemoteFileService fileService;
+    private MyChainxSystemService myChainxSystemService;
 
     @Autowired
     private JgAuthLoginUtil jgAuthLoginUtil;
@@ -324,8 +328,16 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     public void optimisticRealUser(String userId){
         CntUser cntUser = getById(userId);
         cntUser.setIsReal(OK_REAL.getCode());
-        // 用手机号当 模拟地址 无奈之举
-        cntUser.setLinkAddr(SecureUtil.sha256(cntUser.getPhone()));
+        // 调用合约
+        AccountInfoDto accountInfoDto = remoteBuiMoneyService.userMoneyById(userId).getData();
+        CallAccountDto callAccountDto = Builder.of(CallAccountDto::new).build();
+        callAccountDto.setUserId(cntUser.getId());
+        callAccountDto.setNickName(StrUtil.nullToDefault(callAccountDto.getNickName(), "CNT_"+cntUser.getUserId()));
+        callAccountDto.setDate(cntUser.getCreatedTime().toLocalDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
+        callAccountDto.setRealName(StrUtil.nullToDefault(accountInfoDto.getRealName(), "CNT_"+cntUser.getUserId()));
+        callAccountDto.setRealPhone(StrUtil.nullToDefault(cntUser.getPhone(), "CNT_"+cntUser.getUserId()));
+        String hash = myChainxSystemService.accountCreate(callAccountDto, SecurityConstants.INNER).getData();
+        cntUser.setLinkAddr(hash);
         cntUser.updateD(userId);
         updateById(cntUser);
     }

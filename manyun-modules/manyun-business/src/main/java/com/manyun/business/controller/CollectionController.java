@@ -52,6 +52,14 @@ public class CollectionController extends BaseController{
         return R.ok(collectionService.queryDict(keyword));
     }
 
+    @GetMapping("/thisAssertQueryDict/{keyword}")
+    @ApiOperation(value = "/根据词条 查询我的(藏品|盲盒)完整 标题信息",notes = "返回的都是 (藏品|盲盒)词条完整信息 ")
+    public R<List<KeywordVo>> thisAssertQueryDict(@PathVariable String keyword){
+        String userId = SecurityUtils.getNotNullLoginBusinessUser().getUserId();
+        return R.ok(collectionService.thisAssertQueryDict(userId,keyword));
+    }
+
+
     @PostMapping("/pageList")
     @ApiOperation("分页查询藏品列表信息")
     public R<TableDataInfo<CollectionVo>> pageList(@RequestBody CollectionQuery collectionQuery){

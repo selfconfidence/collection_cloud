@@ -2,6 +2,7 @@ package com.manyun.comm.api.factory;
 
 import com.manyun.comm.api.MyChainxSystemService;
 import com.manyun.comm.api.RemoteSystemService;
+import com.manyun.comm.api.domain.dto.CallAccountDto;
 import com.manyun.common.core.domain.R;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,11 @@ public class RemoteChainxFallbackFactory implements FallbackFactory<MyChainxSyst
         return new MyChainxSystemService() {
             @Override
             public R resetUpLink(String userId, String userCollectionId, String source) {
+                return R.fail("操作失败:" + throwable.getMessage());
+            }
+
+            @Override
+            public R<String> accountCreate(CallAccountDto callAccountDto, String source) {
                 return R.fail("操作失败:" + throwable.getMessage());
             }
 

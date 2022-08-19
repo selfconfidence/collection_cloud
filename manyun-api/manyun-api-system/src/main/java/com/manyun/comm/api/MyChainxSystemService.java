@@ -1,13 +1,13 @@
 package com.manyun.comm.api;
 
+import com.manyun.comm.api.domain.dto.CallAccountDto;
 import com.manyun.comm.api.factory.RemoteChainxFallbackFactory;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.constant.ServiceNameConstants;
 import com.manyun.common.core.domain.R;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 业务板块 蚂蚁链服务
@@ -25,4 +25,12 @@ public interface MyChainxSystemService {
      @GetMapping("/mychain/resetUpLink")
      R resetUpLink(@RequestParam("userId") String userId, @RequestParam("userCollectionId") String userCollectionId,@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 
+
+    /**
+     * 创建账户
+     * 适用于外部调用
+     * @param callAccountDto 内部用户信息
+     */
+     @PostMapping("/mychain/accountCreate")
+     R<String> accountCreate(@RequestBody CallAccountDto callAccountDto,@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 }

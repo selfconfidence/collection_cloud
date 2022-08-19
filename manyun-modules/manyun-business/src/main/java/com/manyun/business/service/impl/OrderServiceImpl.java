@@ -442,8 +442,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 是寄售吗? 还是普通?
         ICntConsignmentService cntConsignmentServiceObjectFactoryObject = cntConsignmentServiceObjectFactory.getObject();
         CntConsignment cntConsignment = cntConsignmentServiceObjectFactoryObject.getOne(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getOrderId,id).eq(CntConsignment::getConsignmentStatus, LOCK_CONSIGN.getCode()));
-        cancelOrder(id,Objects.isNull(cntConsignment));
-        cntConsignmentServiceObjectFactoryObject.reLoadConsignments(Arrays.asList(cntConsignment));
+        if (Objects.isNull(cntConsignment)){
+            // 普通
+            cancelOrder(id,Boolean.TRUE);
+        }else{
+            // 寄售
+            cancelOrder(id,Boolean.FALSE);
+            cntConsignmentServiceObjectFactoryObject.reLoadConsignments(Arrays.asList(cntConsignment));
+        }
 
     }
     private void cancelOrder(String id,Boolean reloadAssert) {

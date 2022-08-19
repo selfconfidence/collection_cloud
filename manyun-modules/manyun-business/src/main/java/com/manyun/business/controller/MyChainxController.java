@@ -1,6 +1,8 @@
 package com.manyun.business.controller;
 
+import com.manyun.business.design.mychain.MyChainService;
 import com.manyun.business.service.IUserCollectionService;
+import com.manyun.comm.api.domain.dto.CallAccountDto;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.security.annotation.InnerAuth;
 import io.swagger.annotations.Api;
@@ -15,6 +17,9 @@ public class MyChainxController {
 
     @Autowired
     private IUserCollectionService userCollectionService;
+
+    @Autowired
+    private MyChainService myChainService;
 
 
     /**
@@ -32,7 +37,17 @@ public class MyChainxController {
     }
 
 
-
+    /**
+     * 创建账户
+     * 适用于外部调用
+     * @param callAccountDto 内部用户信息
+     */
+    @PostMapping("/accountCreate")
+    @ApiOperation(value = "重新上链",hidden = true)
+    @InnerAuth
+    public R<String> accountCreate(@RequestBody CallAccountDto callAccountDto){
+        return R.ok(myChainService.accountCreate(callAccountDto));
+    }
 
 
 

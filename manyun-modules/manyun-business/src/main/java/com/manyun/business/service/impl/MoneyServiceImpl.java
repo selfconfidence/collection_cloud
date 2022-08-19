@@ -58,7 +58,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         Money money = getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
         money.setMoneyBalance(money.getMoneyBalance().add(moneyBln));
         money.updateD(userId);
-        logsService.saveLogs(LogInfoDto.builder().buiId(userId).jsonTxt(formInfo).formInfo( money.getMoneyBalance().toString()).isType(PULL_SOURCE).modelType(MONEY_TYPE).build());
+        logsService.saveLogs(LogInfoDto.builder().buiId(userId).jsonTxt(formInfo).formInfo( moneyBln.toString()).isType(PULL_SOURCE).modelType(MONEY_TYPE).build());
         updateById(money);
     }
 

@@ -30,6 +30,10 @@ public class UserBox implements Serializable {
     @ApiModelProperty("用户编号")
     private String userId;
 
+
+    @ApiModelProperty("盲盒标题")
+    private String boxTitle;
+
     @ApiModelProperty("盲盒编号")
     private String boxId;
 

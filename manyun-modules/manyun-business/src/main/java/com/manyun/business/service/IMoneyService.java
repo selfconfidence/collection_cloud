@@ -23,7 +23,6 @@ import java.math.BigDecimal;
  */
 public interface IMoneyService extends IService<Money> {
 
-    @Transactional(rollbackFor = Exception.class)
     void orderBack(String userId, BigDecimal moneyBln, String formInfo);
 
     BigDecimal ordePay(String outHost, String userId, BigDecimal realPayMoney, String formInfo);

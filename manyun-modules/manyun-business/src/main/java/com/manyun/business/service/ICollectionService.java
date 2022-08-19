@@ -48,4 +48,5 @@ public interface ICollectionService extends IService<CntCollection> {
 
     String sellOrderCollection(String userId, CollectionOrderSellForm collectionOrderSellForm);
 
+    List<KeywordVo> thisAssertQueryDict(String userId, String keyword);
 }

@@ -100,6 +100,8 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
 
     private final IBoxService boxService;
 
+    private final IUserBoxService userBoxService;
+
     private final IStepService stepService;
 
     private final RemoteBuiUserService userService;
@@ -227,6 +229,13 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
                 .userId(userId)
                 .build());
         return orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, outHost)).getId();
+    }
+
+    @Override
+    public List<KeywordVo> thisAssertQueryDict(String userId, String keyword) {
+        List<String> collectIonNames = userCollectionService.list(Wrappers.<UserCollection>lambdaQuery().select(UserCollection::getCollectionName).like(UserCollection::getCollectionName,keyword).eq(UserCollection::getUserId,userId).eq(UserCollection::getIsExist,USE_EXIST.getCode()).orderByDesc(UserCollection::getCreatedTime).last(" limit 10"  )).parallelStream().map(item -> item.getCollectionName()).collect(Collectors.toList());
+        List<String> boxNames = userBoxService.list(Wrappers.<UserBox>lambdaQuery().select(UserBox::getBoxTitle).like(UserBox::getBoxTitle, keyword).eq(UserBox::getUserId, userId).eq(UserBox::getIsExist, USE_EXIST.getCode()).orderByDesc(UserBox::getCreatedTime).last(" limit 10 ")).parallelStream().map(item -> item.getBoxTitle()).collect(Collectors.toList());
+        return  initKeywordVo(collectIonNames,boxNames);
     }
 
     /**

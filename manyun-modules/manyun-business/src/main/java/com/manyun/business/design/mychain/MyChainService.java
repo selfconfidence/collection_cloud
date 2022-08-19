@@ -13,9 +13,9 @@ import com.manyun.business.domain.dto.CallCommitDto;
 import com.manyun.business.domain.dto.CallTranDto;
 import com.manyun.business.domain.entity.UserCollection;
 import com.manyun.business.service.IUserCollectionService;
+import com.manyun.comm.api.domain.dto.CallAccountDto;
 import com.manyun.common.core.exception.LinkTranException;
 import com.manyun.common.core.exception.LinkUpException;
-import com.manyun.common.core.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +51,7 @@ public class MyChainService {
     private String upBase = "/callMychain/call";
 
     private String megerBase = "/callMychain/tranForm";
+    private String createAccountBase = "/callMychain/createAccount";
 
     @Autowired
     private ObjectFactory<IUserCollectionService> userCollectionServiceObjectFactory;
@@ -96,6 +97,31 @@ public class MyChainService {
 
 
     }
+
+
+
+    /**
+     * 创建账户
+     *
+     * 3次重试，  5秒重试一次， 每次按 2倍时间递增
+     *        5s   10s  20s
+     */
+   // @Retryable(maxAttempts = 3,value = LinkTranException.class,backoff = @Backoff(multiplier = 2,value = 5000L))
+    public String accountCreate(CallAccountDto callAccountDto){
+        log.info("开始创建账户:{}",callAccountDto.toString());
+        try {
+            String hash = httpAccountCreateTran(callAccountDto);
+            log.info("新增账户成功:对应得 hash 为:{}",hash);
+            return hash;
+        }catch (Exception e){
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
+
+    }
+
+
+
 
 
     /**
@@ -158,6 +184,15 @@ public class MyChainService {
      */
     private String httpAccountCollectionTran(CallTranDto callTranDto){
         return httpCommLink(JSON.toJSONString(callTranDto),megerBase);
+    }
+
+
+
+    /**
+     * http 创建账户
+     */
+    private String httpAccountCreateTran(CallAccountDto callAccountDto){
+        return httpCommLink(JSON.toJSONString(callAccountDto),createAccountBase);
     }
 
     private String  httpCommLink(String bodyJson,String baseUrl){

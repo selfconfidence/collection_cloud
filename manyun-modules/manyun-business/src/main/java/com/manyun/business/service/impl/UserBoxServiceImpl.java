@@ -85,11 +85,13 @@ public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> impl
      */
     @Override
     public String bindOrderBox(String userId, String buiId, String sourceInfo, Integer goodsNum) {
+        Box box = boxMapper.selectById(buiId);
         ArrayList<UserBox> userBoxList = Lists.newArrayList();
         for (Integer i = 0; i < goodsNum; i++) {
             UserBox userBox = Builder.of(UserBox::new).build();
             userBox.setUserId(userId);
             userBox.setBoxId(buiId);
+            userBox.setBoxTitle(box.getBoxTitle());
             userBox.setId(IdUtil.getSnowflake().nextIdStr());
             userBox.createD(userId);
             userBox.setIsExist(USE_EXIST.getCode());
@@ -115,11 +117,13 @@ public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> impl
      */
     @Override
     public void bindBox(String userId, String buiId, String sourceInfo, Integer goodsNum) {
+        Box box = boxMapper.selectById(buiId);
         ArrayList<UserBox> userBoxList = Lists.newArrayList();
         for (Integer i = 0; i < goodsNum; i++) {
             UserBox userBox = Builder.of(UserBox::new).build();
             userBox.setUserId(userId);
             userBox.setBoxId(buiId);
+            userBox.setBoxTitle(box.getBoxTitle());
             userBox.setId(IdUtil.getSnowflake().nextIdStr());
             userBox.createD(userId);
             userBox.setIsExist(USE_EXIST.getCode());
@@ -166,6 +170,7 @@ public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> impl
         String formatTran = StrUtil.format("{}:盲盒被赠送!",box.getBoxTitle());
         boolean rows = update(Wrappers.<UserBox>lambdaUpdate()
                 .set(UserBox::getUserId, toUserId)
+                .set(UserBox::getBoxTitle,box.getBoxTitle())
                 .set(UserBox::getBoxOpen, BoxOpenType.NO_OPEN.getCode())
                 .set(UserBox::getSourceInfo, format)
                 .set(UserBox::getUpdatedBy, toUserId)
