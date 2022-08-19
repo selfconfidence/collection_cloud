@@ -69,13 +69,14 @@ public class CntCateServiceImpl extends ServiceImpl<CntCateMapper,CntCate> imple
     {
         PageHelper.startPage(cateQuery.getPageNum(),cateQuery.getPageSize());
         List<CntCate> cntCateList = cntCateMapper.selectSearchCateList(cateQuery);
+        List<CntCate> cntCates = list();
         return TableDataInfoUtil.pageTableDataInfo(cntCateList.parallelStream().map(e -> {
             CntCateVo cntCateVo=new CntCateVo();
             BeanUtil.copyProperties(e,cntCateVo);
             if("0".equals(e.getParentId())){
                 cntCateVo.setParentName("顶级分类");
             }else {
-                Optional<CntCate> optional = list().parallelStream().filter(f -> f.getId().equals(e.getParentId())).findFirst();
+                Optional<CntCate> optional = cntCates.parallelStream().filter(f -> f.getId().equals(e.getParentId())).findFirst();
                 if(optional.isPresent()){
                     cntCateVo.setParentName(optional.get().getCateName());
                 }

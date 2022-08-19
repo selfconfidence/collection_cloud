@@ -57,13 +57,14 @@ public class CntCustomerServiceServiceImpl extends ServiceImpl<CntCustomerServic
     {
         PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
         List<CntCustomerService> cntCustomerServices = cntCustomerServiceMapper.selectCntCustomerServiceList(new CntCustomerService());
+        List<CntCustomerService> cntCustomerServiceList = list();
         return TableDataInfoUtil.pageTableDataInfo(cntCustomerServices.parallelStream().map(m ->{
             CntCustomerServiceVo cntCustomerServiceVo=new CntCustomerServiceVo();
             BeanUtil.copyProperties(m,cntCustomerServiceVo);
             if(m.getParentId()==0){
                 cntCustomerServiceVo.setParentName("父菜单");
             }else {
-                Optional<CntCustomerService> optional = cntCustomerServiceMapper.selectCntCustomerServiceList(new CntCustomerService()).parallelStream().filter(f -> f.getId().equals(m.getParentId())).findFirst();
+                Optional<CntCustomerService> optional = cntCustomerServiceList.parallelStream().filter(f -> f.getId().equals(m.getParentId())).findFirst();
                 if(optional.isPresent()){
                     cntCustomerServiceVo.setParentName(optional.get().getMenuName());
                 }

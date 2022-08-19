@@ -84,4 +84,8 @@ public interface CntDictService
      */
     R cateDict();
 
+    /***
+     * 盲盒评分字典
+     */
+    R boxScoreDict();
 }

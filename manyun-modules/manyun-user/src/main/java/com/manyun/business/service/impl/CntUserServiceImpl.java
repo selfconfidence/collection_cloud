@@ -103,6 +103,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     public CntUser login(LoginPhoneForm loginPhoneForm) {
         CntUser cntUser = getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPhone, loginPhoneForm.getPhone()));
         Assert.isTrue(Objects.nonNull(cntUser),"暂未找到该手机号!");
+        Assert.isFalse("1".equals(cntUser.getStatus()), "当前用户已被停用，请联系管理员");
         Assert.isTrue(loginPhoneForm.getPassword().equals(cntUser.getLoginPass()),"密码输入错误!");
         return cntUser;
     }
@@ -110,6 +111,9 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     @Override
     public CntUser codeLogin(String phone) {
         CntUser cntUser = getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPhone, phone));
+        if (cntUser != null) {
+            Assert.isFalse("1".equals(cntUser.getStatus()), "当前用户已被停用，请联系管理员");
+        }
         // 登录即注册
         if (Objects.isNull(cntUser)){
             regUser(new UserRegForm(phone));

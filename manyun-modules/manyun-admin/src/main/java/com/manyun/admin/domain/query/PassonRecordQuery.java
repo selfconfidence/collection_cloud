@@ -11,11 +11,11 @@ import lombok.Data;
 public class PassonRecordQuery extends PageQuery
 {
 
-    @ApiModelProperty("转出用户昵称")
-    private String oldNickName;
+    @ApiModelProperty("转出用户手机号")
+    private String oldUserPhone;
 
-    @ApiModelProperty("转入用户昵称")
-    private String newNickName;
+    @ApiModelProperty("转入用户手机号")
+    private String newUserPhone;
 
     @ApiModelProperty("商品名称")
     private String goodsName;

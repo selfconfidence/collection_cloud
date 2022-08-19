@@ -31,6 +31,9 @@ public class CntCollectionAlterVo
     @ApiModelProperty("藏品原价")
     private BigDecimal sourcePrice;
 
+    @ApiModelProperty("藏品状态;0=下架,1=正常")
+    private Integer statusBy;
+
     @ApiModelProperty("藏品现价")
     private BigDecimal realPrice;
 

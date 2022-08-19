@@ -37,6 +37,7 @@
             u.head_image headImage,
             u.please_code pleaseCode,
             u.link_addr linkAddr,
+            u.parent_id parentId,
             m.real_name realName,
             m.bank_cart bankCart,
             m.money_balance moneyBalance,

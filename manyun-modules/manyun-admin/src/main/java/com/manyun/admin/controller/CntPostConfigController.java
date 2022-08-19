@@ -1,7 +1,5 @@
 package com.manyun.admin.controller;
 
-import java.util.List;
-
 import com.manyun.admin.domain.query.PostConfigQuery;
 import com.manyun.admin.domain.vo.CntPostConfigVo;
 import com.manyun.common.core.domain.R;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
-import com.manyun.common.security.annotation.RequiresPermissions;
 import com.manyun.admin.domain.CntPostConfig;
 import com.manyun.admin.service.ICntPostConfigService;
 import com.manyun.common.core.web.controller.BaseController;
