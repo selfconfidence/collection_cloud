@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Objects;
+
 /**
  * <p>
  * 盲盒;盲盒主体表 前端控制器
@@ -72,8 +74,8 @@ public class BoxController extends BaseController {
     @GetMapping("/info/{id}")
     @ApiOperation("根据盲盒编号,查询盲盒的详细信息 -需登录")
     public R<BoxVo> info(@PathVariable String id){
-        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        return R.ok(boxService.info(id,loginBusinessUser.getUserId()));
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getLoginBusinessUser();
+        return R.ok(boxService.info(id, Objects.nonNull(loginBusinessUser) ? loginBusinessUser.getUserId() : null));
     }
 
     @GetMapping("/innerInfo/{id}")
