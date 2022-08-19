@@ -40,7 +40,7 @@ import com.manyun.admin.service.ISysUserService;
 
 /**
  * 用户信息
- * 
+ *
  * @author ruoyi
  */
 @RestController
@@ -74,7 +74,7 @@ public class SysUserController extends BaseController
         return getDataTable(list);
     }
 
-    @Log(title = "用户管理", businessType = BusinessType.EXPORT)
+    @Log(title = "", businessType = BusinessType.EXPORT)
     @RequiresPermissions("system:user:export")
     @PostMapping("/export")
     public void export(HttpServletResponse response, SysUser user)
@@ -147,7 +147,7 @@ public class SysUserController extends BaseController
 
     /**
      * 获取用户信息
-     * 
+     *
      * @return 用户信息
      */
     @GetMapping("getInfo")

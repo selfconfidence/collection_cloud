@@ -15,6 +15,7 @@ import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.DateUtils;
+import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
@@ -65,7 +66,11 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> imple
     {
         PageHelper.startPage(userMoneyQuery.getPageNum(),userMoneyQuery.getPageSize());
         List<UserMoneyVo> userMoneyVos = cntUserMapper.selectUserMoneyList(userMoneyQuery);
-        return TableDataInfoUtil.pageTableDataInfo(userMoneyVos,userMoneyVos);
+        List<CntUser> cntUsers = list();
+        return TableDataInfoUtil.pageTableDataInfo(userMoneyVos.parallelStream().map(m->{
+            m.setInviteNumber(cntUsers.parallelStream().filter(ff->(m.getId().equals(ff.getParentId()))).count());
+            return m;
+        }).collect(Collectors.toList()), userMoneyVos);
     }
 
     /**

@@ -1,10 +1,7 @@
 package com.manyun.admin.service;
 
-import java.util.List;
-
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntBox;
-import com.manyun.admin.domain.dto.BoxStateDto;
 import com.manyun.admin.domain.dto.CntBoxAlterCombineDto;
 import com.manyun.admin.domain.query.BoxQuery;
 import com.manyun.admin.domain.query.OrderQuery;
@@ -59,10 +56,4 @@ public interface ICntBoxService extends IService<CntBox>
      */
     TableDataInfo<CntBoxOrderVo> boxOrderList(OrderQuery orderQuery);
 
-    /**
-     * 修改状态
-     * @param boxStateDto
-     * @return
-     */
-    int updateState(BoxStateDto boxStateDto);
 }

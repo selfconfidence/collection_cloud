@@ -1,10 +1,6 @@
 package com.manyun.admin.controller;
 
-import java.util.List;
-
-import com.manyun.admin.domain.dto.BoxStateDto;
 import com.manyun.admin.domain.dto.CntBoxAlterCombineDto;
-import com.manyun.admin.domain.dto.CollectionStateDto;
 import com.manyun.admin.domain.query.BoxQuery;
 import com.manyun.admin.domain.query.OrderQuery;
 import com.manyun.admin.domain.vo.CntBoxDetailsVo;
@@ -17,14 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
-import com.manyun.admin.domain.CntBox;
 import com.manyun.admin.service.ICntBoxService;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.TableDataInfo;
@@ -71,13 +65,6 @@ public class CntBoxController extends BaseController
     public R edit(@RequestBody CntBoxAlterCombineDto boxAlterCombineDto)
     {
         return cntBoxService.updateCntBox(boxAlterCombineDto);
-    }
-
-    @PostMapping("/updateState")
-    @ApiOperation("修改状态")
-    public R updateState(@Valid @RequestBody BoxStateDto boxStateDto)
-    {
-        return toResult(cntBoxService.updateState(boxStateDto));
     }
 
     @GetMapping("/boxOrderList")

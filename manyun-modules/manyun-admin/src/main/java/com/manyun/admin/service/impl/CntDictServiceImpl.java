@@ -56,6 +56,9 @@ public class CntDictServiceImpl implements CntDictService
     @Autowired
     private ICntPostConfigService postConfigService;
 
+    @Autowired
+    private ICntBoxScoreService boxScoreService;
+
     /***
      * 查询藏品字典
      */
@@ -263,6 +266,18 @@ public class CntDictServiceImpl implements CntDictService
             return cateDictVo;
         }).collect(Collectors.toList()));
         return R.ok(cateDictVos);
+    }
+
+    /***
+     * 盲盒评分字典
+     */
+    @Override
+    public R boxScoreDict() {
+        return R.ok(boxScoreService.list(Wrappers.<CntBoxScore>lambdaQuery().eq(CntBoxScore::getScoreStatus,0).orderByAsc(CntBoxScore::getScoreSort)).parallelStream().map(m->{
+            CntBoxScoreDictVo boxScoreDictVo=new CntBoxScoreDictVo();
+            BeanUtil.copyProperties(m,boxScoreDictVo);
+            return boxScoreDictVo;
+        }));
     }
 
 

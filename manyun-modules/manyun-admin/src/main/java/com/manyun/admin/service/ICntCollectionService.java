@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntCollection;
 import com.manyun.admin.domain.dto.AirdropDto;
 import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
-import com.manyun.admin.domain.dto.CollectionStateDto;
 import com.manyun.admin.domain.excel.BachAirdopExcel;
 import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.*;
@@ -59,13 +58,6 @@ public interface ICntCollectionService extends IService<CntCollection>
      * @return
      */
     R airdrop(AirdropDto airdropDto);
-
-    /**
-     * 修改状态
-     * @param collectionStateDto
-     * @return
-     */
-    int updateState(CollectionStateDto collectionStateDto);
 
     /***
      * 批量空投

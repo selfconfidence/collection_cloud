@@ -121,4 +121,12 @@ public class CntDictController extends BaseController
         return cntDictService.cateDict();
     }
 
+
+    @GetMapping("/boxScoreDict")
+    @ApiOperation("盲盒评分字典")
+    public R boxScoreDict()
+    {
+        return cntDictService.boxScoreDict();
+    }
+
 }

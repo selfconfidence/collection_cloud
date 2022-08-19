@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntBoxScoreMapper">
+
+    <resultMap type="CntBoxScore" id="CntBoxScoreResult">
+        <result property="id"    column="id"    />
+        <result property="scoreName"    column="score_name"    />
+        <result property="scoreStatus"    column="score_status"    />
+        <result property="scoreSort"    column="score_sort"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCntBoxScoreVo">
+        select id, score_name, score_status, score_sort, created_by, created_time, updated_by, updated_time from cnt_box_score
+    </sql>
+
+    <select id="selectCntBoxScoreList" parameterType="BoxScoreQuery" resultMap="CntBoxScoreResult">
+        <include refid="selectCntBoxScoreVo"/>
+        <where>
+            <if test="scoreName != null  and scoreName != ''"> and score_name like concat('%', #{scoreName}, '%')</if>
+        </where>
+        order by created_time desc
+    </select>
+
+</mapper>

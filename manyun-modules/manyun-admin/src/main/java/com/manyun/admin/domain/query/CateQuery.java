@@ -15,4 +15,7 @@ public class CateQuery extends PageQuery {
     @ApiModelProperty("父菜单名称")
     private String parentId;
 
+    @ApiModelProperty("1=藏品系列，2=盲盒分类")
+    private Integer cateType;
+
 }

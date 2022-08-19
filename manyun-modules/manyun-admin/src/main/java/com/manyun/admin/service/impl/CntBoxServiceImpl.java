@@ -1,6 +1,5 @@
 package com.manyun.admin.service.impl;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -9,15 +8,12 @@ import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.*;
-import com.manyun.admin.domain.dto.BoxStateDto;
 import com.manyun.admin.domain.dto.CntBoxAlterCombineDto;
-import com.manyun.admin.domain.dto.CollectionStateDto;
 import com.manyun.admin.domain.query.BoxQuery;
 import com.manyun.admin.domain.query.OrderQuery;
 import com.manyun.admin.domain.vo.*;
@@ -281,21 +277,6 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         PageHelper.startPage(orderQuery.getPageNum(),orderQuery.getPageSize());
         List<CntBoxOrderVo> cntBoxOrderVos = cntBoxMapper.boxOrderList(orderQuery);
         return TableDataInfoUtil.pageTableDataInfo(cntBoxOrderVos,cntBoxOrderVos);
-    }
-
-
-    /**
-     * 修改状态
-     * @param boxStateDto
-     * @return
-     */
-    @Override
-    public int updateState(BoxStateDto boxStateDto) {
-        CntBox cntBox=new CntBox();
-        BeanUtil.copyProperties(boxStateDto,cntBox);
-        cntBox.setUpdatedBy(SecurityUtils.getUsername());
-        cntBox.setUpdatedTime(DateUtils.getNowDate());
-        return updateById(cntBox)==true?1:0;
     }
 
 }

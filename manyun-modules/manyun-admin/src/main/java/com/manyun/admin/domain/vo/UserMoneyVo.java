@@ -33,6 +33,12 @@ public class UserMoneyVo {
     @ApiModelProperty("区块链地址")
     private String linkAddr;
 
+    @ApiModelProperty("父编码")
+    private String parentId;
+
+    @ApiModelProperty("邀请人数")
+    private Long inviteNumber;
+
     @ApiModelProperty("真实姓名")
     private String realName;
 

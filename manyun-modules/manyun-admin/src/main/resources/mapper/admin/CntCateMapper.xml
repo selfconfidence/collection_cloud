@@ -27,6 +27,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <where>
             <if test="cateName != null  and cateName != ''"> and cate_name like concat('%', #{cateName}, '%')</if>
             <if test="parentId != null  and parentId != ''"> and parent_id = #{parentId}</if>
+            <if test="cateType != null"> and cate_type = #{cateType}</if>
         </where>
         order by created_time desc
     </select>

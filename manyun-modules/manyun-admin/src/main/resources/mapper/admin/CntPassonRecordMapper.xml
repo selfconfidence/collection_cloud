@@ -30,8 +30,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectCntPassonRecordList" parameterType="CntPassonRecord" resultMap="CntPassonRecordResult">
         <include refid="selectCntPassonRecordVo"/>
         <where>
-            <if test="oldNickName != null  and oldNickName != ''"> and old_nick_name like concat('%', #{oldNickName}, '%')</if>
-            <if test="newNickName != null  and newNickName != ''"> and new_nick_name like concat('%', #{newNickName}, '%')</if>
+            <if test="oldUserPhone != null  and oldUserPhone != ''"> and old_user_phone = #{oldUserPhone}</if>
+            <if test="newUserPhone != null  and newUserPhone != ''"> and new_user_phone = #{newUserPhone}</if>
             <if test="goodsName != null  and goodsName != ''"> and goods_name like concat('%', #{goodsName}, '%')</if>
         </where>
     </select>
