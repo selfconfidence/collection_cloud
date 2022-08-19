@@ -1,5 +1,6 @@
 package com.manyun.business.domain.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -22,7 +23,8 @@ public class PassonRecordVo {
     @ApiModelProperty("商品名称")
     private String goodsName;
 
-    @ApiModelProperty("转赠时间")
+    @ApiModelProperty("转赠时间 yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
 
