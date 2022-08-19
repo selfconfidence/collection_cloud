@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.manyun.business.design.pay.RootPay;
 import com.manyun.business.domain.dto.MsgCommDto;
 import com.manyun.business.domain.dto.MsgThisDto;
@@ -235,7 +236,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     public List<KeywordVo> thisAssertQueryDict(String userId, String keyword) {
         List<String> collectIonNames = userCollectionService.list(Wrappers.<UserCollection>lambdaQuery().select(UserCollection::getCollectionName).like(UserCollection::getCollectionName,keyword).eq(UserCollection::getUserId,userId).eq(UserCollection::getIsExist,USE_EXIST.getCode()).orderByDesc(UserCollection::getCreatedTime).last(" limit 10"  )).parallelStream().map(item -> item.getCollectionName()).collect(Collectors.toList());
         List<String> boxNames = userBoxService.list(Wrappers.<UserBox>lambdaQuery().select(UserBox::getBoxTitle).like(UserBox::getBoxTitle, keyword).eq(UserBox::getUserId, userId).eq(UserBox::getIsExist, USE_EXIST.getCode()).orderByDesc(UserBox::getCreatedTime).last(" limit 10 ")).parallelStream().map(item -> item.getBoxTitle()).collect(Collectors.toList());
-        return  initKeywordVo(collectIonNames,boxNames);
+        return  initKeywordVo(Lists.newArrayList(Sets.newHashSet(collectIonNames)),Lists.newArrayList(Sets.newHashSet(boxNames)));
     }
 
     /**
