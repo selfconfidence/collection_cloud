@@ -49,6 +49,8 @@ import java.util.stream.Collectors;
 
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.*;
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
+import static com.manyun.common.core.enums.BoxStatus.NULL_ACTION;
+import static com.manyun.common.core.enums.BoxStatus.UP_ACTION;
 import static com.manyun.common.core.enums.CollectionStatus.DOWN_ACTION;
 import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
 import static com.manyun.common.core.enums.PayTypeEnum.MONEY_TAPE;
@@ -166,8 +168,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         BigDecimal realPayMoney = NumberUtil.mul(collectionSellForm.getSellNum(), cntCollection.getRealPrice());
         checkCollection(cntCollection,userId,collectionSellForm.getPayType(),realPayMoney);
         // 锁优化
-        int rows = cntCollectionMapper.updateLock(cntCollection.getId(),collectionSellForm.getSellNum());
-        Assert.isTrue(rows>=1,"您来晚了!");
+        checkBalance(cntCollection,collectionSellForm.getSellNum());
 
         // 根据支付方式创建订单  通用适配方案 余额直接 减扣操作
         //1. 先创建对应的订单
@@ -216,8 +217,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         BigDecimal realPayMoney = NumberUtil.mul(collectionOrderSellForm.getSellNum(), cntCollection.getRealPrice());
         checkPerOrderCollection(cntCollection,userId);
         // 锁优化
-        int rows = cntCollectionMapper.updateLock(cntCollection.getId(),collectionOrderSellForm.getSellNum());
-        Assert.isTrue(rows>=1,"您来晚了!");
+        checkBalance(cntCollection,collectionOrderSellForm.getSellNum());
 
         // 根据支付方式创建订单  通用适配方案 余额直接 减扣操作
         //1. 先创建对应的订单
@@ -230,6 +230,16 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
                 .userId(userId)
                 .build());
         return orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, outHost)).getId();
+    }
+
+    private void checkBalance(CntCollection cntCollection,Integer sellNum) {
+        int rows = cntCollectionMapper.updateLock(cntCollection.getId(),sellNum);
+        if (!(rows >=1)){
+            cntCollection.setStatusBy(NULL_ACTION.getCode());
+            cntCollectionMapper.updateById(cntCollection);
+            Assert.isTrue(Boolean.FALSE,"您来晚了,已售罄了!");
+        }
+
     }
 
     @Override
@@ -549,7 +559,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         for (Cate cate : cateList) {
             CateCollectionVo cateCollectionVo = Builder.of(CateCollectionVo::new).build();
             BeanUtil.copyProperties(cate, cateCollectionVo);
-            List<CntCollection> cateCollectionList = list(Wrappers.<CntCollection>lambdaQuery().eq(CntCollection::getCateId,cate.getId()));
+            List<CntCollection> cateCollectionList = list(Wrappers.<CntCollection>lambdaQuery().ne(CntCollection::getStatusBy, DOWN_ACTION.getCode()).eq(CntCollection::getCateId,cate.getId()));
             List<CollectionVo> collectionVos = Lists.newArrayList();
             for (CntCollection cntCollection : cateCollectionList) {
                 collectionVos.add(providerCollectionVo(cntCollection));

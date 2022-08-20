@@ -79,7 +79,7 @@ public class BoxController extends BaseController {
     }
 
     @GetMapping("/innerInfo/{id}")
-    @ApiOperation("根据盲盒编号,查询盲盒的详细信息 -需登录")
+    @ApiOperation(value = "根据盲盒编号,查询盲盒的详细信息 -需登录",hidden = true)
     @InnerAuth
     public R<BoxListDto> innerInfo(@PathVariable String id){
         BoxVo boxVo = boxService.info(id, null);

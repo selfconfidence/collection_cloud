@@ -100,7 +100,6 @@ public class UserPleaseServiceImpl extends ServiceImpl<UserPleaseMapper, UserPle
         return arrayList;
     }
 
-
     /**
      * 用户领取邀请奖励
      * @param userRealCount
@@ -113,6 +112,11 @@ public class UserPleaseServiceImpl extends ServiceImpl<UserPleaseMapper, UserPle
         PleaseBox pleaseBox = pleaseBoxMapper.selectById(pleaseId);
         Assert.isTrue(Objects.nonNull(pleaseBox),"此领取编号有误!");
         Assert.isTrue(userRealIntCount.compareTo(pleaseBox.getPleaseNumber()) >=0,"推荐实名人数不够,请核实!");
+        Integer pleaseNumber = pleaseBox.getPleaseNumber();
+        Integer realPleaseNumber =  pleaseNumber - 1;
+        Assert.isTrue(pleaseNumber -1 >=0,"库存已领完,请期待!");
+        pleaseBox.setPleaseNumber(realPleaseNumber);
+        pleaseBoxMapper.updateById(pleaseBox);
         // 开始领取
         UserPlease userPlease = Builder.of(UserPlease::new).build();
         userPlease.setId(IdUtil.getSnowflake().nextIdStr());

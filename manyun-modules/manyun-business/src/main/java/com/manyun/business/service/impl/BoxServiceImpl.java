@@ -50,6 +50,7 @@ import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
 import static com.manyun.common.core.enums.BoxOpenType.NO_OPEN;
 import static com.manyun.common.core.enums.BoxOpenType.OK_OPEN;
 import static com.manyun.common.core.enums.BoxStatus.DOWN_ACTION;
+import static com.manyun.common.core.enums.BoxStatus.NULL_ACTION;
 import static com.manyun.common.core.enums.PayTypeEnum.MONEY_TAPE;
 import static com.manyun.common.core.enums.TarStatus.CEN_YES_TAR;
 import static com.manyun.common.core.enums.TarStatus.NO_TAR;
@@ -116,7 +117,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
     @Override
     public TableDataInfo<BoxListVo> pageList(BoxQuery boxQuery) {
         PageHelper.startPage(boxQuery.getPageNum(),boxQuery.getPageSize());
-        List<Box> boxList = list(Wrappers.<Box>lambdaQuery().eq(StrUtil.isNotBlank(boxQuery.getCateId()),Box::getCateId,boxQuery.getCateId()).ne(Box::getStatusBy,DOWN_ACTION.getCode()).like(StrUtil.isNotBlank(boxQuery.getBoxName()), Box::getBoxTitle, boxQuery.getBoxName()).ne(Box::getStatusBy,DOWN_ACTION.getCode()).orderByDesc(Box::getCreatedTime));
+        List<Box> boxList = list(Wrappers.<Box>lambdaQuery().eq(StrUtil.isNotBlank(boxQuery.getCateId()),Box::getCateId,boxQuery.getCateId()).ne(Box::getStatusBy,DOWN_ACTION.getCode()).like(StrUtil.isNotBlank(boxQuery.getBoxName()), Box::getBoxTitle, boxQuery.getBoxName()).orderByDesc(Box::getCreatedTime));
         // 数据组合查询
         return TableDataInfoUtil.pageTableDataInfo(boxList.parallelStream().map(this::initBoxListVo).collect(Collectors.toList()),boxList);
     }
@@ -171,8 +172,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         BigDecimal realPayMoney = NumberUtil.mul(boxSellForm.getSellNum(), box.getRealPrice());
         checkSell(box,userId,boxSellForm.getPayType(),realPayMoney);
         // 锁优化
-        int rows = boxMapper.updateLock(box.getId(),boxSellForm.getSellNum());
-         Assert.isTrue(rows>=1,"您来晚了!");
+        checkBalance(box,boxSellForm.getSellNum());
 
         // 根据支付方式创建订单  通用适配方案 余额直接 减扣操作
         //1. 先创建对应的订单
@@ -213,6 +213,16 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
 
     }
 
+    private void checkBalance(Box box,Integer sellNum) {
+        int rows = boxMapper.updateLock(box.getId(),sellNum);
+        if (!(rows >=1)){
+            box.setStatusBy(NULL_ACTION.getCode());
+            boxMapper.updateById(box);
+            Assert.isTrue(Boolean.FALSE,"您来晚了,已售罄了!");
+        }
+
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String sellOrderBox(BoxOrderSellForm boxOrderSellForm, String userId) {
@@ -222,8 +232,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         BigDecimal realPayMoney = NumberUtil.mul(boxOrderSellForm.getSellNum(), box.getRealPrice());
         checkOrderSell(box,userId);
         // 锁优化
-        int rows = boxMapper.updateLock(box.getId(),boxOrderSellForm.getSellNum());
-        Assert.isTrue(rows>=1,"您来晚了!");
+        checkBalance(box,boxOrderSellForm.getSellNum());
 
         //1. 先创建对应的订单
         String outHost =   orderService.createOrder(OrderCreateDto.builder()
