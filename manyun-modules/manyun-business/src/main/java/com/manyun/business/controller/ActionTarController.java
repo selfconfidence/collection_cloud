@@ -44,6 +44,7 @@ public class ActionTarController {
     @GetMapping("/myNotify")
     @ResponseBody
     public void myNotify(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        log.info("进入回调方法---------");
         String key = "09a9709dd74d464998a15c011844bd0d";
         Map<String, String[]> parameterMap = request.getParameterMap();
         Map<String, String> map = new HashMap<>(2);
