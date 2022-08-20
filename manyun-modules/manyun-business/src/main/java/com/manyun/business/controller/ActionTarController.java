@@ -2,6 +2,7 @@ package com.manyun.business.controller;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -32,6 +33,7 @@ import java.util.TreeMap;
 @Controller
 @RequestMapping("/actionTar")
 @Slf4j
+@CrossOrigin(origins = "*")
 public class ActionTarController {
 
     /**
