@@ -1,6 +1,7 @@
 package com.manyun.business.controller;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -30,6 +31,7 @@ import java.util.TreeMap;
  */
 @Controller
 @RequestMapping("/actionTar")
+@Slf4j
 public class ActionTarController {
 
     /**
@@ -60,8 +62,10 @@ public class ActionTarController {
             String out_trade_no = request.getParameter("orderNo");
             BigDecimal money = new BigDecimal(request.getParameter("money"));
             if ("RECEIVED".equals(String.valueOf(request.getParameter("status")))) {
-                System.out.println("走进来了~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                System.out.println("订单号为:"+out_trade_no+"-----------------------"+money+"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                log.info("走进来了~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                log.info("订单号为:"+out_trade_no+"-----------------------"+money+"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                //System.out.println("走进来了~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                //System.out.println("订单号为:"+out_trade_no+"-----------------------"+money+"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
             }
             //todo 支付成功操作
             response.setCharacterEncoding("UTF-8");
@@ -73,6 +77,7 @@ public class ActionTarController {
         }
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF8");
+        log.info("response_____+++++------"+ response.toString());
         PrintWriter writer = response.getWriter();
         writer.write("fail");
         writer.close();
