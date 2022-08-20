@@ -199,5 +199,9 @@ public interface BusinessConstants {
         String COLLECTION_AUTO_NUM = "collection:auto:numbers:";
     }
 
+    interface CommDict{
+        String REAL_COMPANY = "阿里提供技术支持";
+    }
+
 
 }
