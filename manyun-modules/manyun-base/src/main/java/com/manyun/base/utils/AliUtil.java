@@ -32,8 +32,7 @@ public class AliUtil {
 //    private static final String secret = "wOjfyavkD4GUZjwtZAaDMGjxeJxdXg";
 //    private static final String signName = "数位链盟";
 //    private static final String folderUser = "user/images";
-
-
+      private static final OSSClient ossClient = new OSSClient(SpringUtils.getBean(AliOssConfig.class).getEndpoint(),  SpringUtils.getBean(AliOssConfig.class).getAccessKey(), SpringUtils.getBean(AliOssConfig.class).getSecret());
 
     /**
      * 发送验证码
@@ -233,12 +232,10 @@ public class AliUtil {
     private static String uploadObject(InputStream is, String folder, String fileName,boolean encode, int expire) {
         log.debug("要上传的文体名称：" + fileName);
         String typeName =getContentType(fileName);
-        OSSClient ossClient = null;
         try {
             if (!folder.endsWith("/")) {
                 folder += "/";
             }
-            ossClient = new OSSClient(SpringUtils.getBean(AliOssConfig.class).getEndpoint(),  SpringUtils.getBean(AliOssConfig.class).getAccessKey(), SpringUtils.getBean(AliOssConfig.class).getSecret());
             createBucketName(ossClient,  SpringUtils.getBean(AliOssConfig.class).getBucketName());
             createFolder(ossClient, folder);
             String key = null;
@@ -284,9 +281,9 @@ public class AliUtil {
             e.printStackTrace();
             log.error("上传阿里云OSS服务器异常." + e.getMessage(), e);
         } finally {
-            if (ossClient != null) {
+          /*  if (ossClient != null) {
                 ossClient.shutdown();
-            }
+            }*/
             if (is != null) {
                 try {
                     is.close();
