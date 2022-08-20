@@ -31,6 +31,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.manyun.common.core.constant.BusinessConstants.CommDict.REAL_COMPANY;
 import static com.manyun.common.core.enums.CollectionLink.NOT_LINK;
 import static com.manyun.common.core.enums.CollectionLink.OK_LINK;
 import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
@@ -238,7 +239,7 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
                 .owner(userCollection.getUserId())
                 .build(), (hash)->{
             userCollection.setIsLink(OK_LINK.getCode());
-            userCollection.setRealCompany("阿里提供技术支持");
+            userCollection.setRealCompany(REAL_COMPANY);
             // 编号特殊生成
             userCollection.setCollectionNumber(StrUtil.format("CNT_{}",userCollectionService.autoCollectionNum(userCollection.getCollectionId())));
             userCollection.setCollectionHash(hash);

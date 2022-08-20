@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+import static com.manyun.common.core.constant.BusinessConstants.CommDict.REAL_COMPANY;
 import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.POLL_SOURCE;
 import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.PULL_SOURCE;
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE;
@@ -139,7 +140,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                     .owner(userCollection.getUserId())
                     .build(), (hash)->{
                 userCollection.setIsLink(OK_LINK.getCode());
-                userCollection.setRealCompany("阿里提供技术支持");
+                userCollection.setRealCompany(REAL_COMPANY);
                 // 编号特殊生成 借助 redis 原子性操作
                 userCollection.setCollectionNumber(StrUtil.format("CNT_{}",autoCollectionNum(userCollection.getCollectionId())));
                 //userCollection.setLinkAddr(hash);
@@ -195,7 +196,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                             .owner(userCollection.getUserId())
                     .build(), (hash)->{
                 userCollection.setIsLink(OK_LINK.getCode());
-                userCollection.setRealCompany("阿里提供技术支持");
+                userCollection.setRealCompany(REAL_COMPANY);
                 // 编号特殊生成 借助 redis 原子性操作
                 userCollection.setCollectionNumber(StrUtil.format("CNT_{}",autoCollectionNum(userCollection.getCollectionId())));
                 //userCollection.setLinkAddr(hash);
@@ -234,7 +235,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
        userCollection.setCollectionName(tranUserCollection.getCollectionName());
        userCollection.setCollectionHash(oldCollectionHash);
        userCollection.setCollectionNumber(oldCollectionNumber);
-       userCollection.setRealCompany("阿里提供技术支持");
+       userCollection.setRealCompany(REAL_COMPANY);
        // 初始化 未上链过程
        userCollection.setIsLink(OK_LINK.getCode());
        userCollection.createD(toUserId);
@@ -379,7 +380,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                 .owner(userCollection.getUserId())
                         .build(), (hash)->{
                     userCollection.setIsLink(OK_LINK.getCode());
-                    userCollection.setRealCompany("蚂蚁链");
+                    userCollection.setRealCompany(REAL_COMPANY);
                     // 编号特殊生成
                     userCollection.setCollectionNumber(StrUtil.format("CNT_{}",autoCollectionNum(userCollection.getCollectionId())));
                     //userCollection.setLinkAddr(hash);
