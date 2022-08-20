@@ -95,6 +95,7 @@ public class CntCateServiceImpl extends ServiceImpl<CntCateMapper,CntCate> imple
     @Override
     public int insertCntCate(CntCate cntCate)
     {
+        cntCate.setParentId(cntCate.getCateType()==2?"0":cntCate.getParentId());
         cntCate.setId(IdUtils.getSnowflakeNextIdStr());
         cntCate.setCreatedBy(SecurityUtils.getUsername());
         cntCate.setCreatedTime(DateUtils.getNowDate());
@@ -110,6 +111,7 @@ public class CntCateServiceImpl extends ServiceImpl<CntCateMapper,CntCate> imple
     @Override
     public int updateCntCate(CntCate cntCate)
     {
+        cntCate.setParentId(cntCate.getCateType()==2?"0":cntCate.getParentId());
         cntCate.setUpdatedBy(SecurityUtils.getUsername());
         cntCate.setUpdatedTime(DateUtils.getNowDate());
         return updateById(cntCate)==true?1:0;
