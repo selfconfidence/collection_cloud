@@ -231,6 +231,7 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
     private LambdaQueryWrapper<AuctionSend> getAuctionSendQueryWrappers(AuctionMarketQuery marketQuery) {
         LambdaQueryWrapper<AuctionSend> lambdaQueryWrapper = Wrappers.<AuctionSend>lambdaQuery();
         lambdaQueryWrapper.eq(AuctionSend::getGoodsType, marketQuery.getGoodsType());
+        lambdaQueryWrapper.ne(AuctionSend::getAuctionSendStatus, AuctionSendStatus.WAIT_PAY.getCode());
         lambdaQueryWrapper.ne(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_PASS.getCode());
         lambdaQueryWrapper.ne(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_BREAK.getCode());
         lambdaQueryWrapper.ne(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_SUCCESS.getCode());
