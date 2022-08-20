@@ -32,6 +32,9 @@ public class CntCollectionDetailsVo
     @ApiModelProperty("可提前购的时间")
     private Integer postTime;
 
+    @ApiModelProperty("藏品状态;0=下架,1=正常")
+    private Integer statusBy;
+
     @ApiModelProperty("抽签编号")
     private String tarId;
 

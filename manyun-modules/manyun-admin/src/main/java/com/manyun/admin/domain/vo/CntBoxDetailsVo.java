@@ -35,7 +35,7 @@ public class CntBoxDetailsVo
     @ApiModelProperty("库存")
     private Integer balance;
 
-    @ApiModelProperty("盲盒状态;0=下架,1=正常,2=售罄 ")
+    @ApiModelProperty("盲盒状态;0=下架,1=正常 ")
     private Integer statusBy;
 
     @ApiModelProperty("盲盒详情")
