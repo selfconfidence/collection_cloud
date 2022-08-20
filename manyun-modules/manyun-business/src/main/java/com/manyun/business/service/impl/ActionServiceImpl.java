@@ -238,7 +238,7 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
                 .owner(userCollection.getUserId())
                 .build(), (hash)->{
             userCollection.setIsLink(OK_LINK.getCode());
-            userCollection.setRealCompany("蚂蚁链");
+            userCollection.setRealCompany("阿里提供技术支持");
             // 编号特殊生成
             userCollection.setCollectionNumber(StrUtil.format("CNT_{}",userCollectionService.autoCollectionNum(userCollection.getCollectionId())));
             userCollection.setCollectionHash(hash);

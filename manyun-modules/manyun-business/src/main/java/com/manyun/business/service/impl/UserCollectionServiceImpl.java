@@ -139,7 +139,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                     .owner(userCollection.getUserId())
                     .build(), (hash)->{
                 userCollection.setIsLink(OK_LINK.getCode());
-                userCollection.setRealCompany("蚂蚁链");
+                userCollection.setRealCompany("阿里提供技术支持");
                 // 编号特殊生成 借助 redis 原子性操作
                 userCollection.setCollectionNumber(StrUtil.format("CNT_{}",autoCollectionNum(userCollection.getCollectionId())));
                 //userCollection.setLinkAddr(hash);
@@ -195,7 +195,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                             .owner(userCollection.getUserId())
                     .build(), (hash)->{
                 userCollection.setIsLink(OK_LINK.getCode());
-                userCollection.setRealCompany("蚂蚁链");
+                userCollection.setRealCompany("阿里提供技术支持");
                 // 编号特殊生成 借助 redis 原子性操作
                 userCollection.setCollectionNumber(StrUtil.format("CNT_{}",autoCollectionNum(userCollection.getCollectionId())));
                 //userCollection.setLinkAddr(hash);
@@ -234,7 +234,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
        userCollection.setCollectionName(tranUserCollection.getCollectionName());
        userCollection.setCollectionHash(oldCollectionHash);
        userCollection.setCollectionNumber(oldCollectionNumber);
-       userCollection.setRealCompany("蚂蚁链");
+       userCollection.setRealCompany("阿里提供技术支持");
        // 初始化 未上链过程
        userCollection.setIsLink(OK_LINK.getCode());
        userCollection.createD(toUserId);
