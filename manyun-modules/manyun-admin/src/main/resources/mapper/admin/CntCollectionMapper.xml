@@ -53,6 +53,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             cp.publish_time publishTime,
             cp.balance balance,
             cp.self_balance selfBalance,
+            cp.status_by,
             cpxq.customer_tail customerTail,
             cpxq.look_info lookInfo,
 			ci.id	issuanceId
