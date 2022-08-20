@@ -84,6 +84,7 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
             // 此接口可以进行特别优化
             List<CntPostExist> tbPostExists = postExistService.list(Wrappers.<CntPostExist>lambdaQuery().select(CntPostExist::getCollectionId).eq(CntPostExist::getConfigId, cntPostConfig.getId()));
             Set<String> collectionIds = tbPostExists.stream().map(item -> item.getCollectionId()).collect(Collectors.toSet());
+            if (collectionIds.isEmpty())return Boolean.FALSE;
             List<UserCollection> userCollections = userCollectionService.list(Wrappers.<UserCollection>lambdaQuery().select(UserCollection::getId).eq(UserCollection::getIsExist,USE_EXIST.getCode()).eq(UserCollection::getUserId, userId).in(UserCollection::getCollectionId,collectionIds ));
             // 去重
             Set<String> userCollectionIds = userCollections.stream().map(item -> item.getId()).collect(Collectors.toSet());
