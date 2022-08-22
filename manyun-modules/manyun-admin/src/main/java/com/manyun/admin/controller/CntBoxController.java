@@ -1,5 +1,6 @@
 package com.manyun.admin.controller;
 
+import com.manyun.admin.domain.dto.BoxStateDto;
 import com.manyun.admin.domain.dto.CntBoxAlterCombineDto;
 import com.manyun.admin.domain.query.BoxQuery;
 import com.manyun.admin.domain.query.OrderQuery;
@@ -65,6 +66,13 @@ public class CntBoxController extends BaseController
     public R edit(@RequestBody CntBoxAlterCombineDto boxAlterCombineDto)
     {
         return cntBoxService.updateCntBox(boxAlterCombineDto);
+    }
+
+    @PostMapping("/updateState")
+    @ApiOperation("修改状态")
+    public R updateState(@Valid @RequestBody BoxStateDto boxStateDto)
+    {
+        return toResult(cntBoxService.updateState(boxStateDto));
     }
 
     @GetMapping("/boxOrderList")

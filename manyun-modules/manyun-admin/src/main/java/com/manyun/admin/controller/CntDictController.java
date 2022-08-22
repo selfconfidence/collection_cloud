@@ -86,22 +86,15 @@ public class CntDictController extends BaseController
         return cntDictService.drawRulesDict(drawRulesDictQuery);
     }
 
-    @GetMapping("/postConfigDict")
-    @ApiOperation("提前购配置字典")
-    public R postConfigDict()
-    {
-        return cntDictService.postConfigDict();
-    }
-
     @PostMapping("/postConfigGoodsDict")
-    @ApiOperation("提前购配置的商品字典")
+    @ApiOperation("满足提前购的商品字典")
     public R postConfigGoodsDict(@Valid @RequestBody PostConfigDictQuery postConfigDictQuery)
     {
         return cntDictService.postConfigGoodsDict(postConfigDictQuery);
     }
 
     @GetMapping("/postExistDict")
-    @ApiOperation("提前购已拥配置的藏品字典")
+    @ApiOperation("提前购前置条件字典")
     public R postExistDict()
     {
         return cntDictService.postExistDict();

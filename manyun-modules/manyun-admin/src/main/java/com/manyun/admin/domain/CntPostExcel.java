@@ -30,6 +30,9 @@ public class CntPostExcel implements Serializable
     @ApiModelProperty("业务名称;（盲盒 & 藏品）名称")
     private String buiName;
 
+    @ApiModelProperty("购买次数")
+    private Integer buyFrequency;
+
     @ApiModelProperty("标识;（盲盒 & 藏品）  词条")
     private String typeName;
 
@@ -90,6 +93,14 @@ public class CntPostExcel implements Serializable
         this.buiName = buiName;
     }
 
+    public Integer getBuyFrequency() {
+        return buyFrequency;
+    }
+
+    public void setBuyFrequency(Integer buyFrequency) {
+        this.buyFrequency = buyFrequency;
+    }
+
     public String getTypeName() {
         return typeName;
     }
@@ -146,6 +157,7 @@ public class CntPostExcel implements Serializable
             .append("phone", getPhone())
             .append("buiId", getBuiId())
             .append("buiName", getBuiName())
+            .append("buyFrequency", getBuyFrequency())
             .append("typeName", getTypeName())
             .append("reMark", getReMark())
             .append("createdBy", getCreatedBy())

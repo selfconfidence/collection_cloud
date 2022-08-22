@@ -5,9 +5,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-@ApiModel("提前购前置条件条件查询")
+@ApiModel("提前购可购买商品条件查询")
 @Data
-public class PostExistQuery extends PageQuery {
+public class PostSellQuery extends PageQuery {
 
     @ApiModelProperty("配置编号")
     private String configId;

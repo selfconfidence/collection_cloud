@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.*;
+import com.manyun.admin.domain.dto.BoxStateDto;
 import com.manyun.admin.domain.dto.CntBoxAlterCombineDto;
 import com.manyun.admin.domain.query.BoxQuery;
 import com.manyun.admin.domain.query.OrderQuery;
@@ -111,6 +112,8 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         List<CntBox> boxList = list(Wrappers.<CntBox>lambdaQuery().eq(CntBox::getBoxTitle,cntBoxAlterVo.getBoxTitle()));
         String info = StrUtil.format("盲盒名称为:{}已存在!", cntBoxAlterVo.getBoxTitle());
         Assert.isFalse(boxList.size()>0,info);
+        //验证盲盒如果没有添加藏品不能上架
+        Assert.isFalse(cntBoxAlterVo.getStatusBy()==1,"请先添加盲盒藏品");
         //校验
         R check = check(cntBoxAlterVo,boxAlterCombineDto.getCntLableAlterVo(),boxAlterCombineDto.getMediaAlterVo());
         if(200!=check.getCode()){
@@ -177,6 +180,11 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         List<CntBox> boxList = list(Wrappers.<CntBox>lambdaQuery().eq(CntBox::getBoxTitle,boxAlterVo.getBoxTitle()).ne(CntBox::getId,boxId));
         String info = StrUtil.format("盲盒名称为:{}已存在!", boxAlterVo.getBoxTitle());
         Assert.isFalse(boxList.size()>0,info);
+        //验证盲盒如果没有添加藏品不能上架
+        if(boxAlterVo.getStatusBy()==1){
+            List<CntBoxCollection> boxCollections = boxCollectionService.list(Wrappers.<CntBoxCollection>lambdaQuery().eq(CntBoxCollection::getBoxId, boxId));
+            Assert.isTrue(boxCollections.size()>0, "请先添加盲盒藏品");
+        }
         //校验
         R check = check(boxAlterVo,boxAlterCombineDto.getCntLableAlterVo(),boxAlterCombineDto.getMediaAlterVo());
         if(200!=check.getCode()){
@@ -265,6 +273,26 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
             return R.fail("盲盒主图不能为空!");
         }
         return R.ok();
+    }
+
+
+    /**
+     * 修改状态
+     * @param boxStateDto
+     * @return
+     */
+    @Override
+    public int updateState(BoxStateDto boxStateDto) {
+        CntBox cntBox=new CntBox();
+        //验证盲盒如果没有添加藏品不能上架
+        if(boxStateDto.getStatusBy()==1){
+            List<CntBoxCollection> boxCollections = boxCollectionService.list(Wrappers.<CntBoxCollection>lambdaQuery().eq(CntBoxCollection::getBoxId, boxStateDto.getId()));
+            Assert.isTrue(boxCollections.size()>0, "请先添加盲盒藏品");
+        }
+        BeanUtil.copyProperties(boxStateDto,cntBox);
+        cntBox.setUpdatedBy(SecurityUtils.getUsername());
+        cntBox.setUpdatedTime(DateUtils.getNowDate());
+        return updateById(cntBox)==true?1:0;
     }
 
 

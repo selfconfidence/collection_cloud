@@ -58,19 +58,13 @@ public interface CntDictService
      */
     R drawRulesDict(DrawRulesDictQuery drawRulesDictQuery);
 
-    /**
-     * 提前购配置字典
-     * @return
-     */
-    R postConfigDict();
-
     /***
-     * 提前购配置的商品字典
+     * 满足提前购的商品字典
      */
     R postConfigGoodsDict(PostConfigDictQuery postConfigDictQuery);
 
     /***
-     * 提前购已拥有的
+     * 提前购前置条件字典
      */
     R postExistDict();
 

@@ -19,25 +19,4 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, collection_id, config_id, bui_name, created_by, created_time, updated_by, updated_time from cnt_post_exist
     </sql>
 
-    <select id="selectCntPostExistList" parameterType="PostExistQuery" resultType="com.manyun.admin.domain.vo.CntPostExistVo">
-        select
-            pe.id,
-            pe.bui_name buiname,
-            pe.re_mark remark,
-            co.collection_name collectionName,
-            pc.config_name configname,
-            pe.created_time createdtime,
-            pe.updated_time updatedtime
-        from
-            cnt_post_exist pe
-        left join cnt_collection co on pe.collection_id = co.id
-        left join cnt_post_config pc on pe.config_id = pc.id
-        <where>
-            <if test="collectionId != null  and collectionId != ''"> and pe.collection_id = #{collectionId}</if>
-            <if test="configId != null  and configId != ''"> and pe.config_id = #{configId}</if>
-            <if test="buiName != null  and buiName != ''"> and pe.bui_name like concat('%', #{buiName}, '%')</if>
-        </where>
-        order by pe.created_time desc
-    </select>
-
 </mapper>
