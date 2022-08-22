@@ -361,7 +361,7 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
             }
             if (auctionSend.getGoodsType() == 2) {
                 log.info("555555555555");
-                userBoxService.showUserBox(auctionSend.getUserId(), auctionSend.getMyGoodsId(), info);
+                userBoxService.showUserBox(auctionSend.getMyGoodsId(), auctionSend.getUserId(), info);
             }
         }
         updateBatchById(auctionSendList);
