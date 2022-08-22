@@ -511,6 +511,9 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         } else {
             collectionVo.setPreStatus(2);
         }
+        if (Integer.valueOf(0).equals(CntCollection.getBalance())) {
+            collectionVo.setStatusBy(2);
+        }
         collectionVo.setLableVos(initLableVos(CntCollection.getId()));
         collectionVo.setMediaVos(initMediaVos(CntCollection.getId()));
         collectionVo.setCnfCreationdVo(initCnfCreationVo(CntCollection.getBindCreation()));
