@@ -24,6 +24,7 @@ import com.manyun.common.core.exception.ServiceException;
 import com.manyun.common.core.text.Convert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -107,6 +108,7 @@ public class UserPleaseServiceImpl extends ServiceImpl<UserPleaseMapper, UserPle
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String openPleaseBox(long userRealCount, String pleaseId,String userId) {
         Integer userRealIntCount = Convert.toInt(userRealCount);
         PleaseBox pleaseBox = pleaseBoxMapper.selectById(pleaseId);
