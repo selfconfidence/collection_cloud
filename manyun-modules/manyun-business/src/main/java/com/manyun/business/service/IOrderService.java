@@ -55,4 +55,6 @@ public interface IOrderService extends IService<Order> {
     PayVo unifiedOrder(OrderPayForm orderPayForm,String userId);
 
     void cancelOrder(String id);
+
+//    PayVo consignmentUnifiedOrder(OrderPayForm orderPayForm, String userId);
 }
