@@ -372,6 +372,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     @Transactional(rollbackFor = Exception.class)
     public synchronized PayVo payAuction(String payUserId, AuctionPayForm auctionPayForm) {
         AuctionSend auctionSend = auctionSendService.getById(auctionPayForm.getAuctionSendId());
+        Assert.isFalse(auctionSend.getUserId().equals(payUserId), "自己不可购买自己送拍的产品");
         AuctionOrder auctionOrder = auctionOrderService.getById(auctionSend.getAuctionOrderId());
         /*String auctionOrderHost = auctionOrderService.createAuctionOrder(AuctionOrderCreateDto.builder()
                 .goodsId(auctionSend.getGoodsId())
