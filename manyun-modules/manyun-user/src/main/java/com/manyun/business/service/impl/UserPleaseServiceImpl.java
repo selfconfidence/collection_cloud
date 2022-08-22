@@ -116,11 +116,13 @@ public class UserPleaseServiceImpl extends ServiceImpl<UserPleaseMapper, UserPle
         Assert.isTrue(userRealIntCount.compareTo(pleaseBox.getPleaseNumber()) >=0,"推荐实名人数不够,请核实!");
         Integer balance = pleaseBox.getBalance();
         Integer realBalance =  balance - 1;
-        Assert.isTrue(balance -1 >=0,"库存已领完,请期待!");
+        Assert.isTrue(realBalance >=0,"库存已领完,请期待!");
         pleaseBox.setBalance(realBalance);
         pleaseBox.setSelfBalance(pleaseBox.getSelfBalance() + 1);
         pleaseBoxMapper.updateById(pleaseBox);
         // 开始领取
+        UserPlease please = getOne(Wrappers.<UserPlease>lambdaQuery().eq(UserPlease::getUserId, userId).eq(UserPlease::getPleaseId, pleaseId));
+        Assert.isTrue(Objects.isNull(please),"您已领取,不可重复领取.");
         UserPlease userPlease = Builder.of(UserPlease::new).build();
         userPlease.setId(IdUtil.getSnowflake().nextIdStr());
         userPlease.setPleaseId(pleaseId);
@@ -129,7 +131,7 @@ public class UserPleaseServiceImpl extends ServiceImpl<UserPleaseMapper, UserPle
         userPlease.setUserId(userId);
         save(userPlease);
         // 进行绑定
-        String source = StrUtil.format("推荐人数满{}领取获得盲盒", userRealCount);
+        String source = StrUtil.format("推荐人数满{}位,\t成功领取盲盒!", userRealCount);
         R<String> stringR = remoteBoxService.openPleaseBox(Builder.of(OpenPleaseBoxDto::new).with(OpenPleaseBoxDto::setGoodsNum,Integer.valueOf(1)).with(OpenPleaseBoxDto::setBoxId,pleaseBox.getBoxId()).with(OpenPleaseBoxDto::setSourceInfo,source).with(OpenPleaseBoxDto::setUserId,userId).build(),SecurityConstants.INNER);
         if (CodeStatus.SUCCESS.getCode().equals(stringR.getCode()))
             return source;

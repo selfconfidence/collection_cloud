@@ -188,7 +188,7 @@ public class CntUserController extends BaseController {
 
     @GetMapping("/openPleaseBox/{id}")
     @ApiOperation(value = "邀请奖励进行领取 id 为领取编号",notes = "返回的 data 是消息提示,给用户看即可!")
-    public R<String> openPleaseBox(@PathVariable String id){
+    public synchronized R<String> openPleaseBox(@PathVariable String id){
         String userId = SecurityUtils.getNotNullLoginBusinessUser().getUserId();
         String msg = userService.openPleaseBox(userId,id);
         return R.ok(msg);
