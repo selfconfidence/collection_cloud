@@ -112,10 +112,11 @@ public class UserPleaseServiceImpl extends ServiceImpl<UserPleaseMapper, UserPle
         PleaseBox pleaseBox = pleaseBoxMapper.selectById(pleaseId);
         Assert.isTrue(Objects.nonNull(pleaseBox),"此领取编号有误!");
         Assert.isTrue(userRealIntCount.compareTo(pleaseBox.getPleaseNumber()) >=0,"推荐实名人数不够,请核实!");
-        Integer pleaseNumber = pleaseBox.getPleaseNumber();
-        Integer realPleaseNumber =  pleaseNumber - 1;
-        Assert.isTrue(pleaseNumber -1 >=0,"库存已领完,请期待!");
-        pleaseBox.setPleaseNumber(realPleaseNumber);
+        Integer balance = pleaseBox.getBalance();
+        Integer realBalance =  balance - 1;
+        Assert.isTrue(balance -1 >=0,"库存已领完,请期待!");
+        pleaseBox.setBalance(realBalance);
+        pleaseBox.setSelfBalance(pleaseBox.getSelfBalance() + 1);
         pleaseBoxMapper.updateById(pleaseBox);
         // 开始领取
         UserPlease userPlease = Builder.of(UserPlease::new).build();
@@ -127,7 +128,7 @@ public class UserPleaseServiceImpl extends ServiceImpl<UserPleaseMapper, UserPle
         save(userPlease);
         // 进行绑定
         String source = StrUtil.format("推荐人数满{}领取获得盲盒", userRealCount);
-        R<String> stringR = remoteBoxService.openPleaseBox(OpenPleaseBoxDto.builder().goodsNum(Integer.valueOf(1)).boxId(pleaseBox.getBoxId()).sourceInfo(source).userId(userId).build(),SecurityConstants.INNER);
+        R<String> stringR = remoteBoxService.openPleaseBox(Builder.of(OpenPleaseBoxDto::new).with(OpenPleaseBoxDto::setGoodsNum,Integer.valueOf(1)).with(OpenPleaseBoxDto::setBoxId,pleaseBox.getBoxId()).with(OpenPleaseBoxDto::setSourceInfo,source).with(OpenPleaseBoxDto::setUserId,userId).build(),SecurityConstants.INNER);
         if (CodeStatus.SUCCESS.getCode().equals(stringR.getCode()))
             return source;
         throw new ServiceException(stringR.getMsg());
