@@ -3,6 +3,7 @@ package com.manyun.admin.controller;
 
 import com.manyun.admin.domain.dto.AirdropDto;
 import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
+import com.manyun.admin.domain.dto.CollectionStateDto;
 import com.manyun.admin.domain.excel.BachAirdopExcel;
 import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.*;
@@ -87,6 +88,14 @@ public class CntCollectionController extends BaseController
         ExcelUtil<BachAirdopExcel> util = new ExcelUtil<BachAirdopExcel>(BachAirdopExcel.class);
         List<BachAirdopExcel> bachAirdopExcels = util.importExcel(file.getInputStream());
         return cntCollectionService.postExcelList(bachAirdopExcels);
+    }
+
+
+    @PostMapping("/updateState")
+    @ApiOperation("修改状态")
+    public R updateState(@Valid @RequestBody CollectionStateDto collectionStateDto)
+    {
+        return toResult(cntCollectionService.updateState(collectionStateDto));
     }
 
 }

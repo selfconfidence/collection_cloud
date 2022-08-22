@@ -21,6 +21,9 @@ public class CntAnnouncement implements Serializable
     @ApiModelProperty("公告类型;1平台公告，2发售信息，3上新公告")
     private Integer noticeType;
 
+    @ApiModelProperty("公告标题")
+    private String noticeTitle;
+
     @ApiModelProperty("公告内容")
     private String noticeContent;
 
@@ -52,6 +55,14 @@ public class CntAnnouncement implements Serializable
 
     public void setNoticeType(Integer noticeType) {
         this.noticeType = noticeType;
+    }
+
+    public String getNoticeTitle() {
+        return noticeTitle;
+    }
+
+    public void setNoticeTitle(String noticeTitle) {
+        this.noticeTitle = noticeTitle;
     }
 
     public String getNoticeContent() {
@@ -99,6 +110,7 @@ public class CntAnnouncement implements Serializable
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("id", getId())
             .append("noticeType", getNoticeType())
+            .append("noticeTitle", getNoticeTitle())
             .append("noticeContent", getNoticeContent())
             .append("createdBy", getCreatedBy())
             .append("createdTime", getCreatedTime())

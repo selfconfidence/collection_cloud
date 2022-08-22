@@ -15,20 +15,23 @@ public class CntPostExcelVo
     @ApiModelProperty("主键")
     private String id;
 
-    @ApiModelProperty("用户编号;内部字段")
+    @ApiModelProperty("用户编号")
     private String userId;
 
-    @ApiModelProperty("用户;用户手机号")
+    @ApiModelProperty("用户手机号")
     private String phone;
 
-    @ApiModelProperty("业务编号;(盲盒 & 藏品) 编号")
+    @ApiModelProperty("商品编号")
     private String buiId;
 
-    @ApiModelProperty("业务名称;（盲盒 & 藏品）名称")
+    @ApiModelProperty("商品名称")
     private String buiName;
 
-    @ApiModelProperty("标识;（盲盒 & 藏品）  词条")
+    @ApiModelProperty("商品类型 1:盲盒 2:藏品")
     private String typeName;
+
+    @ApiModelProperty("提前购次数")
+    private Integer buyFrequency;
 
     @ApiModelProperty("备注")
     private String reMark;

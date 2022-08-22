@@ -2,6 +2,7 @@ package com.manyun.admin.domain.excel;
 
 import com.manyun.common.core.annotation.Excel;
 import com.manyun.common.core.xss.Xss;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -18,6 +19,9 @@ public class PostExcel implements Serializable {
 
     @Excel(name = "商品类型",readConverterExp = "1=盲盒,2=藏品",combo = "盲盒,藏品")
     private String typeName;
+
+    @Excel(name = "提前购次数")
+    private Integer buyFrequency;
 
     @Excel(name = "备注",width=60)
     private String reMark;
@@ -47,6 +51,14 @@ public class PostExcel implements Serializable {
 
     public void setTypeName(String typeName) {
         this.typeName = typeName;
+    }
+
+    public Integer getBuyFrequency() {
+        return buyFrequency;
+    }
+
+    public void setBuyFrequency(Integer buyFrequency) {
+        this.buyFrequency = buyFrequency;
     }
 
     @Xss(message = "备注不能包含脚本字符")

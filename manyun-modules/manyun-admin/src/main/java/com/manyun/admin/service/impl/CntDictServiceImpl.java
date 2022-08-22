@@ -182,21 +182,7 @@ public class CntDictServiceImpl implements CntDictService
     }
 
     /***
-     * 提前购配置字典
-     */
-    @Override
-    public R postConfigDict()
-    {
-        return R.ok(postConfigService.list(Wrappers.<CntPostConfig>lambdaQuery().orderByDesc(CntPostConfig::getCreatedTime)).stream().map(m -> {
-            PostConfigDictVo postConfigDictVo=new PostConfigDictVo();
-            BeanUtil.copyProperties(m,postConfigDictVo);
-            return postConfigDictVo;
-        }));
-    }
-
-
-    /***
-     * 提前购配置的商品字典
+     * 满足提前购的商品字典
      */
     @Override
     public R postConfigGoodsDict(PostConfigDictQuery postConfigDictQuery)
@@ -225,7 +211,7 @@ public class CntDictServiceImpl implements CntDictService
     }
 
     /***
-     * 提前购已拥有的
+     * 提前购前置条件字典
      */
     @Override
     public R postExistDict()

@@ -5,10 +5,16 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
+import com.manyun.admin.domain.CntActionTar;
+import com.manyun.admin.domain.CntPostExist;
+import com.manyun.admin.domain.CntPostSell;
 import com.manyun.admin.domain.dto.CntPostConfigBeanDto;
 import com.manyun.admin.domain.query.PostConfigQuery;
 import com.manyun.admin.domain.vo.CntPostConfigVo;
+import com.manyun.admin.service.ICntPostExistService;
+import com.manyun.admin.service.ICntPostSellService;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -20,6 +26,7 @@ import org.springframework.stereotype.Service;
 import com.manyun.admin.mapper.CntPostConfigMapper;
 import com.manyun.admin.domain.CntPostConfig;
 import com.manyun.admin.service.ICntPostConfigService;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 提前购配置-只能有一条Service业务层处理
@@ -32,6 +39,12 @@ public class CntPostConfigServiceImpl extends ServiceImpl<CntPostConfigMapper,Cn
 {
     @Autowired
     private CntPostConfigMapper cntPostConfigMapper;
+
+    @Autowired
+    private ICntPostExistService postExistService;
+
+    @Autowired
+    private ICntPostSellService postSellService;
 
     /**
      * 查询提前购配置-只能有一条详情
@@ -59,7 +72,6 @@ public class CntPostConfigServiceImpl extends ServiceImpl<CntPostConfigMapper,Cn
         return TableDataInfoUtil.pageTableDataInfo(cntPostConfigs.stream().map(m->{
             CntPostConfigVo postConfigVo=new CntPostConfigVo();
             BeanUtil.copyProperties(m,postConfigVo);
-            postConfigVo.setBuiName(m.getIsType()==0?m.getCollectionName():m.getBoxTitle());
             return postConfigVo;
         }).collect(Collectors.toList()),cntPostConfigs);
     }
@@ -100,20 +112,13 @@ public class CntPostConfigServiceImpl extends ServiceImpl<CntPostConfigMapper,Cn
      * @return 结果
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int deleteCntPostConfigByIds(String[] ids)
     {
-        return removeByIds(Arrays.asList(ids))==true?1:0;
+        removeByIds(Arrays.asList(ids));
+        postExistService.remove(Wrappers.<CntPostExist>lambdaQuery().in(CntPostExist::getConfigId,ids));
+        postSellService.remove(Wrappers.<CntPostSell>lambdaQuery().in(CntPostSell::getConfigId,ids));
+        return 1;
     }
 
-    /**
-     * 删除提前购配置-只能有一条信息
-     *
-     * @param id 提前购配置-只能有一条主键
-     * @return 结果
-     */
-    @Override
-    public int deleteCntPostConfigById(String id)
-    {
-        return removeById(id)==true?1:0;
-    }
 }

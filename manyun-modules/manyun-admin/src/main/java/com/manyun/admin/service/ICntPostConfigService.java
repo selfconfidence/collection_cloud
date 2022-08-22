@@ -55,11 +55,4 @@ public interface ICntPostConfigService extends IService<CntPostConfig>
      */
     public int deleteCntPostConfigByIds(String[] ids);
 
-    /**
-     * 删除提前购配置-只能有一条信息
-     *
-     * @param id 提前购配置-只能有一条主键
-     * @return 结果
-     */
-    public int deleteCntPostConfigById(String id);
 }
