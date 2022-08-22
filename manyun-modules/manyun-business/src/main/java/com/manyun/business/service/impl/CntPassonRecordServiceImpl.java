@@ -47,7 +47,7 @@ public class CntPassonRecordServiceImpl extends ServiceImpl<CntPassonRecordMappe
 
     private PassonRecordVo providerPassonRecordVo(CntPassonRecord cntPassonRecord) {
         PassonRecordVo passonRecordVo = Builder.of(PassonRecordVo::new).build();
-        passonRecordVo.setFromPhoneNo(cntPassonRecord.getOldUserPhone());
+        passonRecordVo.setFromPhoneNo(cntPassonRecord.getOldUserPhone().replaceAll("(\\d{3})\\d{4}(\\d{4})","$1****$2"));
         passonRecordVo.setToPhoneNo(cntPassonRecord.getNewUserPhone());
         List<MediaVo> mediaVos = mediaService.initMediaVos(cntPassonRecord.getPictureId(), Integer.valueOf(0).toString()
                 .equals(cntPassonRecord.getPictureType()) ? BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE : BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
