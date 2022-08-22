@@ -12,10 +12,10 @@ public class ConsignmentQuery extends PageQuery {
     @ApiModelProperty("是否最新 0=默认,1=最新")
     private Integer isNew = 0;*/
 
-    @ApiModelProperty("价格排序查询 0=倒序,1=正序(默认倒序)")
+    @ApiModelProperty("价格排序查询 0=倒序,1=正序(默认倒序) -1 代表不用此字段排序")
     private Integer priceOrder = 0;
 
-    @ApiModelProperty("时间排序查询 0=倒序,1=正序(默认倒序)")
+    @ApiModelProperty("时间排序查询 0=倒序,1=正序(默认倒序) -1 代表不用此字段排序")
     private Integer timeOrder = 0;
 
     @ApiModelProperty("搜索标题")

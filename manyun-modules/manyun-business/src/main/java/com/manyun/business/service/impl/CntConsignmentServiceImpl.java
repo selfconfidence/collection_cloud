@@ -138,25 +138,20 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         // 相关排序判定 全部按照 倒序排序
 //        if (Integer.valueOf(1).equals(consignmentQuery.getIsNew()))
 //            lambdaQueryWrapper.orderByDesc(CntConsignment::getUpdatedTime);
-
-/*        if (Objects.nonNull(consignmentQuery.getPriceOrder()) && Integer.valueOf(0).equals(consignmentQuery.getPriceOrder()))
-            lambdaQueryWrapper.orderByDesc(CntConsignment::getConsignmentPrice);*/
-        boolean isDefaultOrder = true;
-        if (Objects.nonNull(consignmentQuery.getPriceOrder()) && Integer.valueOf(0).equals(consignmentQuery.getPriceOrder())  && Integer.valueOf(1).equals(consignmentQuery.getTimeOrder()) ){
-            isDefaultOrder = false;
-            lambdaQueryWrapper.orderByDesc(CntConsignment::getConsignmentPrice);
+        if (!Integer.valueOf(-1).equals(consignmentQuery.getPriceOrder())){
+            if (Objects.nonNull(consignmentQuery.getPriceOrder()) && Integer.valueOf(0).equals(consignmentQuery.getPriceOrder()))
+                lambdaQueryWrapper.orderByDesc(CntConsignment::getConsignmentPrice);
+            if (Objects.nonNull(consignmentQuery.getPriceOrder()) && Integer.valueOf(1).equals(consignmentQuery.getPriceOrder()))
+                lambdaQueryWrapper.orderByAsc(CntConsignment::getConsignmentPrice);
         }
 
 
-//        if (Objects.nonNull(consignmentQuery.getTimeOrder()) && Integer.valueOf(0).equals(consignmentQuery.getTimeOrder()))
-//            lambdaQueryWrapper.orderByDesc(CntConsignment::getCreatedTime);
-        if (Objects.nonNull(consignmentQuery.getTimeOrder()) && Integer.valueOf(0).equals(consignmentQuery.getTimeOrder()) && Integer.valueOf(1).equals(consignmentQuery.getPriceOrder())){
-            isDefaultOrder = false;
-            lambdaQueryWrapper.orderByDesc(CntConsignment::getCreatedTime);
+        if (!Integer.valueOf(-1).equals(consignmentQuery.getTimeOrder())){
+            if (Objects.nonNull(consignmentQuery.getTimeOrder()) && Integer.valueOf(0).equals(consignmentQuery.getTimeOrder()))
+                lambdaQueryWrapper.orderByDesc(CntConsignment::getCreatedTime);
+            if (Objects.nonNull(consignmentQuery.getTimeOrder()) && Integer.valueOf(1).equals(consignmentQuery.getTimeOrder()))
+                lambdaQueryWrapper.orderByAsc(CntConsignment::getCreatedTime);
         }
-        if (isDefaultOrder)
-            lambdaQueryWrapper.orderByDesc(CntConsignment::getCreatedTime);
-
 
         return lambdaQueryWrapper;
     }
