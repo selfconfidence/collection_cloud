@@ -350,17 +350,14 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
 
     @Override
     public void reloadAuctionSend(List<AuctionSend> auctionSendList) {
-        log.info("进入送拍方法-------" + auctionSendList.size());
         for (AuctionSend auctionSend : auctionSendList) {
             auctionSend.setAuctionSendStatus(AuctionSendStatus.BID_BREAK.getCode());
             auctionSend.updateD(auctionSend.getUserId());
             String info = "已违约，从拍卖市场退回";
             if (auctionSend.getGoodsType() == 1) {
-                log.info("44444444444444");
                 userCollectionService.showUserCollection(auctionSend.getUserId(), auctionSend.getMyGoodsId(), info);
             }
             if (auctionSend.getGoodsType() == 2) {
-                log.info("555555555555");
                 userBoxService.showUserBox(auctionSend.getMyGoodsId(), auctionSend.getUserId(), info);
             }
         }
