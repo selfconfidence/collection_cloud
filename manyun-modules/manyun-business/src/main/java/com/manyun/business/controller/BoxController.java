@@ -127,7 +127,7 @@ public class BoxController extends BaseController {
 
 
 
-    @GetMapping("/openPleaseBox")
+    @PostMapping("/openPleaseBox")
     @ApiOperation(value = "用户领取邀请福利,绑定盲盒", hidden = true)
     @InnerAuth
     public R openPleaseBox(@RequestBody OpenPleaseBoxDto pleaseBoxDto){
