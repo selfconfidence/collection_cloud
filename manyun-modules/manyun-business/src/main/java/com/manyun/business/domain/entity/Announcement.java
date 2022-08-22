@@ -28,6 +28,9 @@ public class Announcement implements Serializable {
     @ApiModelProperty("公告类型;1平台公告，2发售信息，3上新公告")
     private Integer noticeType;
 
+    @ApiModelProperty("标题")
+    private String noticeTitle;
+
     @ApiModelProperty("公告内容")
     private String noticeContent;
 
