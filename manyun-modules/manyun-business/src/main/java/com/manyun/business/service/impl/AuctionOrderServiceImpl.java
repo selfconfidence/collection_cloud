@@ -22,6 +22,7 @@ import com.manyun.common.core.enums.AuctionSendStatus;
 import com.manyun.common.core.enums.AuctionStatus;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -50,6 +51,7 @@ import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstan
  * @since 2022-06-17
  */
 @Service
+@Slf4j
 public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, AuctionOrder> implements IAuctionOrderService {
 
     @Autowired
@@ -192,15 +194,19 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
     public synchronized void timeCancelAuction() {
         List<AuctionOrder> auctionOrderList = list(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getAuctionStatus, AuctionStatus.WAIT_PAY.getCode()).lt(AuctionOrder::getEndTime, LocalDateTime.now()));
         if (auctionOrderList.isEmpty()) return;
+        log.info("11111----------"+ auctionOrderList.size());
         List<AuctionSend> auctionSendList = auctionSendService.list(Wrappers.<AuctionSend>lambdaQuery().in(AuctionSend::getAuctionOrderId, auctionOrderList.parallelStream().map(item -> item.getId()).collect(Collectors.toSet()))
                 .eq(AuctionSend::getAuctionSendStatus, AuctionSendStatus.WAIT_PAY.getCode()));
+        log.info("22222--------"+ auctionSendList.size());
         Set<String> auctionSendOrderIds = Sets.newHashSet();
         if (!auctionSendList.isEmpty()) {
+            log.info("进入reload");
             auctionSendOrderIds.addAll(auctionSendList.parallelStream().map(item -> item.getAuctionOrderId()).collect(Collectors.toSet()));
             auctionSendService.reloadAuctionSend(auctionSendList);
         }
 
         List<AuctionOrder> updateOrder = auctionOrderList.parallelStream().map(item -> {
+            log.info("进入update");
             AuctionPrice auctionPrice = auctionPriceService.getById(item.getAuctionPriceId());
             auctionPrice.setAuctionStatus(AuctionStatus.BID_BREAK.getCode());
             auctionPriceService.updateById(auctionPrice);
