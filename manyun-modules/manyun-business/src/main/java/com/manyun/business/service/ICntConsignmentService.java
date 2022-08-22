@@ -2,6 +2,7 @@ package com.manyun.business.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.entity.CntConsignment;
+import com.manyun.business.domain.form.ConsignmentOrderSellForm;
 import com.manyun.business.domain.form.ConsignmentSellForm;
 import com.manyun.business.domain.form.UserConsignmentForm;
 import com.manyun.business.domain.query.ConsignmentOrderQuery;
@@ -38,4 +39,6 @@ public interface ICntConsignmentService extends IService<CntConsignment> {
     void cancelConsignmentById(String id,String sendUserId);
 
     List<KeywordVo> queryDict(String keyword);
+
+    String consignmentCreateOrder(String payUserId, ConsignmentOrderSellForm consignmentOrderSellForm);
 }

@@ -13,6 +13,7 @@ import com.manyun.business.domain.dto.MsgThisDto;
 import com.manyun.business.domain.dto.OrderCreateDto;
 import com.manyun.business.domain.dto.PayInfoDto;
 import com.manyun.business.domain.entity.*;
+import com.manyun.business.domain.form.ConsignmentOrderSellForm;
 import com.manyun.business.domain.form.ConsignmentSellForm;
 import com.manyun.business.domain.form.UserConsignmentForm;
 import com.manyun.business.domain.query.ConsignmentOrderQuery;
@@ -263,7 +264,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
      */
     @Override
     public void reLoadConsignments(List<CntConsignment> cntConsignments) {
-        String format = StrUtil.format("未到支付时间支付,已经取消！");
+        String format = StrUtil.format("已经取消！");
         for (CntConsignment cntConsignment : cntConsignments) {
             cntConsignment.setConsignmentStatus(PUSH_CONSIGN.getCode());
             cntConsignment.setFormInfo(format);
@@ -311,6 +312,38 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
             keywordVo.setCommTitle(item.getBuiName());
             return keywordVo;
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * 预售订单预先 创建订单！！！
+     * @param payUserId
+     * @param consignmentOrderSellForm
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String consignmentCreateOrder(String payUserId, ConsignmentOrderSellForm consignmentOrderSellForm) {
+        CntConsignment consignment = getById(consignmentOrderSellForm.getBuiId());
+        // 校验 购买条件是否符合！！！
+        checkBusinessConsignment(payUserId,consignment);
+
+        // 为买方新增订单！！！
+        String hostOut = orderService.createConsignmentOrder(OrderCreateDto.builder()
+                .orderAmount(consignment.getConsignmentPrice())
+                .buiId(consignment.getRealBuiId())
+               // .payType(consignmentOrderSellForm.getPayType())
+                .goodsType(consignment.getIsType())
+                .collectionName(consignment.getBuiName())
+                .goodsNum(Integer.valueOf(1))
+                .userId(payUserId).build(),(idStr)-> consignment.setOrderId(idStr));
+        // 修改寄售信息
+        consignment.updateD(payUserId);
+        consignment.setPayUserId(payUserId);
+        consignment.setFormInfo("资产已被锁单,等待买家付款.");
+        consignment.setConsignmentStatus(LOCK_CONSIGN.getCode());
+        updateById(consignment);
+
+        return orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, hostOut)).getId();
     }
 
     private void cancelConsignment(CntConsignment cntConsignment) {
@@ -399,7 +432,6 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
             Order order = orderService.getById(cntConsignment.getOrderId());
             consignmentBoxListVo.setEndPayTime(order.getEndTime());
         }
-
         return consignmentBoxListVo;
     }
 

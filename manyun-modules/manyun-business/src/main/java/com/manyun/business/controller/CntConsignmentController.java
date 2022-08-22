@@ -1,4 +1,5 @@
 package com.manyun.business.controller;
+import com.manyun.business.domain.form.ConsignmentOrderSellForm;
 import com.manyun.business.domain.form.ConsignmentSellForm;
 import com.manyun.business.domain.form.UserConsignmentForm;
 import com.manyun.business.domain.query.ConsignmentOrderQuery;
@@ -77,13 +78,24 @@ public class CntConsignmentController {
     }
 
     @PostMapping("/businessConsignment")
-    @ApiOperation(value = "寄售市场进行交易",notes = "对某个 资产 进行购买")
+    @ApiOperation(value = "寄售市场进行交易",notes = "对某个 资产 进行购买\n 此接口被废弃，属于一次调用支付 + 创建订单")
+    @Deprecated
     public R<PayVo> businessConsignment(@RequestBody @Valid ConsignmentSellForm consignmentSellForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         String payUserId = notNullLoginBusinessUser.getUserId();
         PayVo payVo =  cntConsignmentService.businessConsignment(payUserId,consignmentSellForm);
         return R.ok(payVo);
     }
+
+
+    @PostMapping("/consignmentCreateOrder")
+    @ApiOperation(value = "购买寄售_预先_生成订单",notes = "用来预先 生成一个待支付订单,返回订单编号,用来二次提交支付\n version 1.0.1")
+    public synchronized R<String>  consignmentCreateOrder(@RequestBody ConsignmentOrderSellForm consignmentOrderSellForm){
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        String payUserId = notNullLoginBusinessUser.getUserId();
+        return R.ok(cntConsignmentService.consignmentCreateOrder( payUserId,consignmentOrderSellForm));
+     }
+
 
 
     @PostMapping("/consignmentPageOrder")

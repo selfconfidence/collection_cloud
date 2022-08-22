@@ -403,8 +403,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setMoneyBln(payVo.getMoneyBln());
         updateById(order);
         if ( StrUtil.isBlank(payVo.getBody())){
-            // 调用完成订单
-            notifyPaySuccess(payVo.getOutHost());
+            // 调用完成订单 是寄售还是普通呢?
+            invokerSuccess(order, payVo);
             String title = "";
             String form = "";
             if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(order.getGoodsType())){
@@ -424,6 +424,21 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             msgService.saveCommMsg(MsgCommDto.builder().msgTitle(title).msgForm(form).build());
         }
         return payVo;
+    }
+
+    /**
+     * 回调是 寄售，还是普通订单？
+     * @param order
+     * @param payVo
+     */
+    private void invokerSuccess(Order order, PayVo payVo) {
+        // 唯一验证 从寄售中获取这个订单
+        ICntConsignmentService consignmentService = cntConsignmentServiceObjectFactory.getObject();
+        CntConsignment cntConsignment = consignmentService.getOne(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getOrderId, order.getId()));
+        if (cntConsignment != null)
+            notifyPayConsignmentSuccess(order.getOrderNo());
+        else
+             notifyPaySuccess(payVo.getOutHost());
     }
 
 
@@ -452,6 +467,56 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
 
     }
+
+    /**
+     * 寄售订单下单支付
+     * @param orderPayForm
+     * @param userId
+     * @return
+     */
+/*
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public PayVo consignmentUnifiedOrder(OrderPayForm orderPayForm, String userId) {
+        Order order = getById(orderPayForm.getOrderId());
+        checkUnified(order,userId);
+        // 判定用户的余额是否充足
+        PayVo payVo =  rootPay.execPayVo(
+                PayInfoDto.builder()
+                        .payType(orderPayForm.getPayType())
+                        .realPayMoney(order.getOrderAmount().subtract(order.getMoneyBln()))
+                        .outHost(order.getOrderNo())
+                        .aliPayEnum(BOX_ALI_PAY)
+                        .wxPayEnum(BOX_WECHAT_PAY)
+                        .userId(userId).build());
+        // 走这一步如果 是余额支付 那就说明扣款成功了！！！
+        order.setMoneyBln(payVo.getMoneyBln());
+        updateById(order);
+        if ( StrUtil.isBlank(payVo.getBody())){
+            // 调用完成订单
+            notifyPayConsignmentSuccess(payVo.getOutHost());
+            String title = "";
+            String form = "";
+            if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(order.getGoodsType())){
+                // 盲盒
+                Box box = boxService.getObject().getById(order.getBuiId());
+                title = StrUtil.format("购买了 {} 盲盒!", box.getBoxTitle());
+                form = StrUtil.format("使用余额{};购买了 {} 盲盒!",order.getOrderAmount(), box.getBoxTitle());
+
+            }
+            if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(order.getGoodsType())){
+                //藏品
+                CntCollection cntCollection = collectionService.getObject().getById(order.getBuiId());
+                title = StrUtil.format("购买了 {} 藏品!", cntCollection.getCollectionName());
+                form = StrUtil.format("使用余额{};购买了 {} 藏品!",order.getOrderAmount(), cntCollection.getCollectionName());
+            }
+            msgService.saveMsgThis(MsgThisDto.builder().userId(userId).msgForm(form).msgTitle(title).build());
+            msgService.saveCommMsg(MsgCommDto.builder().msgTitle(title).msgForm(form).build());
+        }
+        return payVo;
+    }
+*/
+
     private void cancelOrder(String id,Boolean reloadAssert) {
         Order order = getById(id);
         Assert.isTrue(WAIT_ORDER.getCode().equals(order.getOrderStatus()),"待支付订单才可取消!");

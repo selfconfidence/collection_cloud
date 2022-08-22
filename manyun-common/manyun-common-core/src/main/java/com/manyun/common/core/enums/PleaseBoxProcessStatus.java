@@ -7,7 +7,7 @@ package com.manyun.common.core.enums;
  */
 public enum PleaseBoxProcessStatus
 {
-    WAIT_PRO(Integer.valueOf(1), "待领取"), OK_PRO(Integer.valueOf(2), "已经领取"), NO_PRO(Integer.valueOf(2), "未满足条件");
+    WAIT_PRO(Integer.valueOf(1), "待领取"), OK_PRO(Integer.valueOf(2), "已经领取"), NO_PRO(Integer.valueOf(3), "未满足条件");
 
     private final Integer code;
     private final String info;
