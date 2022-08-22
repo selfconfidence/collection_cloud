@@ -179,7 +179,7 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
 
         if (goodsType == 2) {
             // 盲盒
-            userBoxService.bindBox(auctionOrder.getToUserId(),auctionOrder.getBuiId(),info,1);
+            userBoxService.tranBox(auctionOrder.getFromUserId(),auctionOrder.getToUserId(),auctionOrder.getBuiId());
             return;
         }
 
