@@ -12,6 +12,7 @@ import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.*;
 import com.manyun.admin.domain.dto.AirdropDto;
 import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
+import com.manyun.admin.domain.dto.CollectionStateDto;
 import com.manyun.admin.domain.excel.BachAirdopExcel;
 import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.*;
@@ -470,6 +471,20 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
             return airdropVo;
         }).collect(Collectors.toList());
         return R.ok(airdropVos,(errorList.size()>0?"本次导入成功:"+successList.size()+",导入失败:"+errorList.size()+",导入失败的手机号为:"+StringUtils.join(errorList,","):"本次导入成功:"+successList.size()+",导入失败:"+errorList.size()));
+    }
+
+    /**
+     * 修改状态
+     * @param collectionStateDto
+     * @return
+     */
+    @Override
+    public int updateState(CollectionStateDto collectionStateDto) {
+        CntCollection cntCollection=new CntCollection();
+        BeanUtil.copyProperties(collectionStateDto,cntCollection);
+        cntCollection.setUpdatedBy(SecurityUtils.getUsername());
+        cntCollection.setUpdatedTime(DateUtils.getNowDate());
+        return updateById(cntCollection)==true?1:0;
     }
 
 }

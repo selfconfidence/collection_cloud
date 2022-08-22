@@ -29,8 +29,8 @@ public class CntAgreement implements Serializable
     @ApiModelProperty("主键")
     private String id;
 
-    /** 协议类型;1=用户协议,2=隐私协议,3=关于我们 */
-    @ApiModelProperty("协议类型;1=用户协议,2=隐私协议,3=关于我们")
+    /** 协议类型;1=用户协议,2=隐私协议,3=关于我们,4推广规则,5邀请规则 */
+    @ApiModelProperty("协议类型;1=用户协议,2=隐私协议,3=关于我们,4推广规则,5邀请规则")
     private Integer agreementType;
 
     /** 协议标题 */
