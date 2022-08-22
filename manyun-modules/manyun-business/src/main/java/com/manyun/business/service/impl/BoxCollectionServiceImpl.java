@@ -9,6 +9,7 @@ import com.manyun.business.service.IBoxCollectionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.business.service.ICntBoxScoreService;
 import com.manyun.common.core.domain.Builder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 @Service
 public class BoxCollectionServiceImpl extends ServiceImpl<BoxCollectionMapper, BoxCollection> implements IBoxCollectionService {
 
+    @Autowired
     private ICntBoxScoreService cntBoxScoreService;
 
     /**
