@@ -7,6 +7,7 @@ import com.manyun.business.domain.vo.BoxCollectionJoinVo;
 import com.manyun.business.mapper.BoxCollectionMapper;
 import com.manyun.business.service.IBoxCollectionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.business.service.ICntBoxScoreService;
 import com.manyun.common.core.domain.Builder;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,8 @@ import java.util.stream.Collectors;
 @Service
 public class BoxCollectionServiceImpl extends ServiceImpl<BoxCollectionMapper, BoxCollection> implements IBoxCollectionService {
 
+    private ICntBoxScoreService cntBoxScoreService;
+
     /**
      * 盲盒编号
      * @param boxId
@@ -39,6 +42,7 @@ public class BoxCollectionServiceImpl extends ServiceImpl<BoxCollectionMapper, B
     private BoxCollectionJoinVo initBoxCollectionJoinVo(BoxCollection boxCollection){
         BoxCollectionJoinVo collectionJoinVo = Builder.of(BoxCollectionJoinVo::new).build();
         BeanUtil.copyProperties(boxCollection,collectionJoinVo);
+        collectionJoinVo.setFlagScore(cntBoxScoreService.getById(boxCollection.getFlagScore()).getScoreName());
         return collectionJoinVo;
 
     }
