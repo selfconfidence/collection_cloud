@@ -33,7 +33,7 @@ public class CntUser implements Serializable {
     @ApiModelProperty("激光推送编号 uuid")
     private String jgPush;
 
-    @ApiModelProperty("用户状态")
+    @ApiModelProperty("帐号状态（0正常 1停用）")
     private String status;
 
     @ApiModelProperty("用户电话号")
@@ -80,6 +80,8 @@ public class CntUser implements Serializable {
 
     @ApiModelProperty("更新时间")
     private LocalDateTime updatedTime;
+
+
 
     public void createD(String createId){
         this.createdBy = createId;

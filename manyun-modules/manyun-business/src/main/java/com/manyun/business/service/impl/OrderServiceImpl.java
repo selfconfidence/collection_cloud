@@ -94,6 +94,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Autowired
     private IMoneyService moneyService;
 
+    @Autowired
+    private ICntPostExcelService cntPostExcelService;
+
     @Override
     public TableDataInfo<OrderVo> pageQueryList(OrderQuery orderQuery, String userId) {
         List<Order> orderList = list(Wrappers.<Order>lambdaQuery()
@@ -188,6 +191,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             String userBoxId = userBoxService.bindOrderBox(order.getUserId(), order.getBuiId(), info, order.getGoodsNum());
             order.setUserBuiId(userBoxId);
             updateById(order);
+            // 提前购记录次数
+            Box box = boxService.getObject().getById(order.getBuiId());
+            if (Objects.nonNull(box.getPostTime()))
+            cntPostExcelService.orderExec(order.getUserId(),order.getBuiId());
             return;
         }
 
@@ -196,6 +203,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             String userCollectionId = userCollectionService.bindOrderCollection(order.getUserId(), order.getBuiId(), order.getCollectionName(), info, order.getGoodsNum());
             order.setUserBuiId(userCollectionId);
             updateById(order);
+            // 提前购记录次数
+            CntCollection collection = collectionService.getObject().getById(order.getBuiId());
+            if (Objects.nonNull(collection.getPostTime()))
+                cntPostExcelService.orderExec(order.getUserId(),order.getBuiId());
             return;
         }
         throw new IllegalStateException("not fount order good_type = " + goodsType);
@@ -400,7 +411,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                         .wxPayEnum(BOX_WECHAT_PAY)
                         .userId(userId).build());
         // 走这一步如果 是余额支付 那就说明扣款成功了！！！
-        order.setMoneyBln(payVo.getMoneyBln());
+        order.setMoneyBln(order.getMoneyBln().add(payVo.getMoneyBln()));
         updateById(order);
         if ( StrUtil.isBlank(payVo.getBody())){
             // 调用完成订单 是寄售还是普通呢?

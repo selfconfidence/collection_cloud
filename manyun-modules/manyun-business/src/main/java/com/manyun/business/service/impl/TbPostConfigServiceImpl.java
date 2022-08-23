@@ -1,4 +1,5 @@
 package com.manyun.business.service.impl;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
@@ -7,6 +8,7 @@ import com.manyun.business.mapper.TbPostConfigMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import com.manyun.business.service.*;
+import com.manyun.common.core.domain.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,8 +40,8 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
     /**
      * 能购买的
      */
-//    @Autowired
-//    private ICntPostSellService postSellService;
+    @Autowired
+    private ICntPostSellService postSellService;
 
 /*    @Autowired
     private ICntPostConfigService postConfigService;*/
@@ -50,6 +52,9 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
 
     @Autowired
     private IUserBoxService userBoxService;
+
+    @Autowired
+    private ICntPostConfigLogService postConfigLogService;
 
 
     /**
@@ -73,7 +78,7 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
 //        return Boolean.FALSE;
 //    }
 
-    @Override
+/*    @Override
     public boolean isConfigPostCustomer(String userId, String buiId) {
         ICntPostConfigService postConfigService = SpringUtil.getBean(ICntPostConfigService.class);
         //1.查询 配置购买表中 有没有这个  buiId
@@ -92,8 +97,36 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
         }
         // 1.2 没有的话，直接返回 false
         return Boolean.FALSE;
+    }*/
+    @Override
+    public boolean isConfigPostCustomer(String userId, String buiId) {
+           // 1. 查询 sell 表中是否有当前 资产的记录，如果有的话，就按照集合的方式，整理下 config_id 然后，根据 新增字段排序按需验证即可
+        List<CntPostSell> cntPostSells = getCntPostSells(buiId);
+        if (cntPostSells.isEmpty()) return Boolean.FALSE;
+        Set<String> configIds = cntPostSells.parallelStream().map(item -> item.getConfigId()).collect(Collectors.toSet());
+        List<CntPostConfig> cntPostConfigs = list(Wrappers.<CntPostConfig>lambdaQuery().select(CntPostConfig::getId,CntPostConfig::getBuyFrequency).in(CntPostConfig::getId, configIds).orderByDesc(CntPostConfig::getCreatedTime));
+        // 拿到当前 配置列表后，开始遍历 已经是有顺序得了
+        for (CntPostConfig cntPostConfig : cntPostConfigs) {
+            // 条件查出来之后，只需要满足一个即可
+            List<CntPostExist> cntPostExists = postExistService.list(Wrappers.<CntPostExist>lambdaQuery().eq(CntPostExist::getConfigId, cntPostConfig.getId()));
+            if (cntPostExists.isEmpty()) return Boolean.FALSE;
+            List<UserCollection> userCollections = userCollectionService.list(Wrappers.<UserCollection>lambdaQuery().select(UserCollection::getId).eq(UserCollection::getIsExist,USE_EXIST.getCode()).eq(UserCollection::getUserId, userId).in(UserCollection::getCollectionId,cntPostExists.parallelStream().map(item -> item.getCollectionId()) ));
+            if (!userCollections.isEmpty()){
+                // 如果满足，需要二次查询 自己的次数是否满足了.
+                CntPostConfigLog postConfigLogServiceOne = postConfigLogService.getOne(Wrappers.<CntPostConfigLog>lambdaQuery().eq(CntPostConfigLog::getUserId, userId).eq(CntPostConfigLog::getConfigId, cntPostConfig.getId()));
+                // 如果是 null 就直接返回 true
+                if (Objects.isNull(postConfigLogServiceOne))return Boolean.TRUE;
+                // 如果不是 NULL
+                return postConfigLogServiceOne.getBuyFrequency().compareTo(cntPostConfig.getBuyFrequency()) < 1;
+            }
+        }
+        return Boolean.FALSE;
     }
 
+    private List<CntPostSell> getCntPostSells(String buiId) {
+        List<CntPostSell> cntPostSells = postSellService.list(Wrappers.<CntPostSell>lambdaQuery().eq(CntPostSell::getBuiId, buiId));
+        return cntPostSells;
+    }
 
     /**
      * 是否可以提前购 盲盒
@@ -132,5 +165,38 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
         }
         // 1.2 没有的话，直接返回 false
         return Boolean.FALSE;
+    }
+
+    /**
+     * 顺序执行，没有新增，有的话 次数 ++ 即可
+     * @param userId
+     * @param buiId
+     */
+    @Override
+    public void orderExec(String userId, String buiId) {
+        List<CntPostSell> cntPostSells = getCntPostSells(buiId);
+        Set<String> configIds = cntPostSells.parallelStream().map(item -> item.getConfigId()).collect(Collectors.toSet());
+        List<CntPostConfig> cntPostConfigs = list(Wrappers.<CntPostConfig>lambdaQuery().select(CntPostConfig::getId,CntPostConfig::getBuyFrequency).in(CntPostConfig::getId, configIds).orderByDesc(CntPostConfig::getCreatedTime));
+        for (CntPostConfig cntPostConfig : cntPostConfigs) {
+            CntPostConfigLog postConfigLogServiceOne = postConfigLogService.getOne(Wrappers.<CntPostConfigLog>lambdaQuery().eq(CntPostConfigLog::getUserId, userId).eq(CntPostConfigLog::getConfigId, cntPostConfig.getId()));
+            if (Objects.isNull(postConfigLogServiceOne)){
+                postConfigLogServiceOne = Builder.of(CntPostConfigLog::new)
+                        .with(CntPostConfigLog::setId, IdUtil.getSnowflake().nextIdStr())
+                        .with(CntPostConfigLog::setConfigId, cntPostConfig.getId())
+                        .with(CntPostConfigLog::setUserId, userId)
+                        .with(CntPostConfigLog::setBuyFrequency, Integer.valueOf(1))
+                        .build();
+                postConfigLogService.save(postConfigLogServiceOne);
+                return;
+            }else{
+                if (postConfigLogServiceOne.getBuyFrequency().compareTo(cntPostConfig.getBuyFrequency()) <1){
+                    postConfigLogServiceOne.setBuyFrequency(postConfigLogServiceOne.getBuyFrequency() +1);
+                    postConfigLogService.updateById(postConfigLogServiceOne);
+                    return;
+                }
+
+            }
+        }
+
     }
 }

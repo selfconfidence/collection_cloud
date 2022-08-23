@@ -3,8 +3,12 @@ package com.manyun.common.security.interceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cn.hutool.extra.spring.SpringUtil;
+import com.manyun.comm.api.RemoteBuiUserService;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.enums.UserLoginSource;
+import com.manyun.common.core.exception.ServiceException;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import com.manyun.common.core.constant.SecurityConstants;
@@ -14,6 +18,9 @@ import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.security.auth.AuthUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import com.manyun.comm.api.model.LoginUser;
+
+import static com.manyun.common.core.constant.BusinessConstants.UserDict.USER_OFF;
+import static com.manyun.common.core.constant.HttpStatus.NOT_LOGIN;
 
 /**
  * 自定义请求头拦截器，将Header数据封装到线程变量中方便获取
@@ -59,8 +66,7 @@ public class HeaderInterceptor implements AsyncHandlerInterceptor
     }
 
     private void execAdminData(String source,String token){
-        if (!UserLoginSource.PC.getInfo().equals(source))
-            return;
+        if (!UserLoginSource.PC.getInfo().equals(source))return;
         LoginUser loginUser = AuthUtil.getLoginUser(token);
         if (StringUtils.isNotNull(loginUser))
         {
@@ -70,9 +76,12 @@ public class HeaderInterceptor implements AsyncHandlerInterceptor
     }
 
     private void execBuiData(String source,String token){
-        if (!UserLoginSource.APP.getInfo().equals(source))
-            return;
+        if (!UserLoginSource.APP.getInfo().equals(source))return;
         LoginBusinessUser loginUser = AuthUtil.getLoginBusinessUserUser(token);
+        RemoteBuiUserService remoteBuiUserService = SpringUtil.getBean(RemoteBuiUserService.class);
+        CntUserDto cntUserDto = remoteBuiUserService.commUni(loginUser.getUserId(), SecurityConstants.INNER).getData();
+        if (USER_OFF.equals(cntUserDto.getStatus()))
+            throw new ServiceException("账户异常已被停用,请联系客服!",NOT_LOGIN);
         if (StringUtils.isNotNull(loginUser))
         {
             AuthUtil.verifyLoginUserExpire(loginUser);

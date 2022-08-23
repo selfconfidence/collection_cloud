@@ -17,4 +17,6 @@ public interface ICntPostConfigService extends IService<CntPostConfig> {
 
     @Deprecated
     boolean isConfigPostBoxCustomer(String userId, String buiId);
+
+    void orderExec(String userId, String buiId);
 }

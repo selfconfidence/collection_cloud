@@ -30,6 +30,9 @@ public class CntPostConfig implements Serializable {
     @ApiModelProperty("配置名称")
     private String configName;
 
+    @ApiModelProperty("购买次数")
+    private Integer buyFrequency;
+
 
     @ApiModelProperty("业务编号(藏品|盲盒)")
     private String buiId;

@@ -1,5 +1,9 @@
 package com.manyun.gateway.filter;
 
+import cn.hutool.core.lang.Assert;
+
+import com.manyun.common.core.domain.R;
+import com.manyun.common.core.enums.UserLoginSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +25,8 @@ import com.manyun.gateway.config.properties.IgnoreWhiteProperties;
 import io.jsonwebtoken.Claims;
 import reactor.core.publisher.Mono;
 
+import static com.manyun.common.core.constant.BusinessConstants.UserDict.USER_OFF;
+
 /**
  * 网关鉴权
  * 
@@ -37,6 +43,8 @@ public class AuthFilter implements GlobalFilter, Ordered
 
     @Autowired
     private RedisService redisService;
+
+
 
 
     @Override
@@ -79,6 +87,7 @@ public class AuthFilter implements GlobalFilter, Ordered
         addHeader(mutate, SecurityConstants.DETAILS_USER_ID, userid);
         addHeader(mutate, SecurityConstants.DETAILS_USERNAME, username);
         addHeader(mutate, SecurityConstants.DETAILS_LOGIN_SOURCE, source);
+
 
         // 内部请求来源参数清除
         removeHeader(mutate, SecurityConstants.FROM_SOURCE);

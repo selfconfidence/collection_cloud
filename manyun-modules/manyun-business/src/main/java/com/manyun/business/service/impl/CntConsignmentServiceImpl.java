@@ -224,7 +224,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
                         .userId(payUserId).build());
         Order order = orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, hostOut));
         // 走这一步如果 是余额支付 那就说明扣款成功了！！！
-        order.setMoneyBln(payVo.getMoneyBln());
+        order.setMoneyBln(order.getMoneyBln().add(payVo.getMoneyBln()));
         orderService.updateById(order);
         // 修改寄售信息
         consignment.updateD(payUserId);
@@ -264,6 +264,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
      */
     @Override
     public void reLoadConsignments(List<CntConsignment> cntConsignments) {
+        if (cntConsignments.isEmpty())return;
         String format = StrUtil.format("已经取消！");
         for (CntConsignment cntConsignment : cntConsignments) {
             cntConsignment.setConsignmentStatus(PUSH_CONSIGN.getCode());

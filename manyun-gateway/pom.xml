@@ -94,6 +94,12 @@
             <artifactId>knife4j-spring-boot-starter</artifactId>
         </dependency>
 
+
+<!--        <dependency>
+            <groupId>com.manyun</groupId>
+            <artifactId>manyun-api-system</artifactId>
+        </dependency>-->
+
     </dependencies>
 
     <build>

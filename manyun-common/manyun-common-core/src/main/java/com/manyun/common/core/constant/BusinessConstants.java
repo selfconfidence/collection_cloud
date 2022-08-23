@@ -204,4 +204,11 @@ public interface BusinessConstants {
     }
 
 
+    interface UserDict{
+        //（0正常 1停用）
+        String USER_ON = "0";
+        String USER_OFF = "1";
+    }
+
+
 }

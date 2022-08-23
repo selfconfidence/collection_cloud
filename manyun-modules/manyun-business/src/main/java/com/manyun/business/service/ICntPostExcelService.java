@@ -14,4 +14,6 @@ import com.manyun.business.domain.entity.CntPostExcel;
 public interface ICntPostExcelService extends IService<CntPostExcel> {
 
     Boolean isExcelPostCustomer(String userId, String buiId);
+
+    void orderExec(String userId, String buiId);
 }

@@ -48,6 +48,9 @@ public class CntPostExcel implements Serializable {
     @ApiModelProperty("创建人")
     private String createdBy;
 
+    @ApiModelProperty("购买次数")
+    private Integer buyFrequency;
+
     @ApiModelProperty("创建时间")
     private LocalDateTime createdTime;
 

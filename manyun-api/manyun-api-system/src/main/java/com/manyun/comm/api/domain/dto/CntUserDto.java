@@ -36,6 +36,9 @@ public class CntUserDto implements Serializable {
     @ApiModelProperty("是否实名;1=未实名,1=实名")
     private Integer isReal;
 
+    @ApiModelProperty("帐号状态（0正常 1停用）")
+    private String status;
+
     @ApiModelProperty("邀请码;用户初始化生成")
     private String pleaseCode;
 
