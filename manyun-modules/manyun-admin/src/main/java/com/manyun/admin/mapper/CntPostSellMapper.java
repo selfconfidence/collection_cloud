@@ -12,11 +12,5 @@ import com.manyun.admin.domain.CntPostSell;
  */
 public interface CntPostSellMapper extends BaseMapper<CntPostSell>
 {
-    /**
-     * 查询提前购配置可以购买列表
-     *
-     * @param cntPostSell 提前购配置可以购买
-     * @return 提前购配置可以购买集合
-     */
-    public List<CntPostSell> selectCntPostSellList(CntPostSell cntPostSell);
+
 }

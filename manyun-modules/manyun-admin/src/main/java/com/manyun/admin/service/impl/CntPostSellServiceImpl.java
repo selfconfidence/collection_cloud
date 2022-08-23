@@ -51,7 +51,7 @@ public class CntPostSellServiceImpl extends ServiceImpl<CntPostSellMapper,CntPos
     public TableDataInfo<CntPostSellVo> selectCntPostSellList(PostSellQuery postSellQuery)
     {
         PageHelper.startPage(postSellQuery.getPageNum(),postSellQuery.getPageSize());
-        List<CntPostSell> cntPostSells = list(Wrappers.<CntPostSell>lambdaQuery().eq(CntPostSell::getConfigId,postSellQuery.getConfigId()).orderByDesc(CntPostSell::getCreatedTime));
+        List<CntPostSell> cntPostSells = list(Wrappers.<CntPostSell>lambdaQuery().eq(CntPostSell::getConfigId,postSellQuery.getConfigId()).orderByAsc(CntPostSell::getCreatedTime));
         return TableDataInfoUtil.pageTableDataInfo(cntPostSells.parallelStream().map(m->{
             CntPostSellVo cntPostSellVo=new CntPostSellVo();
             BeanUtils.copyProperties(m,cntPostSellVo);
@@ -83,7 +83,6 @@ public class CntPostSellServiceImpl extends ServiceImpl<CntPostSellMapper,CntPos
                         .with(CntPostSell::setConfigId,configId)
                         .with(CntPostSell::setBuiId,m.getBuiId())
                         .with(CntPostSell::setIsType,m.getIsType())
-                        .with(CntPostSell::setBuyFrequency,m.getBuyFrequency())
                         .with(CntPostSell::setCreatedBy,SecurityUtils.getUsername())
                         .with(CntPostSell::setCreatedTime,DateUtils.getNowDate())
                         .build();

@@ -14,4 +14,7 @@ public class TqgGoodsDictVo {
     @ApiModelProperty("名称")
     private String buiName;
 
+    @ApiModelProperty("商品类型 0=藏品,1=盲盒")
+    private Integer isType;
+
 }

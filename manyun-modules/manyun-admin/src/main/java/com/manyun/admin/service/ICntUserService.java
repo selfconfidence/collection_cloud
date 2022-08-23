@@ -9,6 +9,7 @@ import com.manyun.admin.domain.dto.MyBoxDto;
 import com.manyun.admin.domain.dto.MyCollectionDto;
 import com.manyun.admin.domain.dto.MyOrderDto;
 import com.manyun.admin.domain.dto.UpdateBalanceDto;
+import com.manyun.admin.domain.excel.UserPhoneExcel;
 import com.manyun.admin.domain.query.UserMoneyQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.common.core.domain.R;
@@ -63,4 +64,10 @@ public interface ICntUserService extends IService<CntUser>
      * 查询近七日每日新增数
      */
     List<UserAddStatisticsVo> userAddStatistics();
+
+    /**
+     * 导出用户手机号
+     * @return
+     */
+    List<UserPhoneExcel> selectUserList();
 }

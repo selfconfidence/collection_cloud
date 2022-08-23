@@ -15,7 +15,4 @@ public class CntPostSellVo
     @ApiModelProperty("商品类型 0=藏品,1=盲盒")
     private Integer isType;
 
-    @ApiModelProperty("购买次数")
-    private Integer buyFrequency;
-
 }

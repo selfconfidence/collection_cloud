@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.models.auth.In;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import java.io.Serializable;
@@ -23,6 +24,9 @@ public class CntPostConfig implements Serializable
 
     @ApiModelProperty("备注")
     private String reMark;
+
+    @ApiModelProperty("可购买次数")
+    private Integer buyFrequency;
 
     @ApiModelProperty("创建人")
     private String createdBy;
@@ -73,6 +77,14 @@ public class CntPostConfig implements Serializable
 
     public void setReMark(String reMark) {
         this.reMark = reMark;
+    }
+
+    public Integer getBuyFrequency() {
+        return buyFrequency;
+    }
+
+    public void setBuyFrequency(Integer buyFrequency) {
+        this.buyFrequency = buyFrequency;
     }
 
     public String getCreatedBy()
@@ -131,6 +143,7 @@ public class CntPostConfig implements Serializable
             .append("id", getId())
             .append("configName", getConfigName())
             .append("reMark", getReMark())
+            .append("buyFrequency", getBuyFrequency())
             .append("createdBy", getCreatedBy())
             .append("createdTime", getCreatedTime())
             .append("updatedBy", getUpdatedBy())

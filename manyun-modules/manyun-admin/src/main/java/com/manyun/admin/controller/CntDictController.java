@@ -3,7 +3,6 @@ package com.manyun.admin.controller;
 
 import com.manyun.admin.domain.query.ActionTarDictQuery;
 import com.manyun.admin.domain.query.DrawRulesDictQuery;
-import com.manyun.admin.domain.query.PostConfigDictQuery;
 import com.manyun.admin.service.CntDictService;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
@@ -88,9 +87,9 @@ public class CntDictController extends BaseController
 
     @PostMapping("/postConfigGoodsDict")
     @ApiOperation("满足提前购的商品字典")
-    public R postConfigGoodsDict(@Valid @RequestBody PostConfigDictQuery postConfigDictQuery)
+    public R postConfigGoodsDict()
     {
-        return cntDictService.postConfigGoodsDict(postConfigDictQuery);
+        return cntDictService.postConfigGoodsDict();
     }
 
     @GetMapping("/postExistDict")
