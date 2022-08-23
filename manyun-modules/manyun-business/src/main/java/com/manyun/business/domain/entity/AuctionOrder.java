@@ -86,6 +86,9 @@ public class AuctionOrder implements Serializable {
     @ApiModelProperty("拍卖状态;1竞拍中，2,未拍中，3待支付，4已支付，5已违约")
     private Integer auctionStatus;
 
+    @ApiModelProperty("组合支付专属,如果此值不是0.00 就说明使用了余额支付。")
+    private BigDecimal moneyBln;
+
     @ApiModelProperty("创建人")
     private String createdBy;
 

@@ -8,6 +8,7 @@ import com.manyun.admin.domain.dto.MyBoxDto;
 import com.manyun.admin.domain.dto.MyCollectionDto;
 import com.manyun.admin.domain.dto.MyOrderDto;
 import com.manyun.admin.domain.dto.UpdateBalanceDto;
+import com.manyun.admin.domain.excel.UserPhoneExcel;
 import com.manyun.admin.domain.query.UserMoneyQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.service.*;
@@ -19,6 +20,7 @@ import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.manyun.admin.mapper.CntUserMapper;
@@ -145,6 +147,19 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> imple
     public int updateBalance(UpdateBalanceDto balanceDto) {
         CntMoney money = Builder.of(CntMoney::new).with(CntMoney::setMoneyBalance, balanceDto.getMoneyBalance()).build();
         return moneyService.update(money,Wrappers.<CntMoney>lambdaUpdate().eq(CntMoney::getUserId,balanceDto.getUserId()))==true?1:0;
+    }
+
+    /**
+     * 导出用户手机号
+     * @return
+     */
+    @Override
+    public List<UserPhoneExcel> selectUserList() {
+        return list(Wrappers.<CntUser>lambdaQuery().orderByAsc(CntUser::getCreatedTime)).parallelStream().map(m->{
+            UserPhoneExcel userPhoneExcel=new UserPhoneExcel();
+            BeanUtils.copyProperties(m,userPhoneExcel);
+            return userPhoneExcel;
+        }).collect(Collectors.toList());
     }
 
 }

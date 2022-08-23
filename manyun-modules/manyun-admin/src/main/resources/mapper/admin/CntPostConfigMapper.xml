@@ -8,6 +8,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="id"    column="id"    />
         <result property="configName"    column="config_name"    />
         <result property="reMark"    column="re_mark"    />
+        <result property="buyFrequency"    column="buy_frequency"    />
         <result property="createdBy"    column="created_by"    />
         <result property="createdTime"    column="created_time"    />
         <result property="updatedBy"    column="updated_by"    />
@@ -17,18 +18,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectCntPostConfigVo">
-        select id, config_name, re_mark, created_by, created_time, updated_by, updated_time, bui_id, is_type from cnt_post_config
+        select id, config_name, re_mark, buy_frequency, created_by, created_time, updated_by, updated_time, bui_id, is_type from cnt_post_config
     </sql>
 
-    <select id="selectCntPostConfigList" parameterType="PostConfigQuery" resultType="com.manyun.admin.domain.dto.CntPostConfigBeanDto">
-        select
-            id,
-            config_name configName,
-            re_mark reMark,
-            created_time createdTime,
-            updated_time updatedTime
-        from
-            cnt_post_config
+    <select id="selectCntPostConfigList" parameterType="PostConfigQuery" resultMap="CntPostConfigResult">
+        <include refid="selectCntPostConfigVo"/>
         <where>
             <if test="configName != null  and configName != ''"> and config_name like concat('%', #{configName}, '%')</if>
         </where>

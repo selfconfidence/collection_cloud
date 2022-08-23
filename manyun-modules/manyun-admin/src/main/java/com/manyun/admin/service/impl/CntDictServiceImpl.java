@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.admin.domain.*;
 import com.manyun.admin.domain.query.ActionTarDictQuery;
 import com.manyun.admin.domain.query.DrawRulesDictQuery;
-import com.manyun.admin.domain.query.PostConfigDictQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.service.*;
 import com.manyun.common.core.domain.Builder;
@@ -185,29 +184,31 @@ public class CntDictServiceImpl implements CntDictService
      * 满足提前购的商品字典
      */
     @Override
-    public R postConfigGoodsDict(PostConfigDictQuery postConfigDictQuery)
+    public R postConfigGoodsDict()
     {
-        return R.ok(
-                postConfigDictQuery.getIsType()==0?collectionService
-                        .list(
-                                Wrappers.<CntCollection>lambdaQuery()
-                                        .gt(CntCollection::getPublishTime, new Date())
-                                        .isNotNull(CntCollection::getPostTime).orderByDesc(CntCollection::getCreatedTime)).stream().map(m -> {
-                            TqgGoodsDictVo tqgGoodsDictVo = new TqgGoodsDictVo();
-                            tqgGoodsDictVo.setId(m.getId());
-                            tqgGoodsDictVo.setBuiName(m.getCollectionName());
-                            return tqgGoodsDictVo;
-                        }).collect(Collectors.toList()):boxService
-                        .list(
-                                Wrappers.<CntBox>lambdaQuery()
-                                        .gt(CntBox::getPublishTime, new Date())
-                                        .isNotNull(CntBox::getPostTime).orderByDesc(CntBox::getCreatedTime)).stream().map(m -> {
-                            TqgGoodsDictVo tqgGoodsDictVo = new TqgGoodsDictVo();
-                            tqgGoodsDictVo.setId(m.getId());
-                            tqgGoodsDictVo.setBuiName(m.getBoxTitle());
-                            return tqgGoodsDictVo;
-                        }).collect(Collectors.toList())
-                );
+        List<TqgGoodsDictVo> goodsDictVos = collectionService
+                .list(
+                        Wrappers.<CntCollection>lambdaQuery()
+                                .gt(CntCollection::getPublishTime, new Date())
+                                .isNotNull(CntCollection::getPostTime).orderByDesc(CntCollection::getCreatedTime)).stream().map(m -> {
+                    TqgGoodsDictVo tqgGoodsDictVo = new TqgGoodsDictVo();
+                    tqgGoodsDictVo.setId(m.getId());
+                    tqgGoodsDictVo.setBuiName(m.getCollectionName()+"(藏品)");
+                    tqgGoodsDictVo.setIsType(0);
+                    return tqgGoodsDictVo;
+                }).collect(Collectors.toList());
+        goodsDictVos.addAll(boxService
+                .list(
+                        Wrappers.<CntBox>lambdaQuery()
+                                .gt(CntBox::getPublishTime, new Date())
+                                .isNotNull(CntBox::getPostTime).orderByDesc(CntBox::getCreatedTime)).stream().map(m -> {
+                    TqgGoodsDictVo tqgGoodsDictVo = new TqgGoodsDictVo();
+                    tqgGoodsDictVo.setId(m.getId());
+                    tqgGoodsDictVo.setBuiName(m.getBoxTitle()+"(盲盒)");
+                    tqgGoodsDictVo.setIsType(1);
+                    return tqgGoodsDictVo;
+                }).collect(Collectors.toList()));
+        return R.ok(goodsDictVos);
     }
 
     /***

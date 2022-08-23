@@ -47,6 +47,15 @@ public class AuctionMargin implements Serializable {
     @ApiModelProperty("保证金")
     private BigDecimal margin;
 
+    @ApiModelProperty("组合支付专属,如果此值不是0.00 就说明使用了余额支付。")
+    private BigDecimal moneyBln;
+
+    @ApiModelProperty("支付保证金状态，0：失败，1，成功")
+    private Integer payMarginStatus;
+
+    @ApiModelProperty("付款截止时间")
+    private LocalDateTime endTime;
+
     public void createD(String createId){
         this.createdBy = createId;
         this.createdTime = LocalDateTime.now();

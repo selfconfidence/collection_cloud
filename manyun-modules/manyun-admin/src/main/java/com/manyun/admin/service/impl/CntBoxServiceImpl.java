@@ -113,7 +113,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         String info = StrUtil.format("盲盒名称为:{}已存在!", cntBoxAlterVo.getBoxTitle());
         Assert.isFalse(boxList.size()>0,info);
         //验证盲盒如果没有添加藏品不能上架
-        Assert.isFalse(cntBoxAlterVo.getStatusBy()==1,"请先添加盲盒藏品");
+        Assert.isFalse(cntBoxAlterVo.getStatusBy()==1,"未添加盲盒中的藏品,不可上架该盲盒!");
         //校验
         R check = check(cntBoxAlterVo,boxAlterCombineDto.getCntLableAlterVo(),boxAlterCombineDto.getMediaAlterVo());
         if(200!=check.getCode()){
@@ -183,7 +183,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         //验证盲盒如果没有添加藏品不能上架
         if(boxAlterVo.getStatusBy()==1){
             List<CntBoxCollection> boxCollections = boxCollectionService.list(Wrappers.<CntBoxCollection>lambdaQuery().eq(CntBoxCollection::getBoxId, boxId));
-            Assert.isTrue(boxCollections.size()>0, "请先添加盲盒藏品");
+            Assert.isTrue(boxCollections.size()>0, "未添加盲盒中的藏品,不可上架该盲盒!");
         }
         //校验
         R check = check(boxAlterVo,boxAlterCombineDto.getCntLableAlterVo(),boxAlterCombineDto.getMediaAlterVo());
@@ -287,7 +287,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         //验证盲盒如果没有添加藏品不能上架
         if(boxStateDto.getStatusBy()==1){
             List<CntBoxCollection> boxCollections = boxCollectionService.list(Wrappers.<CntBoxCollection>lambdaQuery().eq(CntBoxCollection::getBoxId, boxStateDto.getId()));
-            Assert.isTrue(boxCollections.size()>0, "请先添加盲盒藏品");
+            Assert.isTrue(boxCollections.size()>0, "未添加盲盒中的藏品,不可上架该盲盒!");
         }
         BeanUtil.copyProperties(boxStateDto,cntBox);
         cntBox.setUpdatedBy(SecurityUtils.getUsername());

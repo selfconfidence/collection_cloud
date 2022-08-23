@@ -30,9 +30,6 @@ public class CntPostSell implements Serializable
     @ApiModelProperty("0=藏品,1=盲盒")
     private Integer isType;
 
-    @ApiModelProperty("购买次数")
-    private Integer buyFrequency;
-
     @ApiModelProperty("创建人")
     private String createdBy;
 
@@ -93,14 +90,6 @@ public class CntPostSell implements Serializable
         return isType;
     }
 
-    public Integer getBuyFrequency() {
-        return buyFrequency;
-    }
-
-    public void setBuyFrequency(Integer buyFrequency) {
-        this.buyFrequency = buyFrequency;
-    }
-
     public void setCreatedBy(String createdBy)
     {
         this.createdBy = createdBy;
@@ -146,7 +135,6 @@ public class CntPostSell implements Serializable
             .append("configId", getConfigId())
             .append("buiName", getBuiName())
             .append("isType", getIsType())
-            .append("buyFrequency", getBuyFrequency())
             .append("createdBy", getCreatedBy())
             .append("createdTime", getCreatedTime())
             .append("updatedBy", getUpdatedBy())

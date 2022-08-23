@@ -2,15 +2,14 @@ package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.design.delay.DelayAbsAspect;
 import com.manyun.business.design.delay.DelayQueue;
 import com.manyun.business.design.pay.RootPay;
-import com.manyun.business.domain.dto.AuctionOrderCreateDto;
-import com.manyun.business.domain.dto.LogInfoDto;
-import com.manyun.business.domain.dto.PayInfoDto;
+import com.manyun.business.domain.dto.*;
 import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.form.AuctionPayFixedForm;
 import com.manyun.business.domain.form.AuctionPayForm;
@@ -44,6 +43,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -111,13 +111,16 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     @Autowired
     private ILogsService logsService;
 
+    @Autowired
+    private IMsgService msgService;
+
 
     //判断是否出过价
 
     @Override
     public R checkPayMargin(AuctionPriceForm auctionPriceForm, String userId) {
         List<AuctionMargin> list = auctionMarginService.list(Wrappers.<AuctionMargin>lambdaQuery().eq(AuctionMargin::getAuctionSendId, auctionPriceForm.getAuctionSendId())
-                .eq(AuctionMargin::getUserId, userId));
+                .eq(AuctionMargin::getUserId, userId).eq(AuctionMargin::getPayMarginStatus, Integer.valueOf(1)));
         //判断是否出过价
         if (list.size() > 0) {
             //支付保证金
@@ -386,11 +389,13 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         PayVo payVo =  rootPay.execPayVo(
                 PayInfoDto.builder()
                         .payType(auctionPayForm.getPayType())
-                        .realPayMoney(auctionSend.getNowPrice())
+                        .realPayMoney(auctionOrder.getOrderAmount().subtract(auctionOrder.getMoneyBln()))
                         .outHost(auctionOrder.getOrderNo())
                         .aliPayEnum(AUCTION_ALI_PAY)
                         .wxPayEnum(AUCTION_WECHAT_PAY)
                         .userId(payUserId).build());
+
+        auctionOrder.setMoneyBln(payVo.getMoneyBln());
 
         // 修改拍卖信息
         //auctionSend.setAuctionStatus(AuctionStatus.PAY_SUCCESS.getCode());
@@ -398,12 +403,34 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         auctionOrder.setPayType(auctionPayForm.getPayType());
         auctionOrderService.updateById(auctionOrder);
         // 走这一步如果 是余额支付 那就说明扣款成功了！！！
-        if (MONEY_TAPE.getCode().equals(auctionPayForm.getPayType())){
+        /*if (MONEY_TAPE.getCode().equals(auctionPayForm.getPayType())){
             // 调用完成订单
             auctionOrderService.notifyPaySuccess(payVo.getOutHost(), payUserId);
-        }
+        }*/
 
+        if ( StrUtil.isBlank(payVo.getBody())){
+
+            auctionOrderService.notifyPaySuccess(payVo.getOutHost());
+            String title = "";
+            String form = "";
+            if (Integer.valueOf(2).equals(auctionOrder.getGoodsType())){
+                // 盲盒
+                Box box = boxService.getById(auctionOrder.getGoodsId());
+                title = StrUtil.format("购买了 {} 盲盒!", box.getBoxTitle());
+                form = StrUtil.format("使用余额{};从拍卖市场购买了 {} 盲盒!",auctionOrder.getOrderAmount(), box.getBoxTitle());
+
+            }
+            if (Integer.valueOf(1).equals(auctionOrder.getGoodsType())){
+                //藏品
+                CntCollection cntCollection = collectionService.getById(auctionOrder.getGoodsId());
+                title = StrUtil.format("购买了 {} 藏品!", cntCollection.getCollectionName());
+                form = StrUtil.format("使用余额{};从拍卖市场购买了 {} 藏品!",auctionOrder.getOrderAmount(), cntCollection.getCollectionName());
+            }
+            msgService.saveMsgThis(MsgThisDto.builder().userId(payUserId).msgForm(form).msgTitle(title).build());
+            msgService.saveCommMsg(MsgCommDto.builder().msgTitle(title).msgForm(form).build());
+        }
         return payVo;
+
     }
 
     /**
@@ -419,28 +446,57 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
         AuctionSend auctionSend = auctionSendService.getById(auctionPayMarginForm.getAuctionSendId());
         Assert.isFalse(payUserId.equals(auctionSend.getUserId()), "不可对自己送拍的支付保证金");
-        //用户余额
-        BigDecimal margin = auctionSend.getStartPrice().multiply(systemService.getVal(BusinessConstants.SystemTypeConstant.MARGIN_SCALE, BigDecimal.class)).setScale(2, RoundingMode.HALF_UP);
-        Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, payUserId));
-        BigDecimal moneyBalance = money.getMoneyBalance();
-        AuctionMargin auctionMargin = Builder.of(AuctionMargin::new).build();
-        auctionMargin.setAuctionSendId(auctionPayMarginForm.getAuctionSendId());
-        auctionMargin.setUserId(payUserId);
-        auctionMargin.setMargin(margin);
-        auctionMargin.createD(payUserId);
-        auctionMarginService.save(auctionMargin);
 
-        String payMarginHost ="";
+        BigDecimal margin = auctionSend.getStartPrice().multiply(systemService.getVal(BusinessConstants.SystemTypeConstant.MARGIN_SCALE, BigDecimal.class)).setScale(2, RoundingMode.HALF_UP);
+        AuctionMargin auctionMargin = auctionMarginService.getOne(Wrappers.<AuctionMargin>lambdaQuery().eq(AuctionMargin::getUserId, payUserId)
+                .eq(AuctionMargin::getAuctionSendId, auctionPayMarginForm.getAuctionSendId()));
+        if (auctionMargin == null) {
+            auctionMargin = Builder.of(AuctionMargin::new).build();
+            auctionMargin.setId(IdUtil.getSnowflakeNextIdStr());
+            auctionMargin.setAuctionSendId(auctionPayMarginForm.getAuctionSendId());
+            auctionMargin.setUserId(payUserId);
+            auctionMargin.setMargin(margin);
+            auctionMargin.setEndTime(LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_ORDER_TIME, Integer.class)));
+            auctionMargin.createD(payUserId);
+            auctionMarginService.save(auctionMargin);
+        }
+        //用户余额
+        AuctionMargin auctionMargin1 = auctionMarginService.getOne(Wrappers.<AuctionMargin>lambdaQuery().eq(AuctionMargin::getUserId, payUserId)
+                .eq(AuctionMargin::getAuctionSendId, auctionPayMarginForm.getAuctionSendId()));
 
         PayVo payVo = rootPay.execPayVo(PayInfoDto.builder()
                 .payType(auctionPayMarginForm.getPayType())
-                .realPayMoney(margin)
+                .realPayMoney(auctionMargin1.getMargin().subtract(auctionMargin1.getMoneyBln()))
+                .outHost(auctionMargin1.getId())
                 .aliPayEnum(MARGIN_ALI_PAY)
                 .wxPayEnum(MARGIN_WECHAT_PAY)
                 .userId(payUserId).build());
+        auctionMargin1.setMoneyBln(payVo.getMoneyBln());
+        auctionMarginService.updateById(auctionMargin1);
+
+        if (StrUtil.isBlank(payVo.getBody())) {
+            notifyPayMarginSuccess(payVo.getOutHost());
+            String title = StrUtil.format("支付保证金!");
+            String form = StrUtil.format("使用余额{};支付了保证金",auctionMargin1.getMargin());
+            msgService.saveMsgThis(MsgThisDto.builder().userId(payUserId).msgForm(form).msgTitle(title).build());
+            msgService.saveCommMsg(MsgCommDto.builder().msgTitle(title).msgForm(form).build());
+        }
 
         return payVo;
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public synchronized void notifyPayMarginSuccess(String outHost) {
+        AuctionMargin auctionMargin = auctionMarginService.getById(outHost);
+        //支付成功，将保证金状态置为已成功
+        auctionMargin.setPayMarginStatus(Integer.valueOf(1));
+        auctionMarginService.updateById(auctionMargin);
+    }
+
+
+
+
 
     //一口价
 
@@ -479,30 +535,59 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         auctionPrice.setBidPrice(auctionSend.getSoldPrice());
         save(auctionPrice);
 
-        String auctionOrderHost = auctionOrderService.createAuctionOrder(AuctionOrderCreateDto.builder()
-                .goodsId(auctionSend.getGoodsId())
-                .goodsName(auctionSend.getGoodsName())
-                .goodsType(auctionSend.getGoodsType())
-                .nowPrice(auctionSend.getSoldPrice())
-                .payType(auctionPayFixedForm.getPayType())
-                .orderAmount(auctionSend.getSoldPrice())
-                .auctionPriceId(auctionPrice.getId())
-                .sendAuctionId(auctionPayFixedForm.getAuctionSendId())
-                .fromUserId(auctionSend.getUserId())
-                .toUserId(userId).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));
+        AuctionOrder haveOrder = auctionOrderService.getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getSendAuctionId, auctionSend.getId())
+                .eq(AuctionOrder::getToUserId, userId));
+        if (haveOrder == null) {
+            String auctionOrderHost = auctionOrderService.createAuctionOrder(AuctionOrderCreateDto.builder()
+                    .goodsId(auctionSend.getGoodsId())
+                    .goodsName(auctionSend.getGoodsName())
+                    .goodsType(auctionSend.getGoodsType())
+                    .nowPrice(auctionSend.getSoldPrice())
+                    .payType(auctionPayFixedForm.getPayType())
+                    .orderAmount(auctionSend.getSoldPrice())
+                    .auctionPriceId(auctionPrice.getId())
+                    .sendAuctionId(auctionPayFixedForm.getAuctionSendId())
+                    .fromUserId(auctionSend.getUserId())
+                    .toUserId(userId).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));
+        }
+
+        AuctionOrder auctionOrder = auctionOrderService.getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getSendAuctionId, auctionSend.getId())
+                .eq(AuctionOrder::getToUserId, userId));
+
+
 
         PayVo payVo = rootPay.execPayVo(PayInfoDto.builder()
                 .payType(auctionPayFixedForm.getPayType())
-                .realPayMoney(auctionSend.getSoldPrice())
-                .outHost(auctionOrderHost)
+                .realPayMoney(auctionOrder.getOrderAmount().subtract(auctionOrder.getMoneyBln()))
+                .outHost(auctionOrder.getOrderNo())
                 .aliPayEnum(FIXED_ALI_PAY)
                 .wxPayEnum(FIXED_WECHAT_PAY)
                 .userId(userId).build());
 
-        if (MONEY_TAPE.getCode().equals(auctionPayFixedForm.getPayType()) && StrUtil.isBlank(payVo.getBody())){
-            // 调用完成订单
-            auctionOrderService.notifyPaySuccess(payVo.getOutHost(),userId);
+        auctionOrder.setMoneyBln(payVo.getMoneyBln());
+        auctionOrderService.updateById(auctionOrder);
 
+
+        if ( StrUtil.isBlank(payVo.getBody())){
+
+            auctionOrderService.notifyPaySuccess(payVo.getOutHost());
+            String title = "";
+            String form = "";
+            if (Integer.valueOf(2).equals(auctionOrder.getGoodsType())){
+                // 盲盒
+                Box box = boxService.getById(auctionOrder.getGoodsId());
+                title = StrUtil.format("购买了 {} 盲盒!", box.getBoxTitle());
+                form = StrUtil.format("使用余额{};从拍卖市场一口价购买了 {} 盲盒!",auctionOrder.getOrderAmount(), box.getBoxTitle());
+
+            }
+            if (Integer.valueOf(1).equals(auctionOrder.getGoodsType())){
+                //藏品
+                CntCollection cntCollection = collectionService.getById(auctionOrder.getGoodsId());
+                title = StrUtil.format("购买了 {} 藏品!", cntCollection.getCollectionName());
+                form = StrUtil.format("使用余额{};从拍卖市场一口价购买了 {} 藏品!",auctionOrder.getOrderAmount(), cntCollection.getCollectionName());
+            }
+            msgService.saveMsgThis(MsgThisDto.builder().userId(userId).msgForm(form).msgTitle(title).build());
+            msgService.saveCommMsg(MsgCommDto.builder().msgTitle(title).msgForm(form).build());
         }
 
         return payVo;
@@ -582,6 +667,27 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
             winnerOperation(auctionSend);
         }
         auctionSendService.updateBatchById(sendList);
+    }
+
+    /**
+     * 定时调度，将保证金支付失败的余额部分退回
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public synchronized void checkPayMarginFail() {
+        List<AuctionMargin> list = auctionMarginService.list(Wrappers.<AuctionMargin>lambdaQuery().eq(AuctionMargin::getPayMarginStatus, Integer.valueOf(0))
+                .lt(AuctionMargin::getEndTime, LocalDateTime.now()));
+        if (list.isEmpty()) {
+            return;
+        }
+        list.parallelStream().map(item -> {
+            BigDecimal moneyBln = item.getMoneyBln();
+            if (Objects.nonNull(moneyBln) && moneyBln.compareTo(NumberUtil.add(0D)) >=1){
+                moneyService.orderBack(item.getUserId(),moneyBln,StrUtil.format("保证金已取消,此产生的消费 {},已经退还余额!" , moneyBln));
+            }
+            return item;
+        }).collect(Collectors.toList());
+
     }
 
 

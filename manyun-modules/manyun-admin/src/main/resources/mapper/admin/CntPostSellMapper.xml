@@ -10,7 +10,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="configId"    column="config_id"    />
         <result property="buiName"    column="bui_name"    />
         <result property="isType"    column="is_type"    />
-        <result property="buyFrequency"    column="buy_frequency"    />
         <result property="createdBy"    column="created_by"    />
         <result property="createdTime"    column="created_time"    />
         <result property="updatedBy"    column="updated_by"    />
@@ -18,22 +17,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectCntPostSellVo">
-        select id, bui_id, config_id, bui_name, is_type, buy_frequency, created_by, created_time, updated_by, updated_time from cnt_post_sell
+        select id, bui_id, config_id, bui_name, is_type, created_by, created_time, updated_by, updated_time from cnt_post_sell
     </sql>
-
-    <select id="selectCntPostSellList" parameterType="CntPostSell" resultMap="CntPostSellResult">
-        <include refid="selectCntPostSellVo"/>
-        <where>
-            <if test="buiId != null  and buiId != ''"> and bui_id = #{buiId}</if>
-            <if test="configId != null  and configId != ''"> and config_id = #{configId}</if>
-            <if test="buiName != null  and buiName != ''"> and bui_name like concat('%', #{buiName}, '%')</if>
-            <if test="isType != null "> and is_type = #{isType}</if>
-            <if test="buyFrequency != null "> and buy_frequency = #{buyFrequency}</if>
-            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
-            <if test="createdTime != null "> and created_time = #{createdTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
-            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
-        </where>
-    </select>
 
 </mapper>

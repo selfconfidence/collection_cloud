@@ -3,7 +3,6 @@ package com.manyun.admin.mapper;
 import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.manyun.admin.domain.CntPostConfig;
-import com.manyun.admin.domain.dto.CntPostConfigBeanDto;
 import com.manyun.admin.domain.query.PostConfigQuery;
 
 /**
@@ -20,5 +19,5 @@ public interface CntPostConfigMapper extends BaseMapper<CntPostConfig>
      * @param postConfigQuery
      * @return 提前购配置-只能有一条集合
      */
-    public List<CntPostConfigBeanDto> selectCntPostConfigList(PostConfigQuery postConfigQuery);
+    public List<CntPostConfig> selectCntPostConfigList(PostConfigQuery postConfigQuery);
 }

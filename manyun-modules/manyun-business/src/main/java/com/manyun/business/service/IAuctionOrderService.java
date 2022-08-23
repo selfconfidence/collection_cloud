@@ -34,7 +34,7 @@ public interface IAuctionOrderService extends IService<AuctionOrder> {
 
     List<AuctionOrder> checkUnpaidOrder(String payUserId);
 
-    void notifyPaySuccess(String outHost, String userId);
+    void notifyPaySuccess(String outHost);
 
     void timeCancelAuction();
 

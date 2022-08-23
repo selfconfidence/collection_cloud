@@ -2,6 +2,7 @@ package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -132,7 +133,7 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized void notifyPaySuccess(String outHost, String userId) {
+    public synchronized void notifyPaySuccess(String outHost) {
         AuctionOrder auctionOrder = getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getOrderNo, outHost));
         String info = StrUtil.format("购买成功,本次消费{}，来源为拍卖市场", auctionOrder.getOrderAmount().toString());
         Assert.isTrue(Objects.nonNull(auctionOrder),"找不到对应订单编号!");
@@ -156,10 +157,10 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
         auctionPriceService.updateById(auctionPrice);
 
         //退还买方保证金
-        Money buyerMoney = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
+        Money buyerMoney = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, auctionOrder.getToUserId()));
         buyerMoney.setMoneyBalance(buyerMoney.getMoneyBalance().add(auctionOrder.getMargin()));
         moneyService.updateById(buyerMoney);
-        logsService.saveLogs(LogInfoDto.builder().buiId(userId).jsonTxt("退还保证金").formInfo(auctionSend.getMargin().toString()).isType(PULL_SOURCE).modelType(MONEY_TYPE).build());
+        logsService.saveLogs(LogInfoDto.builder().buiId(auctionOrder.getToUserId()).jsonTxt("退还保证金").formInfo(auctionSend.getMargin().toString()).isType(PULL_SOURCE).modelType(MONEY_TYPE).build());
 
         //扣除佣金,剩余钱加给卖方   需要后台审核
         Money sellerMoney = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, auctionSend.getUserId()));
@@ -207,6 +208,11 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
             auctionPrice.setAuctionStatus(AuctionStatus.BID_BREAK.getCode());
             auctionPriceService.updateById(auctionPrice);
             item.setAuctionStatus(AuctionStatus.BID_BREAK.getCode());
+            //余额支付了，剩余部分没付,退还
+            BigDecimal moneyBln = item.getMoneyBln();
+            if (Objects.nonNull(moneyBln) && moneyBln.compareTo(NumberUtil.add(0D)) >=1){
+                moneyService.orderBack(item.getToUserId(),moneyBln,StrUtil.format("订单已取消,此产生的消费 {},已经退还余额!" , moneyBln));
+            }
             item.updateD(item.getToUserId());
             return item;
         }).collect(Collectors.toList());

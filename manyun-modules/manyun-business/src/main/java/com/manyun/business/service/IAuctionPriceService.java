@@ -32,6 +32,8 @@ public interface IAuctionPriceService extends IService<AuctionPrice> {
 
     PayVo payMargin(String payUserId, AuctionPayMarginForm auctionPayMarginForm);
 
+    void notifyPayMarginSuccess(String outHost);
+
     R checkPayMargin(AuctionPriceForm auctionPriceForm, String userId);
 
     void checkAuctionEnd();
@@ -47,4 +49,6 @@ public interface IAuctionPriceService extends IService<AuctionPrice> {
     void checkWinner();
 
     void checkDelayWinner();
+
+    void checkPayMarginFail();
 }

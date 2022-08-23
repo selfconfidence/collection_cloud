@@ -7,10 +7,8 @@ import java.util.stream.Collectors;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
-import com.manyun.admin.domain.CntActionTar;
 import com.manyun.admin.domain.CntPostExist;
 import com.manyun.admin.domain.CntPostSell;
-import com.manyun.admin.domain.dto.CntPostConfigBeanDto;
 import com.manyun.admin.domain.query.PostConfigQuery;
 import com.manyun.admin.domain.vo.CntPostConfigVo;
 import com.manyun.admin.service.ICntPostExistService;
@@ -68,7 +66,7 @@ public class CntPostConfigServiceImpl extends ServiceImpl<CntPostConfigMapper,Cn
     public TableDataInfo<CntPostConfigVo> selectCntPostConfigList(PostConfigQuery postConfigQuery)
     {
         PageHelper.startPage(postConfigQuery.getPageNum(),postConfigQuery.getPageSize());
-        List<CntPostConfigBeanDto> cntPostConfigs = cntPostConfigMapper.selectCntPostConfigList(postConfigQuery);
+        List<CntPostConfig> cntPostConfigs = cntPostConfigMapper.selectCntPostConfigList(postConfigQuery);
         return TableDataInfoUtil.pageTableDataInfo(cntPostConfigs.stream().map(m->{
             CntPostConfigVo postConfigVo=new CntPostConfigVo();
             BeanUtil.copyProperties(m,postConfigVo);
