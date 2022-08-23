@@ -535,9 +535,9 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         auctionPrice.setBidPrice(auctionSend.getSoldPrice());
         save(auctionPrice);
 
-        AuctionOrder auctionOrder = auctionOrderService.getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getSendAuctionId, auctionSend.getId())
+        AuctionOrder haveOrder = auctionOrderService.getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getSendAuctionId, auctionSend.getId())
                 .eq(AuctionOrder::getToUserId, userId));
-        if (auctionOrder == null) {
+        if (haveOrder == null) {
             String auctionOrderHost = auctionOrderService.createAuctionOrder(AuctionOrderCreateDto.builder()
                     .goodsId(auctionSend.getGoodsId())
                     .goodsName(auctionSend.getGoodsName())
@@ -550,6 +550,9 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                     .fromUserId(auctionSend.getUserId())
                     .toUserId(userId).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));
         }
+
+        AuctionOrder auctionOrder = auctionOrderService.getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getSendAuctionId, auctionSend.getId())
+                .eq(AuctionOrder::getToUserId, userId));
 
 
 
