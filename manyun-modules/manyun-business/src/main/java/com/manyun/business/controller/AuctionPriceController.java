@@ -135,5 +135,13 @@ public class AuctionPriceController {
         return R.ok();
     }
 
+    @GetMapping("/checkPayMarginFail")
+    @ApiOperation(value = "定时调度保证金支付失败退还余额部分",hidden = true)
+    @InnerAuth
+    public R checkPayMarginFail() {
+        auctionPriceService.checkPayMarginFail();
+        return R.ok();
+    }
+
 }
 

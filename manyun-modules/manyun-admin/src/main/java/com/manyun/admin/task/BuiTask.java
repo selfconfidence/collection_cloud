@@ -81,6 +81,12 @@ public class BuiTask
         remoteAuctionService.checkDelayWinner(SecurityConstants.INNER);
     }
 
+    /**
+     * 定时调度退回保证金余额支付部分
+     */
+    public void checkPayMarginFail() {
+        remoteAuctionService.checkPayMarginFail(SecurityConstants.INNER);
+    }
 
     /**
      * 定时调度寄售时限周期退回源
