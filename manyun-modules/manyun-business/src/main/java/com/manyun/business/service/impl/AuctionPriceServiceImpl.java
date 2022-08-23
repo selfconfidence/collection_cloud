@@ -463,21 +463,23 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         //用户余额
 
         Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, payUserId));
+        AuctionMargin auctionMargin1 = auctionMarginService.getOne(Wrappers.<AuctionMargin>lambdaQuery().eq(AuctionMargin::getUserId, payUserId)
+                .eq(AuctionMargin::getAuctionSendId, auctionPayMarginForm.getAuctionSendId()));
 
         PayVo payVo = rootPay.execPayVo(PayInfoDto.builder()
                 .payType(auctionPayMarginForm.getPayType())
-                .realPayMoney(auctionMargin.getMargin().subtract(auctionMargin.getMoneyBln()))
-                .outHost(auctionMargin.getId())
+                .realPayMoney(auctionMargin1.getMargin().subtract(auctionMargin1.getMoneyBln()))
+                .outHost(auctionMargin1.getId())
                 .aliPayEnum(MARGIN_ALI_PAY)
                 .wxPayEnum(MARGIN_WECHAT_PAY)
                 .userId(payUserId).build());
-        auctionMargin.setMoneyBln(payVo.getMoneyBln());
-        auctionMarginService.updateById(auctionMargin);
+        auctionMargin1.setMoneyBln(payVo.getMoneyBln());
+        auctionMarginService.updateById(auctionMargin1);
 
         if (StrUtil.isBlank(payVo.getBody())) {
             notifyPayMarginSuccess(payVo.getOutHost());
             String title = StrUtil.format("支付保证金!");
-            String form = StrUtil.format("使用余额{};支付了保证金",auctionMargin.getMargin());
+            String form = StrUtil.format("使用余额{};支付了保证金",auctionMargin1.getMargin());
             msgService.saveMsgThis(MsgThisDto.builder().userId(payUserId).msgForm(form).msgTitle(title).build());
             msgService.saveCommMsg(MsgCommDto.builder().msgTitle(title).msgForm(form).build());
         }
