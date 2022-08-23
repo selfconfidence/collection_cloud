@@ -461,8 +461,6 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
             auctionMarginService.save(auctionMargin);
         }
         //用户余额
-
-        Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, payUserId));
         AuctionMargin auctionMargin1 = auctionMarginService.getOne(Wrappers.<AuctionMargin>lambdaQuery().eq(AuctionMargin::getUserId, payUserId)
                 .eq(AuctionMargin::getAuctionSendId, auctionPayMarginForm.getAuctionSendId()));
 
