@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.comm.api.domain.dto.OpenPleaseBoxDto;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.enums.BoxOpenType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +47,7 @@ import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
  * @since 2022-06-21
  */
 @Service
+@Slf4j
 public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> implements IUserBoxService {
 
 
@@ -214,6 +216,9 @@ public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> impl
 
     @Override
     public String showUserBox(String buiId, String userId, String info) {
+        log.info("1111111111----------------------");
+        log.info("盲盒id----------" +  buiId);
+        log.info("用户id--------------" + userId);
         UserBox userBox = getOne(Wrappers.<UserBox>lambdaQuery().eq(UserBox::getIsExist, NOT_EXIST.getCode()).eq(UserBox::getUserId, userId).eq(UserBox::getId, buiId).eq(UserBox::getBoxOpen, BoxOpenType.NO_OPEN.getCode()));
         Assert.isTrue(Objects.nonNull(userBox),"盲盒有误,请核实盲盒是否存在!");
         userBox.setIsExist(USE_EXIST.getCode());
