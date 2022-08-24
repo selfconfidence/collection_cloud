@@ -9,6 +9,7 @@ import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
+import com.manyun.admin.domain.vo.CntAgreementVo;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.manyun.common.core.web.page.PageQuery;
@@ -52,11 +53,11 @@ public class CntAgreementServiceImpl extends ServiceImpl<CntAgreementMapper,CntA
      * @return 协议相关
      */
     @Override
-    public TableDataInfo<CntAgreement> selectCntAgreementList(PageQuery pageQuery)
+    public TableDataInfo<CntAgreementVo> selectCntAgreementList(PageQuery pageQuery)
     {
         PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
-        List<CntAgreement> cntAgreements = cntAgreementMapper.selectCntAgreementList(new CntAgreement());
-        return TableDataInfoUtil.pageTableDataInfo(cntAgreements,cntAgreements);
+        List<CntAgreementVo> cntAgreementVos = cntAgreementMapper.selectCntAgreementList(new CntAgreement());
+        return TableDataInfoUtil.pageTableDataInfo(cntAgreementVos,cntAgreementVos);
     }
 
     /**

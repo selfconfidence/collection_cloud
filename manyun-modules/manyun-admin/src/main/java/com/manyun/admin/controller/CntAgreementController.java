@@ -1,6 +1,7 @@
 package com.manyun.admin.controller;
 
 
+import com.manyun.admin.domain.vo.CntAgreementVo;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.PageQuery;
 import io.swagger.annotations.Api;
@@ -32,7 +33,7 @@ public class CntAgreementController extends BaseController
     //@RequiresPermissions("admin:agreement:list")
     @GetMapping("/list")
     @ApiOperation("查询协议相关列表")
-    public TableDataInfo<CntAgreement> list(PageQuery pageQuery)
+    public TableDataInfo<CntAgreementVo> list(PageQuery pageQuery)
     {
         return cntAgreementService.selectCntAgreementList(pageQuery);
     }

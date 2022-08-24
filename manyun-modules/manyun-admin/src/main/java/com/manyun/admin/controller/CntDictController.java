@@ -121,4 +121,11 @@ public class CntDictController extends BaseController
         return cntDictService.boxScoreDict();
     }
 
+    @GetMapping("/agreementTypeDict")
+    @ApiOperation("协议类型字典")
+    public R agreementTypeDict()
+    {
+        return cntDictService.agreementTypeDict();
+    }
+
 }

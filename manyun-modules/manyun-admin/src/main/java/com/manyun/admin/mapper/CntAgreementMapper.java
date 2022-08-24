@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.manyun.admin.domain.CntAgreement;
+import com.manyun.admin.domain.vo.CntAgreementVo;
 
 /**
  * 协议相关Mapper接口
@@ -20,6 +21,6 @@ public interface CntAgreementMapper extends BaseMapper<CntAgreement>
      * @param cntAgreement 协议相关
      * @return 协议相关集合
      */
-    public List<CntAgreement> selectCntAgreementList(CntAgreement cntAgreement);
+    public List<CntAgreementVo> selectCntAgreementList(CntAgreement cntAgreement);
 
 }
