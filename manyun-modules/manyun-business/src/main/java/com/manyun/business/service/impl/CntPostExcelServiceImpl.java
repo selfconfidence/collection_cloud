@@ -48,6 +48,7 @@ public class CntPostExcelServiceImpl extends ServiceImpl<CntPostExcelMapper, Cnt
     public Boolean isExcelPostCustomer(String userId, String buiId) {
          // 可能有重复数据
         CntPostExcel excel = getCntPostExcel(userId, buiId);
+        if (Objects.isNull(excel))return Boolean.FALSE;
         // 是否购买到达这个次数了?
         CntPostExcelLog postExcelLog = getPostExcelLog(userId, excel);
         if (Objects.nonNull(excel)){
