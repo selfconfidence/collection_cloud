@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -25,6 +26,7 @@ public class UserConsignmentForm implements Serializable {
 
     @ApiModelProperty("寄售价格")
     @NotNull(message = "寄售价格不可为空")
+    @Min(value = 1L,message = "寄售价格不可小于1元!")
     private BigDecimal consignmentMoney;
 
 

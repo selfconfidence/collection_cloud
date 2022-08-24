@@ -52,7 +52,7 @@ public class CntConsignmentController {
 
     @PostMapping("/consignmentAssets")
     @ApiOperation("对资产进行寄售")
-    public R  consignmentAssets(@RequestBody @Valid UserConsignmentForm userConsignmentForm){
+    public synchronized R  consignmentAssets(@RequestBody @Valid UserConsignmentForm userConsignmentForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         cntConsignmentService.consignmentAssets(userConsignmentForm,notNullLoginBusinessUser.getUserId());
         return R.ok();
@@ -116,7 +116,7 @@ public class CntConsignmentController {
 
     @GetMapping("/cancelConsignmentById/{id}")
     @ApiOperation(value = "寄售方取消寄售市场中的资产",notes = "id 为寄售订单的id")
-    public R cancelConsignmentById(@PathVariable String id){
+    public synchronized R cancelConsignmentById(@PathVariable String id){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         cntConsignmentService.cancelConsignmentById(id,notNullLoginBusinessUser.getUserId());
         return R.ok();
