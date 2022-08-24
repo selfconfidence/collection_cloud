@@ -123,6 +123,14 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         List<CntCollection> cntCollectionList = list(Wrappers.<CntCollection>lambdaQuery().eq(CntCollection::getCollectionName, collectionAlterVo.getCollectionName()));
         String info = StrUtil.format("藏品名称为:{}已存在!", collectionAlterVo.getCollectionName());
         Assert.isFalse(cntCollectionList.size()>0,info);
+        //验证发售时间是否小于当前时间
+        //比较两个时间大小，前者大 = -1， 相等 =0，后者大 = 1
+        Date publishTime = collectionAlterVo.getPublishTime();
+        if(publishTime!=null){
+            if (DateUtils.compareTo(new Date(), publishTime, DateUtils.YYYY_MM_DD_HH_MM_SS) == -1) {
+                return R.fail("发售时间不能小于当前时间!");
+            }
+        }
         //校验
         R check = check(collectionAlterVo,collectionAlterCombineDto.getCntLableAlterVo(),collectionAlterCombineDto.getMediaAlterVo());
         if(200!=check.getCode()){
@@ -316,17 +324,9 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
     public R check(CntCollectionAlterVo collectionAlterVo,CntLableAlterVo lableAlterVo ,MediaAlterVo mediaAlterVo){
         //验证提前购分钟是否在范围内
         Integer postTime = collectionAlterVo.getPostTime();
-        Date publishTime = collectionAlterVo.getPublishTime();
         if(postTime!=null){
             if(postTime<10 || postTime>1000){
                 return R.fail("提前购时间请输入大于等于10,小于1000的整数!");
-            }
-        }
-        //验证发售时间是否小于当前时间
-        //比较两个时间大小，前者大 = -1， 相等 =0，后者大 = 1
-        if(publishTime!=null){
-            if (DateUtils.compareTo(new Date(), publishTime, DateUtils.YYYY_MM_DD_HH_MM_SS) == -1) {
-                return R.fail("发售时间不能小于当前时间!");
             }
         }
         //验证标签是否超过三个
