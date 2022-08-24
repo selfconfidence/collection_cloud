@@ -11,6 +11,13 @@ import com.aliyun.tea.TeaException;
 import com.aliyun.tea.TeaUnretryableException;
 import com.aliyun.tearpc.models.Config;
 import com.aliyun.teautil.models.RuntimeOptions;
+import com.aliyuncs.DefaultAcsClient;
+import com.aliyuncs.IAcsClient;
+import com.aliyuncs.cloudauth.model.v20190307.DescribeFaceVerifyRequest;
+import com.aliyuncs.cloudauth.model.v20190307.DescribeFaceVerifyResponse;
+import com.aliyuncs.cloudauth.model.v20190307.InitFaceVerifyRequest;
+import com.aliyuncs.cloudauth.model.v20190307.InitFaceVerifyResponse;
+import com.aliyuncs.profile.DefaultProfile;
 import com.manyun.business.domain.form.UserAliyunRealForm;
 import lombok.Data;
 import lombok.SneakyThrows;
@@ -31,10 +38,76 @@ import java.util.List;
 public class AliRealConfig {
     // 场景ID
     private Long sceneId;
+
+    private Long h5SceneId;
+
     private String accessKey;
     private String  accessKeySecret;
 
+    private String  h5ReturnUrl;
 
+
+    /**
+     * 金融级实人方案 h5-进行的调用
+     * @param aliyunRealForm
+     * @return
+     */
+    @SneakyThrows
+    public String getCertifyIdH5(UserAliyunRealForm aliyunRealForm){
+        IAcsClient client = new DefaultAcsClient(getDefaultProfile());
+
+        InitFaceVerifyRequest request = new InitFaceVerifyRequest();
+        request.setMetaInfo(aliyunRealForm.getMetaInfo());
+        request.setCertName(aliyunRealForm.getRealName());
+        request.setCertNo(aliyunRealForm.getCartNo());
+// 固定值。
+        request.setCertType("IDENTITY_CARD");
+        request.setSceneId(h5SceneId);
+        request.setOuterOrderNo(IdUtil.getSnowflakeNextIdStr());
+// 固定值。
+        request.setProductCode("ID_PRO");
+// Web SDK请求时为必填。
+        request.setReturnUrl(h5ReturnUrl);
+        InitFaceVerifyResponse response = client.getAcsResponse(request);
+        log.info(response.getRequestId());
+        log.info(response.getCode());
+        log.info(response.getMessage());
+        log.info(response.getResultObject() == null ? null
+                : response.getResultObject().getCertifyId());
+        Assert.isTrue(response.getCode().equals("200"),response.getMessage());
+        return response.getResultObject().getCertifyId();
+    }
+
+
+    /**
+     * 增强版实人认证 - app双端在调用
+     * @param certifyId
+     */
+    @SneakyThrows
+    public void checkCertifyIdH5Status(String certifyId){
+// 等App客户端提交刷脸认证后，在客户端SDK的回调函数中，由客户端通知服务端运行以下代码查询认证结果。
+        DescribeFaceVerifyRequest request2 = new DescribeFaceVerifyRequest();
+        request2.setCertifyId(certifyId);
+        request2.setSceneId(h5SceneId);
+        IAcsClient client = new DefaultAcsClient(getDefaultProfile());
+        DescribeFaceVerifyResponse response = client.getAcsResponse(request2);
+//        System.out.println(response2.getCode());
+//        System.out.println(response2.getMessage());
+//        System.out.println(response2.getRequestId());
+//        System.out.println(response2.getResultObject().getPassed());
+//        System.out.println(response2.getResultObject().getSubCode());
+//        System.out.println(response2.getResultObject().getMaterialInfo());
+//        System.out.println(response2.getResultObject().getIdentityInfo());
+        Assert.isTrue("200".equals(response.getCode()),response.getMessage());
+        Assert.isTrue("200".equals(response.getResultObject().getSubCode()),response.getResultObject().getPassed());
+    }
+
+
+    /**
+     * 增强版实人认证 - app双端在调用
+     * @param userAliyunRealForm
+     * @return
+     */
     public String getCertifyId(UserAliyunRealForm userAliyunRealForm){
         // 通过以下代码创建API请求并设置参数。
         InitSmartVerifyRequest request = new InitSmartVerifyRequest();
@@ -125,6 +198,10 @@ public class AliRealConfig {
     }
 
 
+    /**
+     * 增强版实人认证 - app双端在调用
+     * @param certifyId
+     */
     @SneakyThrows
     public void checkCertifyIdStatus(String certifyId){
         // 通过以下代码创建API请求并设置参数。
@@ -208,6 +285,14 @@ public class AliRealConfig {
         runtime.connectTimeout = 10000;
 
         return client.describeSmartVerify(request, runtime);
+    }
+
+    private DefaultProfile getDefaultProfile(){
+        return DefaultProfile.getProfile(
+                "cn-hangzhou",    // 固定为cn-hangzhou。
+                accessKey,      // 您的AccessKey ID。
+               accessKeySecret);  // 您的AccessKey Secret。
+
     }
 
 }

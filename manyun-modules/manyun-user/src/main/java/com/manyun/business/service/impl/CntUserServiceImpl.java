@@ -4,12 +4,10 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.*;
-import cn.hutool.crypto.SecureUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.alibaba.nacos.shaded.com.google.protobuf.Timestamp;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.config.AliRealConfig;
 import com.manyun.business.config.AsyncUtil;
@@ -27,9 +25,7 @@ import com.manyun.business.service.IUserPleaseService;
 import com.manyun.business.domain.entity.CntUser;
 import com.manyun.comm.api.MyChainxSystemService;
 import com.manyun.comm.api.RemoteBuiMoneyService;
-import com.manyun.comm.api.RemoteFileService;
 import com.manyun.comm.api.RemoteSystemService;
-import com.manyun.comm.api.domain.SysFile;
 import com.manyun.comm.api.domain.dto.AccountInfoDto;
 import com.manyun.comm.api.domain.dto.CallAccountDto;
 import com.manyun.comm.api.domain.dto.CntUserDto;
@@ -46,13 +42,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
-import javax.json.JsonObject;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 
 import java.io.File;
-import java.io.InputStream;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -85,7 +77,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     private RemoteBuiMoneyService remoteBuiMoneyService;
 
     @Autowired
-    private AliRealConfig aliRealConfig;
+    public AliRealConfig aliRealConfig;
 
     @Autowired
     private UnionRealConfig unionRealConfig;
@@ -371,6 +363,18 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
                 log.error("异步生成图片失败");
             }
         });
+    }
+
+    @Override
+    public String getH5CertifyId(UserAliyunRealForm userAliyunRealForm) {
+        return aliRealConfig.getCertifyIdH5(userAliyunRealForm);
+    }
+
+
+    @Override
+    public void checkCertifyIdH5Status(String certifyId, CntUserDto cntUser) {
+        aliRealConfig.checkCertifyIdH5Status(certifyId);
+        optimisticRealUser(cntUser.getId());
     }
 
 

@@ -111,7 +111,7 @@ public class CntCateServiceImpl extends ServiceImpl<CntCateMapper,CntCate> imple
     @Override
     public int updateCntCate(CntCate cntCate)
     {
-        cntCate.setParentId(cntCate.getCateType()==2?"0":cntCate.getParentId());
+        cntCate.setParentId(cntCate.getCateType()==2?"-1":cntCate.getParentId());
         cntCate.setUpdatedBy(SecurityUtils.getUsername());
         cntCate.setUpdatedTime(DateUtils.getNowDate());
         return updateById(cntCate)==true?1:0;

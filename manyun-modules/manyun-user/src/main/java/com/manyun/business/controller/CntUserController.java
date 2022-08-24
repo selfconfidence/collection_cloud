@@ -2,6 +2,7 @@ package com.manyun.business.controller;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.alibaba.fastjson2.JSONObject;
+import com.manyun.business.config.AliRealConfig;
 import com.manyun.business.domain.entity.CntUser;
 import com.manyun.business.domain.form.*;
 import com.manyun.business.domain.vo.InviteUserVo;
@@ -51,6 +52,7 @@ public class CntUserController extends BaseController {
 
     @Autowired
     private RedisService redisService;
+
 
 
     @PostMapping("/login")
@@ -114,27 +116,43 @@ public class CntUserController extends BaseController {
     @PostMapping("/realUser")
     @ApiOperation("实名认证 -- 银联")
     public R realUser(@RequestBody @Valid UserRealForm userRealForm){
-        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         codeCheck(userRealForm.getPhone(),userRealForm.getPhoneCode());
         return userService.userRealName(userRealForm, notNullLoginBusinessUser.getUserId());
     }
 
     //调起认证
    @PostMapping("/getCertifyId")
-   @ApiOperation("获取认证ID")
+   @ApiOperation(value = "获取认证ID -app",notes = "app 端")
    public R<String> getCertifyId(@RequestBody UserAliyunRealForm userAliyunRealForm){
-       LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
+       LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
        return R.ok(userService.getCertifyId(notNullLoginBusinessUser.getCntUser(),userAliyunRealForm));
    }
 
    @GetMapping("/checkCertifyIdStatus/{certifyId}")
-   @ApiOperation("查询阿里云刷脸实名认证信息")
+   @ApiOperation(value = "查询阿里云刷脸实名认证信息 - app",notes = "app 端")
    public R checkCertifyIdStatus(@PathVariable String certifyId){
-       LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
+       LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
        userService.checkCertifyIdStatus(certifyId,notNullLoginBusinessUser.getCntUser());
         return R.ok();
    }
 
+
+    //调起认证
+    @PostMapping("/getH5CertifyId")
+    @ApiOperation(value = "获取认证ID -h5",notes = "h5 端 \n version 1.0.1")
+    public R<String> getH5CertifyId(@RequestBody UserAliyunRealForm userAliyunRealForm){
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return R.ok(userService.getH5CertifyId(userAliyunRealForm));
+    }
+
+    @GetMapping("/checkCertifyIdH5Status/{certifyId}")
+    @ApiOperation(value = "查询阿里云刷脸实名认证信息 - h5",notes = "h5 端 \n version 1.0.1")
+    public R checkCertifyIdH5Status(@PathVariable String certifyId){
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        userService.checkCertifyIdH5Status(certifyId,notNullLoginBusinessUser.getCntUser());
+        return R.ok();
+    }
     // 修改登录密码
     @PostMapping("/changeLogin")
     @ApiOperation("修改登录密码--废弃")
