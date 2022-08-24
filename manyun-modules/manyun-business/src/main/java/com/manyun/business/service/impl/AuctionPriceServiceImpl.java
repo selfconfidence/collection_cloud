@@ -235,7 +235,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         }).collect(Collectors.toList());
         //拍中者修改状态为待支付
         winAuctionPrice.setAuctionStatus(AuctionStatus.WAIT_PAY.getCode());
-        LocalDateTime endPayTime = LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class));
+        LocalDateTime endPayTime = LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_ORDER_TIME, Integer.class));
 
         winAuctionPrice.setEndPayTime(endPayTime);
         //回调成功,生成订单
@@ -520,6 +520,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         //修改竞拍状态，相当于锁单
         auctionSend.setAuctionSendStatus(AuctionSendStatus.WAIT_PAY.getCode());
         auctionSend.setNowPrice(auctionSend.getSoldPrice());
+        LocalDateTime endPayTime = LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_ORDER_TIME, Integer.class));
+        auctionSend.setEndPayTime(endPayTime);
         auctionSendService.updateById(auctionSend);
         AuctionPrice one = getOne(Wrappers.<AuctionPrice>lambdaQuery().eq(AuctionPrice::getAuctionSendId, auctionSend.getId())
                 .eq(AuctionPrice::getUserId, userId).eq(AuctionPrice::getIsNew, 1));
@@ -534,7 +536,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         auctionPrice.setAuctionSendId(auctionPayFixedForm.getAuctionSendId());
         auctionPrice.setUserName(remoteBuiUserService.commUni(userId, SecurityConstants.INNER).getData().getNickName());
         auctionPrice.setCreatedTime(LocalDateTime.now());
-        auctionPrice.setEndPayTime(LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class)));
+        auctionPrice.setEndPayTime(endPayTime);
         auctionPrice.setBidPrice(auctionSend.getSoldPrice());
         save(auctionPrice);
 
