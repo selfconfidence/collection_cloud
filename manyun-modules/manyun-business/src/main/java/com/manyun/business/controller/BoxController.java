@@ -65,7 +65,7 @@ public class BoxController extends BaseController {
 
     @GetMapping("/tarBox/{id}")
     @ApiOperation(value = "对需要抽签的盲盒,进行抽签",notes = " id = 盲盒编号  \rdata = 状态,(1=抽中,2=未抽中)")
-    public R<Integer> tarBox(@PathVariable String id){
+    public synchronized R<Integer> tarBox(@PathVariable String id){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(boxService.tarBox(id,notNullLoginBusinessUser.getUserId()));
     }
@@ -113,7 +113,7 @@ public class BoxController extends BaseController {
 
     @GetMapping("/openBox/{userBoxId}")
     @ApiOperation(value = "开启盲盒",notes = "盲盒编号  点击后, 返回的 data 会弹出对应的提示信息给用户即可.")
-    public R<String> openBox(@PathVariable String userBoxId){
+    public  R<String> openBox(@PathVariable String userBoxId){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(boxService.openBox(userBoxId,notNullLoginBusinessUser.getUserId()));
     }

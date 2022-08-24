@@ -107,11 +107,12 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
         List<CntPostConfig> cntPostConfigs = list(Wrappers.<CntPostConfig>lambdaQuery().select(CntPostConfig::getId,CntPostConfig::getBuyFrequency).in(CntPostConfig::getId, configIds).orderByDesc(CntPostConfig::getCreatedTime));
         // 拿到当前 配置列表后，开始遍历 已经是有顺序得了
         for (CntPostConfig cntPostConfig : cntPostConfigs) {
-            // 条件查出来之后，只需要满足一个即可
+
+            // 条件查出来之后，全部满足即可
             List<CntPostExist> cntPostExists = postExistService.list(Wrappers.<CntPostExist>lambdaQuery().eq(CntPostExist::getConfigId, cntPostConfig.getId()));
             if (cntPostExists.isEmpty()) return Boolean.FALSE;
             List<UserCollection> userCollections = userCollectionService.list(Wrappers.<UserCollection>lambdaQuery().select(UserCollection::getId).eq(UserCollection::getIsExist,USE_EXIST.getCode()).eq(UserCollection::getUserId, userId).in(UserCollection::getCollectionId,cntPostExists.parallelStream().map(item -> item.getCollectionId()) ));
-            if (!userCollections.isEmpty()){
+            if (userCollections.size() >= cntPostExists.size()){
                 // 如果满足，需要二次查询 自己的次数是否满足了.
                 CntPostConfigLog postConfigLogServiceOne = postConfigLogService.getOne(Wrappers.<CntPostConfigLog>lambdaQuery().eq(CntPostConfigLog::getUserId, userId).eq(CntPostConfigLog::getConfigId, cntPostConfig.getId()));
                 // 如果是 null 就直接返回 true
