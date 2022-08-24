@@ -345,6 +345,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         AuctionCollectionAllVo auctionCollectionAllVo = Builder.of(AuctionCollectionAllVo::new)
                 .with(AuctionCollectionAllVo::setCollectionVo, collectionService.getBaseCollectionVo(collectionId))
                 .with(AuctionCollectionAllVo::setCollectionInfoVo,auctionSendService.getBaseCollectionInfoVo(collectionId))
+                .with(AuctionCollectionAllVo::setCollectionNumber, userCollectionService.getById(auctionSendService.getById(auctionSendId).getMyGoodsId()).getCollectionNumber())
                 .with(AuctionCollectionAllVo::setAuctionVo,auctionSendService.getAuctionSendVo(auctionSendId)).build();
 
         return auctionCollectionAllVo;
