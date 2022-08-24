@@ -51,11 +51,10 @@ public class CntPostExcelServiceImpl extends ServiceImpl<CntPostExcelMapper, Cnt
         if (Objects.isNull(excel))return Boolean.FALSE;
         // 是否购买到达这个次数了?
         CntPostExcelLog postExcelLog = getPostExcelLog(userId, excel);
-        if (Objects.nonNull(excel)){
+            // 数据不完整性，必须限制此操作，否则 null
             if (Objects.isNull(postExcelLog))return Boolean.TRUE;
             return postExcelLog.getBuyFrequency().compareTo(excel.getBuyFrequency()) <1;
-        }
-        return Boolean.FALSE;
+
     }
 
     /**
