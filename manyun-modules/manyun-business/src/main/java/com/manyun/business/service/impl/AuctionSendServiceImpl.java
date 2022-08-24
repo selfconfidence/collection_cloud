@@ -392,6 +392,8 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
 
     private void checkAll(AuctionSendForm auctionSendForm, String userId) {
         Integer type = auctionSendForm.getGoodsType();
+        Assert.isTrue(auctionSendForm.getStartPrice().compareTo(auctionSendForm.getSoldPrice()) < 1 ,"一口价需大于起拍价");
+
         // 藏品
         if (type == 1)
             Assert.isTrue(userCollectionService.existUserCollection(userId,auctionSendForm.getMyGoodsId()),"选择的藏品有误,请核实藏品详细信息!");
