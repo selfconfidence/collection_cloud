@@ -377,10 +377,12 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     @Override
     public R<InviteUserVo> inviteUser(String userId) {
         CntUser cntUser = getById(userId);
+        String regUrl = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.REG_URL, SecurityConstants.INNER).getData() + "?pleaseCode=" + cntUser.getPleaseCode();
         InviteUserVo inviteUserVo = new InviteUserVo();
         inviteUserVo.setInviteCode(cntUser.getPleaseCode());
         if (StringUtils.isNotBlank(cntUser.getInviteUrl())) {
             inviteUserVo.setInviteUrl(cntUser.getInviteUrl());
+            inviteUserVo.setRegUrl(regUrl);
             return R.ok(inviteUserVo);
         }
         //背景，海报图
@@ -398,7 +400,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
             // 画 二维码 并改变大小
             // 1. 先 获取二维码(二维码携带一个参数)
 
-            String regUrl = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.REG_URL, SecurityConstants.INNER).getData() + "?pleaseCode=" + cntUser.getPleaseCode();
+            //String regUrl = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.REG_URL, SecurityConstants.INNER).getData() + "?pleaseCode=" + cntUser.getPleaseCode();
             // + "?" + cntUser.getPleaseCode()
             // 生成二维码并指定宽高
             BufferedImage qrCode = QrCodeUtil.generate(regUrl, 300, 300);
@@ -432,6 +434,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
             cntUser.setInviteUrl(data.toString());
             updateById(cntUser);
             inviteUserVo.setInviteUrl(data.toString());
+            inviteUserVo.setRegUrl(regUrl);
             return R.ok(inviteUserVo);
 
 
