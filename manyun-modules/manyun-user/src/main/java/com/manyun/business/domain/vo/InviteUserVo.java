@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-@ApiModel("邀请好友视图")
+@ApiModel("邀请好友返回视图")
 public class InviteUserVo {
 
     @ApiModelProperty("海报链接")
@@ -13,5 +13,8 @@ public class InviteUserVo {
 
     @ApiModelProperty("邀请码")
     private String inviteCode;
+
+    @ApiModelProperty("注册链接")
+    private String regUrl;
 
 }
