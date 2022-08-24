@@ -235,7 +235,9 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         }).collect(Collectors.toList());
         //拍中者修改状态为待支付
         winAuctionPrice.setAuctionStatus(AuctionStatus.WAIT_PAY.getCode());
-        winAuctionPrice.setEndPayTime(LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class)));
+        LocalDateTime endPayTime = LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class));
+
+        winAuctionPrice.setEndPayTime(endPayTime);
         //回调成功,生成订单
         String auctionOrderNo = auctionOrderService.createAuctionOrder(AuctionOrderCreateDto.builder()
                 .goodsId(auctionSend.getGoodsId())
@@ -248,7 +250,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .fromUserId(auctionSend.getUserId())
                 .toUserId(winAuctionPrice.getUserId()).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));
         auctionSend.setAuctionSendStatus(AuctionSendStatus.WAIT_PAY.getCode());
-        auctionSend.setEndPayTime(LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class)));
+        auctionSend.setEndPayTime(endPayTime);
 
         auctionSendService.updateById(auctionSend);
 
