@@ -5,10 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.manyun.business.config.AliRealConfig;
 import com.manyun.business.domain.entity.CntUser;
 import com.manyun.business.domain.form.*;
-import com.manyun.business.domain.vo.InviteUserVo;
-import com.manyun.business.domain.vo.UserInfoVo;
-import com.manyun.business.domain.vo.UserLevelVo;
-import com.manyun.business.domain.vo.UserPleaseBoxVo;
+import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.ICntUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.domain.form.JgLoginTokenForm;
@@ -141,7 +138,7 @@ public class CntUserController extends BaseController {
     //调起认证
     @PostMapping("/getH5CertifyId")
     @ApiOperation(value = "获取认证ID -h5",notes = "h5 端 \n version 1.0.1")
-    public R<String> getH5CertifyId(@RequestBody UserAliyunRealForm userAliyunRealForm){
+    public R<AliRealVo> getH5CertifyId(@RequestBody UserAliyunRealForm userAliyunRealForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(userService.getH5CertifyId(userAliyunRealForm));
     }

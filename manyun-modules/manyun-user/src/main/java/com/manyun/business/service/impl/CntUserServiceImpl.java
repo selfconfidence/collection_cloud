@@ -14,10 +14,7 @@ import com.manyun.business.config.AsyncUtil;
 import com.manyun.business.config.InviteUtil.PosterUtil;
 import com.manyun.business.config.UnionRealConfig;
 import com.manyun.business.domain.form.*;
-import com.manyun.business.domain.vo.InviteUserVo;
-import com.manyun.business.domain.vo.UserInfoVo;
-import com.manyun.business.domain.vo.UserLevelVo;
-import com.manyun.business.domain.vo.UserPleaseBoxVo;
+import com.manyun.business.domain.vo.*;
 import com.manyun.business.mapper.CntUserMapper;
 import com.manyun.business.service.ICntUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -366,7 +363,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     }
 
     @Override
-    public String getH5CertifyId(UserAliyunRealForm userAliyunRealForm) {
+    public AliRealVo getH5CertifyId(UserAliyunRealForm userAliyunRealForm) {
         return aliRealConfig.getCertifyIdH5(userAliyunRealForm);
     }
 

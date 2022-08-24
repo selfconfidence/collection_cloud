@@ -2,10 +2,7 @@ package com.manyun.business.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.form.*;
-import com.manyun.business.domain.vo.InviteUserVo;
-import com.manyun.business.domain.vo.UserInfoVo;
-import com.manyun.business.domain.vo.UserLevelVo;
-import com.manyun.business.domain.vo.UserPleaseBoxVo;
+import com.manyun.business.domain.vo.*;
 import com.manyun.business.domain.entity.CntUser;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.domain.form.JgLoginTokenForm;
@@ -64,6 +61,6 @@ public interface ICntUserService extends IService<CntUser> {
 
     void asyncInviteUser(String userId);
 
-    String getH5CertifyId(UserAliyunRealForm userAliyunRealForm);
+    AliRealVo getH5CertifyId(UserAliyunRealForm userAliyunRealForm);
 
 }
