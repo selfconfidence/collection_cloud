@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.Objects;
 
+import static com.manyun.common.core.enums.UserRealStatus.OK_REAL;
+
 /**
  * 转赠相关实现
  */
@@ -96,6 +98,7 @@ public class ITranServiceImpl implements ITranService {
         // 收方信息是否正确
         R<CntUserDto> cntUserDtoR = remoteBuiUserService.commUni(tranAccForm.getCommUni(), SecurityConstants.INNER);
         Assert.isTrue(cntUserDtoR.getCode() == R.SUCCESS && Objects.nonNull(cntUserDtoR.getData()),"转赠方信息有误,请核实!\n{}",cntUserDtoR.getMsg());
+        Assert.isTrue(OK_REAL.getCode().equals(cntUserDtoR.getData().getIsReal()),"受赠方暂未实名认证!");
         // 转方信息是否准确  查询当前用户是否正常拥有这个 藏品 和盲盒
         Integer accFormType = tranAccForm.getType();
 
