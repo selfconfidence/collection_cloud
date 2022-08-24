@@ -19,6 +19,8 @@ import com.aliyuncs.cloudauth.model.v20190307.InitFaceVerifyRequest;
 import com.aliyuncs.cloudauth.model.v20190307.InitFaceVerifyResponse;
 import com.aliyuncs.profile.DefaultProfile;
 import com.manyun.business.domain.form.UserAliyunRealForm;
+import com.manyun.business.domain.vo.AliRealVo;
+import com.manyun.common.core.domain.Builder;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +55,7 @@ public class AliRealConfig {
      * @return
      */
     @SneakyThrows
-    public String getCertifyIdH5(UserAliyunRealForm aliyunRealForm){
+    public AliRealVo getCertifyIdH5(UserAliyunRealForm aliyunRealForm){
         IAcsClient client = new DefaultAcsClient(getDefaultProfile());
 
         InitFaceVerifyRequest request = new InitFaceVerifyRequest();
@@ -75,7 +77,8 @@ public class AliRealConfig {
         log.info(response.getResultObject() == null ? null
                 : response.getResultObject().getCertifyId());
         Assert.isTrue(response.getCode().equals("200"),response.getMessage());
-        return response.getResultObject().getCertifyId();
+        InitFaceVerifyResponse.ResultObject resultObject = response.getResultObject();
+        return Builder.of(AliRealVo::new).with(AliRealVo::setCertifyUrl,resultObject.getCertifyUrl()).with(AliRealVo::setCertifyId, resultObject.getCertifyId()).build();
     }
 
 
