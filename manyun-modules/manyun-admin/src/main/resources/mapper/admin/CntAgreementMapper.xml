@@ -19,18 +19,29 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, agreement_type, agreement_title, agreement_info, created_by, created_time, updated_by, updated_time from cnt_agreement
     </sql>
 
-    <select id="selectCntAgreementList" parameterType="CntAgreement" resultMap="CntAgreementResult">
-        <include refid="selectCntAgreementVo"/>
+    <select id="selectCntAgreementList" parameterType="CntAgreement" resultType="com.manyun.admin.domain.vo.CntAgreementVo">
+        select
+            ca.id,
+            cat.agreement_name agreementTypeName,
+            ca.agreement_title agreementTitle,
+            ca.agreement_info agreementInfo,
+            ca.created_time createdTime,
+            ca.updated_time updatedTime
+        from
+            cnt_agreement ca
+        left join
+            cnt_agreement_type cat
+        on ca.agreement_type=cat.agreement_code
         <where>
-            <if test="agreementType != null "> and agreement_type = #{agreementType}</if>
-            <if test="agreementTitle != null  and agreementTitle != ''"> and agreement_title = #{agreementTitle}</if>
-            <if test="agreementInfo != null  and agreementInfo != ''"> and agreement_info = #{agreementInfo}</if>
-            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
-            <if test="createdTime != null "> and created_time = #{createdTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
-            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
+            <if test="agreementType != null "> and ca.agreement_type = #{agreementType}</if>
+            <if test="agreementTitle != null  and agreementTitle != ''"> and ca.agreement_title = #{agreementTitle}</if>
+            <if test="agreementInfo != null  and agreementInfo != ''"> and ca.agreement_info = #{agreementInfo}</if>
+            <if test="createdBy != null  and createdBy != ''"> and ca.created_by = #{createdBy}</if>
+            <if test="createdTime != null "> and ca.created_time = #{createdTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and ca.updated_by = #{updatedBy}</if>
+            <if test="updatedTime != null "> and ca.updated_time = #{updatedTime}</if>
         </where>
-        order by created_time desc
+        order by ca.created_time desc
     </select>
 
 </mapper>

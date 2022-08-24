@@ -81,4 +81,10 @@ public interface CntDictService
      * 盲盒评分字典
      */
     R boxScoreDict();
+
+    /**
+     * 协议类型字典
+     * @return
+     */
+    R agreementTypeDict();
 }

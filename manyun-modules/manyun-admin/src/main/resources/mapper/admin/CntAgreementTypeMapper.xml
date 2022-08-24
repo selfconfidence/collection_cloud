@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntAgreementTypeMapper">
+
+    <resultMap type="CntAgreementType" id="CntAgreementTypeResult">
+        <result property="id"    column="id"    />
+        <result property="agreementCode"    column="agreement_code"    />
+        <result property="agreementName"    column="agreement_name"    />
+        <result property="agreementStatus"    column="agreement_status"    />
+        <result property="agreementSort"    column="agreement_sort"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCntAgreementTypeVo">
+        select id, agreement_code, agreement_name, agreement_status, agreement_sort, created_by, created_time, updated_by, updated_time from cnt_agreement_type
+    </sql>
+
+    <select id="selectCntAgreementTypeList" parameterType="AgreementTypeQuery" resultMap="CntAgreementTypeResult">
+        <include refid="selectCntAgreementTypeVo"/>
+        <where>
+            <if test="agreementName != null  and agreementName != ''"> and agreement_name like concat('%', #{agreementName}, '%')</if>
+        </where>
+    </select>
+
+</mapper>

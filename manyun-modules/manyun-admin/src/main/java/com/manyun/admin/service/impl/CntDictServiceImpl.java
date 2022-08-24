@@ -58,6 +58,9 @@ public class CntDictServiceImpl implements CntDictService
     @Autowired
     private ICntBoxScoreService boxScoreService;
 
+    @Autowired
+    private ICntAgreementTypeService agreementTypeService;
+
     /***
      * 查询藏品字典
      */
@@ -264,6 +267,19 @@ public class CntDictServiceImpl implements CntDictService
             CntBoxScoreDictVo boxScoreDictVo=new CntBoxScoreDictVo();
             BeanUtil.copyProperties(m,boxScoreDictVo);
             return boxScoreDictVo;
+        }));
+    }
+
+
+    /***
+     * 协议类型字典
+     */
+    @Override
+    public R agreementTypeDict() {
+        return R.ok(agreementTypeService.list(Wrappers.<CntAgreementType>lambdaQuery().eq(CntAgreementType::getAgreementStatus,0).orderByAsc(CntAgreementType::getAgreementSort)).parallelStream().map(m->{
+            CntAgreementTypeDictVo cntAgreementTypeDictVo=new CntAgreementTypeDictVo();
+            BeanUtil.copyProperties(m,cntAgreementTypeDictVo);
+            return cntAgreementTypeDictVo;
         }));
     }
 
