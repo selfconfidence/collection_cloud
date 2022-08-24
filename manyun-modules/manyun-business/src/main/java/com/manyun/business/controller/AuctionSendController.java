@@ -52,7 +52,7 @@ public class AuctionSendController {
 
     @PostMapping("/auctionSend")
     @ApiOperation("提交送拍")
-    public R auctionSend(@Valid @RequestBody AuctionSendForm auctionSendForm) {
+    public synchronized R auctionSend(@Valid @RequestBody AuctionSendForm auctionSendForm) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return auctionSendService.auctionSend(auctionSendForm, loginBusinessUser.getUserId());
     }
@@ -71,7 +71,7 @@ public class AuctionSendController {
 
     @PostMapping("/reAuctionSend")
     @ApiOperation("重新送拍")
-    public R reAuctionSend(@Valid @RequestBody AuctionSendForm auctionSendForm, String auctionSendId) {
+    public synchronized R reAuctionSend(@Valid @RequestBody AuctionSendForm auctionSendForm, String auctionSendId) {
         return auctionSendService.reAuctionSend(auctionSendForm, auctionSendId);
     }
 

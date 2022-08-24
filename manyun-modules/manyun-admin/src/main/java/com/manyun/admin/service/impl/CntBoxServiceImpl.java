@@ -114,6 +114,14 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         Assert.isFalse(boxList.size()>0,info);
         //验证盲盒如果没有添加藏品不能上架
         Assert.isFalse(cntBoxAlterVo.getStatusBy()==1,"未添加盲盒中的藏品,不可上架该盲盒!");
+        //验证发售时间是否小于当前时间
+        //比较两个时间大小，前者大 = -1， 相等 =0，后者大 = 1
+        Date publishTime = cntBoxAlterVo.getPublishTime();
+        if(publishTime!=null){
+            if (DateUtils.compareTo(new Date(), publishTime, DateUtils.YYYY_MM_DD_HH_MM_SS) == -1) {
+                return R.fail("发售时间不能小于当前时间!");
+            }
+        }
         //校验
         R check = check(cntBoxAlterVo,boxAlterCombineDto.getCntLableAlterVo(),boxAlterCombineDto.getMediaAlterVo());
         if(200!=check.getCode()){
@@ -249,17 +257,9 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
     public R check(CntBoxAlterVo boxAlterVo, CntLableAlterVo lableAlterVo, MediaAlterVo mediaAlterVo){
         //验证提前购分钟是否在范围内
         Integer postTime = boxAlterVo.getPostTime();
-        Date publishTime = boxAlterVo.getPublishTime();
         if(postTime!=null){
             if(postTime<10 || postTime>1000){
                 return R.fail("提前购时间请输入大于等于10,小于1000的整数!");
-            }
-        }
-        //验证发售时间是否小于当前时间
-        //比较两个时间大小，前者大 = -1， 相等 =0，后者大 = 1
-        if(publishTime!=null){
-            if (DateUtils.compareTo(new Date(), publishTime, DateUtils.YYYY_MM_DD_HH_MM_SS) == -1) {
-                return R.fail("发售时间不能小于当前时间!");
             }
         }
         //验证标签是否超过三个
