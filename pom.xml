@@ -302,17 +302,17 @@
         </dependency>
 
         <!-- 链路追踪 -->
-        <dependency>
+       <!-- <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-sleuth</artifactId>
-        </dependency>
+        </dependency>-->
         <!-- 链路追踪产生的日志,进行UI页面展示 -->
-        <dependency>
+       <!-- <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-zipkin</artifactId>
             <version>${starter-zipkin-version}</version>
         </dependency>
-
+-->
         <!-- 工具包 -->
         <dependency>
             <groupId>cn.hutool</groupId>
