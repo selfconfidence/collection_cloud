@@ -52,6 +52,7 @@ import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstan
 import static com.manyun.common.core.enums.PayTypeEnum.MONEY_TAPE;
 
 import static com.manyun.common.core.enums.AliPayEnum.*;
+import static com.manyun.common.core.enums.UserRealStatus.OK_REAL;
 import static com.manyun.common.core.enums.WxPayEnum.*;
 
 
@@ -114,6 +115,9 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     @Autowired
     private IMsgService msgService;
 
+    @Autowired
+    private RemoteBuiUserService userService;
+
 
     //判断是否出过价
 
@@ -131,8 +135,16 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     }
 
 
+    private void realCheck(String userId) {
+        R<CntUserDto> cntUserDtoR = userService.commUni(userId, SecurityConstants.INNER);
+        CntUserDto data = cntUserDtoR.getData();
+        cn.hutool.core.lang.Assert.isTrue(OK_REAL.getCode().equals(data.getIsReal()),"暂未实名认证,请实名认证!");
+    }
+
+
     @Override
     public synchronized R<BigDecimal> myAuctionPrice(AuctionPriceForm auctionPriceForm, String userId) {
+        realCheck(userId);
         LoginBusinessUser businessUser = SecurityUtils.getNotNullLoginBusinessUser();
         AuctionSend auctionSend = auctionSendService.getById(auctionPriceForm.getAuctionSendId());
         Integer delayTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_DELAY_TIME, Integer.class);
@@ -506,6 +518,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     @Override
     @Transactional(rollbackFor = Exception.class)
     public synchronized PayVo payFixed(String userId, AuctionPayFixedForm auctionPayFixedForm) {
+        realCheck(userId);
         LoginBusinessUser businessUser = SecurityUtils.getNotNullLoginBusinessUser();
 
         AuctionSend auctionSend = auctionSendService.getById(auctionPayFixedForm.getAuctionSendId());

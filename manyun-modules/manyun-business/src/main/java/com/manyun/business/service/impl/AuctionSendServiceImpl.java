@@ -17,6 +17,8 @@ import com.manyun.business.mapper.AuctionSendMapper;
 import com.manyun.business.mapper.CollectionInfoMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.comm.api.RemoteBuiUserService;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
@@ -40,6 +42,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.manyun.common.core.enums.UserRealStatus.OK_REAL;
 
 
 /**
@@ -84,6 +88,9 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
 
     @Autowired
     private ObjectFactory<IAuctionOrderService> auctionOrderServiceObjectFactory;
+
+    @Autowired
+    private RemoteBuiUserService userService;
 
     /**
      * 查询保证金比例
@@ -389,8 +396,15 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         return R.ok();
     }
 
+    private void realCheck(String userId) {
+        R<CntUserDto> cntUserDtoR = userService.commUni(userId, SecurityConstants.INNER);
+        CntUserDto data = cntUserDtoR.getData();
+        cn.hutool.core.lang.Assert.isTrue(OK_REAL.getCode().equals(data.getIsReal()),"暂未实名认证,请实名认证!");
+    }
+
 
     private void checkAll(AuctionSendForm auctionSendForm, String userId) {
+        realCheck(userId);
         Integer type = auctionSendForm.getGoodsType();
         Assert.isTrue(auctionSendForm.getStartPrice().compareTo(auctionSendForm.getSoldPrice()) < 1 ,"一口价需大于起拍价");
 
