@@ -51,7 +51,7 @@ public interface ICntUserService extends IService<CntUser> {
 
     R userRealName(UserRealForm userRealForm, String userId);
 
-    void checkCertifyIdH5Status(String certifyId, CntUserDto cntUser);
+    void checkCertifyIdH5Status(String certifyId, String userId);
 
     R<InviteUserVo> inviteUser(String userId);
 
@@ -61,6 +61,6 @@ public interface ICntUserService extends IService<CntUser> {
 
     void asyncInviteUser(String userId);
 
-    AliRealVo getH5CertifyId(UserAliyunRealForm userAliyunRealForm);
+    AliRealVo getH5CertifyId(UserAliyunRealForm userAliyunRealForm,String userId);
 
 }

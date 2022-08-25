@@ -321,6 +321,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
      */
     public void optimisticRealUser(String userId){
         CntUser cntUser = getById(userId);
+        if (OK_REAL.getCode().equals(cntUser.getIsReal()))return;
         cntUser.setIsReal(OK_REAL.getCode());
         // 调用合约
         AccountInfoDto accountInfoDto = remoteBuiMoneyService.userMoneyById(userId,SecurityConstants.INNER).getData();
@@ -363,15 +364,15 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     }
 
     @Override
-    public AliRealVo getH5CertifyId(UserAliyunRealForm userAliyunRealForm) {
-        return aliRealConfig.getCertifyIdH5(userAliyunRealForm);
+    public AliRealVo getH5CertifyId(UserAliyunRealForm userAliyunRealForm,String userId) {
+        return aliRealConfig.getCertifyIdH5(userAliyunRealForm,userId);
     }
 
 
     @Override
-    public void checkCertifyIdH5Status(String certifyId, CntUserDto cntUser) {
+    public void checkCertifyIdH5Status(String certifyId, String userId ) {
         aliRealConfig.checkCertifyIdH5Status(certifyId);
-        optimisticRealUser(cntUser.getId());
+        optimisticRealUser(userId);
     }
 
 

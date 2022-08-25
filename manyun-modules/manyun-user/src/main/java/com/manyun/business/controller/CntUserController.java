@@ -140,14 +140,14 @@ public class CntUserController extends BaseController {
     @ApiOperation(value = "获取认证ID -h5",notes = "h5 端 \n version 1.0.1")
     public R<AliRealVo> getH5CertifyId(@RequestBody UserAliyunRealForm userAliyunRealForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        return R.ok(userService.getH5CertifyId(userAliyunRealForm));
+        return R.ok(userService.getH5CertifyId(userAliyunRealForm,notNullLoginBusinessUser.getUserId()));
     }
 
     @GetMapping("/checkCertifyIdH5Status/{certifyId}")
     @ApiOperation(value = "查询阿里云刷脸实名认证信息 - h5",notes = "h5 端 \n version 1.0.1")
     public R checkCertifyIdH5Status(@PathVariable String certifyId){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        userService.checkCertifyIdH5Status(certifyId,notNullLoginBusinessUser.getCntUser());
+        userService.checkCertifyIdH5Status(certifyId,notNullLoginBusinessUser.getCntUser().getId());
         return R.ok();
     }
     // 修改登录密码

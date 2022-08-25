@@ -47,6 +47,7 @@ public class AliRealConfig {
     private String  accessKeySecret;
 
     private String  h5ReturnUrl;
+    private String  h5CallbackUrl;
 
 
     /**
@@ -55,7 +56,7 @@ public class AliRealConfig {
      * @return
      */
     @SneakyThrows
-    public AliRealVo getCertifyIdH5(UserAliyunRealForm aliyunRealForm){
+    public AliRealVo getCertifyIdH5(UserAliyunRealForm aliyunRealForm,String userId){
         IAcsClient client = new DefaultAcsClient(getDefaultProfile());
 
         InitFaceVerifyRequest request = new InitFaceVerifyRequest();
@@ -66,6 +67,8 @@ public class AliRealConfig {
         request.setCertType("IDENTITY_CARD");
         request.setSceneId(h5SceneId);
         request.setOuterOrderNo(IdUtil.getSnowflakeNextIdStr());
+        request.setCallbackToken(userId);
+        request.setCallbackUrl(h5CallbackUrl);
 // 固定值。
         request.setProductCode("ID_PRO");
 // Web SDK请求时为必填。
