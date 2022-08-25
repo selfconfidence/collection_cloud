@@ -29,7 +29,7 @@ public class MyAuctionPriceVo {
     @ApiModelProperty("竞品拍卖相关信息")
     private AuctionVo auctionVo;
 
-    @ApiModelProperty("竞拍状态")
+    @ApiModelProperty("竞拍状态，1, 竞拍中，2，未拍中，3，待支付，4，已支付，5，已违约")
     private Integer auctionStatus;
 
     @ApiModelProperty("剩余支付时间，只有状态为待支付才有效")
