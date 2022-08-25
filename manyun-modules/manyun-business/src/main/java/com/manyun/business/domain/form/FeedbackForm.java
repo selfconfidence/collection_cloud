@@ -14,7 +14,7 @@ public class FeedbackForm {
     @NotBlank(message = "区块链地址不能为空")
     private String linkAddr;
 
-    @ApiModelProperty(value = "反馈类型")
+    @ApiModelProperty(value = "反馈类型，举报类型 1:举报他人炒作/交易藏品   2:举报他人使用外挂等违规手段抢购藏品  3:其他")
     @NotBlank(message = "反馈类型不能为空")
     private String feedbackType;
 
