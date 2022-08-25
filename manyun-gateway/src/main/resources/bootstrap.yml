@@ -39,4 +39,6 @@ spring:
             dataId: sentinel-manyun-gateway
             groupId: SENTINEL_SECURITY
             data-type: json
-            rule-type: flow
+            rule-type: gw-flow
+      filter:
+        enabled: false
