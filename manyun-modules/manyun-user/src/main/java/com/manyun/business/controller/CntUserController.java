@@ -85,7 +85,7 @@ public class CntUserController extends BaseController {
     }
 
     private void codeCheck(String phone,String code) {
-        Object andDelete = redisService.redisTemplate.opsForValue().getAndDelete(PHONE_CODE.concat(phone));
+        Object andDelete = redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(phone));
         Assert.isTrue(Objects.nonNull(andDelete),"验证码失效！");
         String phoneCode = andDelete.toString();
         Assert.isTrue(code.equals(phoneCode),"验证码输入错误,请核实!");
