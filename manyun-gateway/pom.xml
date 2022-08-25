@@ -40,6 +40,18 @@
             <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
         </dependency>
 
+        <!--
+
+         Spring Cloud Gateway 的适配模块，可以提供两种资源维度的限流：
+
+route 维度：即在 Spring 配置文件中配置的路由条目，资源名为对应的 routeId
+自定义 API 维度：用户可以利用 Sentinel 提供的 API 来自定义一些 API 分组
+        -->
+        <dependency>
+            <groupId>com.alibaba.csp</groupId>
+            <artifactId>sentinel-spring-cloud-gateway-adapter</artifactId>
+        </dependency>
+
         <!-- SpringCloud Alibaba Sentinel Gateway -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
