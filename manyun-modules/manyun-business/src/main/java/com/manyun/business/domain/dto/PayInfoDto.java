@@ -15,9 +15,17 @@ import java.math.BigDecimal;
 @Builder
 public class PayInfoDto implements Serializable {
 
+    //商品名称
+    private String goodsName;
+    //订单号
     private String outHost;
+    //金额
     private BigDecimal realPayMoney;
+    //用户id
     private String userId;
+    //ip
+    private String ipaddr;
+    //支付方式
     private Integer payType;
     private AliPayEnum aliPayEnum;
     private WxPayEnum wxPayEnum;

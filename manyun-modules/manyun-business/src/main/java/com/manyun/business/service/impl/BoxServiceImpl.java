@@ -164,7 +164,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public PayVo sellBox(BoxSellForm boxSellForm,String userId) {
+    public PayVo sellBox(BoxSellForm boxSellForm,String userId, String ipaddr) {
 
         // 总结校验 —— 支付方式
         Box box = getById(boxSellForm.getBoxId());
@@ -195,6 +195,8 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
                         .payType(boxSellForm.getPayType())
                         .realPayMoney(realPayMoney)
                         .outHost(outHost)
+                        .ipaddr(ipaddr)
+                        .goodsName(box.getBoxTitle())
                         .aliPayEnum(BOX_ALI_PAY)
                         .wxPayEnum(BOX_WECHAT_PAY)
                         .userId(userId).build());

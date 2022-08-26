@@ -1,6 +1,7 @@
 package com.manyun.business.controller;
 
 
+import com.manyun.business.config.cashier.sdk.CertUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +36,13 @@ import java.util.TreeMap;
 @Slf4j
 @CrossOrigin(origins = "*")
 public class ActionTarController {
+
+
+    @GetMapping("/test")
+    @ResponseBody
+    public void test() {
+        System.out.println(CertUtil.getPublicKey()+"测试测手册");
+    }
 
     /**
      * 墨云支付成功回调

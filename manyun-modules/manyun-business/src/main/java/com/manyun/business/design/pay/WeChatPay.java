@@ -20,7 +20,7 @@ public class WeChatPay implements RootPayServer {
     private WxComm wxComm;
 
     @Autowired
-    private MoneyPay moneyPay;
+    private ShandePay shandePay;
 
     /**
      *
@@ -35,7 +35,7 @@ public class WeChatPay implements RootPayServer {
             String body = wxComm.appPay(payInfoDto.getOutHost(), payInfoDto.getRealPayMoney(), payInfoDto.getWxPayEnum(), JSONUtil.toJsonStr(payInfoDto));
             return Builder.of(PayVo::new).with(PayVo::setBody, body).with(PayVo::setPayType, payInfoDto.getPayType()).with(PayVo::setOutHost, payInfoDto.getOutHost()).build();
         }
-        return moneyPay.execPayVo(payInfoDto);
+        return shandePay.execPayVo(payInfoDto);
     }
 
 

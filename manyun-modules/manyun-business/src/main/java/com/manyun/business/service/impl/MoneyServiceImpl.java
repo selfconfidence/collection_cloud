@@ -6,6 +6,7 @@ import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.manyun.business.domain.dto.LogInfoDto;
+import com.manyun.business.domain.dto.UserMoneyDto;
 import com.manyun.business.domain.entity.Logs;
 import com.manyun.business.domain.entity.Money;
 import com.manyun.business.domain.form.AccountInfoForm;
@@ -47,6 +48,9 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
 
     @Autowired
     private ILogsService logsService;
+
+    @Autowired
+    private MoneyMapper moneyMapper;
 
 
     /**
@@ -168,6 +172,16 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         } else {
             return R.fail("当前身份证已用于实名，请勿重复验证");
         }
+    }
+
+    /**
+     * 杉德支付所需参数
+     * @param userId
+     * @return
+     */
+    @Override
+    public UserMoneyDto userMoneyInfo(String userId) {
+        return moneyMapper.userMoneyInfo(userId);
     }
 
 }

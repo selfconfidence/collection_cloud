@@ -2,4 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.manyun.business.mapper.MoneyMapper">
 
+    <select id="userMoneyInfo" resultType="com.manyun.business.domain.dto.UserMoneyDto">
+        SELECT
+            u.user_id userNumber,
+            m.real_name realName,
+            m.cart_no cartNo
+        FROM
+            cnt_user u
+            LEFT JOIN cnt_money m ON u.id = m.user_id where u.id=#{userId}
+    </select>
+
 </mapper>

@@ -29,7 +29,7 @@ public interface IBoxService extends IService<Box> {
 
     BoxVo info(String id,String userId);
 
-    PayVo sellBox(BoxSellForm boxSellForm, String userId);
+    PayVo sellBox(BoxSellForm boxSellForm, String userId, String ipaddr);
 
     TableDataInfo<UserBoxVo> userBoxPageList(UseAssertQuery useAssertQuery, String userId);
 

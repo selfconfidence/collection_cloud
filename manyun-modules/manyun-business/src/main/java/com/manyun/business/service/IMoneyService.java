@@ -1,5 +1,6 @@
 package com.manyun.business.service;
 
+import com.manyun.business.domain.dto.UserMoneyDto;
 import com.manyun.business.domain.entity.Money;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.form.AccountInfoForm;
@@ -38,4 +39,6 @@ public interface IMoneyService extends IService<Money> {
     R updateUserMoney(UserRealMoneyForm userRealMoneyForm);
 
     R checkIdentity(String identityNo);
+
+    UserMoneyDto userMoneyInfo(String userId);
 }
