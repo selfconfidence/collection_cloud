@@ -197,6 +197,8 @@ public interface BusinessConstants {
         Integer EXP_TIME = Integer.valueOf(60);
         // 持续递增编号key
         String COLLECTION_AUTO_NUM = "collection:auto:numbers:";
+        String  USER_ACTIVE_NUMBERS = "user:active:numbers:";
+
     }
 
     interface CommDict{

@@ -7,10 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.BoundSetOperations;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 
 /**
@@ -59,6 +56,24 @@ public class RedisService
     public boolean expire(final String key, final long timeout)
     {
         return expire(key, timeout, TimeUnit.SECONDS);
+    }
+
+    /**
+     * 统计日活
+     */
+    public void setActives(String boundKey,String minKey){
+        BoundHashOperations boundHashOperations = redisTemplate.boundHashOps(boundKey);
+        if (boundHashOperations.hasKey(minKey)) {
+            boundHashOperations.increment(minKey, 1L);
+            return;
+        }
+        boundHashOperations.put(minKey, 1L);
+    }
+    /**
+     * 获取日活总量
+     */
+    public Long getActives(String bounds){
+        return redisTemplate.boundHashOps(bounds).size();
     }
 
     /**

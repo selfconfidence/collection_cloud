@@ -12,11 +12,14 @@ import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.OrderStatus;
 import com.manyun.common.core.utils.DateUtils;
+import com.manyun.common.redis.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+
+import static com.manyun.common.core.constant.BusinessConstants.RedisDict.USER_ACTIVE_NUMBERS;
 
 @Service
 public class FrontPageServiceImpl implements IFrontPageService
@@ -30,6 +33,9 @@ public class FrontPageServiceImpl implements IFrontPageService
 
     @Autowired
     private ICntOrderService orderService;
+
+    @Autowired
+    private RedisService redisService;
 
     @Override
     public R<FrontPageVo> list() {
@@ -73,6 +79,7 @@ public class FrontPageServiceImpl implements IFrontPageService
                 .with(FrontPageVo::setValidOrderAddStatisticsVoList,validOrderAddStatisticsVoList)
                 .with(FrontPageVo::setOrderAmountsAddStatisticsVoList,orderAmountsAddStatisticsVoList)
                 .with(FrontPageVo::setOrderTypeNumberVo,orderTypeNumberVo)
+                        .with(FrontPageVo::setUserActives, redisService.getActives(USER_ACTIVE_NUMBERS))
                 .build());
     }
 

@@ -14,6 +14,7 @@ import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.redis.service.RedisService;
 import com.manyun.common.security.annotation.InnerAuth;
 import com.manyun.common.security.utils.SecurityUtils;
 import io.swagger.annotations.Api;
@@ -22,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.math.BigDecimal;
+
+import static com.manyun.common.core.constant.BusinessConstants.RedisDict.USER_ACTIVE_NUMBERS;
 
 /**
  * <p>
@@ -38,13 +41,23 @@ public class MoneyController extends BaseController {
     @Autowired
     private IMoneyService moneyService;
 
+    @Autowired
+    private RedisService redisService;
+
 
     @GetMapping("/thisMoney")
     @ApiOperation(value = "查看自己钱包余额",notes = "返回钱包余额")
     public R<BigDecimal>  thisMoney(){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         Money moneyUser = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, notNullLoginBusinessUser.getUserId()));
+        redisService.setActives(USER_ACTIVE_NUMBERS, notNullLoginBusinessUser.getUserId());
         return R.ok(moneyUser.getMoneyBalance());
+    }
+
+    @GetMapping("/userActives")
+    @ApiOperation("查看用户日活")
+    public R userActives(){
+        return R.ok(redisService.getActives(USER_ACTIVE_NUMBERS));
     }
 
 
