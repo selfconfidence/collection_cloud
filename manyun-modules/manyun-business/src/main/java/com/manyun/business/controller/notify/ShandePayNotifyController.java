@@ -28,6 +28,7 @@ public class ShandePayNotifyController {
     @ResponseBody
     @ApiOperation(value = "杉德支付回调",hidden = true)
     public String ShandeNotify(HttpServletRequest req) {
+        log.info("进入回调");
         String data=req.getParameter("data");
         String sign=req.getParameter("sign");
         log.info("接收到后台通知数据："+data);
