@@ -14,6 +14,10 @@ public class FrontPageVo {
     @ApiModelProperty("总会员数量")
     private Long totalUsers;
 
+
+    @ApiModelProperty("会员日活")
+    private Long userActives;
+
     @ApiModelProperty("用户藏品持有总量")
     private Long totalUserCollections;
 
