@@ -10,7 +10,7 @@ import lombok.Getter;
 @Getter
 public enum ShandePayEnum
 {
-    BOX_SHANDE_PAY("/business/notify_pay/ShandePay/ShandeNotify", "盲盒支付");
+    BOX_SHANDE_PAY("http://test.dcalliance.com.cn/prod-api/business/notify_pay/ShandePay/ShandeNotify", "盲盒支付");
 
     private final String notifyUrl;
     private final String body;

@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,8 +41,8 @@ public class ActionTarController {
 
     @GetMapping("/test")
     @ResponseBody
-    public void test() {
-        System.out.println(CertUtil.getPublicKey()+"测试测手册");
+    public PublicKey test() {
+        return CertUtil.getPublicKey();
     }
 
     /**
