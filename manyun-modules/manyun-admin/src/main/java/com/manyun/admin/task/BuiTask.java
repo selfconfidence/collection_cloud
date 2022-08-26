@@ -5,10 +5,14 @@ import com.manyun.comm.api.RemoteConsignmentService;
 import com.manyun.comm.api.RemoteOrderService;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.utils.StringUtils;
+import com.manyun.common.redis.service.RedisService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+
+import static com.manyun.common.core.constant.BusinessConstants.RedisDict.USER_ACTIVE_NUMBERS;
 
 /**
  * 业务相关调度
@@ -28,6 +32,9 @@ public class BuiTask
 
     @Resource
     private RemoteConsignmentService remoteConsignmentService;
+
+    @Autowired
+    private RedisService redisService;
 
     /**
      * 藏品盲盒,提前一个小时发售全局进行推送用户.
@@ -93,6 +100,13 @@ public class BuiTask
      */
     public void backConsignmentByTime(){
         remoteConsignmentService.cancelSchedulingConsignment(SecurityConstants.INNER);
+    }
+
+    /**
+     * 定时清空日活
+     */
+    public void clearActives(){
+        redisService.deleteObject(USER_ACTIVE_NUMBERS);
     }
 
 }
