@@ -55,7 +55,8 @@ public class MoneyController extends BaseController {
     }
 
     @GetMapping("/userActives")
-    @ApiOperation("查看用户日活")
+    @ApiOperation(value = "查看用户日活",hidden = true)
+    @Deprecated
     public R userActives(){
         return R.ok(redisService.getActives(USER_ACTIVE_NUMBERS));
     }
