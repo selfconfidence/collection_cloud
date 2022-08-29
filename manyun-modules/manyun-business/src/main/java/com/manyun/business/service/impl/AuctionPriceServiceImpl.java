@@ -307,9 +307,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         List<AuctionPrice> auctionPriceList = list(Wrappers.<AuctionPrice>lambdaQuery()
                 .eq(myAuctionPriceQuery.getAuctionPriceStatus() != null && myAuctionPriceQuery.getAuctionPriceStatus() != 0, AuctionPrice::getAuctionStatus, myAuctionPriceQuery.getAuctionPriceStatus())
                 .eq(AuctionPrice::getUserId, userId)
-                .eq(AuctionPrice::getIsNew, 1));
-
-
+                .eq(AuctionPrice::getIsNew, 1).orderByDesc(AuctionPrice::getCreatedTime));
 
         return TableDataInfoUtil.pageTableDataInfo(auctionPriceList.parallelStream().map(this::providerMyAuctionPriceVo).collect(Collectors.toList()), auctionPriceList);
 
