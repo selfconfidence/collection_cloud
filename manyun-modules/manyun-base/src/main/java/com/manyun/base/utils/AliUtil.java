@@ -337,7 +337,7 @@ public class AliUtil {
             fileExtension = fileName.substring(fileName.lastIndexOf("."));
 
         }catch (Exception e){
-
+            fileExtension = ".jpeg";
         }
         /**
          * "video/mp4",
