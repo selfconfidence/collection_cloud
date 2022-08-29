@@ -141,7 +141,7 @@ public class SysProfileController extends BaseController
             R<String> fileResult = remoteFileService.upload(file);
             if (StringUtils.isNull(fileResult) || StringUtils.isNull(fileResult.getData()))
             {
-                return AjaxResult.error("文件服务异常，请联系管理员");
+                return AjaxResult.error(fileResult.getMsg());
             }
             String url = fileResult.getData();
             if (userService.updateUserAvatar(loginUser.getUsername(), url))
