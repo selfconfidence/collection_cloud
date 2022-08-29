@@ -24,6 +24,17 @@ import javax.servlet.http.HttpServletRequest;
 @Api(hidden = true)
 public class ShandePayNotifyController {
 
+
+    /**
+     * 11:32:11.636 [http-nio-9205-exec-2] INFO  c.m.b.c.n.ShandePayNotifyController - [ShandeNotify,31] - 进入回调
+     * 11:32:11.636 [http-nio-9205-exec-2] INFO  c.m.b.c.n.ShandePayNotifyController - [ShandeNotify,34] - 接收到后台通知数据：{"head":{"version":"1.0","respTime":"20220829113140","respCode":"000000","respMsg":"成功"},"body":{"mid":"6888801048981","orderCode":"630c3305e4b09f5444cfe71b","tradeNo":"630c3305e4b09f5444cfe71b","clearDate":"20220829","totalAmount":"000000000100","orderStatus":"1","payTime":"20220829113139","settleAmount":"000000000100","buyerPayAmount":"000000000100","discAmount":"000000000000","txnCompleteTime":"20220829113140","payOrderCode":"2022082900024900000382750110201","accLogonNo":"621700*********2734","accNo":"621700*********2734","midFee":"000000000010","extraFee":"000000000000","specialFee":"000000000000","plMidFee":"000000000000","bankserial":"202208291050000739908721010012H11661743900854590","externalProductCode":"00000018","cardNo":"621700*********2734","creditFlag":"","bid":"SDSMP00688880104898120220826043232446637","benefitAmount":"000000000000","remittanceCode":"","extend":""}}
+     * 11:32:11.637 [http-nio-9205-exec-2] INFO  c.m.b.c.n.ShandePayNotifyController - [ShandeNotify,35] - 接收到后台通知签名：NxMJVX/km3ekCBQ12sND63EdtPPS6pLFwT4YoPW7tlgkT4Dae/usJ3Cvmti0q1QrLu9x9DYHo6vq4fKw9qDm8yftqCEVc9xsCW3CD8mbNtQhc147WwL2IaMkC4SdC0di9jlUl6J16CAjGg5U1kO1Ei0kZdDhR5V7QF/vZ22N5cR8wShIyPBe9X810i0eXgBrH3SMZFWaOrrn1vDT7hcjF7NhL/jLc3RseRw6Nt377ykwirHHfRb7SOZ00BKkyxf4HutbxurelOVaw2LGxuRV6sAyzlFr83Sar4IF3hn9G94MtAtYFGmFddLn/9zNwFezl8uA5qVQTdEzUfJ4DG5bqw==
+     * 11:32:11.637 [http-nio-9205-exec-2] INFO  c.m.b.c.n.ShandePayNotifyController - [ShandeNotify,42] - verify sign fail.
+     * 11:32:11.637 [http-nio-9205-exec-2] INFO  c.m.b.c.n.ShandePayNotifyController - [ShandeNotify,43] - 签名字符串(data)为：{"head":{"version":"1.0","respTime":"20220829113140","respCode":"000000","respMsg":"成功"},"body":{"mid":"6888801048981","orderCode":"630c3305e4b09f5444cfe71b","tradeNo":"630c3305e4b09f5444cfe71b","clearDate":"20220829","totalAmount":"000000000100","orderStatus":"1","payTime":"20220829113139","settleAmount":"000000000100","buyerPayAmount":"000000000100","discAmount":"000000000000","txnCompleteTime":"20220829113140","payOrderCode":"2022082900024900000382750110201","accLogonNo":"621700*********2734","accNo":"621700*********2734","midFee":"000000000010","extraFee":"000000000000","specialFee":"000000000000","plMidFee":"000000000000","bankserial":"202208291050000739908721010012H11661743900854590","externalProductCode":"00000018","cardNo":"621700*********2734","creditFlag":"","bid":"SDSMP00688880104898120220826043232446637","benefitAmount":"000000000000","remittanceCode":"","extend":""}}
+     * 11:32:11.638 [http-nio-9205-exec-2] INFO  c.m.b.c.n.ShandePayNotifyController - [ShandeNotify,44] - 签名值(sign)为：NxMJVX/km3ekCBQ12sND63EdtPPS6pLFwT4YoPW7tlgkT4Dae/usJ3Cvmti0q1QrLu9x9DYHo6vq4fKw9qDm8yftqCEVc9xsCW3CD8mbNtQhc147WwL2IaMkC4SdC0di9jlUl6J16CAjGg5U1kO1Ei0kZdDhR5V7QF/vZ22N5cR8wShIyPBe9X810i0eXgBrH3SMZFWaOrrn1vDT7hcjF7NhL/jLc3RseRw6Nt377ykwirHHfRb7SOZ00BKkyxf4HutbxurelOVaw2LGxuRV6sAyzlFr83Sar4IF3hn9G94MtAtYFGmFddLn/9zNwFezl8uA5qVQTdEzUfJ4DG5bqw==
+     * @param req
+     * @return
+     */
     @RequestMapping(value = "/ShandeNotify")
     @ResponseBody
     @ApiOperation(value = "杉德支付回调",hidden = true)
