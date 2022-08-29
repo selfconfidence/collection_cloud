@@ -332,7 +332,13 @@ public class AliUtil {
      */
     public static String getContentType(String fileName) {
         //文件的后缀名
-        String fileExtension = fileName.substring(fileName.lastIndexOf("."));
+        String fileExtension = null;
+        try {
+            fileExtension = fileName.substring(fileName.lastIndexOf("."));
+
+        }catch (Exception e){
+
+        }
         /**
          * "video/mp4",
          *           "video/ogg",
