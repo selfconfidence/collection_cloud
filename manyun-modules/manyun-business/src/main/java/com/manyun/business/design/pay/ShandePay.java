@@ -95,7 +95,7 @@ public class ShandePay implements RootPayServer {
         String mer_key = "PZWgkPqM09qpDbUngCDdGL5kgg/9jDd3wvZUn87m0CnI6CklVzmtMi2AkXOd7P4xWmEjjzEo5bo="; //活的
         //回调地址
         String notify_url = ShandePayEnum.BOX_SHANDE_PAY.getNotifyUrl();
-        String return_url = "https://www.baidu.com"; //待修改
+        String return_url = "https://dcalliance.com.cn"; //待修改
         //支付扩展域
         //"userId":"用户在商户下唯一标识 1-10位",
         // "userName":"证件姓名",
