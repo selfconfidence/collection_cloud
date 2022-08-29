@@ -2,6 +2,7 @@ package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.net.Ipv4Util;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
@@ -409,6 +410,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                         .outHost(order.getOrderNo())
                         .aliPayEnum(BOX_ALI_PAY)
                         .wxPayEnum(BOX_WECHAT_PAY)
+                        .goodsName(order.getCollectionName())
+                        .ipaddr(Ipv4Util.LOCAL_IP)
                         .userId(userId).build());
         // 走这一步如果 是余额支付 那就说明扣款成功了！！！
         order.setMoneyBln(order.getMoneyBln().add(payVo.getMoneyBln()));
