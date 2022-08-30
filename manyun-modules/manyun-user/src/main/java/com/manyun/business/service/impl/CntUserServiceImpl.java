@@ -399,15 +399,19 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         log.info("111111111111111111");
         //背景，海报图
         String background = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.INVITE_URL, SecurityConstants.INNER).getData();
+        log.info("777777777" + background);
         int width = 0;
         int height = 0;
         try {
             URL backgroundUrl = new URL(background);
+            log.info("88888888888888");
             BufferedImage read = ImageIO.read(backgroundUrl.openStream());
+            log.info("9999999999999999");
             width = read.getWidth();
             height = read.getHeight();
 
             BufferedImage bufferedImage = PosterUtil.drawInitAndChangeSize(background, backgroundUrl.openConnection().getInputStream(),width, height);
+            log.info("1000000000000000000");
 
             // 画 二维码 并改变大小
             // 1. 先 获取二维码(二维码携带一个参数)
@@ -416,6 +420,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
             // + "?" + cntUser.getPleaseCode()
             // 生成二维码并指定宽高
             BufferedImage qrCode = QrCodeUtil.generate(regUrl, 300, 300);
+            log.info("78998641353416");
             // 2. 初始化并的改变大小
             // 将二维码保存到本地
             // 3. 画二维码
