@@ -1,6 +1,7 @@
 package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.net.Ipv4Util;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
@@ -410,6 +411,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                         .aliPayEnum(AUCTION_ALI_PAY)
                         .wxPayEnum(AUCTION_WECHAT_PAY)
                         .shandePayEnum(ShandePayEnum.AUCTION_SHANDE_PAY)
+                        .ipaddr(Ipv4Util.LOCAL_IP)
+                        .goodsName(auctionOrder.getGoodsName())
                         .userId(payUserId).build());
 
         auctionOrder.setMoneyBln(payVo.getMoneyBln());
@@ -491,6 +494,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .aliPayEnum(MARGIN_ALI_PAY)
                 .wxPayEnum(MARGIN_WECHAT_PAY)
                 .shandePayEnum(ShandePayEnum.AUCTION_MARGIN_SHANDE_PAY)
+                .ipaddr(Ipv4Util.LOCAL_IP)
+                .goodsName(auctionSend.getGoodsName())
                 .userId(payUserId).build());
         auctionMargin1.setMoneyBln(payVo.getMoneyBln());
         auctionMarginService.updateById(auctionMargin1);
@@ -589,6 +594,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .aliPayEnum(FIXED_ALI_PAY)
                 .wxPayEnum(FIXED_WECHAT_PAY)
                 .shandePayEnum(ShandePayEnum.AUCTION_FIX_SHANDE_PAY)
+                .ipaddr(Ipv4Util.LOCAL_IP)
+                .goodsName(auctionOrder.getGoodsName())
                 .userId(userId).build());
 
         auctionOrder.setMoneyBln(payVo.getMoneyBln());
