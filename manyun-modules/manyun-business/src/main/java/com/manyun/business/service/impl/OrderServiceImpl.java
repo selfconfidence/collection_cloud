@@ -23,6 +23,8 @@ import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.constant.BusinessConstants;
+import com.manyun.common.core.enums.PayTypeEnum;
+import com.manyun.common.core.enums.ShandePayEnum;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
@@ -408,8 +410,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                         .payType(orderPayForm.getPayType())
                         .realPayMoney(order.getOrderAmount().subtract(order.getMoneyBln()))
                         .outHost(order.getOrderNo())
-                        .aliPayEnum(BOX_ALI_PAY)
-                        .wxPayEnum(BOX_WECHAT_PAY)
+                        .shandePayEnum(ShandePayEnum.COLLECTION_BOX_SHANDE_PAY)
                         .goodsName(order.getCollectionName())
                         .ipaddr(Ipv4Util.LOCAL_IP)
                         .userId(userId).build());

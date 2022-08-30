@@ -1,6 +1,7 @@
 package com.manyun.business.domain.dto;
 
 import com.manyun.common.core.enums.AliPayEnum;
+import com.manyun.common.core.enums.ShandePayEnum;
 import com.manyun.common.core.enums.WxPayEnum;
 import lombok.Builder;
 import lombok.Data;
@@ -29,6 +30,9 @@ public class PayInfoDto implements Serializable {
     private Integer payType;
     private AliPayEnum aliPayEnum;
     private WxPayEnum wxPayEnum;
+    private ShandePayEnum shandePayEnum;
+
+
 
 
 }

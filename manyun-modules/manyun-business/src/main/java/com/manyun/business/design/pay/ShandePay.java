@@ -29,8 +29,7 @@ import java.util.Objects;
 @Slf4j
 public class ShandePay implements RootPayServer {
 
-    @Autowired
-    private MoneyPay moneyPay;
+
 
     @Autowired
     private IMoneyService moneyService;
@@ -46,7 +45,8 @@ public class ShandePay implements RootPayServer {
             String body = pay(payInfoDto);
             return Builder.of(PayVo::new).with(PayVo::setBody, body).with(PayVo::setPayType, payInfoDto.getPayType()).with(PayVo::setOutHost, payInfoDto.getOutHost()).build();
         }
-        return moneyPay.execPayVo(payInfoDto);
+        throw new IllegalArgumentException("not fount pay_type = " + payInfoDto.getPayType());
+
     }
 
     /**
@@ -57,6 +57,7 @@ public class ShandePay implements RootPayServer {
     public String pay(PayInfoDto payInfoDto) {
         UserMoneyDto userMoneyDto = moneyService.userMoneyInfo(payInfoDto.getUserId());
         Assert.isTrue((Objects.nonNull(payInfoDto) && Objects.nonNull(userMoneyDto)),"支付失败!");
+        ShandePayEnum shandePayEnum = payInfoDto.getShandePayEnum();
         //用户短编号
         String userNumber = userMoneyDto.getUserNumber();
         //真实姓名
@@ -94,8 +95,8 @@ public class ShandePay implements RootPayServer {
         //商户key1
         String mer_key = "PZWgkPqM09qpDbUngCDdGL5kgg/9jDd3wvZUn87m0CnI6CklVzmtMi2AkXOd7P4xWmEjjzEo5bo="; //活的
         //回调地址
-        String notify_url = ShandePayEnum.BOX_SHANDE_PAY.getNotifyUrl();
-        String return_url = "https://dcalliance.com.cn"; //待修改
+        String notify_url = shandePayEnum.getNotifyUrl();
+        String return_url = "cnt://start.cnt.app/main?id=1";
         //支付扩展域
         //"userId":"用户在商户下唯一标识 1-10位",
         // "userName":"证件姓名",

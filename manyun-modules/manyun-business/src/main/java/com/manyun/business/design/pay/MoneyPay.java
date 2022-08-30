@@ -26,7 +26,8 @@ public class MoneyPay implements RootPayServer {
 
     @Autowired
     private IMoneyService moneyService;
-
+    @Autowired
+    private ShandePay shandePay;
 
 
     /**
@@ -37,6 +38,7 @@ public class MoneyPay implements RootPayServer {
     @Override
     public PayVo execPayVo(PayInfoDto payInfoDto){
         if (MONEY_TAPE.getCode().equals(payInfoDto.getPayType())){
+            String body = null;
             // 是自己执行的
             // 钱包自行扣除进行支付 - 可以组合支付..... 不够可以组合支付！！！ -银联
             String formInfo = StrUtil.format("消费");
@@ -44,14 +46,16 @@ public class MoneyPay implements RootPayServer {
             BigDecimal moneyBln = payInfoDto.getRealPayMoney();
             if (moneyPayMoney.compareTo(NumberUtil.add(0D)) >=1 ){
                 moneyBln = payInfoDto.getRealPayMoney().subtract(moneyPayMoney).abs();
-                //TODO 银联.....
                 //moneyPayMoney
-                Assert.isFalse(true,"银联未对接;余额不足,请核实！");
+                payInfoDto.setRealPayMoney(moneyPayMoney);
+                body = shandePay.pay(payInfoDto);
+                //Assert.isFalse(true,"银联未对接;余额不足,请核实！");
             }
-            return Builder.of(PayVo::new).with(PayVo::setMoneyBln,moneyBln).with(PayVo::setBody, null).with(PayVo::setPayType, payInfoDto.getPayType()).with(PayVo::setOutHost, payInfoDto.getOutHost()).build();
+            return Builder.of(PayVo::new).with(PayVo::setMoneyBln,moneyBln).with(PayVo::setBody, body).with(PayVo::setPayType, payInfoDto.getPayType()).with(PayVo::setOutHost, payInfoDto.getOutHost()).build();
 
         }
-        throw new IllegalArgumentException("not fount pay_type = " + payInfoDto.getPayType());
+
+        return shandePay.execPayVo(payInfoDto);
     }
 
 

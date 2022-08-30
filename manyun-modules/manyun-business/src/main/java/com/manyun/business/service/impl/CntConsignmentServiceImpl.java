@@ -1,6 +1,7 @@
 package com.manyun.business.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.net.Ipv4Util;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
@@ -27,6 +28,7 @@ import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.enums.ShandePayEnum;
 import com.manyun.common.core.exception.ServiceException;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
@@ -219,8 +221,9 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
                         .payType(consignmentSellForm.getPayType())
                         .realPayMoney(consignment.getConsignmentPrice())
                         .outHost(hostOut)
-                        .aliPayEnum(CONSIGNMENT_ALI_PAY)
-                        .wxPayEnum(CONSIGNMENT_WECHAT_PAY)
+                        .goodsName(consignment.getBuiName())
+                        .ipaddr(Ipv4Util.LOCAL_IP)
+                        .shandePayEnum(ShandePayEnum.CONSIGNMENT_SHANDE_PAY)
                         .userId(payUserId).build());
         Order order = orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, hostOut));
         // 走这一步如果 是余额支付 那就说明扣款成功了！！！

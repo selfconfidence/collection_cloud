@@ -3,10 +3,12 @@ package com.manyun.business.controller.notify;
 import com.alibaba.fastjson.JSONObject;
 import com.manyun.business.config.cashier.sdk.CertUtil;
 import com.manyun.business.config.cashier.sdk.CryptoUtil;
+import com.manyun.business.service.IOrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -24,6 +26,9 @@ import javax.servlet.http.HttpServletRequest;
 @Api(hidden = true)
 public class ShandePayNotifyController {
 
+    @Autowired
+    private IOrderService orderService;
+
 
     /**
      * 11:32:11.636 [http-nio-9205-exec-2] INFO  c.m.b.c.n.ShandePayNotifyController - [ShandeNotify,31] - 进入回调
@@ -38,7 +43,7 @@ public class ShandePayNotifyController {
     @RequestMapping(value = "/ShandeNotify")
     @ResponseBody
     @ApiOperation(value = "杉德支付回调",hidden = true)
-    public String ShandeNotify(HttpServletRequest req) {
+    public JSONObject ShandeNotify(HttpServletRequest req) {
         log.info("进入回调");
         String data=req.getParameter("data");
         String sign=req.getParameter("sign");
@@ -53,6 +58,7 @@ public class ShandePayNotifyController {
                 log.info("verify sign fail.");
                 log.info("签名字符串(data)为："+ data);
                 log.info("签名值(sign)为："+ sign);
+                return null;
             }else {
                 log.info("verify sign success");
                 JSONObject dataJson = JSONObject.parseObject(data);
@@ -67,11 +73,159 @@ public class ShandePayNotifyController {
                     log.info("通知数据异常！！！");
                 }
             }
-
         } catch (Exception e) {
             log.info(e.getMessage());
+            return  null;
         }
-        return null;
+      return commResult();
     }
 
+
+    /**
+     * 盲盒支付回调
+     * @return
+     */
+    @RequestMapping(value = "/collectionJoinBoxNotify")
+    @ApiOperation(value = "盲盒藏品聚合杉德支付回调",hidden = true)
+    public JSONObject boxNotify(HttpServletRequest req) {
+        log.info("进入盲盒藏品聚合杉德支付回调");
+        String data=req.getParameter("data");
+        String sign=req.getParameter("sign");
+        log.info("接收到后台通知数据："+data);
+        log.info("接收到后台通知签名："+sign);
+        // 验证签名
+        boolean valid;
+        try {
+            valid = CryptoUtil.verifyDigitalSign(data.getBytes("utf-8"), Base64.decodeBase64(sign),
+                    CertUtil.getPublicKey(), "SHA1WithRSA");
+            if (!valid) {
+                log.info("verify sign fail.");
+                log.info("签名字符串(data)为："+ data);
+                log.info("签名值(sign)为："+ sign);
+                return null;
+            }else {
+                log.info("verify sign success");
+                JSONObject dataJson = JSONObject.parseObject(data);
+                JSONObject bodyData = JSONObject.parseObject(dataJson.getString("body"));
+                String orderStatus = bodyData.getString("orderStatus");
+                String tradeNo = bodyData.getString("tradeNo");
+                if (dataJson != null) {
+                    log.info("后台通知业务数据为：" + JSONObject.toJSONString(dataJson, true));
+                    log.info("orderStatus：" + orderStatus);
+                    log.info("tradeNo：" + tradeNo);
+                    if ("1".equals(orderStatus)){
+                        orderService.notifyPaySuccess(tradeNo);
+                    }
+                } else {
+                    log.info("通知数据异常！！！");
+                }
+            }
+        } catch (Exception e) {
+            log.info(e.getMessage());
+            return  null;
+        }
+        return commResult();
+    }
+
+
+/*    *//**
+     * 藏品支付回调
+     * @return
+     *//*
+    @RequestMapping(value = "/collectionNotify")
+    @ApiOperation(value = "藏品杉德支付回调",hidden = true)
+    public JSONObject collectionNotify(HttpServletRequest req) {
+        log.info("进入藏品杉德支付回调");
+        String data=req.getParameter("data");
+        String sign=req.getParameter("sign");
+        log.info("接收到后台通知数据："+data);
+        log.info("接收到后台通知签名："+sign);
+        // 验证签名
+        boolean valid;
+        try {
+            valid = CryptoUtil.verifyDigitalSign(data.getBytes("utf-8"), Base64.decodeBase64(sign),
+                    CertUtil.getPublicKey(), "SHA1WithRSA");
+            if (!valid) {
+                log.info("verify sign fail.");
+                log.info("签名字符串(data)为："+ data);
+                log.info("签名值(sign)为："+ sign);
+                return null;
+            }else {
+                log.info("verify sign success");
+                JSONObject dataJson = JSONObject.parseObject(data);
+                JSONObject bodyData = JSONObject.parseObject(dataJson.getString("body"));
+                String orderStatus = bodyData.getString("orderStatus");
+                String tradeNo = bodyData.getString("tradeNo");
+                if (dataJson != null) {
+                    log.info("后台通知业务数据为：" + JSONObject.toJSONString(dataJson, true));
+                    log.info("orderStatus：" + orderStatus);
+                    log.info("tradeNo：" + tradeNo);
+                    if ("1".equals(orderStatus)){
+                        orderService.notifyPaySuccess(tradeNo);
+                    }
+                } else {
+                    log.info("通知数据异常！！！");
+                }
+            }
+        } catch (Exception e) {
+            log.info(e.getMessage());
+            return  null;
+        }
+        return commResult();
+    }*/
+
+
+
+    /**
+     * 寄售支付回调
+     * @return
+     */
+    @RequestMapping(value = "/consignmentNotify")
+    @ApiOperation(value = "寄售支付回调",hidden = true)
+    public JSONObject consignmentNotify(HttpServletRequest req) {
+        log.info("进入寄售支付回调");
+        String data=req.getParameter("data");
+        String sign=req.getParameter("sign");
+        log.info("接收到后台通知数据："+data);
+        log.info("接收到后台通知签名："+sign);
+        // 验证签名
+        boolean valid;
+        try {
+            valid = CryptoUtil.verifyDigitalSign(data.getBytes("utf-8"), Base64.decodeBase64(sign),
+                    CertUtil.getPublicKey(), "SHA1WithRSA");
+            if (!valid) {
+                log.info("verify sign fail.");
+                log.info("签名字符串(data)为："+ data);
+                log.info("签名值(sign)为："+ sign);
+                return null;
+            }else {
+                log.info("verify sign success");
+                JSONObject dataJson = JSONObject.parseObject(data);
+                JSONObject bodyData = JSONObject.parseObject(dataJson.getString("body"));
+                String orderStatus = bodyData.getString("orderStatus");
+                String tradeNo = bodyData.getString("tradeNo");
+                if (dataJson != null) {
+                    log.info("后台通知业务数据为：" + JSONObject.toJSONString(dataJson, true));
+                    log.info("orderStatus：" + orderStatus);
+                    log.info("tradeNo：" + tradeNo);
+                    if ("1".equals(orderStatus)){
+                        orderService.notifyPayConsignmentSuccess(tradeNo);
+                    }
+                } else {
+                    log.info("通知数据异常！！！");
+                }
+            }
+        } catch (Exception e) {
+            log.info(e.getMessage());
+            return  null;
+        }
+        return commResult();
+    }
+
+
+    private JSONObject commResult(){
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("respCode", "000000");
+        return jsonObject;
+    }
 }
