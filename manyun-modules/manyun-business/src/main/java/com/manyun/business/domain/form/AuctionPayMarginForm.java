@@ -25,4 +25,8 @@ public class AuctionPayMarginForm {
     @ApiModelProperty("原生双端 h5所需,支付后返回app 的路径")
     @NotBlank(message = "跳转url不可为空")
     private String returnUrl;
+
+    @ApiModelProperty("支付密码")
+    @NotBlank(message = "支付密码不可为空")
+    private String payPass;
 }
