@@ -30,8 +30,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.POLL_SOURCE;
@@ -228,6 +230,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         Integer payStatus = Integer.valueOf(0);
         Integer payType = Integer.valueOf(0);
         BigDecimal moneyBln = BigDecimal.ZERO;
+        LocalDateTime payTime = LocalDateTime.now();
 
         switch (checkOrderPayQuery.getType()) {
             case 1 :
@@ -240,8 +243,9 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
                 if (OrderStatus.OVER_ORDER.getCode().equals(order.getOrderStatus())) {
                     payStatus = 1;
                 }
-                payType = order.getPayType();
+                payType = Optional.<Integer>of(order.getPayType()).orElse(Integer.valueOf(0));
                 moneyBln = order.getMoneyBln();
+                payTime = order.getPayTime();
                 break;
             case 2 :
                 AuctionMargin auctionMargin = auctionMarginService.getById(checkOrderPayQuery.getOrderNo());
@@ -252,6 +256,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
                 payStatus = auctionMargin.getPayMarginStatus();
                 payType = auctionMargin.getPayType();
                 moneyBln = auctionMargin.getMoneyBln();
+                payTime = auctionMargin.getUpdatedTime();
                 break;
             case 3 :
                 AuctionOrder auctionOrder = auctionOrderService.getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getOrderNo, checkOrderPayQuery.getOrderNo()));
@@ -264,6 +269,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
                 }
                 payType = auctionOrder.getPayType();
                 moneyBln = auctionOrder.getMoneyBln();
+                payTime = auctionOrder.getPayTime();
                 break;
             case 4 :
                 AuctionOrder auctionPayOrder = auctionOrderService.getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getOrderNo, checkOrderPayQuery.getOrderNo()));
@@ -276,6 +282,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
                 }
                 payType = auctionPayOrder.getPayType();
                 moneyBln = auctionPayOrder.getMoneyBln();
+                payTime = auctionPayOrder.getPayTime();
                 break;
             default:
                 break;
@@ -285,6 +292,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         checkOrderVo.setPayStatus(payStatus);
         checkOrderVo.setPayType(payType);
         checkOrderVo.setMoneyBln(moneyBln);
+        checkOrderVo.setPayTime(payTime);
 
         return checkOrderVo;
     }
