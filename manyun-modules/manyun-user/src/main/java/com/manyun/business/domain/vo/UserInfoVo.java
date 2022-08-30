@@ -40,5 +40,8 @@ public class UserInfoVo  implements Serializable {
     @ApiModelProperty("支付密码")
     private String payPass;
 
+    @ApiModelProperty("登录密码")
+    private String loginPass;
+
 
 }
