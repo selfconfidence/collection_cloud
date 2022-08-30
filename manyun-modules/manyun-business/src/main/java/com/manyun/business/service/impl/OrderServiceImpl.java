@@ -406,7 +406,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     public PayVo unifiedOrder(OrderPayForm orderPayForm,String userId) {
         Order order = getById(orderPayForm.getOrderId());
         checkUnified(order,userId);
-        ShandePayEnum shandePayEnum =  switchCase(order.getId(),orderPayForm.getReturnUrl(), ShandePay.defaultReturnUrl);
+        ShandePayEnum shandePayEnum =  switchCase(order.getId(),orderPayForm.getReturnUrl(), orderPayForm.getReturnUrl());
         // 判定用户的余额是否充足
         PayVo payVo =  rootPay.execPayVo(
                 PayInfoDto.builder()
