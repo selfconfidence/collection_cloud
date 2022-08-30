@@ -21,4 +21,8 @@ public class AuctionPayMarginForm {
 
     @ApiModelProperty(value = "是否余额抵扣, true抵扣，false不抵扣", required = true)
     private boolean isDeduction;
+
+    @ApiModelProperty("原生双端 h5所需,支付后返回app 的路径")
+    @NotBlank(message = "跳转url不可为空")
+    private String returnUrl;
 }
