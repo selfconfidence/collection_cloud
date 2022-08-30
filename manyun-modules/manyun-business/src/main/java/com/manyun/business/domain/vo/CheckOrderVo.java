@@ -18,10 +18,10 @@ public class CheckOrderVo {
     @ApiModelProperty("支付状态，0失败，1成功")
     private Integer payStatus;
 
-    @ApiModelProperty("支付方式")
+    @ApiModelProperty("支付方式0余额支付,4杉德支付 ")
     private Integer payType;
 
-    @ApiModelProperty("此值不为0，即为组合支付")
+    @ApiModelProperty(" payType = 0 并且 此值不为0.00 ，即为组合支付")
     private BigDecimal moneyBln;
 
 }

@@ -103,7 +103,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public BigDecimal ordePay(String outHost,String userId, BigDecimal realPayMoney, String formInfo) {
+    public BigDecimal ordePay(String outHost, String userId, BigDecimal realPayMoney, String formInfo) {
         // 剩余金额
         BigDecimal moneyPayMoney = NumberUtil.add(0D);
         Money money = getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
@@ -139,6 +139,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateAccountInfo(String userId, AccountInfoForm accountInfoForm) {
         Money money = getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
         BeanUtil.copyProperties(accountInfoForm,money);
@@ -181,6 +182,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public R updateUserMoney(UserRealMoneyForm userRealMoneyForm) {
 
         Money moneyUser = getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userRealMoneyForm.getUserId()));
@@ -230,6 +232,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         switch (checkOrderPayQuery.getType()) {
             case 1 :
                 Order order = orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, checkOrderPayQuery.getOrderNo()));
+                if (Objects.isNull(order)) order = orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getId, checkOrderPayQuery.getOrderNo()));
                 if (order == null) {
                     break;
                 }
