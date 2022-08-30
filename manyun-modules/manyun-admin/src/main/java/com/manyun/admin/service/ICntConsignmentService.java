@@ -17,14 +17,6 @@ import com.manyun.common.core.web.page.TableDataInfo;
  */
 public interface ICntConsignmentService extends IService<CntConsignment>
 {
-
-    /**
-     * 打款审核
-     * @param paymentReviewDto
-     * @return
-     */
-    R paymentReview(PaymentReviewDto paymentReviewDto);
-
     /**
      * 藏品订单管理列表
      *

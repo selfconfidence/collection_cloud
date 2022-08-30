@@ -4,11 +4,14 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-@ApiModel("活动海报")
+import javax.validation.constraints.NotBlank;
+
+@ApiModel("平台规则")
 @Data
 public class PosterDto {
 
-    @ApiModelProperty("规则值")
+    @NotBlank(message = "参数不能为空!")
+    @ApiModelProperty(value = "规则值",required = true)
     private String systemVal;
 
 }

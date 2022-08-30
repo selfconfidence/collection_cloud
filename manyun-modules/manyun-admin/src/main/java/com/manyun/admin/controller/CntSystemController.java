@@ -15,6 +15,8 @@ import com.manyun.admin.service.ICntSystemService;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.TableDataInfo;
 
+import javax.validation.Valid;
+
 /**
  * 平台规则Controller
  *
@@ -79,9 +81,29 @@ public class CntSystemController extends BaseController
      */
     @PostMapping("updatePoster")
     @ApiOperation("更新邀请海报")
-    public R updatePoster(@RequestBody PosterDto posterDto)
+    public R updatePoster(@Valid @RequestBody PosterDto posterDto)
     {
         return toResult(cntSystemService.updatePoster(posterDto));
+    }
+
+    /**
+     * 查询用户默认头像
+     */
+    @GetMapping("queryUserDeafultAvatar")
+    @ApiOperation("查询用户默认头像")
+    public R<PosterDto> queryUserDeafultAvatar()
+    {
+        return R.ok(cntSystemService.queryUserDeafultAvatar());
+    }
+
+    /**
+     * 更新用户默认头像
+     */
+    @PostMapping("updateUserDeafultAvatar")
+    @ApiOperation("更新用户默认头像")
+    public R updateUserDeafultAvatar(@Valid @RequestBody PosterDto posterDto)
+    {
+        return toResult(cntSystemService.updateUserDeafultAvatar(posterDto));
     }
 
 }

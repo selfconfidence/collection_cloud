@@ -30,12 +30,6 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
     @Autowired
     private CntConsignmentMapper cntConsignmentMapper;
 
-    @Override
-    public R paymentReview(PaymentReviewDto paymentReviewDto) {
-
-        return null;
-    }
-
     /**
      * 藏品订单管理列表
      *

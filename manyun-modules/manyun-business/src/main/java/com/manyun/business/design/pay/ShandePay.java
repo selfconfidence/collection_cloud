@@ -88,7 +88,8 @@ public class ShandePay implements RootPayServer {
         SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMddHHmmss");
         Calendar calendar = Calendar.getInstance();
         String createTime = sdf.format(calendar.getTime());
-        calendar.add(Calendar.HOUR,1);
+        //订单失效时间-----建议设置0.5～1小时
+        calendar.add(Calendar.MINUTE, 5);
         String endTime = sdf.format(calendar.getTime());
 
         String version = "10";
@@ -165,6 +166,10 @@ public class ShandePay implements RootPayServer {
                 "&sign="+sign+"" ;
         log.info("最终链接：\n\n"+url);
         return url;
+    }
+
+    public static void main(String[] args) {
+
     }
 
 }

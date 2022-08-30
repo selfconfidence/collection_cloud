@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.manyun.admin.domain.CntBanner;
+import com.manyun.admin.domain.vo.CntBannerVo;
 
 /**
  * 轮播Mapper接口
@@ -20,6 +21,6 @@ public interface CntBannerMapper extends BaseMapper<CntBanner>
      * @param cntBanner 轮播
      * @return 轮播集合
      */
-    public List<CntBanner> selectCntBannerList(CntBanner cntBanner);
+    public List<CntBannerVo> selectCntBannerList(CntBanner cntBanner);
 
 }

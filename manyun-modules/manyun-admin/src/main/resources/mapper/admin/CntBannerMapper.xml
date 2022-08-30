@@ -21,20 +21,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, banner_title, banner_image, banner_info, banner_type, jump_link, created_by, created_time, updated_by, updated_time from cnt_banner
     </sql>
 
-    <select id="selectCntBannerList" parameterType="CntBanner" resultMap="CntBannerResult">
-        <include refid="selectCntBannerVo"/>
-        <where>
-            <if test="bannerTitle != null  and bannerTitle != ''"> and banner_title = #{bannerTitle}</if>
-            <if test="bannerImage != null  and bannerImage != ''"> and banner_image = #{bannerImage}</if>
-            <if test="bannerInfo != null  and bannerInfo != ''"> and banner_info = #{bannerInfo}</if>
-            <if test="bannerType != null "> and banner_type = #{bannerType}</if>
-            <if test="jumpLink != null  and jumpLink != ''"> and jump_link = #{jumpLink}</if>
-            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
-            <if test="createdTime != null "> and created_time = #{createdTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
-            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
-        </where>
-        order by created_time desc
+    <select id="selectCntBannerList" parameterType="CntBanner" resultType="com.manyun.admin.domain.vo.CntBannerVo">
+        SELECT
+        b.id,
+        b.banner_title bannerTitle,
+        b.banner_image bannerImage,
+        b.banner_info bannerInfo,
+        b.banner_type bannerType,
+        b.jump_link jumpLink,
+        bjl.link_name jumpLinkName,
+        b.created_time createdTime,
+        b.updated_time updatedTime
+        FROM
+        cnt_banner b
+        LEFT JOIN cnt_banner_jump_link bjl ON b.jump_link = bjl.link_code
+        order by b.created_time desc
     </select>
 
 </mapper>

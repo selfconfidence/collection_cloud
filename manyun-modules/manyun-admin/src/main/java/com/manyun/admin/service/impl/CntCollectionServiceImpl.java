@@ -1,6 +1,7 @@
 package com.manyun.admin.service.impl;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
@@ -13,6 +14,7 @@ import com.manyun.admin.domain.*;
 import com.manyun.admin.domain.dto.AirdropDto;
 import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
 import com.manyun.admin.domain.dto.CollectionStateDto;
+import com.manyun.admin.domain.dto.MyChainxDto;
 import com.manyun.admin.domain.excel.BachAirdopExcel;
 import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.*;
@@ -359,7 +361,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         String collectionId = collection.getId();
         Integer selfBalance = collection.getSelfBalance();
         Integer balance = collection.getBalance();
-        Assert.isFalse(selfBalance >= balance, "已售空!");
+        Assert.isFalse(Integer.valueOf(0).equals(collection.getBalance()), "库存不足!");
         //扣减库存
         updateById(
                 Builder
@@ -389,6 +391,12 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         return R.ok(Builder.of(AirdropVo::new).with(AirdropVo::setUserId,cntUsers.get(0).getId()).with(AirdropVo::setUsercollectionId,idStr).build());
     }
 
+    public static void main(String[] args) {
+        Set<String> set=new HashSet<>();
+        set.add("asdada");
+        System.out.println(set.parallelStream().findFirst().get());
+    }
+
     /**
      * 批量空投
      * @param bachAirdopExcels 批量空投请求参数
@@ -402,6 +410,9 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         {
             R.fail("导入批量空投数据不能为空!");
          }
+        //判断藏品id是否一致
+        Set<String> collectionIds = bachAirdopExcels.parallelStream().map(BachAirdopExcel::getCollectionId).collect(Collectors.toSet());
+        Assert.isTrue(collectionIds.size()==1, "所选藏品不一致!");
         //获取用户
         List<CntUser> cntUsers = userService.list(
                 Wrappers
@@ -411,30 +422,28 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         );
         Assert.isTrue(cntUsers.size() > 0, "用户不存在!");
         //获取藏品
-        List<CntCollection> cntCollections = list(
-                Wrappers
-                        .<CntCollection>lambdaQuery()
-                        .in(CntCollection::getId, bachAirdopExcels.parallelStream().map(BachAirdopExcel::getCollectionId)
-                                .collect(Collectors.toList()))
-        ).parallelStream().filter(f->f.getSelfBalance()<f.getBalance()).collect(Collectors.toList());
-        Assert.isTrue(cntCollections.size() > 0, "藏品不存在!");
+        CntCollection cntCollections = getOne(Wrappers
+                .<CntCollection>lambdaQuery()
+                .eq(CntCollection::getId,collectionIds.stream().findFirst().get())
+                .gt(CntCollection::getBalance, 0));
+        Assert.isTrue(Objects.nonNull(cntCollections), "藏品不存在!");
+
 
         //筛选成功的和失败的
         HashSet<String> errorList = new HashSet<String>();
         List<CntUserCollection> successList = new ArrayList<CntUserCollection>();
-        bachAirdopExcels.parallelStream().forEach(e->{
+        bachAirdopExcels.stream().forEach(e->{
             Optional<CntUser> user = cntUsers.parallelStream().filter(f -> f.getPhone().equals(e.getPhone())).findFirst();
-            Optional<CntCollection> collection = cntCollections.parallelStream().filter(f -> f.getId().equals(e.getCollectionId())).findFirst();
-            if(user.isPresent() && collection.isPresent()){
+            if(user.isPresent()){
                 successList.add(
                         Builder
                                 .of(CntUserCollection::new)
                                 .with(CntUserCollection::setId, IdUtils.getSnowflakeNextIdStr())
                                 .with(CntUserCollection::setUserId, user.get().getId())
-                                .with(CntUserCollection::setCollectionId, collection.get().getId())
-                                .with(CntUserCollection::setCollectionName, collection.get().getCollectionName())
+                                .with(CntUserCollection::setCollectionId, cntCollections.getId())
+                                .with(CntUserCollection::setCollectionName, cntCollections.getCollectionName())
                                 .with(CntUserCollection::setLinkAddr, IdUtils.getSnowflake().nextIdStr())
-                                .with(CntUserCollection::setSourceInfo, "空投")
+                                .with(CntUserCollection::setSourceInfo, "批量空投")
                                 .with(CntUserCollection::setIsExist,USE_EXIST.getCode())
                                 .with(CntUserCollection::setIsLink,NOT_LINK.getCode())
                                 .with(CntUserCollection::setCreatedBy,SecurityUtils.getUsername())
@@ -445,32 +454,21 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                 errorList.add(e.getPhone());
             }
         });
-        //扣减库存
-        successList.parallelStream().forEach(e->{
-            Optional<CntCollection> collection = cntCollections.parallelStream().filter(f -> f.getId().equals(e.getCollectionId())).findFirst();
-            if (collection.isPresent()){
-                updateById(
-                        Builder
-                                .of(CntCollection::new)
-                                .with(CntCollection::setId, collection.get().getId())
-                                .with(CntCollection::setSelfBalance, (collection.get().getSelfBalance() + 1))
-                                .with(CntCollection::setBalance, (collection.get().getBalance() - 1))
-                                .with(CntCollection::setUpdatedBy, SecurityUtils.getUsername())
-                                .with(CntCollection::setUpdatedTime,DateUtils.getNowDate())
-                                .build()
-                );
-            }
-        });
+        int rows = cntCollectionMapper.updateLock(cntCollections.getId(), successList.size());
+        if(!(rows >=1)){
+            Assert.isTrue(Boolean.FALSE,"库存不足!");
+        }
         //增加用户藏品
+
         userCollectionService.saveBatch(successList);
         //拼接上链参数返回
-        List<AirdropVo> airdropVos = successList.parallelStream().map(m -> {
-            AirdropVo airdropVo = new AirdropVo();
-            airdropVo.setUserId(m.getUserId());
-            airdropVo.setUsercollectionId(m.getCollectionId());
-            return airdropVo;
+        List<MyChainxDto> myChainxDtos = successList.parallelStream().map(m -> {
+            MyChainxDto myChainxDto = new MyChainxDto();
+            myChainxDto.setUserId(m.getUserId());
+            myChainxDto.setId(m.getId());
+            return myChainxDto;
         }).collect(Collectors.toList());
-        return R.ok(airdropVos,(errorList.size()>0?"本次导入成功:"+successList.size()+",导入失败:"+errorList.size()+",导入失败的手机号为:"+StringUtils.join(errorList,","):"本次导入成功:"+successList.size()+",导入失败:"+errorList.size()));
+        return R.ok(myChainxDtos,(errorList.size()>0?"本次导入成功:"+successList.size()+",导入失败:"+errorList.size()+",导入失败的手机号为:"+StringUtils.join(errorList,","):"本次导入成功:"+successList.size()+",导入失败:"+errorList.size()));
     }
 
     /**

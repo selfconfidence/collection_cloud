@@ -1,9 +1,9 @@
 package com.manyun.admin.service;
 
-import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntBanner;
+import com.manyun.admin.domain.vo.CntBannerVo;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 
@@ -29,7 +29,7 @@ public interface ICntBannerService extends IService<CntBanner>
      * @param pageQuery
      * @return 轮播集合
      */
-    public TableDataInfo<CntBanner> selectCntBannerList(PageQuery pageQuery);
+    public TableDataInfo<CntBannerVo> selectCntBannerList(PageQuery pageQuery);
 
     /**
      * 新增轮播

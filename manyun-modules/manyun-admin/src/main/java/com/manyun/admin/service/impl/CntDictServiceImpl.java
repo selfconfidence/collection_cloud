@@ -61,6 +61,9 @@ public class CntDictServiceImpl implements CntDictService
     @Autowired
     private ICntAgreementTypeService agreementTypeService;
 
+    @Autowired
+    private ICntBannerJumpLinkService bannerJumpLinkService;
+
     /***
      * 查询藏品字典
      */
@@ -280,6 +283,18 @@ public class CntDictServiceImpl implements CntDictService
             CntAgreementTypeDictVo cntAgreementTypeDictVo=new CntAgreementTypeDictVo();
             BeanUtil.copyProperties(m,cntAgreementTypeDictVo);
             return cntAgreementTypeDictVo;
+        }));
+    }
+
+    /**
+     * 轮播跳转链接字典
+     */
+    @Override
+    public R bannerJumpLinkDict() {
+        return R.ok(bannerJumpLinkService.list(Wrappers.<CntBannerJumpLink>lambdaQuery().eq(CntBannerJumpLink::getLinkStatus,0).orderByAsc(CntBannerJumpLink::getLinkSort)).parallelStream().map(m->{
+            BannerJumpLinkDictVo bannerJumpLinkDictVo=new BannerJumpLinkDictVo();
+            BeanUtil.copyProperties(m,bannerJumpLinkDictVo);
+            return bannerJumpLinkDictVo;
         }));
     }
 

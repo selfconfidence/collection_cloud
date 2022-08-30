@@ -128,4 +128,11 @@ public class CntDictController extends BaseController
         return cntDictService.agreementTypeDict();
     }
 
+    @GetMapping("/bannerJumpLinkDict")
+    @ApiOperation("轮播跳转链接字典")
+    public R bannerJumpLinkDict()
+    {
+        return cntDictService.bannerJumpLinkDict();
+    }
+
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
+import com.manyun.admin.domain.vo.CntBannerVo;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.manyun.common.core.web.page.PageQuery;
@@ -48,10 +49,10 @@ public class CntBannerServiceImpl extends ServiceImpl<CntBannerMapper,CntBanner>
      * @return 轮播
      */
     @Override
-    public TableDataInfo<CntBanner> selectCntBannerList(PageQuery pageQuery)
+    public TableDataInfo<CntBannerVo> selectCntBannerList(PageQuery pageQuery)
     {
         PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize());
-        List<CntBanner> cntBanners = cntBannerMapper.selectCntBannerList(new CntBanner());
+        List<CntBannerVo> cntBanners = cntBannerMapper.selectCntBannerList(new CntBanner());
         return TableDataInfoUtil.pageTableDataInfo(cntBanners,cntBanners);
     }
 

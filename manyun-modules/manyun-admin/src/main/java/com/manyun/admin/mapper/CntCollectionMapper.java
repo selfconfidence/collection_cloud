@@ -33,4 +33,6 @@ public interface CntCollectionMapper extends BaseMapper<CntCollection>
      */
     CntCollectionDetailsVo selectCntCollectionDetailsById(String id);
 
+    int updateLock(@Param("id") String id,@Param("sellNum") Integer sellNum);
+
 }
