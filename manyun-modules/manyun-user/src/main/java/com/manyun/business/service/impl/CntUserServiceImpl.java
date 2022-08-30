@@ -66,7 +66,6 @@ import static com.manyun.common.core.enums.UserRealStatus.OK_REAL;
  * @since 2022-06-17
  */
 @Service
-@Slf4j
 public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> implements ICntUserService {
 
     @Autowired
@@ -396,23 +395,16 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
             inviteUserVo.setRegUrl(regUrl);
             return R.ok(inviteUserVo);
         }
-        log.info("111111111111111111");
         //背景，海报图
         String background = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.INVITE_URL, SecurityConstants.INNER).getData();
-        log.info("777777777" + background);
         int width = 0;
         int height = 0;
         try {
             URL backgroundUrl = new URL(background);
-            log.info("88888888888888");
             BufferedImage read = ImageIO.read(backgroundUrl.openStream());
-            log.info("9999999999999999");
             width = read.getWidth();
-            log.info("width----------" + width);
             height = read.getHeight();
-            log.info("height------------" + height);
             BufferedImage bufferedImage = PosterUtil.drawInitAndChangeSize(background, backgroundUrl.openConnection().getInputStream(),width, height);
-            log.info("1000000000000000000");
 
             // 画 二维码 并改变大小
             // 1. 先 获取二维码(二维码携带一个参数)
@@ -421,14 +413,12 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
             // + "?" + cntUser.getPleaseCode()
             // 生成二维码并指定宽高
             BufferedImage qrCode = QrCodeUtil.generate(regUrl, 300, 300);
-            log.info("78998641353416");
             // 2. 初始化并的改变大小
             // 将二维码保存到本地
             // 3. 画二维码
             //PosterUtil.drawImage(bufferedImage, qrCode, 300, 300, (int) Math.round(width*0.37), (int) Math.round(height*0.75));
             PosterUtil.drawImage(bufferedImage, qrCode, 300, 300, (int) Math.round(width/2 - 300/2), (int) Math.round(height*0.75));
 
-            log.info("22222222222222222222222222");
 
             // 海报 保存到本地/var/opt/  线上使用 "d:\\upload\\"
             String linuxPath = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.LOCAL_PATH, SecurityConstants.INNER).getData();
@@ -436,7 +426,6 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
             if (!file1.exists() && !file1.isDirectory()) {
                 file1.mkdirs();
             }
-            log.info("3333333333333333333333333");
             String localPath = linuxPath + System.currentTimeMillis() + ".png";
             PosterUtil.save(bufferedImage, "png", localPath);
             HashMap<String, Object> paramMap = new HashMap<>();
@@ -447,10 +436,8 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
             paramMap.put("file", file);
 
             String gatewayUrl = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.GATEWAY_URL, SecurityConstants.INNER).getData();
-            log.info("4444444444444444444444444444");
 
             String post = HttpUtil.post(gatewayUrl, paramMap);
-            log.info("5555555555555555555555" + post);
             JSONObject responseJson = JSONUtil.toBean(post, JSONObject.class);
             Object data = responseJson.get("data");
             file.delete();
@@ -462,7 +449,6 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
 
 
         } catch (Exception e) {
-            log.info("进入异常---------" + e.getMessage());
             e.printStackTrace();
             return R.fail(e.getMessage());
         }
