@@ -4,8 +4,10 @@ import com.manyun.business.domain.dto.UserMoneyDto;
 import com.manyun.business.domain.entity.Money;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.form.AccountInfoForm;
+import com.manyun.business.domain.query.CheckOrderPayQuery;
 import com.manyun.business.domain.query.MoneyLogQuery;
 import com.manyun.business.domain.vo.AccountInfoVo;
+import com.manyun.business.domain.vo.CheckOrderVo;
 import com.manyun.business.domain.vo.MoneyLogVo;
 import com.manyun.comm.api.domain.form.UserRealMoneyForm;
 import com.manyun.common.core.domain.R;
@@ -44,4 +46,6 @@ public interface IMoneyService extends IService<Money> {
     R<String> checkIdentity(String identityNo);
 
     UserMoneyDto userMoneyInfo(String userId);
+
+    CheckOrderVo checkOrderPayStatus(CheckOrderPayQuery checkOrderPayQuery);
 }

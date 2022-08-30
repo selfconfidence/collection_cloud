@@ -469,6 +469,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
             auctionMargin = Builder.of(AuctionMargin::new).build();
             auctionMargin.setId(IdUtil.getSnowflakeNextIdStr());
             auctionMargin.setAuctionSendId(auctionPayMarginForm.getAuctionSendId());
+            auctionMargin.setPayType(auctionPayMarginForm.getPayType());
             auctionMargin.setUserId(payUserId);
             auctionMargin.setMargin(margin);
             auctionMargin.setEndTime(LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_ORDER_TIME, Integer.class)));

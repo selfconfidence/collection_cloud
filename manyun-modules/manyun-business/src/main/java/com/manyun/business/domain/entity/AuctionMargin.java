@@ -56,6 +56,9 @@ public class AuctionMargin implements Serializable {
     @ApiModelProperty("付款截止时间")
     private LocalDateTime endTime;
 
+    @ApiModelProperty(value = "支付类型,1=微信,2=支付宝,0=余额支付，3=银联, 4= 杉德")
+    private Integer payType;
+
     public void createD(String createId){
         this.createdBy = createId;
         this.createdTime = LocalDateTime.now();

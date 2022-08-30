@@ -3,8 +3,10 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.domain.entity.Money;
 import com.manyun.business.domain.form.AccountInfoForm;
+import com.manyun.business.domain.query.CheckOrderPayQuery;
 import com.manyun.business.domain.query.MoneyLogQuery;
 import com.manyun.business.domain.vo.AccountInfoVo;
+import com.manyun.business.domain.vo.CheckOrderVo;
 import com.manyun.business.domain.vo.MoneyLogVo;
 import com.manyun.business.service.IMoneyService;
 import com.manyun.comm.api.domain.dto.AccountInfoDto;
@@ -134,6 +136,11 @@ public class MoneyController extends BaseController {
     }
 
 
+    @PostMapping("/checkOrderPayStatus")
+    @ApiOperation("检查支付返回结果")
+    public R<CheckOrderVo> checkOrderPayStatus(@RequestBody @Valid CheckOrderPayQuery checkOrderPayQuery) {
+        return R.ok(moneyService.checkOrderPayStatus(checkOrderPayQuery));
+    }
 
 
 }

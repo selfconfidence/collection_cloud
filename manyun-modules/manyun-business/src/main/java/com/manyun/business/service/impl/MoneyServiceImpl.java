@@ -7,22 +7,25 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.manyun.business.domain.dto.LogInfoDto;
 import com.manyun.business.domain.dto.UserMoneyDto;
-import com.manyun.business.domain.entity.Logs;
-import com.manyun.business.domain.entity.Money;
+import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.form.AccountInfoForm;
+import com.manyun.business.domain.query.CheckOrderPayQuery;
 import com.manyun.business.domain.query.MoneyLogQuery;
 import com.manyun.business.domain.vo.AccountInfoVo;
+import com.manyun.business.domain.vo.CheckOrderVo;
 import com.manyun.business.domain.vo.MoneyLogVo;
 import com.manyun.business.mapper.MoneyMapper;
-import com.manyun.business.service.ILogsService;
-import com.manyun.business.service.IMoneyService;
+import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.comm.api.domain.form.UserRealMoneyForm;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.enums.AuctionStatus;
+import com.manyun.common.core.enums.OrderStatus;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +54,18 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
 
     @Autowired
     private MoneyMapper moneyMapper;
+
+    @Autowired
+    @Lazy
+    private IAuctionMarginService auctionMarginService;
+
+    @Autowired
+    @Lazy
+    private IOrderService orderService;
+
+    @Autowired
+    @Lazy
+    private IAuctionOrderService auctionOrderService;
 
 
     /**
@@ -196,6 +211,79 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
     @Override
     public UserMoneyDto userMoneyInfo(String userId) {
         return moneyMapper.userMoneyInfo(userId);
+    }
+
+
+    /**
+     * 检查支付返回结果
+     * @param checkOrderPayQuery
+     * @return
+     */
+    @Override
+    public CheckOrderVo checkOrderPayStatus(CheckOrderPayQuery checkOrderPayQuery) {
+        CheckOrderVo checkOrderVo = new CheckOrderVo();
+        BigDecimal orderAmount = BigDecimal.ZERO;
+        Integer payStatus = Integer.valueOf(0);
+        Integer payType = Integer.valueOf(0);
+        BigDecimal moneyBln = BigDecimal.ZERO;
+
+        switch (checkOrderPayQuery.getType()) {
+            case 1 :
+                Order order = orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, checkOrderPayQuery.getOrderNo()));
+                if (order == null) {
+                    break;
+                }
+                orderAmount = order.getOrderAmount();
+                if (OrderStatus.OVER_ORDER.getCode().equals(order.getOrderStatus())) {
+                    payStatus = 1;
+                }
+                payType = order.getPayType();
+                moneyBln = order.getMoneyBln();
+                break;
+            case 2 :
+                AuctionMargin auctionMargin = auctionMarginService.getById(checkOrderPayQuery.getOrderNo());
+                if (auctionMargin == null) {
+                    break;
+                }
+                orderAmount = auctionMargin.getMargin();
+                payStatus = auctionMargin.getPayMarginStatus();
+                payType = auctionMargin.getPayType();
+                moneyBln = auctionMargin.getMoneyBln();
+                break;
+            case 3 :
+                AuctionOrder auctionOrder = auctionOrderService.getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getOrderNo, checkOrderPayQuery.getOrderNo()));
+                if (auctionOrder == null) {
+                    break;
+                }
+                orderAmount = auctionOrder.getOrderAmount();
+                if (AuctionStatus.PAY_SUCCESS.getCode().equals(auctionOrder.getAuctionStatus())) {
+                    payStatus = 1;
+                }
+                payType = auctionOrder.getPayType();
+                moneyBln = auctionOrder.getMoneyBln();
+                break;
+            case 4 :
+                AuctionOrder auctionPayOrder = auctionOrderService.getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getOrderNo, checkOrderPayQuery.getOrderNo()));
+                if (auctionPayOrder == null) {
+                    break;
+                }
+                orderAmount = auctionPayOrder.getOrderAmount();
+                if (AuctionStatus.PAY_SUCCESS.getCode().equals(auctionPayOrder.getAuctionStatus())) {
+                    payStatus = 1;
+                }
+                payType = auctionPayOrder.getPayType();
+                moneyBln = auctionPayOrder.getMoneyBln();
+                break;
+            default:
+                break;
+
+        }
+        checkOrderVo.setOrderAmount(orderAmount);
+        checkOrderVo.setPayStatus(payStatus);
+        checkOrderVo.setPayType(payType);
+        checkOrderVo.setMoneyBln(moneyBln);
+
+        return checkOrderVo;
     }
 
 }

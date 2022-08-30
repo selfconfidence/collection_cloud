@@ -71,7 +71,7 @@ public class AuctionOrder implements Serializable {
     @ApiModelProperty("佣金")
     private BigDecimal commission;
 
-    @ApiModelProperty("支付方式;0平台，1支付宝，2微信，3银联")
+    @ApiModelProperty("支付方式;0平台，1支付宝，2微信，3银联, 4杉德")
     private Integer payType;
 
     @ApiModelProperty("订单金额")
