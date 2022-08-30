@@ -396,6 +396,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
             inviteUserVo.setRegUrl(regUrl);
             return R.ok(inviteUserVo);
         }
+        log.info("111111111111111111");
         //背景，海报图
         String background = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.INVITE_URL, SecurityConstants.INNER).getData();
         int width = 0;
@@ -421,12 +422,15 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
             //PosterUtil.drawImage(bufferedImage, qrCode, 300, 300, (int) Math.round(width*0.37), (int) Math.round(height*0.75));
             PosterUtil.drawImage(bufferedImage, qrCode, 300, 300, (int) Math.round(width/2 - 300/2), (int) Math.round(height*0.75));
 
+            log.info("22222222222222222222222222");
+
             // 海报 保存到本地/var/opt/  线上使用 "d:\\upload\\"
             String linuxPath = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.LOCAL_PATH, SecurityConstants.INNER).getData();
             File file1 = new File(linuxPath);
             if (!file1.exists() && !file1.isDirectory()) {
                 file1.mkdirs();
             }
+            log.info("3333333333333333333333333");
             String localPath = linuxPath + System.currentTimeMillis() + ".png";
             PosterUtil.save(bufferedImage, "png", localPath);
             HashMap<String, Object> paramMap = new HashMap<>();
@@ -437,8 +441,10 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
             paramMap.put("file", file);
 
             String gatewayUrl = remoteSystemService.findType(BusinessConstants.SystemTypeConstant.GATEWAY_URL, SecurityConstants.INNER).getData();
+            log.info("4444444444444444444444444444");
 
             String post = HttpUtil.post(gatewayUrl, paramMap);
+            log.info("5555555555555555555555" + post);
             JSONObject responseJson = JSONUtil.toBean(post, JSONObject.class);
             Object data = responseJson.get("data");
             file.delete();
