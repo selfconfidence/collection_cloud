@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.manyun.business.design.pay.RootPay;
+import com.manyun.business.design.pay.ShandePay;
 import com.manyun.business.domain.dto.MsgCommDto;
 import com.manyun.business.domain.dto.MsgThisDto;
 import com.manyun.business.domain.dto.OrderCreateDto;
@@ -401,16 +402,18 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
+    ///ShandePayEnum.COLLECTION_BOX_SHANDE_PAY.setReturnUrl(orderPayForm.getReturnUrl())
     public PayVo unifiedOrder(OrderPayForm orderPayForm,String userId) {
         Order order = getById(orderPayForm.getOrderId());
         checkUnified(order,userId);
+        ShandePayEnum shandePayEnum =  switchCase(order.getId(),orderPayForm.getReturnUrl(), ShandePay.defaultReturnUrl);
         // 判定用户的余额是否充足
         PayVo payVo =  rootPay.execPayVo(
                 PayInfoDto.builder()
                         .payType(orderPayForm.getPayType())
                         .realPayMoney(order.getOrderAmount().subtract(order.getMoneyBln()))
                         .outHost(order.getOrderNo())
-                        .shandePayEnum(ShandePayEnum.COLLECTION_BOX_SHANDE_PAY)
+                        .shandePayEnum(shandePayEnum)
                         .goodsName(order.getCollectionName())
                         .ipaddr(Ipv4Util.LOCAL_IP)
                         .userId(userId).build());
@@ -439,6 +442,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             msgService.saveCommMsg(MsgCommDto.builder().msgTitle(title).msgForm(form).build());
         }
         return payVo;
+    }
+
+    private ShandePayEnum switchCase(String id,String returnUrl,String defaultUrl) {
+        // 唯一验证 从寄售中获取这个订单
+        ICntConsignmentService consignmentService = cntConsignmentServiceObjectFactory.getObject();
+        CntConsignment cntConsignment = consignmentService.getOne(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getOrderId, id));
+        if (cntConsignment != null)
+            return ShandePayEnum.CONSIGNMENT_SHANDE_PAY.setReturnUrl(returnUrl,defaultUrl);
+        else
+            return ShandePayEnum.COLLECTION_BOX_SHANDE_PAY.setReturnUrl(returnUrl,defaultUrl);
     }
 
     /**

@@ -34,6 +34,8 @@ public class ShandePay implements RootPayServer {
     @Autowired
     private IMoneyService moneyService;
 
+    public static final String defaultReturnUrl = "http://h5.dcalliance.com.cn/";
+
     /**
      *
      * @param payInfoDto 相关项
@@ -96,7 +98,7 @@ public class ShandePay implements RootPayServer {
         String mer_key = "PZWgkPqM09qpDbUngCDdGL5kgg/9jDd3wvZUn87m0CnI6CklVzmtMi2AkXOd7P4xWmEjjzEo5bo="; //活的
         //回调地址
         String notify_url = shandePayEnum.getNotifyUrl();
-        String return_url = "cnt://start.cnt.app/main?id=1";
+        String return_url = shandePayEnum.getReturnUrl();
         //支付扩展域
         //"userId":"用户在商户下唯一标识 1-10位",
         // "userName":"证件姓名",

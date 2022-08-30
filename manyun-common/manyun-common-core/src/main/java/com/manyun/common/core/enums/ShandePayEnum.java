@@ -1,5 +1,6 @@
 package com.manyun.common.core.enums;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 
 /**
@@ -17,9 +18,13 @@ public enum ShandePayEnum
     CONSIGNMENT_SHANDE_PAY("https://dcalliance.com.cn/prod-api/business/notify_pay/ShandePay/consignmentNotify", "寄售支付","");
     private final String notifyUrl;
     private final String body;
-    private final String returnUrl;
+    private  String returnUrl;
 
 
+    public ShandePayEnum setReturnUrl(String returnUrl,String defaultReturnUrl){
+        this.returnUrl = StrUtil.emptyToDefault(returnUrl, defaultReturnUrl);
+        return this;
+    }
     ShandePayEnum(String notifyUrl, String body,String returnUrl)
     {
         this.notifyUrl = notifyUrl;
