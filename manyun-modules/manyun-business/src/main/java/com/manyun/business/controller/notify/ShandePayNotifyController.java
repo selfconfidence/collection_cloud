@@ -3,6 +3,8 @@ package com.manyun.business.controller.notify;
 import com.alibaba.fastjson.JSONObject;
 import com.manyun.business.config.cashier.sdk.CertUtil;
 import com.manyun.business.config.cashier.sdk.CryptoUtil;
+import com.manyun.business.service.IAuctionOrderService;
+import com.manyun.business.service.IAuctionPriceService;
 import com.manyun.business.service.IOrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,6 +30,12 @@ public class ShandePayNotifyController {
 
     @Autowired
     private IOrderService orderService;
+
+    @Autowired
+    private IAuctionPriceService auctionPriceService;
+
+    @Autowired
+    private IAuctionOrderService auctionOrderService;
 
 
     /**
@@ -210,6 +218,146 @@ public class ShandePayNotifyController {
                     log.info("tradeNo：" + tradeNo);
                     if ("1".equals(orderStatus)){
                         orderService.notifyPayConsignmentSuccess(tradeNo);
+                    }
+                } else {
+                    log.info("通知数据异常！！！");
+                }
+            }
+        } catch (Exception e) {
+            log.info(e.getMessage());
+            return  null;
+        }
+        return commResult();
+    }
+
+
+    /**
+     * 保证金支付回调
+     * @return
+     */
+    @RequestMapping(value = "/auctionMarginNotify")
+    @ApiOperation(value = "保证金支付回调",hidden = true)
+    public JSONObject auctionMarginNotify(HttpServletRequest req) {
+        log.info("进入保证金支付回调");
+        String data=req.getParameter("data");
+        String sign=req.getParameter("sign");
+        log.info("接收到后台通知数据："+data);
+        log.info("接收到后台通知签名："+sign);
+        // 验证签名
+        boolean valid;
+        try {
+            valid = CryptoUtil.verifyDigitalSign(data.getBytes("utf-8"), Base64.decodeBase64(sign),
+                    CertUtil.getPublicKey(), "SHA1WithRSA");
+            if (!valid) {
+                log.info("verify sign fail.");
+                log.info("签名字符串(data)为："+ data);
+                log.info("签名值(sign)为："+ sign);
+                return null;
+            }else {
+                log.info("verify sign success");
+                JSONObject dataJson = JSONObject.parseObject(data);
+                JSONObject bodyData = JSONObject.parseObject(dataJson.getString("body"));
+                String orderStatus = bodyData.getString("orderStatus");
+                String tradeNo = bodyData.getString("tradeNo");
+                if (dataJson != null) {
+                    log.info("后台通知业务数据为：" + JSONObject.toJSONString(dataJson, true));
+                    log.info("orderStatus：" + orderStatus);
+                    log.info("tradeNo：" + tradeNo);
+                    if ("1".equals(orderStatus)){
+                        auctionPriceService.notifyPayMarginSuccess(tradeNo);
+                    }
+                } else {
+                    log.info("通知数据异常！！！");
+                }
+            }
+        } catch (Exception e) {
+            log.info(e.getMessage());
+            return  null;
+        }
+        return commResult();
+    }
+
+    /**
+     * 拍卖支付回调
+     * @return
+     */
+    @RequestMapping(value = "/auctionNotify")
+    @ApiOperation(value = "拍卖支付回调",hidden = true)
+    public JSONObject auctionNotify(HttpServletRequest req) {
+        log.info("进入拍卖支付支付回调");
+        String data=req.getParameter("data");
+        String sign=req.getParameter("sign");
+        log.info("接收到后台通知数据："+data);
+        log.info("接收到后台通知签名："+sign);
+        // 验证签名
+        boolean valid;
+        try {
+            valid = CryptoUtil.verifyDigitalSign(data.getBytes("utf-8"), Base64.decodeBase64(sign),
+                    CertUtil.getPublicKey(), "SHA1WithRSA");
+            if (!valid) {
+                log.info("verify sign fail.");
+                log.info("签名字符串(data)为："+ data);
+                log.info("签名值(sign)为："+ sign);
+                return null;
+            }else {
+                log.info("verify sign success");
+                JSONObject dataJson = JSONObject.parseObject(data);
+                JSONObject bodyData = JSONObject.parseObject(dataJson.getString("body"));
+                String orderStatus = bodyData.getString("orderStatus");
+                String tradeNo = bodyData.getString("tradeNo");
+                if (dataJson != null) {
+                    log.info("后台通知业务数据为：" + JSONObject.toJSONString(dataJson, true));
+                    log.info("orderStatus：" + orderStatus);
+                    log.info("tradeNo：" + tradeNo);
+                    if ("1".equals(orderStatus)){
+                        auctionOrderService.notifyPaySuccess(tradeNo);
+                    }
+                } else {
+                    log.info("通知数据异常！！！");
+                }
+            }
+        } catch (Exception e) {
+            log.info(e.getMessage());
+            return  null;
+        }
+        return commResult();
+    }
+
+
+    /**
+     * 一口价支付回调
+     * @return
+     */
+    @RequestMapping(value = "/auctionFixNotify")
+    @ApiOperation(value = "一口价支付回调",hidden = true)
+    public JSONObject auctionFixNotify(HttpServletRequest req) {
+        log.info("进入一口价支付支付回调");
+        String data=req.getParameter("data");
+        String sign=req.getParameter("sign");
+        log.info("接收到后台通知数据："+data);
+        log.info("接收到后台通知签名："+sign);
+        // 验证签名
+        boolean valid;
+        try {
+            valid = CryptoUtil.verifyDigitalSign(data.getBytes("utf-8"), Base64.decodeBase64(sign),
+                    CertUtil.getPublicKey(), "SHA1WithRSA");
+            if (!valid) {
+                log.info("verify sign fail.");
+                log.info("签名字符串(data)为："+ data);
+                log.info("签名值(sign)为："+ sign);
+                return null;
+            }else {
+                log.info("verify sign success");
+                JSONObject dataJson = JSONObject.parseObject(data);
+                JSONObject bodyData = JSONObject.parseObject(dataJson.getString("body"));
+                String orderStatus = bodyData.getString("orderStatus");
+                String tradeNo = bodyData.getString("tradeNo");
+                if (dataJson != null) {
+                    log.info("后台通知业务数据为：" + JSONObject.toJSONString(dataJson, true));
+                    log.info("orderStatus：" + orderStatus);
+                    log.info("tradeNo：" + tradeNo);
+                    if ("1".equals(orderStatus)){
+                        auctionOrderService.notifyPaySuccess(tradeNo);
                     }
                 } else {
                     log.info("通知数据异常！！！");

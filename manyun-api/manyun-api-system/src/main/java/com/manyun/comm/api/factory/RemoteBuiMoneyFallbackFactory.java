@@ -35,7 +35,7 @@ public class RemoteBuiMoneyFallbackFactory implements FallbackFactory<RemoteBuiM
             }
 
             @Override
-            public R checkIdentity(String identityNo, String source) {
+            public R<String> checkIdentity(String identityNo, String source) {
                 return R.fail("操作失败:" + throwable.getMessage());
             }
 

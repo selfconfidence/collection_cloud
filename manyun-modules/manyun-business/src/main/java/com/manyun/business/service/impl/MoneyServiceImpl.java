@@ -178,12 +178,13 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
     }
 
     @Override
-    public R checkIdentity(String identityNo) {
+    public R<String> checkIdentity(String identityNo) {
         Money moneyUser = getOne(Wrappers.<Money>lambdaQuery().eq(Money::getCartNo, identityNo));
         if (moneyUser == null) {
             return R.ok();
         } else {
-            return R.fail("当前身份证已用于实名，请勿重复验证");
+            //return R.fail("当前身份证已用于实名，请勿重复验证");
+            return R.fail(moneyUser.getUserId());
         }
     }
 

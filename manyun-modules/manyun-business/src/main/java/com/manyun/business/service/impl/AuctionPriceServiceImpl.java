@@ -31,6 +31,7 @@ import com.manyun.common.core.domain.CodeStatus;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.AuctionSendStatus;
 import com.manyun.common.core.enums.AuctionStatus;
+import com.manyun.common.core.enums.ShandePayEnum;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
@@ -406,6 +407,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                         .outHost(auctionOrder.getOrderNo())
                         .aliPayEnum(AUCTION_ALI_PAY)
                         .wxPayEnum(AUCTION_WECHAT_PAY)
+                        .shandePayEnum(ShandePayEnum.AUCTION_SHANDE_PAY)
                         .userId(payUserId).build());
 
         auctionOrder.setMoneyBln(payVo.getMoneyBln());
@@ -483,6 +485,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .outHost(auctionMargin1.getId())
                 .aliPayEnum(MARGIN_ALI_PAY)
                 .wxPayEnum(MARGIN_WECHAT_PAY)
+                .shandePayEnum(ShandePayEnum.AUCTION_MARGIN_SHANDE_PAY)
                 .userId(payUserId).build());
         auctionMargin1.setMoneyBln(payVo.getMoneyBln());
         auctionMarginService.updateById(auctionMargin1);
@@ -578,6 +581,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .outHost(auctionOrder.getOrderNo())
                 .aliPayEnum(FIXED_ALI_PAY)
                 .wxPayEnum(FIXED_WECHAT_PAY)
+                .shandePayEnum(ShandePayEnum.AUCTION_FIX_SHANDE_PAY)
                 .userId(userId).build());
 
         auctionOrder.setMoneyBln(payVo.getMoneyBln());

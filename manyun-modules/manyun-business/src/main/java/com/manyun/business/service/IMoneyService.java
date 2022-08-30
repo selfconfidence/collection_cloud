@@ -41,7 +41,7 @@ public interface IMoneyService extends IService<Money> {
 
     R updateUserMoney(UserRealMoneyForm userRealMoneyForm);
 
-    R checkIdentity(String identityNo);
+    R<String> checkIdentity(String identityNo);
 
     UserMoneyDto userMoneyInfo(String userId);
 }
