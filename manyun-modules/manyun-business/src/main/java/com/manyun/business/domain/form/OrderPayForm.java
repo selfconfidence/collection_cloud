@@ -24,4 +24,7 @@ public class OrderPayForm implements Serializable {
 
 
 
+    @ApiModelProperty("原生双端所需,支付后返回app 的路径")
+    private String returnUrl;
+
 }
