@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntBannerJumpLinkMapper">
+
+    <resultMap type="CntBannerJumpLink" id="CntBannerJumpLinkResult">
+        <result property="id"    column="id"    />
+        <result property="linkCode"    column="link_code"    />
+        <result property="linkName"    column="link_name"    />
+        <result property="linkStatus"    column="link_status"    />
+        <result property="linkSort"    column="link_sort"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCntBannerJumpLinkVo">
+        select id, link_code, link_name, link_status, link_sort, created_by, created_time, updated_by, updated_time from cnt_banner_jump_link
+    </sql>
+
+    <select id="selectCntBannerJumpLinkList" parameterType="BannerJumpLinkQuery" resultMap="CntBannerJumpLinkResult">
+        <include refid="selectCntBannerJumpLinkVo"/>
+        <where>
+            <if test="linkName != null  and linkName != ''"> and link_name like concat('%', #{linkName}, '%')</if>
+        </where>
+    </select>
+
+</mapper>

@@ -4,8 +4,9 @@ package com.manyun.admin.controller;
 import com.manyun.admin.domain.dto.ConsignmentInfoDto;
 import com.manyun.admin.domain.dto.PaymentReviewDto;
 import com.manyun.admin.domain.query.ConsignmentQuery;
-import com.manyun.admin.domain.vo.CntCollectionDetailsVo;
 import com.manyun.admin.domain.vo.CntConsignmentVo;
+import com.manyun.comm.api.RemoteConsignmentService;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,6 +25,9 @@ public class CntConsignmentController extends BaseController
 {
     @Autowired
     private ICntConsignmentService cntConsignmentService;
+
+    @Autowired
+    private RemoteConsignmentService remoteConsignmentService;
 
     @GetMapping("/collectionList")
     @ApiOperation("藏品订单管理列表")
@@ -50,7 +54,7 @@ public class CntConsignmentController extends BaseController
     @ApiOperation("打款审核")
     public R paymentReview(@Valid @RequestBody PaymentReviewDto paymentReviewDto)
     {
-        return cntConsignmentService.paymentReview(paymentReviewDto);
+        return remoteConsignmentService.consignmentSuccess(paymentReviewDto.getId(), SecurityConstants.FROM_SOURCE);
     }
 
 }

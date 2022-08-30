@@ -50,4 +50,14 @@ public interface ICntSystemService extends IService<CntSystem>
      * 查询邀请海报详情
      */
     public PosterDto queryPosterInfo();
+
+    /**
+     * 更新用户默认头像
+     */
+    public int updateUserDeafultAvatar(PosterDto posterDto);
+
+    /**
+     * 查询用户默认头像
+     */
+    public PosterDto queryUserDeafultAvatar();
 }

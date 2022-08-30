@@ -87,4 +87,9 @@ public interface CntDictService
      * @return
      */
     R agreementTypeDict();
+
+    /**
+     * 轮播跳转链接字典
+     */
+    R bannerJumpLinkDict();
 }

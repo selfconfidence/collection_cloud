@@ -100,8 +100,8 @@ public class CntSystemServiceImpl extends ServiceImpl<CntSystemMapper,CntSystem>
     public int updatePoster(PosterDto posterDto) {
         CntSystem cntSystem = Builder.of(CntSystem::new).
                 with(CntSystem::setSystemVal,posterDto.getSystemVal()).
-                with(CntSystem::setCreatedBy,SecurityUtils.getUsername()).
-                with(CntSystem::setCreatedTime,DateUtils.getNowDate()).build();
+                with(CntSystem::setUpdatedBy,SecurityUtils.getUsername()).
+                with(CntSystem::setUpdatedTime,DateUtils.getNowDate()).build();
         if(!update(cntSystem,Wrappers.<CntSystem>lambdaUpdate().eq(CntSystem::getSystemType, CntSystemEnum.INVITE_URL))){
             return 0;
         }
@@ -118,6 +118,29 @@ public class CntSystemServiceImpl extends ServiceImpl<CntSystemMapper,CntSystem>
     public PosterDto queryPosterInfo() {
         PosterDto posterDto=Builder.of(PosterDto::new).build();
         CntSystem cntSystem = getOne(Wrappers.<CntSystem>lambdaQuery().eq(CntSystem::getSystemType, CntSystemEnum.INVITE_URL));
+        BeanUtils.copyProperties(cntSystem,posterDto);
+        return posterDto;
+    }
+
+    /**
+     * 更新用户默认头像
+     */
+    @Override
+    public int updateUserDeafultAvatar(PosterDto posterDto) {
+        CntSystem cntSystem = Builder.of(CntSystem::new).
+                with(CntSystem::setSystemVal,posterDto.getSystemVal()).
+                with(CntSystem::setUpdatedBy,SecurityUtils.getUsername()).
+                with(CntSystem::setUpdatedTime,DateUtils.getNowDate()).build();
+        return update(cntSystem,Wrappers.<CntSystem>lambdaUpdate().eq(CntSystem::getSystemType, CntSystemEnum.USER_DEFAULT_LINK))==true?1:0;
+    }
+
+    /**
+     * 查询用户默认头像
+     */
+    @Override
+    public PosterDto queryUserDeafultAvatar() {
+        PosterDto posterDto=Builder.of(PosterDto::new).build();
+        CntSystem cntSystem = getOne(Wrappers.<CntSystem>lambdaQuery().eq(CntSystem::getSystemType, CntSystemEnum.USER_DEFAULT_LINK));
         BeanUtils.copyProperties(cntSystem,posterDto);
         return posterDto;
     }

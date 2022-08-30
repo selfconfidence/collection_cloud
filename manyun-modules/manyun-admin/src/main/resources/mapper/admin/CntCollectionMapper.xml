@@ -70,4 +70,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	    where cp.id = #{id}
     </select>
 
+    <update id="updateLock">
+        update cnt_collection set balance =  balance - #{sellNum} ,self_balance =  self_balance + #{sellNum} WHERE id = #{id} and balance >=#{sellNum};
+    </update>
 </mapper>
