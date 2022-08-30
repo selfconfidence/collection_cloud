@@ -35,6 +35,7 @@ import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.jg.JgAuthLoginUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -65,6 +66,7 @@ import static com.manyun.common.core.enums.UserRealStatus.OK_REAL;
  * @since 2022-06-17
  */
 @Service
+@Slf4j
 public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> implements ICntUserService {
 
     @Autowired
@@ -448,6 +450,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
 
 
         } catch (Exception e) {
+            log.info("进入异常---------" + e.getMessage());
             e.printStackTrace();
             return R.fail(e.getMessage());
         }
