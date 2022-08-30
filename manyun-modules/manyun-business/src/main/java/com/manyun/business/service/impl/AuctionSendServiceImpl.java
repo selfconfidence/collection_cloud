@@ -404,10 +404,17 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
 
 
     private void checkAll(AuctionSendForm auctionSendForm, String userId) {
+        String isOpen = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_ACC, String.class);
+        Assert.isTrue("1".equals(isOpen), "尚未开启拍卖功能");
         realCheck(userId);
         Integer type = auctionSendForm.getGoodsType();
         Assert.isTrue(auctionSendForm.getStartPrice().compareTo(auctionSendForm.getSoldPrice()) < 1 ,"一口价需大于起拍价");
 
+        boolean exists = this.baseMapper.exists(Wrappers.<AuctionSend>lambdaQuery()
+                .eq(AuctionSend::getMyGoodsId, auctionSendForm.getMyGoodsId())
+                .ne(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_BREAK.getCode())
+                .ne(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_PASS.getCode()));
+        Assert.isFalse(exists, "请勿重复送拍,请确定竞品当前状态");
         // 藏品
         if (type == 1)
             Assert.isTrue(userCollectionService.existUserCollection(userId,auctionSendForm.getMyGoodsId()),"选择的藏品有误,请核实藏品详细信息!");
@@ -415,12 +422,6 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         // 盲盒
         if (type == 2)
             Assert.isTrue(userBoxService.existUserBox(userId,auctionSendForm.getMyGoodsId()),"选择的盲盒有误,请核实盲盒详细信息!");
-
-        boolean exists = this.baseMapper.exists(Wrappers.<AuctionSend>lambdaQuery()
-                .eq(AuctionSend::getMyGoodsId, auctionSendForm.getMyGoodsId())
-                .ne(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_BREAK.getCode())
-                .ne(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_PASS.getCode()));
-        Assert.isFalse(exists, "请勿重复送拍,请确定竞品当前状态");
     }
 
     private void aspect(@NotNull AuctionSendForm auctionSendForm, @NotNull String userId) {
