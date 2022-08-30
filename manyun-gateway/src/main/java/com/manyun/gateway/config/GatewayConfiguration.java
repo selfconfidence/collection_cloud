@@ -1,3 +1,4 @@
+/*
 package com.manyun.gateway.config;
 
 import com.alibaba.csp.sentinel.adapter.gateway.sc.SentinelGatewayFilter;
@@ -38,4 +39,4 @@ public class GatewayConfiguration {
     public GlobalFilter sentinelGatewayFilter() {
         return new SentinelGatewayFilter();
     }
-}
+}*/

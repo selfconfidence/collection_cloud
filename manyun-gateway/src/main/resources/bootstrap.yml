@@ -41,4 +41,4 @@ spring:
             data-type: json
             rule-type: gw-flow
       filter:
-        enabled: false
+        enabled: true
