@@ -8,10 +8,7 @@ import com.manyun.common.core.constant.ServiceNameConstants;
 import com.manyun.common.core.domain.R;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 业务板块 盲盒服务
@@ -20,7 +17,12 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface RemoteConsignmentService {
 
     @GetMapping("/consignment/cancelSchedulingConsignment")
-    @ApiOperation("取消寄售市场中的资产")
+     @ApiOperation("取消寄售市场中的资产")
      R cancelSchedulingConsignment(@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+
+
+     @GetMapping("/consignment/consignmentSuccess/{id}")
+     @ApiOperation("审核通过;id = 寄售编号")
+     R  consignmentSuccess(@PathVariable("id") String id,@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 
 }

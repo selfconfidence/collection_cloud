@@ -66,6 +66,19 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         updateById(money);
     }
 
+    /**
+     * 加余额
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addMoney(String userId,BigDecimal money,String formInfo){
+        Money moneyEntiy = getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
+        moneyEntiy.setMoneyBalance(moneyEntiy.getMoneyBalance().add(money));
+        logsService.saveLogs(LogInfoDto.builder().buiId(userId).jsonTxt(formInfo).formInfo( money.toString()).isType(PULL_SOURCE).modelType(MONEY_TYPE).build());
+        updateById(moneyEntiy);
+
+    }
+
 
     /**
      * 根据进行进行扣除余额操作 —— 组合支付使用

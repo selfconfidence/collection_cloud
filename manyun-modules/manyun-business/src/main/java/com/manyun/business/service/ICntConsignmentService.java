@@ -41,4 +41,6 @@ public interface ICntConsignmentService extends IService<CntConsignment> {
     List<KeywordVo> queryDict(String keyword);
 
     String consignmentCreateOrder(String payUserId, ConsignmentOrderSellForm consignmentOrderSellForm);
+
+    void consignmentSuccess(String id);
 }

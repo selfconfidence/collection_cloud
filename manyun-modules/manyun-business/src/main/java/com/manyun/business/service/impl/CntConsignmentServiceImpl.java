@@ -1,6 +1,7 @@
 package com.manyun.business.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.net.Ipv4Util;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
@@ -24,7 +25,9 @@ import com.manyun.business.mapper.CntConsignmentMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.comm.api.RemoteBuiUserService;
+import com.manyun.comm.api.RemoteSmsService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
+import com.manyun.comm.api.domain.dto.SmsCommDto;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
@@ -49,6 +52,8 @@ import static com.manyun.common.core.constant.BusinessConstants.SystemTypeConsta
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
 import static com.manyun.common.core.enums.AliPayEnum.CONSIGNMENT_ALI_PAY;
 import static com.manyun.common.core.enums.ConsignmentStatus.*;
+import static com.manyun.common.core.enums.ConsignmentToPayStatus.OK_TO_PAY;
+import static com.manyun.common.core.enums.ConsignmentToPayStatus.WAIT_TO_PAY;
 import static com.manyun.common.core.enums.PayTypeEnum.MONEY_TAPE;
 import static com.manyun.common.core.enums.WxPayEnum.BOX_WECHAT_PAY;
 import static com.manyun.common.core.enums.WxPayEnum.CONSIGNMENT_WECHAT_PAY;
@@ -92,6 +97,12 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
 
     @Autowired
     private IMsgService msgService;
+
+    @Autowired
+    private RemoteSmsService remoteSmsService;
+
+    @Autowired
+    private IMoneyService moneyService;
 
 
     /**
@@ -291,6 +302,9 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         for (CntConsignment cntConsignment : cntConsignments) {
             try {
                 cancelConsignment(cntConsignment);
+                // 发送短信好了.
+                CntUserDto cntUserDto = remoteBuiUserService.commUni(cntConsignment.getSendUserId(), SecurityConstants.INNER).getData();
+                remoteSmsService.sendCommPhone(Builder.<SmsCommDto>of(SmsCommDto::new).with(SmsCommDto::setTemplateCode, BusinessConstants.SmsTemplateNumber.ASSERT_BACK).with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().put("buiName",cntConsignment.getBuiName() ).build()).with(SmsCommDto::setPhoneNumber,cntUserDto.getPhone()).build());
             }catch (Exception e){
                 log.error("寄售市场撤回寄售资产错误信息:{},资产编号:{}",e.getMessage(),cntConsignment.getId());
             }
@@ -348,6 +362,28 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         updateById(consignment);
 
         return orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, hostOut)).getId();
+    }
+
+    /**
+     * 寄售成功，钱到钱包余额中
+     * @param id
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void consignmentSuccess(String id) {
+        // 1. 状态限制是否成功
+        CntConsignment cntConsignment = getById(id);
+        Assert.isTrue(WAIT_TO_PAY.getCode().equals(cntConsignment.getToPay()),"状态有误,请核实!");
+        // 更改寄售信息
+        cntConsignment.setConsignmentStatus(OK_TO_PAY.getCode());
+        cntConsignment.updateD(cntConsignment.getSendUserId());
+        updateById(cntConsignment);
+        // 给对应的用户加钱
+        BigDecimal realMoney = cntConsignment.getConsignmentPrice().subtract(cntConsignment.getServerCharge());
+        moneyService.addMoney(cntConsignment.getSendUserId(),realMoney,StrUtil.format("寄售资产 {} 已审核,到账{}元!", cntConsignment.getBuiName(),realMoney.toString()));
+        // 发送通知
+        CntUserDto cntUserDto = remoteBuiUserService.commUni(cntConsignment.getSendUserId(), SecurityConstants.INNER).getData();
+        remoteSmsService.sendCommPhone(Builder.<SmsCommDto>of(SmsCommDto::new).with(SmsCommDto::setTemplateCode, BusinessConstants.SmsTemplateNumber.ASSERT_SUCCESS).with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().put("money", realMoney.toString()).put("buiName",cntConsignment.getBuiName() ).build()).with(SmsCommDto::setPhoneNumber,cntUserDto.getPhone()).build());
     }
 
     private void cancelConsignment(CntConsignment cntConsignment) {
@@ -556,6 +592,9 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         cntConsignment.setFormInfo(info);
         cntConsignment.setBuiName(buiName);
         save(cntConsignment);
+        // 发送短信好了.
+        CntUserDto cntUserDto = remoteBuiUserService.commUni(userId, SecurityConstants.INNER).getData();
+        remoteSmsService.sendCommPhone(Builder.<SmsCommDto>of(SmsCommDto::new).with(SmsCommDto::setTemplateCode, BusinessConstants.SmsTemplateNumber.ASSERT_UP).with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().put("buiName",cntConsignment.getBuiName() ).build()).with(SmsCommDto::setPhoneNumber,cntUserDto.getPhone()).build());
     }
 
 

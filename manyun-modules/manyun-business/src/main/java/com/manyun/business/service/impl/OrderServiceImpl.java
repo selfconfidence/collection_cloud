@@ -2,6 +2,7 @@ package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.net.Ipv4Util;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
@@ -22,8 +23,14 @@ import com.manyun.business.domain.vo.*;
 import com.manyun.business.mapper.OrderMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.comm.api.RemoteBuiUserService;
+import com.manyun.comm.api.RemoteSmsService;
+import com.manyun.comm.api.domain.dto.CntUserDto;
+import com.manyun.comm.api.domain.dto.SmsCommDto;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.constant.BusinessConstants;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.PayTypeEnum;
 import com.manyun.common.core.enums.ShandePayEnum;
 import com.manyun.common.core.utils.StringUtils;
@@ -100,6 +107,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Autowired
     private ICntPostExcelService cntPostExcelService;
+
+
+    @Autowired
+    private RemoteSmsService remoteSmsService;
+
+    @Autowired
+    private RemoteBuiUserService remoteBuiUserService;
 
     @Override
     public TableDataInfo<OrderVo> pageQueryList(OrderQuery orderQuery, String userId) {
@@ -363,8 +377,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         cntConsignment.setFormInfo("买方已经支付!");
         cntConsignment.setToPay(WAIT_TO_PAY.getCode());
         consignmentService.updateById(cntConsignment);
-
-    }
+        CntUserDto cntUserDto = remoteBuiUserService.commUni(cntConsignment.getSendUserId(), SecurityConstants.INNER).getData();
+        remoteSmsService.sendCommPhone(Builder.<SmsCommDto>of(SmsCommDto::new).with(SmsCommDto::setTemplateCode, BusinessConstants.SmsTemplateNumber.ASSERT_OK).with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().build()).with(SmsCommDto::setPhoneNumber,cntUserDto.getPhone()).build());    }
 
     @Override
     public OrderInfoVo info(String id) {
@@ -405,7 +419,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     ///ShandePayEnum.COLLECTION_BOX_SHANDE_PAY.setReturnUrl(orderPayForm.getReturnUrl())
     public PayVo unifiedOrder(OrderPayForm orderPayForm,String userId) {
         Order order = getById(orderPayForm.getOrderId());
-        checkUnified(order,userId);
+        checkUnified(order,userId,orderPayForm.getPayPass());
         ShandePayEnum shandePayEnum =  switchCase(order.getId(),orderPayForm.getReturnUrl(), orderPayForm.getReturnUrl());
         // 判定用户的余额是否充足
         PayVo payVo =  rootPay.execPayVo(
@@ -581,10 +595,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
     }
 
-    private void checkUnified(Order order, String userId) {
+    private void checkUnified(Order order, String userId,String payPass) {
+        CntUserDto cntUserDto = remoteBuiUserService.commUni(userId, SecurityConstants.INNER).getData();
         Assert.isTrue(userId.equals(order.getUserId()), "订单被篡改,请联系平台!" );
         Assert.isTrue(WAIT_ORDER.getCode().equals(order.getOrderStatus()),"待支付订单才可支付!");
         Assert.isTrue(order.getEndTime().compareTo(LocalDateTime.now()) >=0,"付款时间已截止,请核实订单状态!");
+        Assert.isTrue(payPass.equals(cntUserDto.getPayPass()),"支付密码错误,请核实!");
     }
 
 

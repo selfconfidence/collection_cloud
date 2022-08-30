@@ -22,11 +22,16 @@ public class RemoteConsignmentFallbackFactory implements FallbackFactory<RemoteC
     @Override
     public RemoteConsignmentService create(Throwable throwable)
     {
-        log.error("业务盲盒服务调用失败:{}", throwable.getMessage());
+        log.error("业务寄售服务调用失败:{}", throwable.getMessage());
         return new RemoteConsignmentService() {
 
             @Override
             public R cancelSchedulingConsignment(String source) {
+                return R.fail("出错了!!!");
+            }
+
+            @Override
+            public R consignmentSuccess(String id, String source) {
                 return R.fail("出错了!!!");
             }
         };

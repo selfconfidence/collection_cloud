@@ -122,5 +122,13 @@ public class CntConsignmentController {
         return R.ok();
     }
 
+    @GetMapping("/consignmentSuccess/{id}")
+    @ApiOperation(value = "审核通过;id = 寄售编号",hidden = true)
+    @InnerAuth
+    public synchronized R  consignmentSuccess(@PathVariable String id){
+        cntConsignmentService.consignmentSuccess(id);
+        return R.ok();
+    }
+
 }
 

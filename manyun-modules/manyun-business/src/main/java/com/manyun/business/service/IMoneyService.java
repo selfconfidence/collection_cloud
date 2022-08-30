@@ -26,6 +26,9 @@ public interface IMoneyService extends IService<Money> {
 
     void orderBack(String userId, BigDecimal moneyBln, String formInfo);
 
+    @Transactional(rollbackFor = Exception.class)
+    void addMoney(String userId, BigDecimal money, String formInfo);
+
     BigDecimal ordePay(String outHost, String userId, BigDecimal realPayMoney, String formInfo);
 
     AccountInfoVo accountInfo(String userId);

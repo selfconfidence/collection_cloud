@@ -1,6 +1,8 @@
 package com.manyun.base.utils;
 
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.URLUtil;
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.model.*;
@@ -21,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -42,21 +45,20 @@ public class AliUtil {
      * @return
      */
     public static boolean sendSms(String phoneNumber, String ...code) {
-
-        return send(phoneNumber,   SpringUtils.getBean(AliSmsConfig.class).getTemplateCode(),code);
+        return send(phoneNumber,   SpringUtils.getBean(AliSmsConfig.class).getTemplateCode(),MapUtil.<String,String>builder().put("code", code[0]).build());
     }
 
     /**
      * 发送通知
      *
      * @param phoneNumber
-     * @param code
+     * @param paramMaps
      * @return
      */
-    public static boolean sendNotice(String phoneNumber, String ...code) {
-        return send(phoneNumber,   SpringUtils.getBean(AliSmsConfig.class).getTemplateCode(),code);
-    }
-    private static boolean send(String phoneNumber, String templateCode, String ...code) {
+//    public static boolean sendNotice(String phoneNumber, String ...code) {
+//        return send(phoneNumber,   SpringUtils.getBean(AliSmsConfig.class).getTemplateCode(),code);
+//    }
+    public static boolean send(String phoneNumber, String templateCode, Map<String,String> paramMaps ) {
         DefaultProfile profile = DefaultProfile.getProfile(SpringUtils.getBean(AliSmsConfig.class).getRegionId(),  SpringUtils.getBean(AliSmsConfig.class).getAccessKey(),  SpringUtils.getBean(AliSmsConfig.class).getSecret());
         IAcsClient client = new DefaultAcsClient(profile);
 
@@ -69,23 +71,26 @@ public class AliUtil {
         request.putQueryParameter("PhoneNumbers", phoneNumber);
         request.putQueryParameter("SignName",  SpringUtils.getBean(AliSmsConfig.class).getSing());
         request.putQueryParameter("TemplateCode", templateCode);
-        JSONObject templateParam = new JSONObject();
-        if (code.length == 1){
-            templateParam.put("code", code[0]);
-        }/*else{
+        //JSONObject templateParam = new JSONObject();
+/*        if (param.length == 1){
+            templateParam.put("code", param[0]);
+        }*/
+
+        /*else{
             templateParam.put("vipName", code[0]);
             templateParam.put("timeNode", code[1]);
             templateParam.put("subTime", code[2]);
         }
 */
-        request.putQueryParameter("TemplateParam", templateParam.toJSONString());
+        String toJSONString = JSON.toJSONString(paramMaps);
+        request.putQueryParameter("TemplateParam", toJSONString);
         try {
             CommonResponse response = client.getCommonResponse(request);
             JSONObject responseJSON = JSONObject.parseObject(response.getData(),JSONObject.class);
             if ("OK".equals(responseJSON.getString("Message"))) {
                 return true;
             }
-            log.error("【阿里云短信】:发送短信失败，手机号：{},验证码：{},错误信息：{}", phoneNumber, code, responseJSON.getString("Message"));
+            log.error("【阿里云短信】:发送短信失败，手机号：{},验证码：{},错误信息：{}", phoneNumber, toJSONString, responseJSON.getString("Message"));
         } catch (ServerException e) {
             e.printStackTrace();
         } catch (ClientException e) {

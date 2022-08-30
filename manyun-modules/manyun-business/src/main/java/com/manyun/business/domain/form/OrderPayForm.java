@@ -28,4 +28,9 @@ public class OrderPayForm implements Serializable {
     @NotBlank(message = "跳转url不可为空")
     private String returnUrl;
 
+
+    @ApiModelProperty("支付密码")
+    @NotBlank(message = "支付密码不可为空")
+    private String payPass;
+
 }

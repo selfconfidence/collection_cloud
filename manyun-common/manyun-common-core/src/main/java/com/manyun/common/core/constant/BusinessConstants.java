@@ -212,5 +212,26 @@ public interface BusinessConstants {
         String USER_OFF = "1";
     }
 
+    /**
+     * 短信通知
+     */
+    interface SmsTemplateNumber{
+
+        //您寄售的 ${buiName} 到时间被下架了,注意查收!
+        String ASSERT_BACK = "SMS_249815543";
+
+        //您的 ${buiName} 已经成功寄售!
+        String ASSERT_UP = "SMS_249960533";
+
+        //您的藏品已被用户买入啦！收入${money}元将在${day}天后到账。开启全新的艺术收藏之旅，就在CNT。
+        //String ASSERT_SUCCESS = "SMS_249970552";
+
+       // 您的寄售资产已被用户买入啦！后台审核后即将到款。开启全新的艺术收藏之旅，就在CNT。
+        String ASSERT_OK = "SMS_250450009";
+
+
+        String ASSERT_SUCCESS = "SMS_250320015";
+    }
+
 
 }

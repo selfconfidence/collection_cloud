@@ -3,15 +3,14 @@ package com.manyun.base.controller;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.RandomUtil;
 import com.manyun.base.utils.AliUtil;
+import com.manyun.comm.api.domain.dto.SmsCommDto;
 import com.manyun.common.core.domain.CodeStatus;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.redis.service.RedisService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +36,13 @@ public class BaseController {
         String code = RandomUtil.randomNumbers(6);
         AliUtil.sendSms(phone,code);
         redisService.redisTemplate.opsForValue().set(PHONE_CODE.concat(phone),code,EXP_TIME, TimeUnit.SECONDS);
+        return R.ok();
+    }
+
+    @PostMapping("/sendCommPhone")
+    @ApiOperation("内部提供短信通知")
+    public R sendCommPhone(@RequestBody SmsCommDto smsCommDto){
+        AliUtil.send(smsCommDto.getPhoneNumber(), smsCommDto.getTemplateCode(), smsCommDto.getParamsMap());
         return R.ok();
     }
 }
