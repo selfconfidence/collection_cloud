@@ -408,8 +408,9 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
             BufferedImage read = ImageIO.read(backgroundUrl.openStream());
             log.info("9999999999999999");
             width = read.getWidth();
+            log.info("width----------" + width);
             height = read.getHeight();
-
+            log.info("height------------" + height);
             BufferedImage bufferedImage = PosterUtil.drawInitAndChangeSize(background, backgroundUrl.openConnection().getInputStream(),width, height);
             log.info("1000000000000000000");
 
