@@ -235,8 +235,15 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
      */
     @Override
     public R userRealName(UserRealForm userRealForm, String userId) {
+        R<String> stringR = remoteBuiMoneyService.checkIdentity(userRealForm.getCartNo(), SecurityConstants.INNER);
+
         if (remoteBuiMoneyService.checkIdentity(userRealForm.getCartNo(), SecurityConstants.INNER).getCode() != 200) {
-            return R.fail("当前身份证已用于实名，请勿重复验证");
+            if (StrUtil.isNotBlank(stringR.getData()) && getById(stringR.getData()) != null  && getById(stringR.getData()).getIsReal() == 2) {
+                return R.fail("当前身份证已用于实名，请勿重复验证");
+            }
+            /*String data = stringR.getData();
+            getById(data).getIsReal() == 1;
+            return R.fail("当前身份证已用于实名，请勿重复验证");*/
         }
         R r = unionRealConfig.unionReal(userRealForm);
         if (200 != r.getCode()) {
