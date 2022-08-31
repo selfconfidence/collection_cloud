@@ -117,14 +117,14 @@ public class CntPostExcelServiceImpl extends ServiceImpl<CntPostExcelMapper,CntP
         if(("1".equals(typeName) && Objects.nonNull(box)) || ("2".equals(typeName) && Objects.nonNull(collection))){
             CntPostExcel cntPostExcel = getOne(
                     Wrappers.<CntPostExcel>lambdaQuery()
-                            .eq(CntPostExcel::getUserId, user.getUserId())
+                            .eq(CntPostExcel::getUserId, user.getId())
                             .eq(CntPostExcel::getBuiId,"1".equals(typeName)?box.getId():collection.getId())
                             .eq(CntPostExcel::getTypeName,typeName));
             if(Objects.isNull(cntPostExcel)){
                 save(
                         Builder.of(CntPostExcel::new)
                                 .with(CntPostExcel::setId, IdUtils.getSnowflakeNextIdStr())
-                                .with(CntPostExcel::setUserId, user.getUserId())
+                                .with(CntPostExcel::setUserId, user.getId())
                                 .with(CntPostExcel::setPhone, user.getPhone())
                                 .with(CntPostExcel::setBuiId, "1".equals(typeName)?box.getId():collection.getId())
                                 .with(CntPostExcel::setBuiName,"1".equals(typeName)?box.getBoxTitle():collection.getCollectionName())
@@ -139,7 +139,7 @@ public class CntPostExcelServiceImpl extends ServiceImpl<CntPostExcelMapper,CntP
                 updateById(
                         Builder.of(CntPostExcel::new)
                                 .with(CntPostExcel::setId, cntPostExcel.getId())
-                                .with(CntPostExcel::setUserId, user.getUserId())
+                                .with(CntPostExcel::setUserId, user.getId())
                                 .with(CntPostExcel::setPhone, user.getPhone())
                                 .with(CntPostExcel::setBuiId, "1".equals(typeName)?box.getId():collection.getId())
                                 .with(CntPostExcel::setBuiName,"1".equals(typeName)?box.getBoxTitle():collection.getCollectionName())

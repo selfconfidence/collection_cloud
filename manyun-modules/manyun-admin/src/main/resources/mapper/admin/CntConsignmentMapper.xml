@@ -67,6 +67,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="sellerName != null  and sellerName != ''"> and mr.nick_name like concat('%', #{sellerName}, '%')</if>
             <if test="sellerPhone != null  and sellerPhone != ''"> and mr.phone = #{sellerPhone}</if>
             <if test="payType != null"> and o.pay_type = #{payType}</if>
+            <if test="toPay != null"> and js.to_pay = #{toPay}</if>
         </where>
         order by js.created_time desc
     </select>
@@ -109,6 +110,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="sellerName != null  and sellerName != ''"> and mr.nick_name like concat('%', #{sellerName}, '%')</if>
             <if test="sellerPhone != null  and sellerPhone != ''"> and mr.phone = #{sellerPhone}</if>
             <if test="payType != null"> and o.pay_type = #{payType}</if>
+            <if test="toPay != null"> and js.to_pay = #{toPay}</if>
         </where>
         order by js.created_time desc
     </select>
