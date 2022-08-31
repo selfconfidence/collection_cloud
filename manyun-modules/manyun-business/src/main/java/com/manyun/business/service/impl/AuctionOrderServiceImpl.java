@@ -205,6 +205,9 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
 
         List<AuctionOrder> updateOrder = auctionOrderList.parallelStream().map(item -> {
             AuctionPrice auctionPrice = auctionPriceService.getById(item.getAuctionPriceId());
+            AuctionSend auctionSend = auctionSendService.getById(item.getSendAuctionId());
+            auctionSend.setAuctionSendStatus(AuctionSendStatus.BID_BREAK.getCode());
+            auctionSendService.updateById(auctionSend);
             auctionPrice.setAuctionStatus(AuctionStatus.BID_BREAK.getCode());
             auctionPriceService.updateById(auctionPrice);
             item.setAuctionStatus(AuctionStatus.BID_BREAK.getCode());

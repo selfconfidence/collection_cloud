@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -31,6 +32,9 @@ public class MyAuctionPriceVo {
 
     @ApiModelProperty("竞拍状态，1, 竞拍中，2，未拍中，3，待支付，4，已支付，5，已违约")
     private Integer auctionStatus;
+
+    @ApiModelProperty("组合支付专属, payType = 0 才有用 如果此值不是0.00 就说明使用了余额支付。")
+    private BigDecimal moneyBln;
 
     @ApiModelProperty("剩余支付时间，只有状态为待支付才有效")
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
