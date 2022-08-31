@@ -376,7 +376,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         CntConsignment cntConsignment = getById(id);
         Assert.isTrue(WAIT_TO_PAY.getCode().equals(cntConsignment.getToPay()),"状态有误,请核实!");
         // 更改寄售信息
-        cntConsignment.setConsignmentStatus(OK_TO_PAY.getCode());
+        cntConsignment.setToPay(OK_TO_PAY.getCode());
         cntConsignment.updateD(cntConsignment.getSendUserId());
         updateById(cntConsignment);
         // 给对应的用户加钱
