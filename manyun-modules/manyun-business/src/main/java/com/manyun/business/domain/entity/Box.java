@@ -62,6 +62,9 @@ public class Box implements Serializable {
     @ApiModelProperty("盲盒详情")
     private String boxInfo;
 
+    @ApiModelProperty("是否推送寄售市场(0=可以，1=不可以)")
+    private Integer pushConsignment;
+
     @ApiModelProperty("发售时间;到达对应时间点才可以正常交易_平台")
     private LocalDateTime publishTime;
 

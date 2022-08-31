@@ -51,6 +51,7 @@ import java.util.stream.Collectors;
 import static com.manyun.common.core.constant.BusinessConstants.SystemTypeConstant.CONSIGNMENT_DE_TIME;
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
 import static com.manyun.common.core.enums.AliPayEnum.CONSIGNMENT_ALI_PAY;
+import static com.manyun.common.core.enums.AssertConsignmentStatus.OK_PUSH_CONSIGNMENT;
 import static com.manyun.common.core.enums.ConsignmentStatus.*;
 import static com.manyun.common.core.enums.ConsignmentToPayStatus.OK_TO_PAY;
 import static com.manyun.common.core.enums.ConsignmentToPayStatus.WAIT_TO_PAY;
@@ -530,6 +531,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         String info = null;
         String cateId = null;
         String buiName= null;
+        Integer pushConsignment = 0;
         // 藏品
         if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(type)){
             // 将自己的藏品隐藏,归并状态以及词条
@@ -538,7 +540,8 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
             CntCollection cntCollection = collectionService.getById(realBuiId);
             cateId = cntCollection.getCateId();
             buiName = cntCollection.getCollectionName();
-           // return;
+             pushConsignment = cntCollection.getPushConsignment();
+            // return;
         }
        // 盲盒
         if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(type)){
@@ -548,11 +551,13 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
             Box box = boxService.getById(realBuiId);
             cateId = box.getCateId();
             buiName= box.getBoxTitle();
-           // return;
+            pushConsignment = box.getPushConsignment();
+
+            // return;
         }
         if (StrUtil.isBlank(info) && StrUtil.isBlank(realBuiId))
            throw new ServiceException("not fount type [0-1] now type is "+type+"");
-
+        Assert.isTrue(OK_PUSH_CONSIGNMENT.getCode().equals(pushConsignment),"此资产不可寄售!");
         pushConsignment(userId,userConsignmentForm.getConsignmentMoney(), type, buiId, realBuiId, info,cateId,buiName);
 
     }

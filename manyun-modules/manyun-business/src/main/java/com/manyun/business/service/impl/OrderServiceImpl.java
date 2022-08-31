@@ -179,6 +179,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 待支付状态
         order.setOrderStatus(WAIT_ORDER.getCode());
         order.setPayTime(LocalDateTime.now());
+        order.setMoneyBln(NumberUtil.add(0D));
         // 截止到什么是否到达付款时间 小时为单位
        // Integer serviceVal = systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class);
         order.setEndTime(LocalDateTime.now().plusHours(serviceVal));

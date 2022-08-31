@@ -67,6 +67,9 @@ public class CntCollection implements Serializable {
     @ApiModelProperty("创作者编号;当前系列的创作者编号")
     private String bindCreation;
 
+    @ApiModelProperty("是否推送寄售市场(0=可以，1=不可以)")
+    private Integer pushConsignment;
+
     @ApiModelProperty("创建人")
     private String createdBy;
 
