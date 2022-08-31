@@ -119,6 +119,7 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
         auctionOrder.setMargin(auctionSend.getMargin());
         auctionOrder.setAuctionStatus(AuctionStatus.WAIT_PAY.getCode());
         auctionOrder.setPayTime(LocalDateTime.now());
+        auctionOrder.setMoneyBln(NumberUtil.add(0D));
         auctionOrder.setEndTime(LocalDateTime.now().plusMinutes(serviceVal));
         save(auctionOrder);
         consumer.accept(idStr);
