@@ -336,6 +336,11 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         if (auctionPrice.getEndPayTime() != null) {
             myAuctionPriceVo.setEndPayTime(auctionPrice.getEndPayTime());
         }
+        AuctionOrder auctionOrder = auctionOrderService.getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getSendAuctionId, auctionPrice.getAuctionSendId())
+                .eq(AuctionOrder::getToUserId, auctionPrice.getUserId()));
+        if (auctionOrder != null) {
+            myAuctionPriceVo.setMoneyBln(auctionOrder.getMoneyBln());
+        }
         String mediaUrl = "";
         if (auctionSend.getGoodsType() == 1) {
             mediaUrl = mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE).get(0).getMediaUrl();
