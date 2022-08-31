@@ -30,7 +30,6 @@ public class OrderPayForm implements Serializable {
 
 
     @ApiModelProperty("支付密码")
-    @NotBlank(message = "支付密码不可为空")
     private String payPass;
 
 }
