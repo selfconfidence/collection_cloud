@@ -593,8 +593,12 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         AuctionOrder auctionOrder = auctionOrderService.getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getSendAuctionId, auctionSend.getId())
                 .eq(AuctionOrder::getToUserId, userId));
 
-        ShandePayEnum shandePayEnum = ShandePayEnum.AUCTION_FIX_SHANDE_PAY.setReturnUrl(auctionPayFixedForm.getReturnUrl(), auctionPayFixedForm.getReturnUrl());
+        if (auctionOrder != null) {
+            auctionSend.setAuctionOrderId(auctionOrder.getId());
+            auctionSendService.updateById(auctionSend);
+        }
 
+        ShandePayEnum shandePayEnum = ShandePayEnum.AUCTION_FIX_SHANDE_PAY.setReturnUrl(auctionPayFixedForm.getReturnUrl(), auctionPayFixedForm.getReturnUrl());
         PayVo payVo = rootPay.execPayVo(PayInfoDto.builder()
                 .payType(auctionPayFixedForm.getPayType())
                 .realPayMoney(auctionOrder.getOrderAmount().subtract(auctionOrder.getMoneyBln()))
