@@ -97,7 +97,6 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         PageHelper.startPage(collectionQuery.getPageNum(),collectionQuery.getPageSize());
         List<CntCollection> cntCollectionList = cntCollectionMapper.selectSearchCollectionList(collectionQuery);
         return TableDataInfoUtil.pageTableDataInfo(cntCollectionList.parallelStream().map(m->{
-
             CntCollectionVo cntCollectionVo = new CntCollectionVo();
             BeanUtil.copyProperties(m, cntCollectionVo);
             cntCollectionVo.setTotalBalance(m.getBalance().intValue() + m.getSelfBalance().intValue());

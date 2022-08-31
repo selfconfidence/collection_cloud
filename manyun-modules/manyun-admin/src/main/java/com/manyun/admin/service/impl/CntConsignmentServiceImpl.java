@@ -1,15 +1,18 @@
 package com.manyun.admin.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.CntConsignment;
+import com.manyun.admin.domain.CntUserCollection;
 import com.manyun.admin.domain.dto.ConsignmentInfoDto;
 import com.manyun.admin.domain.dto.PaymentReviewDto;
 import com.manyun.admin.domain.query.ConsignmentQuery;
 import com.manyun.admin.domain.vo.CntConsignmentVo;
+import com.manyun.admin.service.ICntUserCollectionService;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
@@ -29,6 +32,9 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
 {
     @Autowired
     private CntConsignmentMapper cntConsignmentMapper;
+
+    @Autowired
+    private ICntUserCollectionService userCollectionService;
 
     /**
      * 藏品订单管理列表
@@ -63,7 +69,15 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
      */
     @Override
     public CntConsignmentVo selectConsignmentOrderById(ConsignmentInfoDto consignmentInfoDto) {
-        return cntConsignmentMapper.selectConsignmentOrderById(consignmentInfoDto);
+        CntConsignmentVo cntConsignmentVo = cntConsignmentMapper.selectConsignmentOrderById(consignmentInfoDto);
+        List<CntUserCollection> userCollections = userCollectionService.list();
+        if(cntConsignmentVo.getIsType()==0){
+            Optional<CntUserCollection> optional = userCollections.parallelStream().filter(f -> f.getId().equals(cntConsignmentVo.getBuiId())).findFirst();
+            if(optional.isPresent()){
+                cntConsignmentVo.setCollectionHash(optional.get().getCollectionHash());
+            }
+        }
+        return cntConsignmentVo;
     }
 
 }

@@ -78,6 +78,9 @@ public class CntBox implements Serializable
     @ApiModelProperty("更新时间")
     private Date updatedTime;
 
+    @ApiModelProperty("是否推送寄售市场(0=可以，1=不可以)")
+    private Integer pushConsignment;
+
     public String getId() {
         return id;
     }
@@ -214,6 +217,14 @@ public class CntBox implements Serializable
         this.updatedTime = updatedTime;
     }
 
+    public Integer getPushConsignment() {
+        return pushConsignment;
+    }
+
+    public void setPushConsignment(Integer pushConsignment) {
+        this.pushConsignment = pushConsignment;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -234,6 +245,7 @@ public class CntBox implements Serializable
             .append("createdTime", getCreatedTime())
             .append("updatedBy", getUpdatedBy())
             .append("updatedTime", getUpdatedTime())
+            .append("pushConsignment", getPushConsignment())
             .toString();
     }
 }
