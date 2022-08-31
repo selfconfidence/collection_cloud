@@ -77,6 +77,9 @@ public class CntCollection implements Serializable
     @ApiModelProperty("可以提前购的盲盒子")
     private Integer postTime;
 
+    @ApiModelProperty("是否推送寄售市场(0=可以，1=不可以)")
+    private Integer pushConsignment;
+
     public String getId() {
         return id;
     }
@@ -213,6 +216,14 @@ public class CntCollection implements Serializable
         this.postTime = postTime;
     }
 
+    public Integer getPushConsignment() {
+        return pushConsignment;
+    }
+
+    public void setPushConsignment(Integer pushConsignment) {
+        this.pushConsignment = pushConsignment;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -233,6 +244,7 @@ public class CntCollection implements Serializable
             .append("updatedTime", getUpdatedTime())
             .append("cateId", getCateId())
             .append("postTime", getPostTime())
+            .append("pushConsignment", getPushConsignment())
             .toString();
     }
 }

@@ -30,6 +30,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="myOrderList" resultType="com.manyun.admin.domain.vo.CntOrderVo">
         select
             co.id,
+            co.user_bui_id userBuiId,
             co.order_no orderno,
             cu.nick_name nickname,
             cu.phone,

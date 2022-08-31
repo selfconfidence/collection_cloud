@@ -3,7 +3,6 @@ package com.manyun.admin.service;
 import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.manyun.admin.domain.CntOrder;
 import com.manyun.admin.domain.CntUser;
 import com.manyun.admin.domain.dto.MyBoxDto;
 import com.manyun.admin.domain.dto.MyCollectionDto;
@@ -12,7 +11,6 @@ import com.manyun.admin.domain.dto.UpdateBalanceDto;
 import com.manyun.admin.domain.excel.UserPhoneExcel;
 import com.manyun.admin.domain.query.UserMoneyQuery;
 import com.manyun.admin.domain.vo.*;
-import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
@@ -42,8 +40,9 @@ public interface ICntUserService extends IService<CntUser>
 
     /**
      * 我的订单
+     * @return
      */
-    TableDataInfo<CntOrderVo> myOrderList(MyOrderDto orderDto);
+    TableDataInfo myOrderList(MyOrderDto orderDto);
 
     /**
      * 我的藏品

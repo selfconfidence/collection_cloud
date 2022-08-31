@@ -420,7 +420,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     ///ShandePayEnum.COLLECTION_BOX_SHANDE_PAY.setReturnUrl(orderPayForm.getReturnUrl())
     public PayVo unifiedOrder(OrderPayForm orderPayForm,String userId) {
         Order order = getById(orderPayForm.getOrderId());
-        checkUnified(order,userId,orderPayForm.getPayPass());
+        checkUnified(order,userId,orderPayForm.getPayPass(),orderPayForm.getPayType());
         ShandePayEnum shandePayEnum =  switchCase(order.getId(),orderPayForm.getReturnUrl(), orderPayForm.getReturnUrl());
         // 判定用户的余额是否充足
         PayVo payVo =  rootPay.execPayVo(
@@ -597,12 +597,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
     }
 
-    private void checkUnified(Order order, String userId,String payPass) {
+    private void checkUnified(Order order, String userId,String payPass,Integer payType) {
         CntUserDto cntUserDto = remoteBuiUserService.commUni(userId, SecurityConstants.INNER).getData();
         Assert.isTrue(userId.equals(order.getUserId()), "订单被篡改,请联系平台!" );
         Assert.isTrue(WAIT_ORDER.getCode().equals(order.getOrderStatus()),"待支付订单才可支付!");
         Assert.isTrue(order.getEndTime().compareTo(LocalDateTime.now()) >=0,"付款时间已截止,请核实订单状态!");
-        Assert.isTrue(payPass.equals(cntUserDto.getPayPass()),"支付密码错误,请核实!");
+        if (MONEY_TAPE.getCode().equals(payType)) Assert.isTrue(payPass.equals(cntUserDto.getPayPass()),"支付密码错误,请核实!");
+
     }
 
 

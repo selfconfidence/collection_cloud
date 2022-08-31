@@ -22,10 +22,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createdTime"    column="created_time"    />
         <result property="updatedBy"    column="updated_by"    />
         <result property="updatedTime"    column="updated_time"    />
+        <result property="pushConsignment"    column="push_consignment"   />
     </resultMap>
 
     <sql id="selectCntBoxVo">
-        select id, cate_id, post_time, tar_id, box_title, self_balance, balance, box_open, status_by, box_info, publish_time, source_price, real_price, created_by, created_time, updated_by, updated_time from cnt_box
+        select id, cate_id, post_time, tar_id, box_title, self_balance, balance, box_open, status_by, box_info, publish_time, source_price, real_price, created_by, created_time, updated_by, updated_time, push_consignment from cnt_box
     </sql>
 
     <select id="selectSearchBoxList" parameterType="BoxQuery" resultMap="CntBoxResult">

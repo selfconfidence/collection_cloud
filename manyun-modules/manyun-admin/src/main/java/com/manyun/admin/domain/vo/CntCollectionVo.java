@@ -39,4 +39,7 @@ public class CntCollectionVo {
     @ApiModelProperty("总量")
     private Integer totalBalance;
 
+    @ApiModelProperty("是否推送寄售市场(0=可以，1=不可以)")
+    private Integer pushConsignment;
+
 }

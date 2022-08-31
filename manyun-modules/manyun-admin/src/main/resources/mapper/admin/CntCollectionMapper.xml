@@ -22,10 +22,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updatedTime"    column="updated_time"    />
         <result property="cateId"    column="cate_id"    />
         <result property="postTime"    column="post_time"    />
+        <result property="pushConsignment"    column="push_consignment"    />
     </resultMap>
 
     <sql id="selectCntCollectionVo">
-        select id, collection_name, tar_id, source_price, real_price, self_balance, balance, version_flag, status_by, publish_time, bind_creation, created_by, created_time, updated_by, updated_time, cate_id, post_time from cnt_collection
+        select id, collection_name, tar_id, source_price, real_price, self_balance, balance, version_flag, status_by, publish_time, bind_creation, created_by, created_time, updated_by, updated_time, cate_id, post_time, push_consignment from cnt_collection
     </sql>
 
     <select id="selectSearchCollectionList" parameterType="CollectionQuery" resultMap="CntCollectionResult">
@@ -56,7 +57,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             cp.status_by,
             cpxq.customer_tail customerTail,
             cpxq.look_info lookInfo,
-			ci.id	issuanceId
+			ci.id	issuanceId,
+			cp.push_consignment pushConsignment
         from
 	        cnt_collection cp
         left join
