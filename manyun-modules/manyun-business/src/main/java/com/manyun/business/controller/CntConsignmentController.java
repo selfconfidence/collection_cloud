@@ -125,7 +125,7 @@ public class CntConsignmentController {
     @GetMapping("/consignmentSuccess/{id}")
     @ApiOperation(value = "审核通过;id = 寄售编号",hidden = true)
     @InnerAuth
-    public synchronized R  consignmentSuccess(@PathVariable String id){
+    public synchronized R  consignmentSuccess(@PathVariable(name = "id") String id){
         cntConsignmentService.consignmentSuccess(id);
         return R.ok();
     }
