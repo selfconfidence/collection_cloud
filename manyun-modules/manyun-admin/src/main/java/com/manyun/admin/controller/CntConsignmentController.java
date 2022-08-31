@@ -54,7 +54,7 @@ public class CntConsignmentController extends BaseController
     @ApiOperation("打款审核")
     public R paymentReview(@Valid @RequestBody PaymentReviewDto paymentReviewDto)
     {
-        return remoteConsignmentService.consignmentSuccess(paymentReviewDto.getId(), SecurityConstants.FROM_SOURCE);
+        return remoteConsignmentService.consignmentSuccess(paymentReviewDto.getId(), SecurityConstants.INNER);
     }
 
 }
