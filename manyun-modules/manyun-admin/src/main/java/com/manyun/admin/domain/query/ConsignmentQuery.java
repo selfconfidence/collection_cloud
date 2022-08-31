@@ -35,4 +35,7 @@ public class ConsignmentQuery extends PageQuery
     @ApiModelProperty("支付方式")
     private Integer payType;
 
+    @ApiModelProperty("打款状况")
+    private Integer toPay;
+
 }
