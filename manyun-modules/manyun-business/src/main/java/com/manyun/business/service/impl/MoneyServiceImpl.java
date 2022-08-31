@@ -260,6 +260,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
                 break;
             case 3 :
                 AuctionOrder auctionOrder = auctionOrderService.getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getOrderNo, checkOrderPayQuery.getOrderNo()));
+                if (Objects.isNull(auctionOrder)) auctionOrder = auctionOrderService.getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getSendAuctionId, checkOrderPayQuery.getOrderNo()));
                 if (auctionOrder == null) {
                     break;
                 }
@@ -273,6 +274,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
                 break;
             case 4 :
                 AuctionOrder auctionPayOrder = auctionOrderService.getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getOrderNo, checkOrderPayQuery.getOrderNo()));
+                if (Objects.isNull(auctionPayOrder)) auctionPayOrder = auctionOrderService.getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getSendAuctionId, checkOrderPayQuery.getOrderNo()));
                 if (auctionPayOrder == null) {
                     break;
                 }
