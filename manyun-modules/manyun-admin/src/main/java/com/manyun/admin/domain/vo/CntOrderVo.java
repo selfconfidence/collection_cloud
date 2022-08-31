@@ -16,6 +16,9 @@ public class CntOrderVo {
     @ApiModelProperty("主键")
     private String id;
 
+    @ApiModelProperty("用户与业务的唯一编号,没有购买就没有这个编号")
+    private String userBuiId;
+
     @ApiModelProperty("订单号")
     private String orderNo;
 
@@ -39,6 +42,9 @@ public class CntOrderVo {
 
     @ApiModelProperty("购买数量")
     private Integer goodsNum;
+
+    @ApiModelProperty("藏品hash")
+    private String collectionHash;
 
     @ApiModelProperty("订单状态;0待付款，1已完成，2已取消，-1支付未回调 3=进行中(这个比较特殊 属于寄售的时候用的)")
     private Integer orderStatus;

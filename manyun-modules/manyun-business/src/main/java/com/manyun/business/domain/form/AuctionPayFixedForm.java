@@ -27,6 +27,5 @@ public class AuctionPayFixedForm {
     private String returnUrl;
 
     @ApiModelProperty("支付密码")
-    @NotBlank(message = "支付密码不可为空")
     private String payPass;
 }

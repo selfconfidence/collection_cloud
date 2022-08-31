@@ -48,4 +48,7 @@ public class CntBoxAlterVo {
     @ApiModelProperty("藏品实际支付的价格")
     private BigDecimal realPrice;
 
+    @ApiModelProperty("是否推送寄售市场(0=可以，1=不可以)")
+    private Integer pushConsignment;
+
 }

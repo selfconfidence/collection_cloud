@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -19,6 +18,9 @@ public class CntConsignmentVo
 
     @ApiModelProperty("0藏品，1盲盒")
     private Integer isType;
+
+    @ApiModelProperty("寄售商品Id")
+    private String buiId;
 
     @ApiModelProperty("寄售商品名称")
     private String buiName;
@@ -34,6 +36,9 @@ public class CntConsignmentVo
 
     @ApiModelProperty("打款状况 0待打款,1=已打款")
     private Integer toPay;
+
+    @ApiModelProperty("藏品hash")
+    private String collectionHash;
 
     @ApiModelProperty("卖家姓名")
     private String collectorName;

@@ -31,21 +31,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectCollectionOrderList" resultType="com.manyun.admin.domain.vo.CntConsignmentVo">
         select
-            js.id,
-            js.is_type isType,
-            js.bui_name buiName,
-            js.consignment_price consignmentPrice,
-            js.server_charge serverCharge,
-            js.consignment_status consignmentStatus,
-            js.to_pay toPay,
-            cs.nick_name collectorName,
-            cs.phone collectorPhone,
-            mr.nick_name sellerName,
-            mr.phone sellerPhone,
-            o.pay_type payType,
-            o.order_amount orderAmount,
-            o.created_time createOrderTime,
-            o.pay_time payTime
+        js.id,
+        js.is_type isType,
+        js.bui_name buiName,
+        js.consignment_price consignmentPrice,
+        js.server_charge serverCharge,
+        js.consignment_status consignmentStatus,
+        js.to_pay toPay,
+        cuc.collection_hash collectionHash,
+        cs.nick_name collectorName,
+        cs.phone collectorPhone,
+        mr.nick_name sellerName,
+        mr.phone sellerPhone,
+        o.pay_type payType,
+        o.order_amount orderAmount,
+        o.created_time createOrderTime,
+        o.pay_time payTime
         from
         cnt_consignment js
         left join
@@ -57,6 +58,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         left join
         cnt_order o
         on js.order_id=o.id
+        left join
+        cnt_user_collection cuc
+        on js.bui_id=cuc.id
         <where>
             and js.is_type=0
             <if test="id != null  and id != ''"> and js.id = #{id}</if>
@@ -119,6 +123,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select
             js.id,
             js.is_type isType,
+            js.bui_id buiId,
             js.bui_name buiName,
             js.consignment_price consignmentPrice,
             js.server_charge serverCharge,

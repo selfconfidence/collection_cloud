@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.CntMoney;
+import com.manyun.admin.domain.CntUserCollection;
 import com.manyun.admin.domain.dto.MyBoxDto;
 import com.manyun.admin.domain.dto.MyCollectionDto;
 import com.manyun.admin.domain.dto.MyOrderDto;
@@ -27,6 +28,7 @@ import com.manyun.admin.mapper.CntUserMapper;
 import com.manyun.admin.domain.CntUser;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -97,8 +99,15 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> imple
     {
         PageHelper.startPage(orderDto.getPageNum(),orderDto.getPageSize());
         List<CntOrderVo> cntOrderVos = orderService.myOrderList(orderDto.getUserId());
+        List<CntUserCollection> userCollections = userCollectionService.list();
         return TableDataInfoUtil.pageTableDataInfo(cntOrderVos.parallelStream().map(m->{
             m.setMediaVos(mediaService.initMediaVos(m.getBuiId(),m.getGoodsType()==0?BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE:BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+            if(m.getGoodsType() == 0){
+                Optional<CntUserCollection> optional = userCollections.parallelStream().filter(ff -> ff.getId().equals(m.getUserBuiId())).findFirst();
+                if(optional.isPresent()){
+                    m.setCollectionHash(optional.get().getCollectionHash());
+                }
+            }
             return m;
         }).collect(Collectors.toList()),cntOrderVos);
     }
