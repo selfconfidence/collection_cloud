@@ -560,7 +560,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         }
         AuctionPrice auctionPrice = new AuctionPrice();
         auctionPrice.setId(IdUtil.getSnowflakeNextIdStr());
-        auctionPrice.setAuctionStatus(AuctionStatus.BID_BIDING.getCode());
+        auctionPrice.setAuctionStatus(AuctionStatus.WAIT_PAY.getCode());
         auctionPrice.setUserId(businessUser.getUserId());
         auctionPrice.setAuctionSendId(auctionPayFixedForm.getAuctionSendId());
         auctionPrice.setUserName(remoteBuiUserService.commUni(userId, SecurityConstants.INNER).getData().getNickName());
