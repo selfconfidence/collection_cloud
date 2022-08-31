@@ -381,7 +381,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         updateById(cntConsignment);
         // 给对应的用户加钱
         BigDecimal realMoney = cntConsignment.getConsignmentPrice().subtract(cntConsignment.getServerCharge());
-        moneyService.addMoney(cntConsignment.getSendUserId(),realMoney,StrUtil.format("寄售资产 {} 已审核,到账{}元!", cntConsignment.getBuiName(),realMoney.toString()));
+        moneyService.addMoney(cntConsignment.getSendUserId(),realMoney,StrUtil.format("寄售资产审核成功!"));
         // 发送通知
         CntUserDto cntUserDto = remoteBuiUserService.commUni(cntConsignment.getSendUserId(), SecurityConstants.INNER).getData();
         remoteSmsService.sendCommPhone(Builder.<SmsCommDto>of(SmsCommDto::new).with(SmsCommDto::setTemplateCode, BusinessConstants.SmsTemplateNumber.ASSERT_SUCCESS).with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().put("money", realMoney.toString()).put("buiName",cntConsignment.getBuiName() ).build()).with(SmsCommDto::setPhoneNumber,cntUserDto.getPhone()).build());
