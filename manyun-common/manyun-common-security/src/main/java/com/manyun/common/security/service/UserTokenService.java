@@ -13,6 +13,7 @@ import com.manyun.common.core.utils.ip.IpUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.manyun.common.redis.service.RedisService;
 import com.manyun.common.security.utils.SecurityUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +29,7 @@ import java.util.concurrent.TimeUnit;
  * @author yanwei
  */
 @Component
+@Slf4j
 public class UserTokenService
 {
     @Autowired
@@ -175,7 +177,7 @@ public class UserTokenService
         redisService.setCacheObject(userKey, loginUser, expireTime, TimeUnit.MINUTES);
         // 再存一份,用来表示唯一
         redisService.setCacheObject(getLoginTokenLogs(loginUser.getUserId()), loginUser.getToken(),expireTime, TimeUnit.MINUTES);
-
+        log.info("登录！！！");
     }
 
     private String getTokenKey(String token)
