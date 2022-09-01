@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntAuctionOrderMapper">
+
+    <resultMap type="CntAuctionOrder" id="CntAuctionOrderResult">
+        <result property="id"    column="id"    />
+        <result property="toUserId"    column="to_user_id"    />
+        <result property="fromUserId"    column="from_user_id"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+        <result property="goodsType"    column="goods_type"    />
+        <result property="goodsId"    column="goods_id"    />
+        <result property="goodsName"    column="goods_name"    />
+        <result property="goodsImg"    column="goods_img"    />
+        <result property="sendAuctionId"    column="send_auction_id"    />
+        <result property="auctionPriceId"    column="auction_price_id"    />
+        <result property="nowPrice"    column="now_price"    />
+        <result property="soldPrice"    column="sold_price"    />
+        <result property="startPrice"    column="start_price"    />
+        <result property="margin"    column="margin"    />
+        <result property="commission"    column="commission"    />
+        <result property="auctionStatus"    column="auction_status"    />
+        <result property="orderNo"    column="order_no"    />
+        <result property="payType"    column="pay_type"    />
+        <result property="orderAmount"    column="order_amount"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="payTime"    column="pay_time"    />
+        <result property="buiId"    column="bui_id"    />
+        <result property="moneyBln"    column="money_bln"    />
+    </resultMap>
+
+    <sql id="selectCntAuctionOrderVo">
+        select id, to_user_id, from_user_id, created_by, created_time, updated_by, updated_time, goods_type, goods_id, goods_name, goods_img, send_auction_id, auction_price_id, now_price, sold_price, start_price, margin, commission, auction_status, order_no, pay_type, order_amount, end_time, pay_time, bui_id, money_bln from cnt_auction_order
+    </sql>
+
+    <select id="selectCntAuctionOrderList" parameterType="AuctionOrderQuery" resultType="com.manyun.admin.domain.vo.CntAuctionOrderVo">
+        SELECT
+            ao.order_no orderNo,
+            ao.send_auction_id auctionSendId,
+            fuu.nick_name fromUserName,
+            fuu.phone fromUserPhone,
+            tuu.nick_name toUserName,
+            tuu.phone toUserPhone,
+            ao.goods_type goodsType,
+            ao.goods_name goodsName,
+            ao.goods_img goodsImg,
+            ao.margin,
+            ao.commission,
+            ao.start_price startPrice,
+            ao.now_price nowPrice,
+            ao.auction_status auctionStatus,
+            ao.pay_type payType,
+            ao.order_amount orderAmount,
+            ao.pay_time payTime,
+            ao.end_time endTime,
+            ao.created_time createdTime,
+            ao.updated_time updatedTime
+        FROM
+            cnt_auction_order ao
+        left join
+            cnt_user fuu
+        on ao.from_user_id=fuu.id
+        left join
+            cnt_user tuu
+        on ao.to_user_id=tuu.id
+        <where>
+            <if test="orderNo != null  and orderNo != ''"> and ao.order_no = #{orderNo}</if>
+            <if test="fromUserName != null  and fromUserName != ''"> and fuu.nick_name like concat('%', #{fromUserName}, '%')</if>
+            <if test="fromUserPhone != null  and fromUserPhone != ''"> and fuu.phone = #{fromUserPhone}</if>
+            <if test="toUserName != null  and toUserName != ''"> and tuu.nick_name like concat('%', #{toUserName}, '%')</if>
+            <if test="toUserPhone != null  and toUserPhone != ''"> and tuu.phone = #{toUserPhone}</if>
+            <if test="goodsType != null "> and ao.goods_type = #{goodsType}</if>
+            <if test="goodsName != null  and goodsName != ''"> and ao.goods_name like concat('%', #{goodsName}, '%')</if>
+        </where>
+        order by ao.created_time desc
+    </select>
+
+</mapper>

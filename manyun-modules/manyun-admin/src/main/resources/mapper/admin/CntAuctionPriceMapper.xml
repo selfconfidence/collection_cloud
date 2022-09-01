@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntAuctionPriceMapper">
+
+    <resultMap type="CntAuctionPrice" id="CntAuctionPriceResult">
+        <result property="id"    column="id"    />
+        <result property="auctionSendId"    column="auction_send_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="userName"    column="user_name"    />
+        <result property="bidPrice"    column="bid_price"    />
+        <result property="auctionStatus"    column="auction_status"    />
+        <result property="isNew"    column="is_new"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+        <result property="endPayTime"    column="end_pay_time"    />
+    </resultMap>
+
+    <sql id="selectCntAuctionPriceVo">
+        select id, auction_send_id, user_id, user_name, bid_price, auction_status, is_new, created_by, created_time, updated_by, updated_time, end_pay_time from cnt_auction_price
+    </sql>
+
+</mapper>
