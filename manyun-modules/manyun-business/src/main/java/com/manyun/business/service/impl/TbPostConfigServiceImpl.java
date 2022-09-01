@@ -111,8 +111,14 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
 
             // 条件查出来之后，全部满足即可
             List<CntPostExist> cntPostExists = postExistService.list(Wrappers.<CntPostExist>lambdaQuery().eq(CntPostExist::getConfigId, cntPostConfig.getId()));
-            if (cntPostExists.isEmpty()) return Boolean.FALSE;
-            List<UserCollection> userCollections = userCollectionService.list(Wrappers.<UserCollection>lambdaQuery().select(UserCollection::getId).eq(UserCollection::getIsExist,USE_EXIST.getCode()).eq(UserCollection::getUserId, userId).in(UserCollection::getCollectionId,cntPostExists.parallelStream().map(item -> item.getCollectionId()) ));
+            if (cntPostExists.size() == 0){
+                return Boolean.FALSE;
+            }
+            List<UserCollection> userCollections = userCollectionService.list(
+                    Wrappers.<UserCollection>lambdaQuery().select(UserCollection::getId)
+                            .eq(UserCollection::getIsExist,USE_EXIST.getCode())
+                            .eq(UserCollection::getUserId, userId)
+                            .in(UserCollection::getCollectionId,cntPostExists.parallelStream().map(item -> item.getCollectionId()) ));
             if (userCollections.size() >= cntPostExists.size()){
                 // 如果满足，需要二次查询 自己的次数是否满足了.
                 CntPostConfigLog postConfigLogServiceOne = postConfigLogService.getOne(Wrappers.<CntPostConfigLog>lambdaQuery().eq(CntPostConfigLog::getUserId, userId).eq(CntPostConfigLog::getConfigId, cntPostConfig.getId()));
