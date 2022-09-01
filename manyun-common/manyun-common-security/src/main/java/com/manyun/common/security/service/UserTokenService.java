@@ -41,6 +41,8 @@ public class UserTokenService
 
     private final static String ACCESS_TOKEN = CacheConstants.LOGIN_TOKEN_KEY;
 
+    private final static String LOGIN_TOKEN_LOGS = CacheConstants.LOGIN_TOKEN_LOGS;
+
     private final static Long MILLIS_MINUTE_TEN = CacheConstants.REFRESH_TIME * MILLIS_MINUTE;
 
     /**
@@ -158,15 +160,30 @@ public class UserTokenService
      */
     public void refreshToken(LoginBusinessUser loginUser)
     {
+        String loginTokenLogs = getLoginTokenLogs(loginUser.getUserId());
+        // 判定之前是否有过登录痕迹?
+        if (redisService.hasKey(loginTokenLogs)) {
+            // 有的话,清理之前的
+            Object serviceCacheObject = redisService.getCacheObject(loginTokenLogs);
+            redisService.deleteObject(loginTokenLogs);
+            redisService.deleteObject(getTokenKey(serviceCacheObject.toString()));
+        }
         loginUser.setLoginTime(System.currentTimeMillis());
         loginUser.setExpireTime(loginUser.getLoginTime() + expireTime * MILLIS_MINUTE);
         // 根据uuid将loginUser缓存
         String userKey = getTokenKey(loginUser.getToken());
         redisService.setCacheObject(userKey, loginUser, expireTime, TimeUnit.MINUTES);
+        // 再存一份,用来表示唯一
+        redisService.setCacheObject(getLoginTokenLogs(loginUser.getUserId()), loginUser.getToken(),expireTime, TimeUnit.MINUTES);
+
     }
 
     private String getTokenKey(String token)
     {
         return ACCESS_TOKEN + token;
+    }
+
+    private String getLoginTokenLogs(String userId){
+        return LOGIN_TOKEN_LOGS.concat(userId);
     }
 }
