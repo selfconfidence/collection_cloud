@@ -17,7 +17,7 @@ public class AuctionPayForm implements Serializable {
     private String auctionSendId;
 
     @ApiModelProperty(value = "支付类型,1=微信,2=支付宝,0=余额支付，3=银联",required = true)
-    @Range(min = 0,max = 3,message = "支付类型错误")
+    @Range(min = 0,max = 4,message = "支付类型错误")
     private Integer payType;
 
     @ApiModelProperty(value = "是否余额抵扣, true抵扣，false不抵扣", required = true)
