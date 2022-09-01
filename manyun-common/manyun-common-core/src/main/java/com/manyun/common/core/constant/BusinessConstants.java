@@ -230,7 +230,9 @@ public interface BusinessConstants {
         String ASSERT_OK = "SMS_250450009";
 
 
-        String ASSERT_SUCCESS = "SMS_250320015";
+        //String ASSERT_SUCCESS = "SMS_250320015";
+        String ASSERT_SUCCESS = "SMS_250435282";
+
     }
 
 
