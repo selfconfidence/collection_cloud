@@ -118,7 +118,7 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
                     Wrappers.<UserCollection>lambdaQuery().select(UserCollection::getId)
                             .eq(UserCollection::getIsExist,USE_EXIST.getCode())
                             .eq(UserCollection::getUserId, userId)
-                            .in(UserCollection::getCollectionId,cntPostExists.parallelStream().map(item -> item.getCollectionId()) ));
+                            .in(UserCollection::getCollectionId,cntPostExists.parallelStream().map(item -> item.getCollectionId()).collect(Collectors.toSet()) ));
             if (userCollections.size() >= cntPostExists.size()){
                 // 如果满足，需要二次查询 自己的次数是否满足了.
                 CntPostConfigLog postConfigLogServiceOne = postConfigLogService.getOne(Wrappers.<CntPostConfigLog>lambdaQuery().eq(CntPostConfigLog::getUserId, userId).eq(CntPostConfigLog::getConfigId, cntPostConfig.getId()));
