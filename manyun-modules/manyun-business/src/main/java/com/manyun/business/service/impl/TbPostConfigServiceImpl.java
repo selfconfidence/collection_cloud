@@ -104,6 +104,7 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
         List<CntPostSell> cntPostSells = getCntPostSells(buiId);
         if (cntPostSells.isEmpty()) return Boolean.FALSE;
         Set<String> configIds = cntPostSells.parallelStream().map(item -> item.getConfigId()).collect(Collectors.toSet());
+        if (configIds.isEmpty()) return Boolean.FALSE;
         List<CntPostConfig> cntPostConfigs = list(Wrappers.<CntPostConfig>lambdaQuery().select(CntPostConfig::getId,CntPostConfig::getBuyFrequency).in(CntPostConfig::getId, configIds).orderByDesc(CntPostConfig::getCreatedTime));
         // 拿到当前 配置列表后，开始遍历 已经是有顺序得了
         for (CntPostConfig cntPostConfig : cntPostConfigs) {
