@@ -423,7 +423,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                         .goodsName(auctionOrder.getGoodsName())
                         .userId(payUserId).build());
 
-        auctionOrder.setMoneyBln(payVo.getMoneyBln().add(payVo.getMoneyBln()));
+        auctionOrder.setMoneyBln(auctionOrder.getMoneyBln().add(payVo.getMoneyBln()));
 
         // 修改拍卖信息
         //auctionSend.setAuctionStatus(AuctionStatus.PAY_SUCCESS.getCode());
