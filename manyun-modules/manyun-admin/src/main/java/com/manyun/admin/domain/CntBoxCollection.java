@@ -39,6 +39,12 @@ public class CntBoxCollection implements Serializable
     @ApiModelProperty("评分等级;SSR SR 等等")
     private String flagScore;
 
+    @ApiModelProperty("库存数量")
+    private Integer openQuantity;
+
+    @ApiModelProperty("已开数量")
+    private Integer openNumber;
+
     @ApiModelProperty("创建人")
     private String createdBy;
 
@@ -121,6 +127,22 @@ public class CntBoxCollection implements Serializable
         this.createdBy = createdBy;
     }
 
+    public Integer getOpenQuantity() {
+        return openQuantity;
+    }
+
+    public void setOpenQuantity(Integer openQuantity) {
+        this.openQuantity = openQuantity;
+    }
+
+    public Integer getOpenNumber() {
+        return openNumber;
+    }
+
+    public void setOpenNumber(Integer openNumber) {
+        this.openNumber = openNumber;
+    }
+
     public String getCreatedBy()
     {
         return createdBy;
@@ -163,6 +185,8 @@ public class CntBoxCollection implements Serializable
             .append("sourcePrice", getSourcePrice())
             .append("tranSvg", getTranSvg())
             .append("flagScore", getFlagScore())
+            .append("openQuantity", getOpenQuantity())
+            .append("openNumber", getOpenNumber())
             .append("createdBy", getCreatedBy())
             .append("createdTime", getCreatedTime())
             .append("updatedBy", getUpdatedBy())

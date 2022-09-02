@@ -1,9 +1,6 @@
 package com.manyun.admin.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
@@ -81,6 +78,8 @@ public class CntActionTarServiceImpl extends ServiceImpl<CntActionTarMapper,CntA
         List<CntActionTarVo> cntActionTarVos = saveActionTarDto.getCntActionTarVos();
         String actionId = saveActionTarDto.getActionId();
         Assert.isTrue(Objects.nonNull(cntActionTarVos),"新增失败!");
+        Set<String> set = cntActionTarVos.parallelStream().map(CntActionTarVo::getCollectionId).collect(Collectors.toSet());
+        Assert.isTrue(set.size()==cntActionTarVos.size(),"所选藏品不可重复!");
         remove(Wrappers.<CntActionTar>lambdaQuery().eq(CntActionTar::getActionId,actionId));
         if(cntActionTarVos.size()>0){
             List<String> collectionIds = cntActionTarVos.stream().map(CntActionTarVo::getCollectionId).collect(Collectors.toList());

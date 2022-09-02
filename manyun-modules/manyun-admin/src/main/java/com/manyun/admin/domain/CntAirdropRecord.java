@@ -5,33 +5,34 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.models.auth.In;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import java.io.Serializable;
 
-@ApiModel("提前购配置已经拥有对象")
-@TableName("cnt_post_exist")
-public class CntPostExist implements Serializable
+@ApiModel("空投记录对象")
+@TableName("cnt_airdrop_record")
+public class CntAirdropRecord implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键")
     private String id;
 
-    @ApiModelProperty("藏品编号")
+    @ApiModelProperty("用户id")
+    private String userId;
+
+    @ApiModelProperty("用户昵称")
+    private String nickName;
+
+    @ApiModelProperty("用户手机号")
+    private String userPhone;
+
+    @ApiModelProperty("藏品id")
     private String collectionId;
 
-    @ApiModelProperty("配置编号")
-    private String configId;
-
-    @ApiModelProperty("业务名称")
-    private String buiName;
-
-    @ApiModelProperty("备注")
-    private String reMark;
-
-    @ApiModelProperty("需要的数量")
-    private Integer requiredQuantity;
+    @ApiModelProperty("藏品名称")
+    private String collectionName;
 
     @ApiModelProperty("创建人")
     private String createdBy;
@@ -56,6 +57,33 @@ public class CntPostExist implements Serializable
     {
         return id;
     }
+    public void setUserId(String userId)
+    {
+        this.userId = userId;
+    }
+
+    public String getUserId()
+    {
+        return userId;
+    }
+    public void setNickName(String nickName)
+    {
+        this.nickName = nickName;
+    }
+
+    public String getNickName()
+    {
+        return nickName;
+    }
+    public void setUserPhone(String userPhone)
+    {
+        this.userPhone = userPhone;
+    }
+
+    public String getUserPhone()
+    {
+        return userPhone;
+    }
     public void setCollectionId(String collectionId)
     {
         this.collectionId = collectionId;
@@ -65,43 +93,19 @@ public class CntPostExist implements Serializable
     {
         return collectionId;
     }
-    public void setConfigId(String configId)
+    public void setCollectionName(String collectionName)
     {
-        this.configId = configId;
+        this.collectionName = collectionName;
     }
 
-    public String getConfigId()
+    public String getCollectionName()
     {
-        return configId;
-    }
-    public void setBuiName(String buiName)
-    {
-        this.buiName = buiName;
+        return collectionName;
     }
 
-    public String getBuiName()
-    {
-        return buiName;
-    }
     public void setCreatedBy(String createdBy)
     {
         this.createdBy = createdBy;
-    }
-
-    public String getReMark() {
-        return reMark;
-    }
-
-    public void setReMark(String reMark) {
-        this.reMark = reMark;
-    }
-
-    public Integer getRequiredQuantity() {
-        return requiredQuantity;
-    }
-
-    public void setRequiredQuantity(Integer requiredQuantity) {
-        this.requiredQuantity = requiredQuantity;
     }
 
     public String getCreatedBy()
@@ -140,11 +144,11 @@ public class CntPostExist implements Serializable
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("id", getId())
+            .append("userId", getUserId())
+            .append("nickName", getNickName())
+            .append("userPhone", getUserPhone())
             .append("collectionId", getCollectionId())
-            .append("configId", getConfigId())
-            .append("buiName", getBuiName())
-            .append("reMark", getReMark())
-            .append("requiredQuantity", getRequiredQuantity())
+            .append("collectionName", getCollectionName())
             .append("createdBy", getCreatedBy())
             .append("createdTime", getCreatedTime())
             .append("updatedBy", getUpdatedBy())

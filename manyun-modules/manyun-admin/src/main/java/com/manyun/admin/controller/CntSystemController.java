@@ -106,4 +106,44 @@ public class CntSystemController extends BaseController
         return toResult(cntSystemService.updateUserDeafultAvatar(posterDto));
     }
 
+    /**
+     * 查询合成动图
+     */
+    @GetMapping("querySyntheticAnimation")
+    @ApiOperation("查询合成动图")
+    public R<PosterDto> querySyntheticAnimation()
+    {
+        return R.ok(cntSystemService.querySyntheticAnimation());
+    }
+
+    /**
+     * 更新活动动图
+     */
+    @PostMapping("updateSyntheticAnimation")
+    @ApiOperation("更新合成动图")
+    public R updateSyntheticAnimation(@Valid @RequestBody PosterDto posterDto)
+    {
+        return toResult(cntSystemService.updateSyntheticAnimation(posterDto));
+    }
+
+    /**
+     * 查询开盲合动图
+     */
+    @GetMapping("queryOpenBoxGif")
+    @ApiOperation("查询开盲合动图")
+    public R<PosterDto> queryOpenBoxGif()
+    {
+        return R.ok(cntSystemService.queryOpenBoxGif());
+    }
+
+    /**
+     * 更新开盲合动图
+     */
+    @PostMapping("updateOpenBoxGif")
+    @ApiOperation("更新开盲合动图")
+    public R updateOpenBoxGif(@Valid @RequestBody PosterDto posterDto)
+    {
+        return toResult(cntSystemService.updateOpenBoxGif(posterDto));
+    }
+
 }

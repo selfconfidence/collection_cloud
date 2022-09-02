@@ -9,6 +9,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="collectionId"    column="collection_id"    />
         <result property="configId"    column="config_id"    />
         <result property="buiName"    column="bui_name"    />
+        <result property="reMark"    column="re_mark"    />
+        <result property="requiredQuantity"    column="required_quantity"    />
         <result property="createdBy"    column="created_by"    />
         <result property="createdTime"    column="created_time"    />
         <result property="updatedBy"    column="updated_by"    />
@@ -16,7 +18,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectCntPostExistVo">
-        select id, collection_id, config_id, bui_name, created_by, created_time, updated_by, updated_time from cnt_post_exist
+        select id, collection_id, config_id, bui_name, re_mark, required_quantity, created_by, created_time, updated_by, updated_time from cnt_post_exist
     </sql>
 
 </mapper>

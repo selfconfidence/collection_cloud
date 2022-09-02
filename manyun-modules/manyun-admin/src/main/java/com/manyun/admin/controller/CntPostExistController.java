@@ -6,7 +6,6 @@ import com.manyun.admin.domain.query.PostExistQuery;
 import com.manyun.admin.domain.vo.CntPostExistVo;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.StringUtils;
-import com.manyun.common.core.web.page.PageQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;

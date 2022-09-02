@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntAirdropRecordMapper">
+
+    <resultMap type="CntAirdropRecord" id="CntAirdropRecordResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="nickName"    column="nick_name"    />
+        <result property="userPhone"    column="user_phone"    />
+        <result property="collectionId"    column="collection_id"    />
+        <result property="collectionName"    column="collection_name"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCntAirdropRecordVo">
+        select id, user_id, nick_name, user_phone, collection_id, collection_name, created_by, created_time, updated_by, updated_time from cnt_airdrop_record
+    </sql>
+
+    <select id="selectCntAirdropRecordList" parameterType="AirdropRecordQuery" resultMap="CntAirdropRecordResult">
+        <include refid="selectCntAirdropRecordVo"/>
+        <where>
+            <if test="nickName != null  and nickName != ''"> and nick_name like concat('%', #{nickName}, '%')</if>
+            <if test="userPhone != null  and userPhone != ''"> and user_phone = #{userPhone}</if>
+            <if test="collectionName != null  and collectionName != ''"> and collection_name like concat('%', #{collectionName}, '%')</if>
+        </where>
+    </select>
+
+</mapper>

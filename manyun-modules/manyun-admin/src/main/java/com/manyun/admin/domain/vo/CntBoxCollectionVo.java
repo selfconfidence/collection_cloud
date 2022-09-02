@@ -11,6 +11,9 @@ import java.math.BigDecimal;
 public class CntBoxCollectionVo
 {
 
+    @ApiModelProperty("盲盒中的藏品id")
+    private String boxCollectionId;
+
     @ApiModelProperty("藏品编号")
     private String collectionId;
 
@@ -22,5 +25,11 @@ public class CntBoxCollectionVo
 
     @ApiModelProperty("藏品原价")
     private BigDecimal sourcePrice;
+
+    @ApiModelProperty("库存数量")
+    private Integer openQuantity;
+
+    @ApiModelProperty("已开数量")
+    private Integer openNumber;
 
 }

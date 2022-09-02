@@ -1,28 +1,21 @@
 package com.manyun.admin.controller;
 
-import java.util.List;
 
 import com.manyun.admin.domain.dto.SavePostSellDto;
 import com.manyun.admin.domain.query.PostSellQuery;
 import com.manyun.admin.domain.vo.CntPostSellVo;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.StringUtils;
-import com.manyun.common.core.web.page.PageQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
-import com.manyun.common.security.annotation.RequiresPermissions;
-import com.manyun.admin.domain.CntPostSell;
 import com.manyun.admin.service.ICntPostSellService;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.TableDataInfo;

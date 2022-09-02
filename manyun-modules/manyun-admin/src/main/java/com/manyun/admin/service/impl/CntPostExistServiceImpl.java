@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
-import com.manyun.admin.domain.CntPostSell;
 import com.manyun.admin.domain.dto.SavePostExistDto;
 import com.manyun.admin.domain.query.PostExistQuery;
 import com.manyun.admin.domain.vo.CntPostExistVo;
@@ -17,7 +16,6 @@ import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.bean.BeanUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.utils.uuid.IdUtils;
-import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
@@ -50,7 +48,7 @@ public class CntPostExistServiceImpl extends ServiceImpl<CntPostExistMapper,CntP
     public TableDataInfo<CntPostExistVo> selectCntPostExistList(PostExistQuery postExistQuery)
     {
         PageHelper.startPage(postExistQuery.getPageNum(),postExistQuery.getPageSize());
-        List<CntPostExist> postExists = list(Wrappers.<CntPostExist>lambdaQuery().eq(CntPostExist::getConfigId,postExistQuery.getConfigId()).orderByDesc(CntPostExist::getCreatedTime));
+        List<CntPostExist> postExists = list(Wrappers.<CntPostExist>lambdaQuery().eq(CntPostExist::getConfigId,postExistQuery.getConfigId()));
         return TableDataInfoUtil.pageTableDataInfo(postExists.parallelStream().map(m->{
             CntPostExistVo cntPostExistVo=new CntPostExistVo();
             BeanUtils.copyProperties(m,cntPostExistVo);
@@ -81,6 +79,7 @@ public class CntPostExistServiceImpl extends ServiceImpl<CntPostExistMapper,CntP
                         .with(CntPostExist::setId, IdUtils.getSnowflake().nextIdStr())
                         .with(CntPostExist::setConfigId,configId)
                         .with(CntPostExist::setCollectionId,m.getCollectionId())
+                        .with(CntPostExist::setRequiredQuantity,m.getRequiredQuantity())
                         .with(CntPostExist::setCreatedBy,SecurityUtils.getUsername())
                         .with(CntPostExist::setCreatedTime,DateUtils.getNowDate())
                         .build();

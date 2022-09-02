@@ -60,4 +60,24 @@ public interface ICntSystemService extends IService<CntSystem>
      * 查询用户默认头像
      */
     public PosterDto queryUserDeafultAvatar();
+
+    /**
+     * 查询合成动图
+     */
+    public PosterDto querySyntheticAnimation();
+
+    /**
+     * 更新活动动图
+     */
+    public int updateSyntheticAnimation(PosterDto posterDto);
+
+    /**
+     * 查询开盲合动图
+     */
+    public PosterDto queryOpenBoxGif();
+
+    /**
+     * 更新开盲合动图
+     */
+    public int updateOpenBoxGif(PosterDto posterDto);
 }

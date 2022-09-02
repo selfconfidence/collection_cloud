@@ -145,4 +145,50 @@ public class CntSystemServiceImpl extends ServiceImpl<CntSystemMapper,CntSystem>
         return posterDto;
     }
 
+    /**
+     * 查询合成动图
+     */
+    @Override
+    public PosterDto querySyntheticAnimation() {
+        PosterDto posterDto=Builder.of(PosterDto::new).build();
+        CntSystem cntSystem = getOne(Wrappers.<CntSystem>lambdaQuery().eq(CntSystem::getSystemType, CntSystemEnum.SYNTHESIS_GIF));
+        BeanUtils.copyProperties(cntSystem,posterDto);
+        return posterDto;
+    }
+
+    /**
+     * 更新活动动图
+     */
+    @Override
+    public int updateSyntheticAnimation(PosterDto posterDto) {
+        CntSystem cntSystem = Builder.of(CntSystem::new).
+                with(CntSystem::setSystemVal,posterDto.getSystemVal()).
+                with(CntSystem::setUpdatedBy,SecurityUtils.getUsername()).
+                with(CntSystem::setUpdatedTime,DateUtils.getNowDate()).build();
+        return update(cntSystem,Wrappers.<CntSystem>lambdaUpdate().eq(CntSystem::getSystemType, CntSystemEnum.SYNTHESIS_GIF))==true?1:0;
+    }
+
+    /**
+     * 查询开盲合动图
+     */
+    @Override
+    public PosterDto queryOpenBoxGif() {
+        PosterDto posterDto=Builder.of(PosterDto::new).build();
+        CntSystem cntSystem = getOne(Wrappers.<CntSystem>lambdaQuery().eq(CntSystem::getSystemType, CntSystemEnum.OPEN_BOX_GIF));
+        BeanUtils.copyProperties(cntSystem,posterDto);
+        return posterDto;
+    }
+
+    /**
+     * 更新开盲合动图
+     */
+    @Override
+    public int updateOpenBoxGif(PosterDto posterDto) {
+        CntSystem cntSystem = Builder.of(CntSystem::new).
+                with(CntSystem::setSystemVal,posterDto.getSystemVal()).
+                with(CntSystem::setUpdatedBy,SecurityUtils.getUsername()).
+                with(CntSystem::setUpdatedTime,DateUtils.getNowDate()).build();
+        return update(cntSystem,Wrappers.<CntSystem>lambdaUpdate().eq(CntSystem::getSystemType, CntSystemEnum.OPEN_BOX_GIF))==true?1:0;
+    }
+
 }

@@ -74,8 +74,4 @@ public class CntAuctionOrderVo
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdTime;
 
-    @ApiModelProperty("更新时间")
-    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date updatedTime;
-
 }

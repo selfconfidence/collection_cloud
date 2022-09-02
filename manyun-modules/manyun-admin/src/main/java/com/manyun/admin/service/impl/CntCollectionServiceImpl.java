@@ -70,6 +70,9 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
     @Autowired
     private ICnfIssuanceService issuanceService;
 
+    @Autowired
+    private ICntAirdropRecordService airdropRecordService;
+
     /**
      * 查询藏品详情
      *
@@ -387,6 +390,19 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                         .with(CntUserCollection::setCreatedTime,DateUtils.getNowDate())
                         .build()
         );
+        //增加空投记录
+        airdropRecordService.save(
+                Builder.of(CntAirdropRecord::new)
+                .with(CntAirdropRecord::setId,IdUtils.getSnowflakeNextIdStr())
+                .with(CntAirdropRecord::setUserId,cntUsers.get(0).getId())
+                .with(CntAirdropRecord::setNickName,cntUsers.get(0).getNickName())
+                .with(CntAirdropRecord::setUserPhone,cntUsers.get(0).getPhone())
+                .with(CntAirdropRecord::setCollectionId,collection.getId())
+                .with(CntAirdropRecord::setCollectionName,collection.getCollectionName())
+                .with(CntAirdropRecord::setCreatedBy,SecurityUtils.getUsername())
+                .with(CntAirdropRecord::setCreatedTime,DateUtils.getNowDate())
+                .build()
+        );
         return R.ok(Builder.of(AirdropVo::new).with(AirdropVo::setUserId,cntUsers.get(0).getId()).with(AirdropVo::setUsercollectionId,idStr).build());
     }
 
@@ -431,6 +447,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         //筛选成功的和失败的
         HashSet<String> errorList = new HashSet<String>();
         List<CntUserCollection> successList = new ArrayList<CntUserCollection>();
+        List<CntAirdropRecord> successListRecord = new ArrayList<CntAirdropRecord>();
         bachAirdopExcels.stream().forEach(e->{
             Optional<CntUser> user = cntUsers.parallelStream().filter(f -> f.getPhone().equals(e.getPhone())).findFirst();
             if(user.isPresent()){
@@ -449,6 +466,18 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                                 .with(CntUserCollection::setCreatedTime,DateUtils.getNowDate())
                                 .build()
                 );
+                successListRecord.add(
+                        Builder.of(CntAirdropRecord::new)
+                                .with(CntAirdropRecord::setId,IdUtils.getSnowflakeNextIdStr())
+                                .with(CntAirdropRecord::setUserId,user.get().getId())
+                                .with(CntAirdropRecord::setNickName,user.get().getNickName())
+                                .with(CntAirdropRecord::setUserPhone,user.get().getPhone())
+                                .with(CntAirdropRecord::setCollectionId,cntCollections.getId())
+                                .with(CntAirdropRecord::setCollectionName,cntCollections.getCollectionName())
+                                .with(CntAirdropRecord::setCreatedBy,SecurityUtils.getUsername())
+                                .with(CntAirdropRecord::setCreatedTime,DateUtils.getNowDate())
+                                .build()
+                );
             }else {
                 errorList.add(e.getPhone());
             }
@@ -458,8 +487,9 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
             Assert.isTrue(Boolean.FALSE,"库存不足!");
         }
         //增加用户藏品
-
         userCollectionService.saveBatch(successList);
+        //增加空投记录
+        airdropRecordService.saveBatch(successListRecord);
         //拼接上链参数返回
         List<MyChainxDto> myChainxDtos = successList.parallelStream().map(m -> {
             MyChainxDto myChainxDto = new MyChainxDto();

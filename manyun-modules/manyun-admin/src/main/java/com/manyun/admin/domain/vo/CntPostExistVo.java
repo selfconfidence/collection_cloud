@@ -12,4 +12,7 @@ public class CntPostExistVo
     @ApiModelProperty("藏品编号")
     private String collectionId;
 
+    @ApiModelProperty("需要的数量")
+    private Integer requiredQuantity;
+
 }

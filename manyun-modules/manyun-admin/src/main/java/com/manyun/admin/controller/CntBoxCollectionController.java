@@ -42,7 +42,7 @@ public class CntBoxCollectionController extends BaseController
     @ApiOperation("新增盲盒中的物品对象")
     public R add(@RequestBody SaveBoxCollectionDto boxCollectionDto)
     {
-        if(StringUtils.isBlank(boxCollectionDto.getBoxId())){
+        if(StringUtils.isBlank(boxCollectionDto.getBoxId()) || boxCollectionDto.getBoxId()==null){
             return R.fail("缺失必要参数");
         }
         return toResult(cntBoxCollectionService.insertCntBoxCollection(boxCollectionDto));
