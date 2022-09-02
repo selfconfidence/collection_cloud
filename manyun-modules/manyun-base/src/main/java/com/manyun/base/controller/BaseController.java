@@ -33,14 +33,14 @@ public class BaseController {
         if (StringUtils.isBlank(type)) {
             return R.fail("验证码类型不能为空");
         }
-        Object cacheObject = redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(phone).concat(type));
+        Object cacheObject = redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(phone.concat(type)));
         if (Objects.nonNull(cacheObject))
             return R.fail(CodeStatus.PLEASE_WAIT.getCode().intValue(),"未过期,请稍后重试!");
         // 发送验证码
         String code = RandomUtil.randomNumbers(6);
         AliUtil.sendSms(phone,code);
         //AliUtil.send(phone, BusinessConstants.SmsTemplateNumber.ASSERT_BACK)
-        redisService.redisTemplate.opsForValue().set(PHONE_CODE.concat(phone).concat(type),code,EXP_TIME, TimeUnit.SECONDS);
+        redisService.redisTemplate.opsForValue().set(PHONE_CODE.concat(phone.concat(type)),code,EXP_TIME, TimeUnit.SECONDS);
         return R.ok();
     }
 
