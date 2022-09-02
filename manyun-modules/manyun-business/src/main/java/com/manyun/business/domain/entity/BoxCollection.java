@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 /**
  * <p>
@@ -17,6 +18,7 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @TableName("cnt_box_collection")
 @ApiModel(value = "BoxCollection对象", description = "盲盒与藏品中间表")
+@Data
 public class BoxCollection implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -45,6 +47,12 @@ public class BoxCollection implements Serializable {
     @ApiModelProperty("创建人")
     private String createdBy;
 
+    @ApiModelProperty("库存数量")
+    private Integer openQuantity;
+
+    @ApiModelProperty("已开数量")
+    private Integer openNumber;
+
     @ApiModelProperty("创建时间")
     private LocalDateTime createdTime;
 
@@ -54,109 +62,4 @@ public class BoxCollection implements Serializable {
     @ApiModelProperty("更新时间")
     private LocalDateTime updatedTime;
 
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getBoxId() {
-        return boxId;
-    }
-
-    public void setBoxId(String boxId) {
-        this.boxId = boxId;
-    }
-
-    public String getCollectionId() {
-        return collectionId;
-    }
-
-    public void setCollectionId(String collectionId) {
-        this.collectionId = collectionId;
-    }
-
-    public String getCollectionName() {
-        return collectionName;
-    }
-
-    public void setCollectionName(String collectionName) {
-        this.collectionName = collectionName;
-    }
-
-    public BigDecimal getSourcePrice() {
-        return sourcePrice;
-    }
-
-    public void setSourcePrice(BigDecimal sourcePrice) {
-        this.sourcePrice = sourcePrice;
-    }
-
-    public BigDecimal getTranSvg() {
-        return tranSvg;
-    }
-
-    public void setTranSvg(BigDecimal tranSvg) {
-        this.tranSvg = tranSvg;
-    }
-
-    public String getFlagScore() {
-        return flagScore;
-    }
-
-    public void setFlagScore(String flagScore) {
-        this.flagScore = flagScore;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public LocalDateTime getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(LocalDateTime createdTime) {
-        this.createdTime = createdTime;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public LocalDateTime getUpdatedTime() {
-        return updatedTime;
-    }
-
-    public void setUpdatedTime(LocalDateTime updatedTime) {
-        this.updatedTime = updatedTime;
-    }
-
-    @Override
-    public String toString() {
-        return "BoxCollection{" +
-        "id=" + id +
-        ", boxId=" + boxId +
-        ", collectionId=" + collectionId +
-        ", collectionName=" + collectionName +
-        ", sourcePrice=" + sourcePrice +
-        ", tranSvg=" + tranSvg +
-        ", flagScore=" + flagScore +
-        ", createdBy=" + createdBy +
-        ", createdTime=" + createdTime +
-        ", updatedBy=" + updatedBy +
-        ", updatedTime=" + updatedTime +
-        "}";
-    }
 }

@@ -294,9 +294,13 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         Assert.isTrue(Objects.nonNull(userBox),"盲盒已被开启,请核实!");
        // 什么样的随机算法 去得到概率性的藏品？
         // 1. 将所有藏品的概率比例拿到
-        List<BoxCollection> boxCollections = boxCollectionService.list(Wrappers.<BoxCollection>lambdaQuery().eq(BoxCollection::getBoxId, userBox.getBoxId()));
+        List<BoxCollection> boxCollections = boxCollectionService.list(Wrappers.<BoxCollection>lambdaQuery().eq(BoxCollection::getBoxId, userBox.getBoxId()).ne(BoxCollection::getOpenQuantity, Integer.valueOf(0)));
         // 2. 进行分流 容放
+        Assert.isTrue(!boxCollections.isEmpty(),"此盲盒所有藏品已经售罄,沦为空盲盒,请联系客服人员!");
         BoxCollection luckCollection  = luckGetCollection(boxCollections);
+
+        //最后一步验证
+        Assert.isTrue(boxCollectionService.update(Wrappers.<BoxCollection>lambdaUpdate().eq(BoxCollection::getId,luckCollection.getId()).ge(BoxCollection::getOpenQuantity,Integer.valueOf(1)).set(BoxCollection::getOpenQuantity, luckCollection.getOpenQuantity() - 1 ).set(BoxCollection::getOpenNumber,luckCollection.getOpenNumber() + 1)),"开盲盒有误,请重试!");
         // 3. 得到后开始绑定了
         String info = StrUtil.format("恭喜您,开启盲盒,得到 {} 藏品,请注意查收!", luckCollection.getCollectionName());
         userCollectionService.bindCollection(userId,luckCollection.getCollectionId(),luckCollection.getCollectionName(),info,Integer.valueOf(1));
@@ -326,6 +330,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
      * @return
      */
     private  BoxCollection luckGetCollection(List<BoxCollection> boxCollections) {
+        // 在这里开始斟酌, boxCollections 数据阶段已经过滤掉 没有库存数量的藏品了。
        return nowTimeGave(boxCollections);
     }
 
