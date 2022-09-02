@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.manyun.common.core.constant.BusinessConstants.SystemTypeConstant.COLLECTION_INFO;
-import static com.manyun.common.core.constant.BusinessConstants.SystemTypeConstant.SELL_INFO;
+import static com.manyun.common.core.constant.BusinessConstants.SystemTypeConstant.*;
 
 /**
  * <p>
@@ -53,6 +52,18 @@ public class SystemController {
     @InnerAuth
     public R<String> findType(@PathVariable String type){
         return R.ok(systemService.getVal(type,String.class));
+    }
+
+    @GetMapping
+    @ApiOperation("开盲盒动效图")
+    public R<String> openBoxGif() {
+        return R.ok(systemService.getVal(OPEN_BOX_GIF, String.class));
+    }
+
+    @GetMapping
+    @ApiOperation("合成动效图")
+    public R<String> synthesisGif() {
+        return R.ok(systemService.getVal(SYNTHESIS_GIF, String.class));
     }
 }
 

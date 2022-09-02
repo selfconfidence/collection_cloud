@@ -161,6 +161,16 @@ public interface BusinessConstants {
          */
         String LOCAL_PATH = "local_path";
 
+        /**
+         * 开盲盒动图
+         */
+        String OPEN_BOX_GIF = "open_box_gif";
+
+        /**
+         * 合成动图
+         */
+        String SYNTHESIS_GIF = "synthesis_gif";
+
     }
 
 
