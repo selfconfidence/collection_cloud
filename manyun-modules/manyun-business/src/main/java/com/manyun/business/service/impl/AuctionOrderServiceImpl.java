@@ -14,6 +14,7 @@ import com.manyun.business.domain.entity.AuctionSend;
 import com.manyun.business.domain.entity.Money;
 import com.manyun.business.domain.query.AuctionOrderQuery;
 import com.manyun.business.domain.vo.AuctionOrderVo;
+import com.manyun.business.domain.vo.MediaVo;
 import com.manyun.business.mapper.AuctionOrderMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -77,6 +78,9 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
     @Autowired
     private ILogsService logsService;
 
+    @Autowired
+    private IMediaService mediaService;
+
     @Override
     public TableDataInfo<AuctionOrderVo> myAuctionOrderList(AuctionOrderQuery orderQuery, String userId) {
         List<AuctionOrder> list = list(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getToUserId, userId)
@@ -109,6 +113,12 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
 
         String idStr = IdUtil.getSnowflake().nextIdStr();
         auctionOrder.setId(idStr);
+
+        List<MediaVo> mediaVos = mediaService.initMediaVos(auctionOrderCreateDto.getGoodsId(), Integer.valueOf(1).toString()
+                .equals(auctionOrderCreateDto.getGoodsType()) ? BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE : BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
+        if (!mediaVos.isEmpty()) {
+            auctionOrder.setGoodsImg(mediaVos.get(0).getMediaUrl());
+        }
 
         String orderNo = IdUtil.objectId();
         auctionOrder.setOrderNo(orderNo);
