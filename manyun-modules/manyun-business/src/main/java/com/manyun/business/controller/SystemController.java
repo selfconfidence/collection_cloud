@@ -54,5 +54,17 @@ public class SystemController {
         return R.ok(systemService.getVal(type,String.class));
     }
 
+    @GetMapping("/openBoxGif")
+    @ApiOperation("开盲盒动效图")
+    public R<String> openBoxGif() {
+        return R.ok(systemService.getVal(OPEN_BOX_GIF, String.class));
+    }
+
+    @GetMapping("/synthesisGif")
+    @ApiOperation("合成动效图")
+    public R<String> synthesisGif() {
+        return R.ok(systemService.getVal(SYNTHESIS_GIF, String.class));
+    }
+
 }
 
