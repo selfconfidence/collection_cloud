@@ -67,7 +67,7 @@ public class CntUserController extends BaseController {
     @PostMapping("/regUser")
     @ApiOperation("用户注册 - 手机号验证码的方式")
     public R regUser(@RequestBody UserRegForm userRegForm){
-        String phoneCode = (String) redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(userRegForm.getPhone()).concat(PhoneCodeType.REG_CODE.getType()));
+        String phoneCode = (String) redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(userRegForm.getPhone().concat(PhoneCodeType.REG_CODE.getType())));
         Assert.isTrue(userRegForm.getPhoneCode().equals(phoneCode),"验证码输入错误,请核实!");
         userService.regUser(userRegForm);
         return R.ok();
@@ -86,7 +86,7 @@ public class CntUserController extends BaseController {
     }
 
     private void codeCheck(String phone,String code, String type) {
-        Object andDelete = redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(phone).concat(type));
+        Object andDelete = redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(phone.concat(type)));
         Assert.isTrue(Objects.nonNull(andDelete),"验证码失效！");
         String phoneCode = andDelete.toString();
         Assert.isTrue(code.equals(phoneCode),"验证码输入错误,请核实!");
