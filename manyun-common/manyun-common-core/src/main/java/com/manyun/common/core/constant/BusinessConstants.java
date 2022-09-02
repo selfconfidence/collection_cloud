@@ -1,8 +1,5 @@
 package com.manyun.common.core.constant;
 
-import cn.hutool.core.math.MathUtil;
-import cn.hutool.core.util.NumberUtil;
-
 /**
  * 业务常量类
  */
@@ -194,7 +191,7 @@ public interface BusinessConstants {
     interface RedisDict{
         String PHONE_CODE = "phone:code:";
         // 验证码过期时间 60 秒
-        Integer EXP_TIME = Integer.valueOf(60);
+        Integer EXP_TIME = Integer.valueOf(300);
         // 持续递增编号key
         String COLLECTION_AUTO_NUM = "collection:auto:numbers:";
         String  USER_ACTIVE_NUMBERS = "user:active:numbers";

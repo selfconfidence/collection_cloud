@@ -15,6 +15,7 @@ import com.manyun.comm.api.model.LoginPhoneCodeForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.enums.PhoneCodeType;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.redis.service.RedisService;
@@ -66,7 +67,7 @@ public class CntUserController extends BaseController {
     @PostMapping("/regUser")
     @ApiOperation("用户注册 - 手机号验证码的方式")
     public R regUser(@RequestBody UserRegForm userRegForm){
-        String phoneCode = (String) redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(userRegForm.getPhone()));
+        String phoneCode = (String) redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(userRegForm.getPhone()).concat(PhoneCodeType.REG_CODE.getType()));
         Assert.isTrue(userRegForm.getPhoneCode().equals(phoneCode),"验证码输入错误,请核实!");
         userService.regUser(userRegForm);
         return R.ok();
@@ -77,15 +78,15 @@ public class CntUserController extends BaseController {
     @ApiOperation(value = "用户验证码登录",notes = "验证码登录",hidden = true)
     @InnerAuth
     public R<CntUserDto> codeLogin(@RequestBody LoginPhoneCodeForm loginPhoneCodeForm){
-        codeCheck(loginPhoneCodeForm.getPhone(),loginPhoneCodeForm.getPhoneCode());
+        codeCheck(loginPhoneCodeForm.getPhone(),loginPhoneCodeForm.getPhoneCode(), PhoneCodeType.LOGIN_CODE.getType());
         CntUser cntUser =   userService.codeLogin(loginPhoneCodeForm.getPhone());
         CntUserDto cntUserDto = Builder.of(CntUserDto::new).build();
         BeanUtil.copyProperties(cntUser,cntUserDto);
         return R.ok(cntUserDto);
     }
 
-    private void codeCheck(String phone,String code) {
-        Object andDelete = redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(phone));
+    private void codeCheck(String phone,String code, String type) {
+        Object andDelete = redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(phone).concat(type));
         Assert.isTrue(Objects.nonNull(andDelete),"验证码失效！");
         String phoneCode = andDelete.toString();
         Assert.isTrue(code.equals(phoneCode),"验证码输入错误,请核实!");
@@ -114,7 +115,7 @@ public class CntUserController extends BaseController {
     @ApiOperation("实名认证 -- 银联")
     public R realUser(@RequestBody @Valid UserRealForm userRealForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        codeCheck(userRealForm.getPhone(),userRealForm.getPhoneCode());
+        codeCheck(userRealForm.getPhone(),userRealForm.getPhoneCode(), PhoneCodeType.REAL_CODE.getType());
         return userService.userRealName(userRealForm, notNullLoginBusinessUser.getUserId());
     }
 
@@ -167,7 +168,7 @@ public class CntUserController extends BaseController {
     public R changeCodeLogin(@RequestBody @Valid UserChangeCodeLoginForm userChangeCodeLoginForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         String phone = notNullLoginBusinessUser.getCntUser().getPhone();
-        codeCheck(phone,userChangeCodeLoginForm.getPhoneCode());
+        codeCheck(phone,userChangeCodeLoginForm.getPhoneCode(), PhoneCodeType.CHANGE_LOGIN_PASS.getType());
         CntUser cntUser = userService.getById(notNullLoginBusinessUser.getUserId());
         cntUser.setLoginPass(userChangeCodeLoginForm.getPassWord());
         userService.updateById(cntUser);
@@ -179,7 +180,7 @@ public class CntUserController extends BaseController {
     public R changePayPass(@RequestBody @Valid UserChangePayPass userChangePayPass){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         String phone = notNullLoginBusinessUser.getCntUser().getPhone();
-        codeCheck(phone,userChangePayPass.getPhoneCode());
+        codeCheck(phone,userChangePayPass.getPhoneCode(), PhoneCodeType.CHANGE_PAY_PASS.getType());
         userService.changePayPass(notNullLoginBusinessUser.getUserId(),userChangePayPass);
         return R.ok();
     }
