@@ -6,9 +6,11 @@ import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.github.pagehelper.PageHelper;
+import com.manyun.admin.domain.CntCollectionInfo;
 import com.manyun.admin.domain.query.IssuanceQuery;
 import com.manyun.admin.domain.vo.CnfCreationdVo;
 import com.manyun.admin.domain.vo.CnfIssuanceVo;
+import com.manyun.admin.service.ICntCollectionInfoService;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -33,6 +35,9 @@ public class CnfIssuanceServiceImpl extends ServiceImpl<CnfIssuanceMapper,CnfIss
 {
     @Autowired
     private CnfIssuanceMapper cnfIssuanceMapper;
+
+    @Autowired
+    private ICntCollectionInfoService cntCollectionInfoService;
 
     /**
      * 查询发行方详情
@@ -90,6 +95,14 @@ public class CnfIssuanceServiceImpl extends ServiceImpl<CnfIssuanceMapper,CnfIss
     {
         cnfIssuance.setUpdatedBy(SecurityUtils.getUsername());
         cnfIssuance.setUpdatedTime(DateUtils.getNowDate());
+        List<CntCollectionInfo> list = cntCollectionInfoService.list(Wrappers.<CntCollectionInfo>lambdaQuery().eq(CntCollectionInfo::getPublishId, cnfIssuance.getId()))
+                .parallelStream().map(item -> {
+                    item.setPublishAuther(cnfIssuance.getPublishAuther());
+                    item.setPublishOther(cnfIssuance.getPublishOther());
+                    item.setPublishInfo(cnfIssuance.getPublishInfo());
+                    return item;
+                }).collect(Collectors.toList());
+        cntCollectionInfoService.updateBatchById(list);
         return updateById(cnfIssuance)==true?1:0;
     }
 
