@@ -34,6 +34,12 @@ public class CntPostExist implements Serializable {
     @ApiModelProperty("业务名称")
     private String buiName;
 
+
+    @ApiModelProperty("需要的数量条件")
+    private Integer requiredQuantity;
+
+
+
     @ApiModelProperty("备注")
     private String reMark;
 

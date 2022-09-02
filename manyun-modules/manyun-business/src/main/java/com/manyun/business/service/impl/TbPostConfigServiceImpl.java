@@ -1,8 +1,10 @@
 package com.manyun.business.service.impl;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
+import com.google.common.collect.Maps;
 import com.manyun.business.domain.entity.*;
 import com.manyun.business.mapper.TbPostConfigMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -12,9 +14,8 @@ import com.manyun.common.core.domain.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
@@ -108,32 +109,44 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
         List<CntPostConfig> cntPostConfigs = list(Wrappers.<CntPostConfig>lambdaQuery().select(CntPostConfig::getId,CntPostConfig::getBuyFrequency).in(CntPostConfig::getId, configIds).orderByDesc(CntPostConfig::getCreatedTime));
         // 拿到当前 配置列表后，开始遍历 已经是有顺序得了
         for (CntPostConfig cntPostConfig : cntPostConfigs) {
-
             // 条件查出来之后，全部满足即可
             List<CntPostExist> cntPostExists = postExistService.list(Wrappers.<CntPostExist>lambdaQuery().eq(CntPostExist::getConfigId, cntPostConfig.getId()));
             if (cntPostExists.size() == 0){
                 return Boolean.FALSE;
             }
+            // userCollections 让它重复即可
             List<UserCollection> userCollections = userCollectionService.list(
-                    Wrappers.<UserCollection>lambdaQuery().select(UserCollection::getId)
+                    Wrappers.<UserCollection>lambdaQuery().select(UserCollection::getId,UserCollection::getCollectionId)
                             .eq(UserCollection::getIsExist,USE_EXIST.getCode())
                             .eq(UserCollection::getUserId, userId)
                             .in(UserCollection::getCollectionId,cntPostExists.parallelStream().map(item -> item.getCollectionId()).collect(Collectors.toSet()) ));
+            // 组合过滤条件
+            Map<String, Integer> requiredQuantity = cntPostExists.parallelStream().collect(Collectors.toMap(CntPostExist::getCollectionId, CntPostExist::getRequiredQuantity));
+            // 组合操作条件
             if (userCollections.size() >= cntPostExists.size()){
-                // 如果满足，需要二次查询 自己的次数是否满足了.
-                CntPostConfigLog postConfigLogServiceOne = postConfigLogService.getOne(Wrappers.<CntPostConfigLog>lambdaQuery().eq(CntPostConfigLog::getUserId, userId).eq(CntPostConfigLog::getConfigId, cntPostConfig.getId()));
-                // 如果是 null 就直接返回 true
-                if (Objects.isNull(postConfigLogServiceOne))return Boolean.TRUE;
-                // 如果不是 NULL
-                return postConfigLogServiceOne.getBuyFrequency().compareTo(cntPostConfig.getBuyFrequency()) < 0;
+                // 当前用户对应的持有量是否满足！ 必须全部满足即可！
+                Map<String, List<UserCollection>> userUseCollection = userCollections.parallelStream().collect(Collectors.groupingBy(UserCollection::getCollectionId));
+                AtomicBoolean full = new AtomicBoolean(true);
+                requiredQuantity.forEach((k,v)->{
+                    // 有一个条件不成立 就变更状态
+                    if (!(userUseCollection.get(k).size() >= v))
+                        full.set(false);
+                });
+                if (full.get()){
+                    // 如果满足，需要二次查询 自己的次数是否满足了.
+                    CntPostConfigLog postConfigLogServiceOne = postConfigLogService.getOne(Wrappers.<CntPostConfigLog>lambdaQuery().eq(CntPostConfigLog::getUserId, userId).eq(CntPostConfigLog::getConfigId, cntPostConfig.getId()));
+                    // 如果是 null 就直接返回 true
+                    if (Objects.isNull(postConfigLogServiceOne))return Boolean.TRUE;
+                    // 如果不是 NULL
+                    return postConfigLogServiceOne.getBuyFrequency().compareTo(cntPostConfig.getBuyFrequency()) < 0;
+                }
             }
         }
         return Boolean.FALSE;
     }
 
     private List<CntPostSell> getCntPostSells(String buiId) {
-        List<CntPostSell> cntPostSells = postSellService.list(Wrappers.<CntPostSell>lambdaQuery().eq(CntPostSell::getBuiId, buiId));
-        return cntPostSells;
+       return postSellService.list(Wrappers.<CntPostSell>lambdaQuery().eq(CntPostSell::getBuiId, buiId));
     }
 
     /**
@@ -207,4 +220,5 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
         }
 
     }
+
 }
