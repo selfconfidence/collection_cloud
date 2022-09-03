@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.manyun.business.config.PosterUtil;
 import com.manyun.business.design.mychain.MyChainService;
 import com.manyun.business.domain.dto.*;
+import com.manyun.business.domain.entity.CntCollection;
 import com.manyun.business.domain.entity.UserCollection;
 import com.manyun.business.domain.vo.MediaVo;
 import com.manyun.business.domain.vo.UserCollectionVo;
@@ -211,7 +212,9 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
     public String autoCollectionNum(String collectionId) {
         String intAutoNum = redisService.getIntAutoNum(COLLECTION_AUTO_NUM.concat(collectionId)).toString();
         String poiLent = systemService.getVal(COLLECTION_POT, String.class);
-      return  poiLent.substring(0, poiLent.length() - intAutoNum.length()).concat(intAutoNum);
+        CntCollection cntCollection = collectionServiceObjectFactory.getObject().getById(collectionId);
+        String total = cntCollection.getBalance() + cntCollection.getSelfBalance().toString();
+        return  poiLent.substring(0, poiLent.length() - intAutoNum.length()).concat(intAutoNum).concat("/" + total);
     }
 
 
