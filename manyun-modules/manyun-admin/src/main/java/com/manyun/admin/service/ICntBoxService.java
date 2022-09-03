@@ -11,6 +11,7 @@ import com.manyun.admin.domain.vo.CntBoxOrderVo;
 import com.manyun.admin.domain.vo.CntBoxVo;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.TableDataInfo;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 盲盒;盲盒主体Service接口
@@ -64,4 +65,6 @@ public interface ICntBoxService extends IService<CntBox>
      */
     TableDataInfo<CntBoxOrderVo> boxOrderList(OrderQuery orderQuery);
 
+    @Transactional(rollbackFor = Exception.class)
+    void taskCheckStatus();
 }

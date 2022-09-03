@@ -1,5 +1,7 @@
 package com.manyun.admin.task;
 
+import com.manyun.admin.service.ICntBoxService;
+import com.manyun.admin.service.ICntCollectionService;
 import com.manyun.comm.api.RemoteAuctionService;
 import com.manyun.comm.api.RemoteConsignmentService;
 import com.manyun.comm.api.RemoteOrderService;
@@ -35,6 +37,12 @@ public class BuiTask
 
     @Autowired
     private RedisService redisService;
+
+    @Autowired
+    private ICntBoxService boxService;
+
+    @Autowired
+    private ICntCollectionService cntCollectionService;
 
     /**
      * 藏品盲盒,提前一个小时发售全局进行推送用户.
@@ -107,6 +115,14 @@ public class BuiTask
      */
     public void clearActives(){
         redisService.deleteObject(USER_ACTIVE_NUMBERS);
+    }
+
+    /**
+     * 定时刷新 盲盒,藏品的状态库存信息
+     */
+    public void doTaskExe(){
+        boxService.taskCheckStatus();
+        cntCollectionService.taskCheckStatus();
     }
 
 }

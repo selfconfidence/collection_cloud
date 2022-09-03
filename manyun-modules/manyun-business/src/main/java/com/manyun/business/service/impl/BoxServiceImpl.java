@@ -30,6 +30,7 @@ import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.BoxStatus;
+import com.manyun.common.core.utils.SpringUtils;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
@@ -46,6 +47,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE;
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
 import static com.manyun.common.core.enums.BoxOpenType.NO_OPEN;
 import static com.manyun.common.core.enums.BoxOpenType.OK_OPEN;
@@ -109,6 +111,9 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
 
     @Autowired
     private  RemoteBuiUserService userService;
+
+
+
     /**
      * 分页查询盲盒列表
      * @param boxQuery
@@ -289,7 +294,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized String openBox(String userBoxId, String userId) {
+    public synchronized OpenBoxCollectionVo openBox(String userBoxId, String userId) {
         UserBox userBox = userBoxService.getOne(Wrappers.<UserBox>lambdaQuery().eq(UserBox::getId, userBoxId).eq(UserBox::getUserId, userId).eq(UserBox::getBoxOpen, NO_OPEN.getCode()));
         Assert.isTrue(Objects.nonNull(userBox),"盲盒已被开启,请核实!");
        // 什么样的随机算法 去得到概率性的藏品？
@@ -311,7 +316,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
 
         msgService.saveMsgThis(MsgThisDto.builder().userId(userId).msgForm(info).msgTitle(format).build());
         msgService.saveCommMsg(MsgCommDto.builder().msgTitle(format).msgForm(format).build());
-        return info;
+        return OpenBoxCollectionVo.builder().info(info).collectionName(luckCollection.getCollectionName()).mediaVos(mediaService.initMediaVos(luckCollection.getCollectionId(),COLLECTION_MODEL_TYPE)).build();
     }
 
     @Override

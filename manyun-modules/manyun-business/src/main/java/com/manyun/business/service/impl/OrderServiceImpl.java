@@ -50,8 +50,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
+import static com.manyun.common.core.enums.BoxStatus.UP_ACTION;
 import static com.manyun.common.core.enums.CollectionLink.NOT_LINK;
 import static com.manyun.common.core.enums.CollectionLink.OK_LINK;
+import static com.manyun.common.core.enums.CollectionStatus.DOWN_ACTION;
 import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
 import static com.manyun.common.core.enums.ConsignmentStatus.LOCK_CONSIGN;
 import static com.manyun.common.core.enums.ConsignmentStatus.OVER_CONSIGN;
@@ -584,6 +586,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             IBoxService boxServiceReal = boxService.getObject();
             Box box = boxServiceReal.getById(buiId);
             box.setBalance(box.getBalance() + goodsNum);
+            box.setStatusBy(UP_ACTION.getCode());
             box.setSelfBalance(box.getSelfBalance() - goodsNum);
             boxServiceReal.updateById(box);
         }
@@ -592,6 +595,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             ICollectionService collectionServiceReal = collectionService.getObject();
             CntCollection cntCollection = collectionServiceReal.getById(buiId);
             cntCollection.setBalance(cntCollection.getBalance() + goodsNum);
+            cntCollection.setStatusBy(DOWN_ACTION.getCode());
             cntCollection.setSelfBalance(cntCollection.getSelfBalance() - goodsNum);
             collectionServiceReal.updateById(cntCollection);
         }

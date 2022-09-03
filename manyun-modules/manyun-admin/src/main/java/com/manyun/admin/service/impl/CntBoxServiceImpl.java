@@ -36,6 +36,8 @@ import com.manyun.admin.mapper.CntBoxMapper;
 import com.manyun.admin.service.ICntBoxService;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.manyun.common.core.enums.BoxStatus.NULL_ACTION;
+
 /**
  * 盲盒;盲盒主体Service业务层处理
  *
@@ -305,6 +307,13 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         PageHelper.startPage(orderQuery.getPageNum(),orderQuery.getPageSize());
         List<CntBoxOrderVo> cntBoxOrderVos = cntBoxMapper.boxOrderList(orderQuery);
         return TableDataInfoUtil.pageTableDataInfo(cntBoxOrderVos,cntBoxOrderVos);
+    }
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void taskCheckStatus(){
+        update(Wrappers.<CntBox>lambdaUpdate().eq(CntBox::getBalance, Integer.valueOf(0)).set(CntBox::getStatusBy, NULL_ACTION.getCode()));
     }
 
 }
