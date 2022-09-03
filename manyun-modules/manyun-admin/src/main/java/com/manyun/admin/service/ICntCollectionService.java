@@ -12,6 +12,7 @@ import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.TableDataInfo;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 藏品Service接口
@@ -73,4 +74,7 @@ public interface ICntCollectionService extends IService<CntCollection>
      * @return
      */
     int updateState(CollectionStateDto collectionStateDto);
+
+    @Transactional(rollbackFor = Exception.class)
+    void taskCheckStatus();
 }

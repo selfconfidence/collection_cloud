@@ -6,10 +6,7 @@ import com.manyun.business.domain.form.BoxOrderSellForm;
 import com.manyun.business.domain.form.BoxSellForm;
 import com.manyun.business.domain.query.BoxQuery;
 import com.manyun.business.domain.query.UseAssertQuery;
-import com.manyun.business.domain.vo.BoxListVo;
-import com.manyun.business.domain.vo.BoxVo;
-import com.manyun.business.domain.vo.PayVo;
-import com.manyun.business.domain.vo.UserBoxVo;
+import com.manyun.business.domain.vo.*;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 
@@ -33,7 +30,7 @@ public interface IBoxService extends IService<Box> {
 
     TableDataInfo<UserBoxVo> userBoxPageList(UseAssertQuery useAssertQuery, String userId);
 
-    String openBox(String userBoxId, String userId);
+    OpenBoxCollectionVo openBox(String userBoxId, String userId);
 
     List<String> queryDict(String keyword);
 

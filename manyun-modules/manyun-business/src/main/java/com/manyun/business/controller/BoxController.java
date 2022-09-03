@@ -113,7 +113,7 @@ public class BoxController extends BaseController {
 
     @GetMapping("/openBox/{userBoxId}")
     @ApiOperation(value = "开启盲盒",notes = "盲盒编号  点击后, 返回的 data 会弹出对应的提示信息给用户即可.")
-    public  R<String> openBox(@PathVariable String userBoxId){
+    public  R<OpenBoxCollectionVo> openBox(@PathVariable String userBoxId){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(boxService.openBox(userBoxId,notNullLoginBusinessUser.getUserId()));
     }
