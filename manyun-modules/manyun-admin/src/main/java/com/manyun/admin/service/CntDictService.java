@@ -18,6 +18,11 @@ public interface CntDictService
     R collectionDict();
 
     /***
+     * 查询盲盒添加藏品字典
+     */
+    R boxCollectionDict();
+
+    /***
      * 查询盲盒字典
      */
     R boxDict();
@@ -92,4 +97,5 @@ public interface CntDictService
      * 轮播跳转链接字典
      */
     R bannerJumpLinkDict();
+
 }

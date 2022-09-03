@@ -10,6 +10,7 @@ import com.manyun.admin.domain.vo.CntAgreementTypeVo;
 import com.manyun.admin.domain.vo.CntAirdropRecordVo;
 import com.manyun.admin.service.ICntMediaService;
 import com.manyun.common.core.constant.BusinessConstants;
+import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import org.springframework.beans.BeanUtils;
@@ -48,7 +49,9 @@ public class CntAirdropRecordServiceImpl extends ServiceImpl<CntAirdropRecordMap
         return TableDataInfoUtil.pageTableDataInfo(cntAirdropRecords.parallelStream().map(m->{
             CntAirdropRecordVo cntAirdropRecordVo=new CntAirdropRecordVo();
             BeanUtils.copyProperties(m,cntAirdropRecordVo);
-            cntAirdropRecordVo.setMediaVos(mediaService.initMediaVos(m.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
+            if(StringUtils.isNotBlank(m.getCollectionName())){
+                cntAirdropRecordVo.setMediaVos(mediaService.initMediaVos(m.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
+            }
             return cntAirdropRecordVo;
         }).collect(Collectors.toList()), cntAirdropRecords);
     }

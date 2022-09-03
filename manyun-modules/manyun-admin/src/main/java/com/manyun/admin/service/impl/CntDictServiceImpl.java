@@ -78,6 +78,18 @@ public class CntDictServiceImpl implements CntDictService
     }
 
     /***
+     * 查询盲盒添加藏品字典
+     */
+    @Override
+    public R boxCollectionDict() {
+        return R.ok(collectionService.list(Wrappers.<CntCollection>lambdaQuery().eq(CntCollection::getStatusBy,0).orderByDesc(CntCollection::getCreatedTime)).stream().map(m ->{
+            CntCollectionDictVo cntCollectionDictVo=new CntCollectionDictVo();
+            BeanUtil.copyProperties(m,cntCollectionDictVo);
+            return cntCollectionDictVo;
+        }).collect(Collectors.toList()));
+    }
+
+    /***
      * 查询盲盒字典
      */
     @Override

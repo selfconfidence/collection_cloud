@@ -19,4 +19,10 @@ public class AirdropRecordQuery extends PageQuery
     @ApiModelProperty("藏品名称")
     private String collectionName;
 
+    @ApiModelProperty("投递类型 0:空投 1:批量空投")
+    private Integer deliveryType;
+
+    @ApiModelProperty("投递状态 0:投递成功 1:投递失败")
+    private Integer deliveryStatus;
+
 }
