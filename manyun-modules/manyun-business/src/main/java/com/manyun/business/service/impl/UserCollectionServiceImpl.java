@@ -213,7 +213,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         String intAutoNum = redisService.getIntAutoNum(COLLECTION_AUTO_NUM.concat(collectionId)).toString();
         String poiLent = systemService.getVal(COLLECTION_POT, String.class);
         CntCollection cntCollection = collectionServiceObjectFactory.getObject().getById(collectionId);
-        String total = cntCollection.getBalance() + cntCollection.getSelfBalance().toString();
+        int total = cntCollection.getBalance() + cntCollection.getSelfBalance();
         return  poiLent.substring(0, poiLent.length() - intAutoNum.length()).concat(intAutoNum).concat("/" + total);
     }
 
