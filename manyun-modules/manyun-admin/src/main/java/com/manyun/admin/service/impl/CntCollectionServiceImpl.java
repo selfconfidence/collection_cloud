@@ -356,14 +356,43 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
     public R airdrop(AirdropDto airdropDto) {
         //验证用户
         List<CntUser> cntUsers = userService.list(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPhone, airdropDto.getPhone()));
-        Assert.isTrue(cntUsers.size() > 0, "用户不存在!");
         CntCollection collection = getById(airdropDto.getCollectionId());
-        Assert.isTrue(Objects.nonNull(collection), "藏品不存在!");
-        Assert.isFalse(cntUsers.get(0).getIsReal()==1, "当前用户未实名,请先实名认证!");
         String collectionId = collection.getId();
         Integer selfBalance = collection.getSelfBalance();
         Integer balance = collection.getBalance();
-        Assert.isFalse(Integer.valueOf(0).equals(collection.getBalance()), "库存不足!");
+        if(cntUsers.size()==0 || Objects.isNull(collection) || cntUsers.get(0).getIsReal()==1 || Integer.valueOf(0)==collection.getBalance()){
+            //增加空投记录
+            airdropRecordService.save(
+                    Builder.of(CntAirdropRecord::new)
+                            .with(CntAirdropRecord::setId,IdUtils.getSnowflakeNextIdStr())
+                            .with(CntAirdropRecord::setUserId,cntUsers.size()==0?"":cntUsers.get(0).getId())
+                            .with(CntAirdropRecord::setNickName,cntUsers.size()==0?"":cntUsers.get(0).getNickName())
+                            .with(CntAirdropRecord::setUserPhone,cntUsers.size()==0?airdropDto.getPhone():cntUsers.get(0).getPhone())
+                            .with(CntAirdropRecord::setCollectionId,Objects.isNull(collection)==true?"":collection.getId())
+                            .with(CntAirdropRecord::setCollectionName,Objects.isNull(collection)==true?"":collection.getCollectionName())
+                            .with(CntAirdropRecord::setDeliveryStatus,1)
+                            .with(CntAirdropRecord::setDeliveryType,0)
+                            .with(CntAirdropRecord::setDeliveryInfo,cntUsers.size()==0?"用户不存在!":Objects.isNull(collection)==true?"藏品不存在!":cntUsers.get(0).getIsReal()==1?"当前用户未实名!":(Integer.valueOf(0)==collection.getBalance())==true?"库存不足!":"")
+                            .with(CntAirdropRecord::setCreatedBy,SecurityUtils.getUsername())
+                            .with(CntAirdropRecord::setCreatedTime,DateUtils.getNowDate())
+                            .build()
+            );
+            if(cntUsers.size() == 0){
+                return R.fail("用户不存在!");
+            }
+
+            if(Objects.isNull(collection)){
+                return R.fail("藏品不存在!");
+            }
+
+            if(cntUsers.get(0).getIsReal()==1){
+                return R.fail("当前用户未实名,请先实名认证!");
+            }
+
+            if(Integer.valueOf(0)==collection.getBalance()){
+                return R.fail("库存不足!");
+            }
+        }
         //扣减库存
         updateById(
                 Builder
@@ -399,6 +428,9 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                 .with(CntAirdropRecord::setUserPhone,cntUsers.get(0).getPhone())
                 .with(CntAirdropRecord::setCollectionId,collection.getId())
                 .with(CntAirdropRecord::setCollectionName,collection.getCollectionName())
+                .with(CntAirdropRecord::setDeliveryStatus,0)
+                .with(CntAirdropRecord::setDeliveryType,0)
+                .with(CntAirdropRecord::setDeliveryInfo,"投递藏品成功!")
                 .with(CntAirdropRecord::setCreatedBy,SecurityUtils.getUsername())
                 .with(CntAirdropRecord::setCreatedTime,DateUtils.getNowDate())
                 .build()
@@ -425,9 +457,28 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         {
             R.fail("导入批量空投数据不能为空!");
          }
+        List<CntAirdropRecord> errorAirdropRecord = new ArrayList<CntAirdropRecord>();
         //判断藏品id是否一致
         Set<String> collectionIds = bachAirdopExcels.parallelStream().map(BachAirdopExcel::getCollectionId).collect(Collectors.toSet());
-        Assert.isTrue(collectionIds.size()==1, "所选藏品不一致!");
+        if(collectionIds.size()!=1){
+            bachAirdopExcels.parallelStream().forEach(e ->{
+                errorAirdropRecord.add(
+                        Builder.of(CntAirdropRecord::new)
+                                .with(CntAirdropRecord::setId,IdUtils.getSnowflakeNextIdStr())
+                                .with(CntAirdropRecord::setUserPhone,e.getPhone())
+                                .with(CntAirdropRecord::setCollectionId,e.getCollectionId())
+                                .with(CntAirdropRecord::setDeliveryStatus,1)
+                                .with(CntAirdropRecord::setDeliveryType,1)
+                                .with(CntAirdropRecord::setDeliveryInfo,"所选藏品不一致!")
+                                .with(CntAirdropRecord::setCreatedBy,SecurityUtils.getUsername())
+                                .with(CntAirdropRecord::setCreatedTime,DateUtils.getNowDate())
+                                .build()
+                );
+            });
+            //增加空投记录
+            airdropRecordService.saveBatch(errorAirdropRecord);
+            return R.fail("所选藏品不一致!");
+        }
         //获取用户
         List<CntUser> cntUsers = userService.list(
                 Wrappers
@@ -435,19 +486,45 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                         .in(CntUser::getPhone, bachAirdopExcels.parallelStream()
                                 .map(BachAirdopExcel::getPhone).collect(Collectors.toList()))
         );
-        Assert.isTrue(cntUsers.size() > 0, "用户不存在!");
         //获取藏品
-        CntCollection cntCollections = getOne(Wrappers
+        CntCollection cntCollections = getOne(
+                Wrappers
                 .<CntCollection>lambdaQuery()
                 .eq(CntCollection::getId,collectionIds.stream().findFirst().get())
-                .gt(CntCollection::getBalance, 0));
-        Assert.isTrue(Objects.nonNull(cntCollections), "藏品不存在!");
+                .gt(CntCollection::getBalance, 0)
+        );
 
+        if(cntUsers.size()==0 || Objects.isNull(cntCollections)){
+            bachAirdopExcels.parallelStream().forEach(e ->{
+                errorAirdropRecord.add(
+                        Builder.of(CntAirdropRecord::new)
+                                .with(CntAirdropRecord::setId,IdUtils.getSnowflakeNextIdStr())
+                                .with(CntAirdropRecord::setUserPhone,e.getPhone())
+                                .with(CntAirdropRecord::setCollectionId,e.getCollectionId())
+                                .with(CntAirdropRecord::setDeliveryStatus,1)
+                                .with(CntAirdropRecord::setDeliveryType,1)
+                                .with(CntAirdropRecord::setDeliveryInfo,cntUsers.size()==0?"用户不存在或用户未实名!":Objects.isNull(cntCollections)==true?"藏品不存在或库存不足!":"")
+                                .with(CntAirdropRecord::setCreatedBy,SecurityUtils.getUsername())
+                                .with(CntAirdropRecord::setCreatedTime,DateUtils.getNowDate())
+                                .build()
+                );
+            });
+            //增加空投记录
+            airdropRecordService.saveBatch(errorAirdropRecord);
+
+            if(cntUsers.size()==0){
+                return R.fail("用户不存在或用户未实名!");
+            }
+
+            if(Objects.isNull(cntCollections)){
+                return R.fail("藏品不存在或库存不足!");
+            }
+        }
 
         //筛选成功的和失败的
         HashSet<String> errorList = new HashSet<String>();
         List<CntUserCollection> successList = new ArrayList<CntUserCollection>();
-        List<CntAirdropRecord> successListRecord = new ArrayList<CntAirdropRecord>();
+        List<CntAirdropRecord> airdropRecordList = new ArrayList<CntAirdropRecord>();
         bachAirdopExcels.stream().forEach(e->{
             Optional<CntUser> user = cntUsers.parallelStream().filter(f -> f.getPhone().equals(e.getPhone())).findFirst();
             if(user.isPresent()){
@@ -466,7 +543,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                                 .with(CntUserCollection::setCreatedTime,DateUtils.getNowDate())
                                 .build()
                 );
-                successListRecord.add(
+                airdropRecordList.add(
                         Builder.of(CntAirdropRecord::new)
                                 .with(CntAirdropRecord::setId,IdUtils.getSnowflakeNextIdStr())
                                 .with(CntAirdropRecord::setUserId,user.get().getId())
@@ -474,22 +551,55 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                                 .with(CntAirdropRecord::setUserPhone,user.get().getPhone())
                                 .with(CntAirdropRecord::setCollectionId,cntCollections.getId())
                                 .with(CntAirdropRecord::setCollectionName,cntCollections.getCollectionName())
+                                .with(CntAirdropRecord::setDeliveryStatus,0)
+                                .with(CntAirdropRecord::setDeliveryType,1)
+                                .with(CntAirdropRecord::setDeliveryInfo,"投递藏品成功!")
                                 .with(CntAirdropRecord::setCreatedBy,SecurityUtils.getUsername())
                                 .with(CntAirdropRecord::setCreatedTime,DateUtils.getNowDate())
                                 .build()
                 );
             }else {
                 errorList.add(e.getPhone());
+                airdropRecordList.add(
+                        Builder.of(CntAirdropRecord::new)
+                                .with(CntAirdropRecord::setId,IdUtils.getSnowflakeNextIdStr())
+                                .with(CntAirdropRecord::setUserPhone,e.getPhone())
+                                .with(CntAirdropRecord::setCollectionId,cntCollections.getId())
+                                .with(CntAirdropRecord::setCollectionName,cntCollections.getCollectionName())
+                                .with(CntAirdropRecord::setDeliveryStatus,1)
+                                .with(CntAirdropRecord::setDeliveryType,1)
+                                .with(CntAirdropRecord::setDeliveryInfo,"用户不存在或用户未实名!")
+                                .with(CntAirdropRecord::setCreatedBy,SecurityUtils.getUsername())
+                                .with(CntAirdropRecord::setCreatedTime,DateUtils.getNowDate())
+                                .build()
+                );
             }
         });
         int rows = cntCollectionMapper.updateLock(cntCollections.getId(), successList.size());
         if(!(rows >=1)){
-            Assert.isTrue(Boolean.FALSE,"库存不足!");
+            bachAirdopExcels.parallelStream().forEach(e ->{
+                errorAirdropRecord.add(
+                        Builder.of(CntAirdropRecord::new)
+                                .with(CntAirdropRecord::setId,IdUtils.getSnowflakeNextIdStr())
+                                .with(CntAirdropRecord::setUserPhone,e.getPhone())
+                                .with(CntAirdropRecord::setCollectionId,e.getCollectionId())
+                                .with(CntAirdropRecord::setDeliveryStatus,1)
+                                .with(CntAirdropRecord::setDeliveryType,1)
+                                .with(CntAirdropRecord::setDeliveryInfo,"库存不足!")
+                                .with(CntAirdropRecord::setCreatedBy,SecurityUtils.getUsername())
+                                .with(CntAirdropRecord::setCreatedTime,DateUtils.getNowDate())
+                                .build()
+                );
+            });
+            //增加空投记录
+            airdropRecordService.saveBatch(errorAirdropRecord);
+
+            return R.fail("库存不足!");
         }
         //增加用户藏品
         userCollectionService.saveBatch(successList);
         //增加空投记录
-        airdropRecordService.saveBatch(successListRecord);
+        airdropRecordService.saveBatch(airdropRecordList);
         //拼接上链参数返回
         List<MyChainxDto> myChainxDtos = successList.parallelStream().map(m -> {
             MyChainxDto myChainxDto = new MyChainxDto();

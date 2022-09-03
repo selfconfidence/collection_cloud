@@ -29,6 +29,13 @@ public class CntDictController extends BaseController
         return cntDictService.collectionDict();
     }
 
+    @GetMapping("/boxCollectionDict")
+    @ApiOperation("查询盲盒添加藏品字典")
+    public R boxCollectionDict()
+    {
+        return cntDictService.boxCollectionDict();
+    }
+
     @GetMapping("/boxDict")
     @ApiOperation("查询盲盒字典")
     public R boxDict()

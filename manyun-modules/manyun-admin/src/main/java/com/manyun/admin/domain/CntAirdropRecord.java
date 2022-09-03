@@ -34,6 +34,15 @@ public class CntAirdropRecord implements Serializable
     @ApiModelProperty("藏品名称")
     private String collectionName;
 
+    @ApiModelProperty("投递类型 0:空投 1:批量空投")
+    private Integer deliveryType;
+
+    @ApiModelProperty("投递状态 0:投递成功 1:投递失败")
+    private Integer deliveryStatus;
+
+    @ApiModelProperty("投递详情")
+    private String deliveryInfo;
+
     @ApiModelProperty("创建人")
     private String createdBy;
 
@@ -103,6 +112,30 @@ public class CntAirdropRecord implements Serializable
         return collectionName;
     }
 
+    public Integer getDeliveryType() {
+        return deliveryType;
+    }
+
+    public void setDeliveryType(Integer deliveryType) {
+        this.deliveryType = deliveryType;
+    }
+
+    public Integer getDeliveryStatus() {
+        return deliveryStatus;
+    }
+
+    public void setDeliveryStatus(Integer deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
+    }
+
+    public String getDeliveryInfo() {
+        return deliveryInfo;
+    }
+
+    public void setDeliveryInfo(String deliveryInfo) {
+        this.deliveryInfo = deliveryInfo;
+    }
+
     public void setCreatedBy(String createdBy)
     {
         this.createdBy = createdBy;
@@ -149,6 +182,9 @@ public class CntAirdropRecord implements Serializable
             .append("userPhone", getUserPhone())
             .append("collectionId", getCollectionId())
             .append("collectionName", getCollectionName())
+            .append("deliveryType", getDeliveryType())
+            .append("deliveryStatus", getDeliveryStatus())
+            .append("deliveryInfo", getDeliveryInfo())
             .append("createdBy", getCreatedBy())
             .append("createdTime", getCreatedTime())
             .append("updatedBy", getUpdatedBy())
