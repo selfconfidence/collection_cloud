@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.manyun.admin.domain.CntOrder;
+import com.manyun.admin.domain.query.OrderListQuery;
 import com.manyun.admin.domain.vo.CntOrderVo;
 import com.manyun.admin.domain.vo.OrderAmountsAddStatisticsVo;
 import com.manyun.admin.domain.vo.OrderTypePercentageVo;
@@ -37,4 +38,9 @@ public interface CntOrderMapper extends BaseMapper<CntOrder>
      *查询订单各种状态占订单总量比例
      */
     List<OrderTypePercentageVo> orderTypePercentageList();
+
+    /**
+     *订单列表
+     */
+    List<CntOrderVo> orderList(OrderListQuery orderListQuery);
 }

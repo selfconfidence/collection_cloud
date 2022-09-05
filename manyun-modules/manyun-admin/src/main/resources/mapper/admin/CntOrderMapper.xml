@@ -113,4 +113,39 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	        order_status;
     </select>
 
+    <select id="orderList" resultType="com.manyun.admin.domain.vo.CntOrderVo">
+        select
+            co.id,
+            co.user_bui_id userBuiId,
+            co.order_no orderno,
+            cu.nick_name nickname,
+            cu.phone,
+            co.bui_id buiId,
+            co.collection_name collectionname,
+            co.goods_type goodstype,
+            co.goods_num goodsnum,
+            co.order_status orderstatus,
+            co.pay_type paytype,
+            co.order_amount orderamount,
+            co.pay_time paytime,
+            co.created_time createdtime,
+            co.updated_time updatedtime
+        from
+	        cnt_order co
+	    inner join
+	        cnt_user cu
+	    on
+	        co.user_id = cu.id
+        <where>
+            <if test="orderNo != null  and orderNo != ''"> and co.order_no = #{orderNo}</if>
+            <if test="nickName != null  and nickName != ''"> and cu.nick_name like concat('%', #{nickName}, '%')</if>
+            <if test="phone != null  and phone != ''"> and cu.phone = #{phone}</if>
+            <if test="collectionName != null  and collectionName != ''"> and collection_name like concat('%', #{collectionName}, '%')</if>
+            <if test="goodsType != null "> and co.goods_type = #{goodsType}</if>
+            <if test="orderStatus != null "> and co.order_status = #{orderStatus}</if>
+            <if test="payType != null "> and co.pay_type = #{payType}</if>
+        </where>
+	    order by co.created_time desc
+    </select>
+
 </mapper>

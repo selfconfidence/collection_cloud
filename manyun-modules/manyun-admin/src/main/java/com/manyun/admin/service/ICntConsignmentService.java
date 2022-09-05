@@ -5,8 +5,11 @@ import com.manyun.admin.domain.CntConsignment;
 import com.manyun.admin.domain.dto.ConsignmentInfoDto;
 import com.manyun.admin.domain.dto.PaymentReviewDto;
 import com.manyun.admin.domain.query.ConsignmentQuery;
+import com.manyun.admin.domain.query.OrderListQuery;
 import com.manyun.admin.domain.vo.CntConsignmentVo;
+import com.manyun.admin.domain.vo.CntOrderVo;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 
 /**
@@ -17,6 +20,13 @@ import com.manyun.common.core.web.page.TableDataInfo;
  */
 public interface ICntConsignmentService extends IService<CntConsignment>
 {
+
+    /**
+     * 订单管理列表
+     *
+     */
+    TableDataInfo<CntOrderVo> orderList(OrderListQuery orderListQuery);
+
     /**
      * 藏品订单管理列表
      *
@@ -39,4 +49,5 @@ public interface ICntConsignmentService extends IService<CntConsignment>
      * @return
      */
     CntConsignmentVo selectConsignmentOrderById(ConsignmentInfoDto consignmentInfoDto);
+
 }

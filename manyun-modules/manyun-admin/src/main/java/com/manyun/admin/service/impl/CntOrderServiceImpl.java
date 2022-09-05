@@ -1,6 +1,7 @@
 package com.manyun.admin.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.admin.domain.query.OrderListQuery;
 import com.manyun.admin.domain.vo.CntOrderVo;
 import com.manyun.admin.domain.vo.OrderAmountsAddStatisticsVo;
 import com.manyun.admin.domain.vo.OrderTypePercentageVo;
@@ -55,6 +56,15 @@ public class CntOrderServiceImpl extends ServiceImpl<CntOrderMapper,CntOrder> im
     @Override
     public List<OrderTypePercentageVo> orderTypePercentageList() {
         return cntOrderMapper.orderTypePercentageList();
+    }
+
+    /**
+     * 订单列表
+     * @return
+     */
+    @Override
+    public List<CntOrderVo> orderList(OrderListQuery orderListQuery) {
+        return cntOrderMapper.orderList(orderListQuery);
     }
 
 }

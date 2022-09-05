@@ -11,9 +11,15 @@ import com.manyun.admin.domain.CntUserCollection;
 import com.manyun.admin.domain.dto.ConsignmentInfoDto;
 import com.manyun.admin.domain.dto.PaymentReviewDto;
 import com.manyun.admin.domain.query.ConsignmentQuery;
+import com.manyun.admin.domain.query.OrderListQuery;
 import com.manyun.admin.domain.vo.CntConsignmentVo;
+import com.manyun.admin.domain.vo.CntOrderVo;
+import com.manyun.admin.service.ICntMediaService;
+import com.manyun.admin.service.ICntOrderService;
 import com.manyun.admin.service.ICntUserCollectionService;
+import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +41,33 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
 
     @Autowired
     private ICntUserCollectionService userCollectionService;
+
+    @Autowired
+    private ICntOrderService orderService;
+
+    @Autowired
+    private ICntMediaService mediaService;
+
+    /**
+     * 订单管理列表
+     *
+     */
+    @Override
+    public TableDataInfo<CntOrderVo> orderList(OrderListQuery orderListQuery) {
+        PageHelper.startPage(orderListQuery.getPageNum(),orderListQuery.getPageSize());
+        List<CntOrderVo> cntOrderVos = orderService.orderList(orderListQuery);
+        List<CntUserCollection> userCollections = userCollectionService.list();
+        return TableDataInfoUtil.pageTableDataInfo(cntOrderVos.parallelStream().map(m->{
+            m.setMediaVos(mediaService.initMediaVos(m.getBuiId(),m.getGoodsType()==0? BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE:BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+            if(m.getGoodsType() == 0){
+                Optional<CntUserCollection> optional = userCollections.parallelStream().filter(ff -> ff.getId().equals(m.getUserBuiId())).findFirst();
+                if(optional.isPresent()){
+                    m.setCollectionHash(optional.get().getCollectionHash());
+                }
+            }
+            return m;
+        }).collect(Collectors.toList()),cntOrderVos);
+    }
 
     /**
      * 藏品订单管理列表
