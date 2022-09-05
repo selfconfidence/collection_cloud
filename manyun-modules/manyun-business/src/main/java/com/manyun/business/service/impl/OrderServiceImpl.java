@@ -595,7 +595,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             ICollectionService collectionServiceReal = collectionService.getObject();
             CntCollection cntCollection = collectionServiceReal.getById(buiId);
             cntCollection.setBalance(cntCollection.getBalance() + goodsNum);
-            cntCollection.setStatusBy(DOWN_ACTION.getCode());
+            cntCollection.setStatusBy(UP_ACTION.getCode());
             cntCollection.setSelfBalance(cntCollection.getSelfBalance() - goodsNum);
             collectionServiceReal.updateById(cntCollection);
         }
