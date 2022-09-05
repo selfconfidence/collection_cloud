@@ -302,7 +302,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
     public  synchronized void  cancelSchedulingConsignment() {
         // 小时为单位
         Integer time = systemService.getVal(CONSIGNMENT_DE_TIME, Integer.class);
-        List<CntConsignment> cntConsignments = list(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getConsignmentStatus,PUSH_CONSIGN.getCode()).lt(CntConsignment::getCreatedTime, LocalDateTime.now().minusHours(time)));
+        List<CntConsignment> cntConsignments = list(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getConsignmentStatus,PUSH_CONSIGN.getCode()).lt(CntConsignment::getCreatedTime, LocalDateTime.now().minusMinutes(time)));
         // 开始对这些寄售资产进行取消操作
         for (CntConsignment cntConsignment : cntConsignments) {
             try {

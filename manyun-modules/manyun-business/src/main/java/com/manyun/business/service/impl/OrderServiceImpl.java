@@ -184,7 +184,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setMoneyBln(NumberUtil.add(0D));
         // 截止到什么是否到达付款时间 小时为单位
        // Integer serviceVal = systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class);
-        order.setEndTime(LocalDateTime.now().plusHours(serviceVal));
+        order.setEndTime(LocalDateTime.now().plusMinutes(serviceVal));
         save(order);
         consumer.accept(idStr);
         return orderNo;
