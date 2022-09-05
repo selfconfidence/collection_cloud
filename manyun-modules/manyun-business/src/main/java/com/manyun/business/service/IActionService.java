@@ -22,7 +22,7 @@ public interface IActionService extends IService<Action> {
 
     TableDataInfo<SyntheticActivityVo> syntheticActivityList();
 
-    TableDataInfo<SyntheticRecordVo> syntheticRecordList();
+    TableDataInfo<SyntheticRecordVo> syntheticRecordList(String userId);
 
     R<SynthesisVo> synthesisInfo(String userId, String id);
 

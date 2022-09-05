@@ -34,6 +34,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="newUserPhone != null  and newUserPhone != ''"> and new_user_phone = #{newUserPhone}</if>
             <if test="goodsName != null  and goodsName != ''"> and goods_name like concat('%', #{goodsName}, '%')</if>
         </where>
+        order by created_by desc
     </select>
 
 </mapper>

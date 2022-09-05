@@ -9,6 +9,7 @@ import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.CntConsignment;
 import com.manyun.admin.domain.CntUserCollection;
 import com.manyun.admin.domain.dto.ConsignmentInfoDto;
+import com.manyun.admin.domain.dto.OrderInfoDto;
 import com.manyun.admin.domain.dto.PaymentReviewDto;
 import com.manyun.admin.domain.query.ConsignmentQuery;
 import com.manyun.admin.domain.query.OrderListQuery;
@@ -67,6 +68,24 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
             }
             return m;
         }).collect(Collectors.toList()),cntOrderVos);
+    }
+
+    /**
+     * 订单列表详情
+     *
+     */
+    @Override
+    public R<CntOrderVo> orderInfo(OrderInfoDto orderInfoDto) {
+        CntOrderVo cntOrderVo = orderService.orderInfo(orderInfoDto);
+        List<CntUserCollection> userCollections = userCollectionService.list();
+        cntOrderVo.setMediaVos(mediaService.initMediaVos(cntOrderVo.getBuiId(),cntOrderVo.getGoodsType()==0? BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE:BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+        if(cntOrderVo.getGoodsType() == 0){
+            Optional<CntUserCollection> optional = userCollections.parallelStream().filter(ff -> ff.getId().equals(cntOrderVo.getUserBuiId())).findFirst();
+            if(optional.isPresent()){
+                cntOrderVo.setCollectionHash(optional.get().getCollectionHash());
+            }
+        }
+        return R.ok(cntOrderVo);
     }
 
     /**

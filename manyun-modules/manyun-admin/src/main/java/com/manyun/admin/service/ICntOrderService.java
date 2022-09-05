@@ -2,6 +2,7 @@ package com.manyun.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntOrder;
+import com.manyun.admin.domain.dto.OrderInfoDto;
 import com.manyun.admin.domain.query.OrderListQuery;
 import com.manyun.admin.domain.vo.CntOrderVo;
 import com.manyun.admin.domain.vo.OrderAmountsAddStatisticsVo;
@@ -44,4 +45,11 @@ public interface ICntOrderService extends IService<CntOrder>
      * @return
      */
     List<CntOrderVo> orderList(OrderListQuery orderListQuery);
+
+    /**
+     * 订单列表详情
+     *
+     */
+    CntOrderVo orderInfo(OrderInfoDto orderInfoDto);
+
 }

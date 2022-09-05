@@ -19,16 +19,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, action_id, collection_id, collection_name, created_by, created_time, updated_by, updated_time from cnt_action_record
     </sql>
 
-    <select id="selectCntActionRecordList" parameterType="ActionRecordQuery" resultType="CntActionRecordVo">
+    <select id="selectCntActionRecordList" parameterType="ActionRecordQuery" resultType="com.manyun.admin.domain.vo.CntActionRecordVo">
         select
             car.id,
-            ca.action_title,
-            ca.action_image,
-            ca.action_status,
-            ca.start_time,
-            ca.end_time,
-            car.nick_name,
-            car.collection_name
+            ca.action_title actionTitle,
+            ca.action_image actionImage,
+            ca.action_status actionStatus,
+            ca.start_time startTime,
+            ca.end_time endTime,
+            car.nick_name nickName,
+            car.collection_name collectionName,
+            car.created_time createdTime,
+            car.updated_time updatedTime
         from
             cnt_action_record car
         inner join  cnt_action ca on car.action_id = ca.id

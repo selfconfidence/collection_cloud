@@ -46,7 +46,8 @@ public class ActionController {
     @ApiOperation("查询合成记录列表")
     public R<TableDataInfo<SyntheticRecordVo>> syntheticRecordList(@RequestBody PageQuery pageQuery) {
         PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize());
-        return R.ok(actionService.syntheticRecordList());
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
+        return R.ok(actionService.syntheticRecordList(loginBusinessUser.getUserId()));
     }
 
     @GetMapping("/synthesisInfo/{id}")

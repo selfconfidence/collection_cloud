@@ -3,6 +3,7 @@ package com.manyun.admin.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntConsignment;
 import com.manyun.admin.domain.dto.ConsignmentInfoDto;
+import com.manyun.admin.domain.dto.OrderInfoDto;
 import com.manyun.admin.domain.dto.PaymentReviewDto;
 import com.manyun.admin.domain.query.ConsignmentQuery;
 import com.manyun.admin.domain.query.OrderListQuery;
@@ -26,6 +27,12 @@ public interface ICntConsignmentService extends IService<CntConsignment>
      *
      */
     TableDataInfo<CntOrderVo> orderList(OrderListQuery orderListQuery);
+
+    /**
+     * 订单列表详情
+     *
+     */
+    R<CntOrderVo> orderInfo(OrderInfoDto orderInfoDto);
 
     /**
      * 藏品订单管理列表

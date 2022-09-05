@@ -87,8 +87,8 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
      * @return
      */
     @Override
-    public TableDataInfo<SyntheticRecordVo> syntheticRecordList() {
-        List<ActionRecord> actionRecordList = actionRecordService.list(Wrappers.<ActionRecord>lambdaQuery().orderByDesc(ActionRecord::getCreatedTime));
+    public TableDataInfo<SyntheticRecordVo> syntheticRecordList(String userId) {
+        List<ActionRecord> actionRecordList = actionRecordService.list(Wrappers.<ActionRecord>lambdaQuery().eq(ActionRecord::getUserId,userId).orderByDesc(ActionRecord::getCreatedTime));
         return TableDataInfoUtil.pageTableDataInfo(actionRecordList.parallelStream()
                 .map(this::syntheticRecordVo).collect(Collectors.toList()), actionRecordList);
     }

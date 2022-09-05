@@ -1,6 +1,7 @@
 package com.manyun.admin.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.admin.domain.dto.OrderInfoDto;
 import com.manyun.admin.domain.query.OrderListQuery;
 import com.manyun.admin.domain.vo.CntOrderVo;
 import com.manyun.admin.domain.vo.OrderAmountsAddStatisticsVo;
@@ -65,6 +66,15 @@ public class CntOrderServiceImpl extends ServiceImpl<CntOrderMapper,CntOrder> im
     @Override
     public List<CntOrderVo> orderList(OrderListQuery orderListQuery) {
         return cntOrderMapper.orderList(orderListQuery);
+    }
+
+    /**
+     * 订单列表详情
+     *
+     */
+    @Override
+    public CntOrderVo orderInfo(OrderInfoDto orderInfoDto) {
+        return cntOrderMapper.orderInfo(orderInfoDto);
     }
 
 }

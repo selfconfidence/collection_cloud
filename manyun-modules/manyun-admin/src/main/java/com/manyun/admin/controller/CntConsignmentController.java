@@ -3,6 +3,7 @@ package com.manyun.admin.controller;
 
 import com.manyun.admin.domain.dto.ConsignmentInfoDto;
 import com.manyun.admin.domain.dto.MyOrderDto;
+import com.manyun.admin.domain.dto.OrderInfoDto;
 import com.manyun.admin.domain.dto.PaymentReviewDto;
 import com.manyun.admin.domain.query.ConsignmentQuery;
 import com.manyun.admin.domain.query.OrderListQuery;
@@ -38,6 +39,13 @@ public class CntConsignmentController extends BaseController
     public TableDataInfo<CntOrderVo> orderList(OrderListQuery orderListQuery)
     {
         return cntConsignmentService.orderList(orderListQuery);
+    }
+
+    @PostMapping("/orderInfo")
+    @ApiOperation("订单列表详情")
+    public R<CntOrderVo> orderInfo(@Valid @RequestBody OrderInfoDto orderInfoDto)
+    {
+        return cntConsignmentService.orderInfo(orderInfoDto);
     }
 
     @GetMapping("/collectionList")
