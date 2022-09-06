@@ -13,7 +13,9 @@ import com.manyun.common.core.domain.CodeStatus;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.security.service.UserTokenService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,7 +53,7 @@ public class UserTokenController {
         return R.ok(userTokenService.createToken(userRData));
     }
     @PostMapping("/loginRSA")
-    @ApiOperation(value = "用户登录RSA",notes = "用户账号密码登录RSA")
+    @ApiOperation(value = "用户登录RSA",notes = "用户账号密码登录RSA",httpMethod = "POST",produces = "application/json;utf-8",consumes = "application/json;utf-8")
     public R<AccTokenVo> loginRSA(@RequestBodyRsa @Valid LoginPhoneForm loginPhoneForm)
     {
         R<CntUserDto> userR = remoteBuiUserService.login(loginPhoneForm, SecurityConstants.INNER);
