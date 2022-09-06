@@ -9,6 +9,7 @@ import com.manyun.business.domain.query.MyAuctionPriceQuery;
 import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.IAuctionPriceService;
 import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.annotation.RequestBodyRsa;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.PageUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
@@ -39,7 +40,7 @@ public class AuctionPriceController {
 
     @PostMapping("/myAuctionPrice")
     @ApiOperation("我的出价")
-    public R<BigDecimal> myAuctionPrice(@Valid @RequestBody AuctionPriceForm auctionPriceForm) {
+    public R<BigDecimal> myAuctionPrice(@RequestBodyRsa @Valid AuctionPriceForm auctionPriceForm) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return auctionPriceService.myAuctionPrice(auctionPriceForm, loginBusinessUser.getUserId());
     }
@@ -75,7 +76,7 @@ public class AuctionPriceController {
 
     @PostMapping("/payAuction")
     @ApiOperation(value = "拍卖市场支付")
-    public R<PayVo> payAuction(@RequestBody @Valid AuctionPayForm auctionPayForm) {
+    public R<PayVo> payAuction(@RequestBodyRsa @Valid AuctionPayForm auctionPayForm) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         String payUserId = loginBusinessUser.getUserId();
         PayVo payVo = auctionPriceService.payAuction(payUserId, auctionPayForm);
@@ -84,7 +85,7 @@ public class AuctionPriceController {
 
     @PostMapping("/payMargin")
     @ApiOperation(value = "拍卖市场支付保证金")
-    public R<PayVo> payMargin(@RequestBody @Valid AuctionPayMarginForm auctionPayMarginForm) {
+    public R<PayVo> payMargin(@RequestBodyRsa @Valid AuctionPayMarginForm auctionPayMarginForm) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         String payUserId = loginBusinessUser.getUserId();
         PayVo payVo = auctionPriceService.payMargin(payUserId, auctionPayMarginForm);
@@ -95,7 +96,7 @@ public class AuctionPriceController {
 
 
     @ApiOperation(value = "是否支付过保证金")
-    public R checkPayMargin(@RequestBody @Valid AuctionPriceForm auctionPriceForm) {
+    public R checkPayMargin(@RequestBodyRsa @Valid AuctionPriceForm auctionPriceForm) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         String userId = loginBusinessUser.getUserId();
         return auctionPriceService.checkPayMargin(auctionPriceForm, userId);
@@ -103,7 +104,7 @@ public class AuctionPriceController {
 
     @PostMapping("/payFixed")
     @ApiOperation(value = "一口价")
-    public R<PayVo> payFixed(@RequestBody @Valid AuctionPayFixedForm auctionPayFixedForm) {
+    public R<PayVo> payFixed(@RequestBodyRsa @Valid AuctionPayFixedForm auctionPayFixedForm) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         String userId = loginBusinessUser.getUserId();
         PayVo payVo = auctionPriceService.payFixed(userId, auctionPayFixedForm);
