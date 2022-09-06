@@ -82,7 +82,7 @@ public class OrderController extends BaseController {
     @ApiOperation(value = "(普通订单 & 寄售订单)根据订单编号统一下单支付",notes = "传递订单编号,待支付订单都可以通过此接口二次支付!\t " +
             "如果当前支付类型是 (组合支付)0 余额支付,那么用户余额不够的情况下直接扣除所有的余额,其他的调用银联进行支付!" +
             " \n version 1.0.1")
-    public R<PayVo> unifiedOrder(@RequestBody @Valid OrderPayForm orderPayForm){
+    public synchronized R<PayVo> unifiedOrder(@RequestBody @Valid OrderPayForm orderPayForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(orderService.unifiedOrder(orderPayForm,notNullLoginBusinessUser.getUserId()));
     }

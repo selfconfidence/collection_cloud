@@ -7,6 +7,7 @@ import com.manyun.comm.api.domain.form.JgLoginTokenForm;
 import com.manyun.comm.api.domain.vo.AccTokenVo;
 import com.manyun.comm.api.model.LoginPhoneCodeForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
+import com.manyun.common.core.annotation.RequestBodyRsa;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.CodeStatus;
 import com.manyun.common.core.domain.R;
@@ -49,11 +50,20 @@ public class UserTokenController {
         // 用户登录
         return R.ok(userTokenService.createToken(userRData));
     }
-
+    @PostMapping("/loginRSA")
+    @ApiOperation(value = "用户登录RSA",notes = "用户账号密码登录RSA")
+    public R<AccTokenVo> loginRSA(@RequestBodyRsa @Valid LoginPhoneForm loginPhoneForm)
+    {
+        R<CntUserDto> userR = remoteBuiUserService.login(loginPhoneForm, SecurityConstants.INNER);
+        Assert.isTrue(userR.getCode() == CodeStatus.SUCCESS.getCode(),userR.getMsg());
+        CntUserDto userRData = userR.getData();
+        // 用户登录
+        return R.ok(userTokenService.createToken(userRData));
+    }
 
     @PostMapping("/codeLogin")
     @ApiOperation(value = "用户验证码登录",notes = "验证码登录")
-    public R<AccTokenVo> codeLogin(@RequestBody LoginPhoneCodeForm loginPhoneCodeForm){
+    public R<AccTokenVo> codeLogin(@RequestBody @Valid LoginPhoneCodeForm loginPhoneCodeForm){
         R<CntUserDto> cntUserR = remoteBuiUserService.codeLogin(loginPhoneCodeForm,SecurityConstants.INNER);
         Assert.isTrue(cntUserR.getCode() == CodeStatus.SUCCESS.getCode(),cntUserR.getMsg());
         CntUserDto userRData = cntUserR.getData();

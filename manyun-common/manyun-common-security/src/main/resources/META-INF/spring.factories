@@ -4,4 +4,6 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
     com.manyun.common.security.service.UserTokenService,\
   com.manyun.common.security.aspect.PreAuthorizeAspect,\
   com.manyun.common.security.aspect.InnerAuthAspect,\
-  com.manyun.common.security.handler.GlobalExceptionHandler
+  com.manyun.common.security.handler.GlobalExceptionHandler,\
+  com.manyun.common.security.config.GlobalRsaConfig,\
+    org.springframework.web.servlet.mvc.method.annotation.RsaRequestBodyProcessor
