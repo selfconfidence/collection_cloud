@@ -12,6 +12,7 @@ import com.manyun.business.service.IMoneyService;
 import com.manyun.comm.api.domain.dto.AccountInfoDto;
 import com.manyun.comm.api.domain.form.UserRealMoneyForm;
 import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.annotation.RequestBodyRsa;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
@@ -84,7 +85,7 @@ public class MoneyController extends BaseController {
 
     @PostMapping("/updateAccountInfo")
     @ApiOperation("完善收款账户信息")
-    public R updateAccountInfo(@RequestBody @Valid AccountInfoForm accountInfoForm){
+    public R updateAccountInfo(@RequestBodyRsa @Valid AccountInfoForm accountInfoForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         moneyService.updateAccountInfo(notNullLoginBusinessUser.getUserId(),accountInfoForm);
         return R.ok();

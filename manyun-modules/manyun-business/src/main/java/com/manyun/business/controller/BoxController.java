@@ -11,6 +11,7 @@ import com.manyun.business.service.IUserBoxService;
 import com.manyun.comm.api.domain.dto.BoxListDto;
 import com.manyun.comm.api.domain.dto.OpenPleaseBoxDto;
 import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.annotation.RequestBodyRsa;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
@@ -99,7 +100,7 @@ public class BoxController extends BaseController {
 
     @PostMapping("/sellOrderBox")
     @ApiOperation(value = "购买盲盒_预先_生成订单",notes = "用来预先 生成一个待支付订单,返回订单编号,用来二次提交支付\n version 1.0.1")
-    public synchronized R<String> sellOrderBox(@Valid @RequestBody BoxOrderSellForm boxOrderSellForm){
+    public synchronized R<String> sellOrderBox(@Valid @RequestBodyRsa BoxOrderSellForm boxOrderSellForm){
         String userId = SecurityUtils.getBuiUserId();
         return R.ok(boxService.sellOrderBox(boxOrderSellForm,userId));
     }

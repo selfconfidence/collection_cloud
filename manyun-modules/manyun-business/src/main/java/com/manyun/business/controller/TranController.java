@@ -6,6 +6,7 @@ import com.manyun.business.domain.form.TranAccForm;
 import com.manyun.business.service.ISystemService;
 import com.manyun.business.service.ITranService;
 import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.annotation.RequestBodyRsa;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.security.utils.SecurityUtils;
@@ -50,7 +51,7 @@ public class TranController {
     }
     @PostMapping("/tranTypeToPoint")
     @ApiOperation("进行转赠")
-    public synchronized R  tranTypeToPoint(@RequestBody @Valid TranAccForm tranAccForm){
+    public synchronized R  tranTypeToPoint(@RequestBodyRsa @Valid TranAccForm tranAccForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         Assert.isTrue("1".equals(systemService.getVal(BusinessConstants.SystemTypeConstant.TRAN_ACC, String.class)),"转赠未开启!");
         tranService.tranTypeToPoint(notNullLoginBusinessUser.getCntUser(),tranAccForm);

@@ -44,7 +44,7 @@ public class UserTokenController {
 
     @PostMapping("/login")
     @ApiOperation(value = "用户登录",notes = "用户账号密码登录")
-    public R<AccTokenVo> login(@RequestBody @Valid LoginPhoneForm loginPhoneForm)
+    public R<AccTokenVo> login(@RequestBodyRsa @Valid LoginPhoneForm loginPhoneForm)
     {
         R<CntUserDto> userR = remoteBuiUserService.login(loginPhoneForm, SecurityConstants.INNER);
         Assert.isTrue(userR.getCode() == CodeStatus.SUCCESS.getCode(),userR.getMsg());
@@ -65,7 +65,7 @@ public class UserTokenController {
 
     @PostMapping("/codeLogin")
     @ApiOperation(value = "用户验证码登录",notes = "验证码登录")
-    public R<AccTokenVo> codeLogin(@RequestBody @Valid LoginPhoneCodeForm loginPhoneCodeForm){
+    public R<AccTokenVo> codeLogin(@RequestBodyRsa @Valid LoginPhoneCodeForm loginPhoneCodeForm){
         R<CntUserDto> cntUserR = remoteBuiUserService.codeLogin(loginPhoneCodeForm,SecurityConstants.INNER);
         Assert.isTrue(cntUserR.getCode() == CodeStatus.SUCCESS.getCode(),cntUserR.getMsg());
         CntUserDto userRData = cntUserR.getData();
@@ -77,7 +77,7 @@ public class UserTokenController {
      */
     @PostMapping("/jgAuthPhoneLogin")
     @ApiOperation(value = "激光 一键 登录/注册",notes = "成功返回业务token")
-    public R<AccTokenVo> jgPhoneLogin(@RequestBody JgLoginTokenForm jgLoginTokenForm){
+    public R<AccTokenVo> jgPhoneLogin(@RequestBodyRsa JgLoginTokenForm jgLoginTokenForm){
         R<CntUserDto> cntUserR = remoteBuiUserService.jgPhoneLogin(jgLoginTokenForm,SecurityConstants.INNER);
         Assert.isTrue(cntUserR.getCode() == CodeStatus.SUCCESS.getCode(),cntUserR.getMsg());
         CntUserDto userRData = cntUserR.getData();

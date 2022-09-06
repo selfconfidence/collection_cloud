@@ -30,6 +30,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.ValidationAnnotationUtils;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -83,7 +84,11 @@ public class RsaRequestBodyProcessor implements HandlerMethodArgumentResolver, E
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
        // 解析过程
-        return jsr303Check( isOpen(parameter) ?  doDyd(parameter, webRequest) : doDefaultDyd(parameter,webRequest),parameter,mavContainer,webRequest,binderFactory);
+        if (!mavContainer.isRequestHandled()) {
+            mavContainer.setRequestHandled(true);
+            return jsr303Check( isOpen(parameter) ?  doDyd(parameter, webRequest) : doDefaultDyd(parameter,webRequest),parameter,mavContainer,webRequest,binderFactory);
+        }
+        return null;
     }
 
     private Object doDefaultDyd(MethodParameter parameter, NativeWebRequest webRequest) throws IOException {

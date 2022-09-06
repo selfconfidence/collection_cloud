@@ -13,6 +13,7 @@ import com.manyun.comm.api.domain.vo.AccTokenVo;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.comm.api.model.LoginPhoneCodeForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
+import com.manyun.common.core.annotation.RequestBodyRsa;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.PhoneCodeType;
@@ -66,7 +67,7 @@ public class CntUserController extends BaseController {
 
     @PostMapping("/regUser")
     @ApiOperation("用户注册 - 手机号验证码的方式")
-    public R regUser(@RequestBody UserRegForm userRegForm){
+    public R regUser(@RequestBodyRsa @Valid UserRegForm userRegForm){
         String phoneCode = (String) redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(userRegForm.getPhone().concat(PhoneCodeType.REG_CODE.getType())));
         Assert.isTrue(userRegForm.getPhoneCode().equals(phoneCode),"验证码输入错误,请核实!");
         userService.regUser(userRegForm);
@@ -95,7 +96,7 @@ public class CntUserController extends BaseController {
 
     @PostMapping("/changeUser")
     @ApiOperation("修改个人信息")
-    public R changeUser(@RequestBody UserChangeForm userChangeForm){
+    public R changeUser(@RequestBodyRsa UserChangeForm userChangeForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         userService.changeUser(userChangeForm,notNullLoginBusinessUser.getUserId());
         return R.ok();
@@ -113,7 +114,7 @@ public class CntUserController extends BaseController {
     // 实名认证
     @PostMapping("/realUser")
     @ApiOperation("实名认证 -- 银联")
-    public R realUser(@RequestBody @Valid UserRealForm userRealForm){
+    public R realUser(@RequestBodyRsa @Valid UserRealForm userRealForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         codeCheck(userRealForm.getPhone(),userRealForm.getPhoneCode(), PhoneCodeType.REAL_CODE.getType());
         return userService.userRealName(userRealForm, notNullLoginBusinessUser.getUserId());
@@ -122,7 +123,7 @@ public class CntUserController extends BaseController {
     //调起认证
    @PostMapping("/getCertifyId")
    @ApiOperation(value = "获取认证ID -app",notes = "app 端")
-   public R<String> getCertifyId(@RequestBody UserAliyunRealForm userAliyunRealForm){
+   public R<String> getCertifyId(@RequestBodyRsa UserAliyunRealForm userAliyunRealForm){
        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
        return R.ok(userService.getCertifyId(notNullLoginBusinessUser.getCntUser(),userAliyunRealForm));
    }
@@ -139,7 +140,7 @@ public class CntUserController extends BaseController {
     //调起认证
     @PostMapping("/getH5CertifyId")
     @ApiOperation(value = "获取认证ID -h5",notes = "h5 端 \n version 1.0.1")
-    public R<AliRealVo> getH5CertifyId(@RequestBody UserAliyunRealForm userAliyunRealForm){
+    public R<AliRealVo> getH5CertifyId(@RequestBodyRsa UserAliyunRealForm userAliyunRealForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(userService.getH5CertifyId(userAliyunRealForm,notNullLoginBusinessUser.getUserId()));
     }
@@ -165,7 +166,7 @@ public class CntUserController extends BaseController {
     // 修改登录密码
     @PostMapping("/changeCodeLogin")
     @ApiOperation("修改登录密码")
-    public R changeCodeLogin(@RequestBody @Valid UserChangeCodeLoginForm userChangeCodeLoginForm){
+    public R changeCodeLogin(@RequestBodyRsa @Valid UserChangeCodeLoginForm userChangeCodeLoginForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         String phone = notNullLoginBusinessUser.getCntUser().getPhone();
         codeCheck(phone,userChangeCodeLoginForm.getPhoneCode(), PhoneCodeType.CHANGE_LOGIN_PASS.getType());
@@ -177,7 +178,7 @@ public class CntUserController extends BaseController {
     // 修改支付密码
     @PostMapping("/changePayPass")
     @ApiOperation(value = "修改支付密码")
-    public R changePayPass(@RequestBody @Valid UserChangePayPass userChangePayPass){
+    public R changePayPass(@RequestBodyRsa @Valid UserChangePayPass userChangePayPass){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         String phone = notNullLoginBusinessUser.getCntUser().getPhone();
         codeCheck(phone,userChangePayPass.getPhoneCode(), PhoneCodeType.CHANGE_PAY_PASS.getType());
