@@ -26,6 +26,7 @@ import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.redis.service.RedisService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -211,9 +212,10 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
     @Override
     public String autoCollectionNum(String collectionId) {
         String intAutoNum = redisService.getIntAutoNum(COLLECTION_AUTO_NUM.concat(collectionId)).toString();
-        String poiLent = systemService.getVal(COLLECTION_POT, String.class);
+        //String poiLent = systemService.getVal(COLLECTION_POT, String.class);
         CntCollection cntCollection = collectionServiceObjectFactory.getObject().getById(collectionId);
         int total = cntCollection.getBalance() + cntCollection.getSelfBalance();
+        String poiLent = StringUtils.repeat("0", String.valueOf(total).length());
         return  poiLent.substring(0, poiLent.length() - intAutoNum.length()).concat(intAutoNum).concat("/" + total);
     }
 
