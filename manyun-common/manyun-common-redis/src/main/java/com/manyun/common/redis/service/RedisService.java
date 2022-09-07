@@ -81,6 +81,15 @@ public class RedisService
     }
 
     /**
+     * 获取随机编号
+     * @param key
+     * @return
+     */
+    public Object getRandomNum(String key) {
+        return redisTemplate.opsForList().leftPop(key);
+    }
+
+    /**
      * 设置有效时间
      *
      * @param key Redis键
