@@ -212,7 +212,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
     public String autoCollectionNum(String collectionId) {
         //String intAutoNum = redisService.getIntAutoNum(COLLECTION_AUTO_NUM.concat(collectionId)).toString();
         String intAutoNum = redisService.getRandomNum(BusinessConstants.RedisDict.COLLECTION_RANDOM_NUM.concat(collectionId)).toString();
-        if (StringUtils.isBlank(intAutoNum)) {
+        if (StringUtils.isBlank(intAutoNum) || "null".equals(intAutoNum)) {
             intAutoNum = redisService.getIntAutoNum(COLLECTION_AUTO_NUM.concat(collectionId)).toString();
         }
         //String poiLent = systemService.getVal(COLLECTION_POT, String.class);
