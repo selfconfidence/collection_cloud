@@ -225,7 +225,7 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
         UserCollection userCollection=new UserCollection();
         userCollection.setId(IdUtil.getSnowflake().nextIdStr());
         userCollection.setUserId(userId);
-        userCollection.setCollectionId(action.getCollectionId());
+        userCollection.setCollectionId(collection.getId());
         userCollection.setCollectionName(collection.getCollectionName());
         userCollection.setLinkAddr(IdUtil.getSnowflake().nextIdStr());
         userCollection.setIsExist(USE_EXIST.getCode());
@@ -265,7 +265,7 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
                         .with(ActionRecord::setActionId,action.getId())
                         .with(ActionRecord::setUserId,userId)
                         .with(ActionRecord::setNickName,userName)
-                        .with(ActionRecord::setCollectionId,action.getCollectionId())
+                        .with(ActionRecord::setCollectionId,collection.getId())
                         .with(ActionRecord::setCollectionName,collection.getCollectionName())
                         .with(ActionRecord::setCreatedBy,userId)
                         .with(ActionRecord::setCreatedTime,now)
