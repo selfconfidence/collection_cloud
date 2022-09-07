@@ -78,7 +78,7 @@ public class RsaRequestBodyProcessor implements HandlerMethodArgumentResolver, E
     @SneakyThrows
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return Boolean.TRUE;
+        return parameter.hasParameterAnnotation(RequestBodyRsa.class);
     }
 
     @Override
