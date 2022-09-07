@@ -211,9 +211,12 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
     @Override
     public String autoCollectionNum(String collectionId) {
         //String intAutoNum = redisService.getIntAutoNum(COLLECTION_AUTO_NUM.concat(collectionId)).toString();
-        String intAutoNum = redisService.getRandomNum(BusinessConstants.RedisDict.COLLECTION_RANDOM_NUM.concat(collectionId)).toString();
-        if (StringUtils.isBlank(intAutoNum) || "null".equals(intAutoNum)) {
+        Object randomNum = redisService.getRandomNum(BusinessConstants.RedisDict.COLLECTION_RANDOM_NUM.concat(collectionId));
+        String intAutoNum = "";
+        if (Objects.isNull(randomNum)) {
             intAutoNum = redisService.getIntAutoNum(COLLECTION_AUTO_NUM.concat(collectionId)).toString();
+        } else {
+            intAutoNum = randomNum.toString();
         }
         //String poiLent = systemService.getVal(COLLECTION_POT, String.class);
         CntCollection cntCollection = collectionServiceObjectFactory.getObject().getById(collectionId);
