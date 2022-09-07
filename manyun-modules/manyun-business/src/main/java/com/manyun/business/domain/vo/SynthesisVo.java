@@ -11,14 +11,14 @@ public class SynthesisVo {
     @ApiModelProperty("活动编号")
     private String actionId;
 
-    @ApiModelProperty("目标藏品id")
-    private String collectionId;
+    @ApiModelProperty("活动状态;1=待开始,2=进行中,3=结束")
+    private Integer actionStatus;
 
-    @ApiModelProperty("目标藏品名称")
-    private String collectionName;
+    @ApiModelProperty("活动标题")
+    private String actionTitle;
 
-    @ApiModelProperty("藏品主图")
-    private List<MediaVo> mediaVos;
+    @ApiModelProperty("活动封面")
+    private String actionImage;
 
     @ApiModelProperty("合成材料")
     private List<MaterialVo> materials;

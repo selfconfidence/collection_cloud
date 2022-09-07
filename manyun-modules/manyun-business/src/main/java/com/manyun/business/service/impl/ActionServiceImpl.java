@@ -1,10 +1,12 @@
 package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.google.common.collect.Maps;
 import com.manyun.business.design.mychain.MyChainService;
 import com.manyun.business.domain.dto.CallCommitDto;
 import com.manyun.business.domain.dto.UserCollectionCountDto;
@@ -26,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -55,6 +58,9 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
 
     @Autowired
     private IActionTarService actionTarService;
+
+    @Autowired
+    private IActionCollectionService actionCollectionService;
 
     @Autowired
     private ICollectionService collectionService;
@@ -108,8 +114,6 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
         }
         Action action = (Action) relatedData.getData().get("action");
         List<ActionTar> actionTarList = (List<ActionTar>)relatedData.getData().get("actionTarList");
-        CntCollection collection = (CntCollection) relatedData.getData().get("collection");
-        List<MediaVo> mediaVoList = (List<MediaVo>)relatedData.getData().get("mediaVoList");
         List<UserCollectionCountDto> userCollectionCountDtos = (List<UserCollectionCountDto>)relatedData.getData().get("userCollectionCountDtos");
         //组装合成材料数据
         List<MaterialVo> materialVoList = actionTarList.stream().map(m -> {
@@ -131,9 +135,9 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
         //组装目标藏品数据
         SynthesisVo synthesisVo=new SynthesisVo();
         synthesisVo.setActionId(action.getId());
-        synthesisVo.setCollectionId(action.getCollectionId());
-        synthesisVo.setCollectionName(collection.getCollectionName());
-        synthesisVo.setMediaVos(mediaVoList);
+        synthesisVo.setActionStatus(action.getActionStatus());
+        synthesisVo.setActionTitle(action.getActionTitle());
+        synthesisVo.setActionImage(action.getActionImage());
         synthesisVo.setMaterials(materialVoList);
         synthesisVo.setRuleContent(action.getRuleContent());
         //比较碎片是否充足
@@ -172,15 +176,14 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
         }
         Action action = (Action) relatedData.getData().get("action");
         List<ActionTar> actionTarList = (List<ActionTar>)relatedData.getData().get("actionTarList");
-        CntCollection collection = (CntCollection) relatedData.getData().get("collection");
-        List<MediaVo> mediaVoList = (List<MediaVo>)relatedData.getData().get("mediaVoList");
+        List<ActionCollection> actionCollectionList = (List<ActionCollection>)relatedData.getData().get("actionCollectionList");
         List<UserCollectionCountDto> userCollectionCountDtos = (List<UserCollectionCountDto>)relatedData.getData().get("userCollectionCountDtos");
 
         //比较两个时间大小，前者大 = -1， 相等 =0，后者大 = 1
-        if (DateUtils.compareTo(new Date(), DateUtils.toDate(action.getStartTime()), DateUtils.YYYY_MM_DD_HH_MM_SS) == 1) {
+        if (DateUtils.compareTo(new Date(), DateUtils.toDate(action.getStartTime()), DateUtils.YYYY_MM_DD_HH_MM_SS) == 1 || action.getActionStatus()==1) {
             return R.fail("合成暂未开始!");
         }
-        if (DateUtils.compareTo(new Date(), DateUtils.toDate(action.getEndTime()), DateUtils.YYYY_MM_DD_HH_MM_SS) == -1) {
+        if (DateUtils.compareTo(new Date(), DateUtils.toDate(action.getEndTime()), DateUtils.YYYY_MM_DD_HH_MM_SS) == -1 || action.getActionStatus()==3) {
             return R.fail("本轮合成已结束");
         }
 
@@ -204,6 +207,13 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
         if(success == 0){
             return R.fail("合成材料不足");
         }
+
+        ActionCollection luckCollection  = luckGetCollection(actionCollectionList.parallelStream().filter(f -> f.getActionQuantity()!=0).collect(Collectors.toList()));
+        Assert.isTrue(actionCollectionService.update(Wrappers.<ActionCollection>lambdaUpdate().eq(ActionCollection::getId,luckCollection.getId()).ge(ActionCollection::getActionQuantity,Integer.valueOf(1)).set(ActionCollection::getActionQuantity, luckCollection.getActionQuantity() - 1 ).set(ActionCollection::getActionNumber,luckCollection.getActionNumber() + 1)),"合成有误,请重试!");
+        //获取本次合成的藏品及图片信息
+        CntCollection collection = collectionService.getById(luckCollection.getCollectionId());
+        List<MediaVo> mediaVoList = mediaService.initMediaVos(luckCollection.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
+        Assert.isTrue((Objects.nonNull(collection) || mediaVoList.size()>0),"合成有误,请重试!");
 
         //删除需消耗的合成材料
         actionTarList.stream().forEach(e ->{
@@ -270,6 +280,41 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
             );
     }
 
+
+    /**
+     * 根据 组件 规则 获取到幸运藏品,进行绑定用户
+     * @param actionCollectionList
+     * @return
+     */
+    private ActionCollection luckGetCollection(List<ActionCollection> actionCollectionList) {
+        // 在这里开始斟酌, actionCollectionList 数据阶段已经过滤掉 没有库存数量的藏品了。
+        return nowTimeGave(actionCollectionList);
+    }
+
+    /**
+     * 根据当前 概率 做时间戳 取余操作, 相当于有时间 节点才能开出来好盲盒
+     * @param actionCollectionList
+     * @return
+     */
+    private ActionCollection nowTimeGave(List<ActionCollection> actionCollectionList) {
+        // tranSvg 为概率比
+        int count = 0;
+        HashMap<Integer, String> collectionMap = Maps.newHashMap();
+        // 得到所有概率
+        for (ActionCollection actionCollection : actionCollectionList) {
+            // 向上取整
+            int value = actionCollection.getTranSvg().setScale(0, RoundingMode.HALF_UP).intValue();
+            value = count + value;
+            for (int i = count; i < value; i++) {
+                collectionMap.put(i,actionCollection.getId());
+                count ++;
+            }
+        }
+        Integer luckBum =  Long.valueOf(DateUtil.current() % (long)count).intValue();
+        String id = collectionMap.get(luckBum);
+        return actionCollectionList.parallelStream().filter(item -> item.getId().equals(id)).findAny().get();
+    }
+
     private SyntheticRecordVo syntheticRecordVo(ActionRecord actionRecord) {
         SyntheticRecordVo syntheticRecordVo = Builder.of(SyntheticRecordVo::new).build();
         BeanUtil.copyProperties(actionRecord, syntheticRecordVo);
@@ -286,24 +331,20 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
 
     private R<Map> getRelatedData(String id,String userId) {
         Map map=new HashMap();
-        //查询活动、活动材料、目标藏品、目标藏品图片、用户拥有的藏品数
-        Action action = actionMapper.selectOne(Wrappers.<Action>lambdaQuery().eq(Action::getActionStatus, 2).eq(Action::getId, id));
+        //查询活动、活动材料、合成藏品、用户拥有的藏品数
+        Action action = actionMapper.selectOne(Wrappers.<Action>lambdaQuery().eq(Action::getId, id));
         Assert.isTrue(Objects.nonNull(action),"活动藏品不存在!");
         List<ActionTar> actionTarList = actionTarService.list(Wrappers.<ActionTar>lambdaQuery().eq(ActionTar::getActionId, id));
-        if(actionTarList.size()==0){
-            return R.fail("获取活动材料信息失败!");
-        }
-        CntCollection collection = collectionService.getById(action.getCollectionId());
-        List<MediaVo> mediaVoList = mediaService.initMediaVos(action.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
-        if(collection==null || mediaVoList.size()==0){
-            return R.fail("获取目标藏品信息失败!");
-        }
+        Assert.isTrue(actionTarList.size()>0,"获取活动材料信息失败!");
+         List<ActionCollection> actionCollections = actionCollectionService.list(Wrappers.<ActionCollection>lambdaQuery().eq(ActionCollection::getActionId, id));
+        Assert.isTrue(actionTarList.size()>0,"获取合成藏品信息失败!");
+        List<ActionCollection> actionCollectionList = actionCollections.parallelStream().filter(f -> f.getActionQuantity() != Integer.valueOf(0)).collect(Collectors.toList());
+        Assert.isTrue(actionCollectionList.size()>0,"本次所有合成藏品已经售罄,请联系客服人员!");
         List<String> collectionIds = actionTarList.stream().map(ActionTar::getCollectionId).collect(Collectors.toList());
         List<UserCollectionCountDto> userCollectionCountDtos=userCollectionService.selectUserCollectionCount(collectionIds,userId);
         map.put("action",action);
         map.put("actionTarList",actionTarList);
-        map.put("collection",collection);
-        map.put("mediaVoList",mediaVoList);
+        map.put("actionCollectionList",actionCollectionList);
         map.put("userCollectionCountDtos",userCollectionCountDtos);
         return R.ok(map);
     }
