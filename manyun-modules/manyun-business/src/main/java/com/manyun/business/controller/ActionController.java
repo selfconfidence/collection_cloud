@@ -46,7 +46,7 @@ public class ActionController {
     @ApiOperation("查询合成记录列表")
     public R<TableDataInfo<SyntheticRecordVo>> syntheticRecordList(@RequestBody PageQuery pageQuery) {
         PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize());
-        LoginBusinessUser loginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(actionService.syntheticRecordList(loginBusinessUser.getUserId()));
     }
 
@@ -60,7 +60,7 @@ public class ActionController {
     @PostMapping("/synthesizeNow")
     @ApiOperation("立即合成")
     public R<SynthesizeNowVo> synthesizeNow(@RequestBody @Valid SynthesizeForm synthesizeForm) {
-        LoginBusinessUser loginBusinessUser = SecurityUtils.getTestLoginBusinessUser();
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return actionService.synthesizeNow(loginBusinessUser.getUserId(),loginBusinessUser.getUsername(),synthesizeForm.getId());
     }
 
