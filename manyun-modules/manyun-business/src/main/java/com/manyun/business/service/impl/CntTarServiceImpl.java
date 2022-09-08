@@ -140,8 +140,9 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
                         .with(SmsCommDto::setTemplateCode, TAR_MSG)
                         .with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().put("buiName", buiName).put("openTime", format).build())
                 .build());*/
-        jpushUtil.sendMsg(BusinessConstants.JgPushConstant.PUSH_TITLE,format, Arrays.asList(cntUserDto.getJgPush()));
-        return StrUtil.format("您已经参与对{}抽签了,抽签结果将在{}公布!",buiName,format);
+        String msg = StrUtil.format("您已经参与对{}抽签了,抽签结果将在{}公布!", buiName, format);
+        jpushUtil.sendMsg(BusinessConstants.JgPushConstant.PUSH_TITLE,msg, Arrays.asList(cntUserDto.getJgPush()));
+        return msg;
     }
 
     // 开始公布抽签结果
@@ -184,6 +185,8 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
             //         当一个 总数 -  中奖量  = 余下的名单, 开始派发其他未中奖的即可.
              int tempPoint;
              int successBalance =  tempPoint  =  count - successUserTarLists.size();
+             // 预防特殊情况，后台管理没限制
+             Assert.isTrue(successBalance <=0,"see by system error!");
              //successBalance 还有剩余的中奖次数
                Collections.shuffle(whatUserTarLists);
             for (int i = 0; i < successBalance; i++) {
@@ -212,7 +215,7 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
         }
         userTarService.updateBatchById(cntUserTars);
         // 推送用户了表明中奖状态
-        jpushUtil.sendMsg(BusinessConstants.JgPushConstant.PUSH_TITLE,"您抽签结果已经公布,已抽中,快去购买吧!",jgRegLists);
+        if (!jgRegLists.isEmpty()) jpushUtil.sendMsg(BusinessConstants.JgPushConstant.PUSH_TITLE,"您抽签结果已经公布,已抽中,快去购买吧!",jgRegLists);
     }
     /**
      * 未中奖的
@@ -229,7 +232,7 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
         }
         userTarService.updateBatchById(cntUserTars);
         // 推送用户了表明中奖状态
-        jpushUtil.sendMsg(BusinessConstants.JgPushConstant.PUSH_TITLE,"您抽签结果已经公布,未抽中,再接再厉!",jgRegLists);
+        if (!jgRegLists.isEmpty())  jpushUtil.sendMsg(BusinessConstants.JgPushConstant.PUSH_TITLE,"您抽签结果已经公布,未抽中,再接再厉!",jgRegLists);
     }
 
     /**
