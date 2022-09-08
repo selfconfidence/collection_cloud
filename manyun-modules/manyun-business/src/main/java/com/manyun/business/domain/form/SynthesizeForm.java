@@ -11,6 +11,6 @@ import javax.validation.constraints.NotBlank;
 public class SynthesizeForm {
 
     @ApiModelProperty("活动id")
-    @NotBlank
+    @NotBlank(message = "活动id不能为空!")
     private String id;
 }

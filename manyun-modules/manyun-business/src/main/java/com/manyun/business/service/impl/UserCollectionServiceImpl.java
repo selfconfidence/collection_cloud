@@ -49,7 +49,6 @@ import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant
 import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.PULL_SOURCE;
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE;
 import static com.manyun.common.core.constant.BusinessConstants.RedisDict.COLLECTION_AUTO_NUM;
-import static com.manyun.common.core.constant.BusinessConstants.SystemTypeConstant.COLLECTION_POT;
 import static com.manyun.common.core.enums.CollectionLink.NOT_LINK;
 import static com.manyun.common.core.enums.CollectionLink.OK_LINK;
 import static com.manyun.common.core.enums.CommAssetStatus.NOT_EXIST;
@@ -211,7 +210,14 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
 
     @Override
     public String autoCollectionNum(String collectionId) {
-        String intAutoNum = redisService.getIntAutoNum(COLLECTION_AUTO_NUM.concat(collectionId)).toString();
+        //String intAutoNum = redisService.getIntAutoNum(COLLECTION_AUTO_NUM.concat(collectionId)).toString();
+        Object randomNum = redisService.getRandomNum(BusinessConstants.RedisDict.COLLECTION_RANDOM_NUM.concat(collectionId));
+        String intAutoNum = "";
+        if (Objects.isNull(randomNum)) {
+            intAutoNum = redisService.getIntAutoNum(COLLECTION_AUTO_NUM.concat(collectionId)).toString();
+        } else {
+            intAutoNum = randomNum.toString();
+        }
         //String poiLent = systemService.getVal(COLLECTION_POT, String.class);
         CntCollection cntCollection = collectionServiceObjectFactory.getObject().getById(collectionId);
         int total = cntCollection.getBalance() + cntCollection.getSelfBalance();

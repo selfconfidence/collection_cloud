@@ -10,8 +10,8 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class ActionTarDictQuery {
 
-    @NotBlank(message = "目标藏品id不能为空")
-    @ApiModelProperty(value = "目标藏品id",required = true)
-    private String collectionId;
+    @NotBlank(message = "活动id不能为空")
+    @ApiModelProperty(value = "活动id",required = true)
+    private String actionId;
 
 }

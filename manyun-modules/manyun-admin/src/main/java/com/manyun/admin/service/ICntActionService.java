@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntAction;
 import com.manyun.admin.domain.query.ActionQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 活动Service接口
@@ -52,4 +53,6 @@ public interface ICntActionService extends IService<CntAction>
      * @return 结果
      */
     public int deleteCntActionByIds(String[] ids);
+
+    void taskCheckStatus();
 }

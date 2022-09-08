@@ -53,9 +53,6 @@ public class CntDictServiceImpl implements CntDictService
     private ICntBoxService boxService;
 
     @Autowired
-    private ICntPostConfigService postConfigService;
-
-    @Autowired
     private ICntBoxScoreService boxScoreService;
 
     @Autowired
@@ -63,6 +60,9 @@ public class CntDictServiceImpl implements CntDictService
 
     @Autowired
     private ICntBannerJumpLinkService bannerJumpLinkService;
+
+    @Autowired
+    private ICntActionCollectionService actionCollectionService;
 
     /***
      * 查询藏品字典
@@ -250,7 +250,8 @@ public class CntDictServiceImpl implements CntDictService
     @Override
     public R actionTarDict(ActionTarDictQuery tarDictQuery)
     {
-        return R.ok(collectionService.list(Wrappers.<CntCollection>lambdaQuery().ne(CntCollection::getId,tarDictQuery.getCollectionId()).orderByDesc(CntCollection::getCreatedTime)).parallelStream().map(m ->{
+        List<CntActionCollection> actionCollectionList = actionCollectionService.list(Wrappers.<CntActionCollection>lambdaQuery().eq(CntActionCollection::getActionId, tarDictQuery.getActionId()));
+        return R.ok(collectionService.list(Wrappers.<CntCollection>lambdaQuery().notIn(CntCollection::getId,actionCollectionList.parallelStream().map(CntActionCollection::getCollectionId).collect(Collectors.toList())).orderByDesc(CntCollection::getCreatedTime)).parallelStream().map(m ->{
             CntCollectionDictVo cntCollectionDictVo=new CntCollectionDictVo();
             BeanUtil.copyProperties(m,cntCollectionDictVo);
             return cntCollectionDictVo;

@@ -33,7 +33,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             car.updated_time updatedTime
         from
             cnt_action_record car
-        inner join  cnt_action ca on car.action_id = ca.id
+        left join  cnt_action ca on car.action_id = ca.id
         <where>
             <if test="actionTitle != null  and actionTitle != ''"> and ca.action_title like concat('%', #{actionTitle}, '%')</if>
         </where>

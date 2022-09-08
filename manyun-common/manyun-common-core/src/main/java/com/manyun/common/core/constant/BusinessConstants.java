@@ -205,6 +205,7 @@ public interface BusinessConstants {
         // 持续递增编号key
         String COLLECTION_AUTO_NUM = "collection:auto:numbers:";
         String  USER_ACTIVE_NUMBERS = "user:active:numbers";
+        String COLLECTION_RANDOM_NUM = "collection:random:numbers:";
 
     }
 

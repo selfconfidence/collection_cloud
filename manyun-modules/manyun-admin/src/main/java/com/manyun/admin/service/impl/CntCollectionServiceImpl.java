@@ -28,6 +28,7 @@ import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import com.manyun.common.redis.service.RedisService;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,6 +73,9 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
 
     @Autowired
     private ICntAirdropRecordService airdropRecordService;
+
+    @Autowired
+    private RedisService redisService;
 
     /**
      * 查询藏品详情
@@ -202,8 +206,23 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                             .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
             );
         }
+        List<Integer> list = autoNum(collectionAlterCombineDto.getCntCollectionAlterVo().getBalance());
+
+        redisService.setCacheList(BusinessConstants.RedisDict.COLLECTION_RANDOM_NUM.concat(cntCollectionInfo.getCollectionId()),list);
         return R.ok();
      }
+
+     private List<Integer> autoNum(Integer total) {
+         Integer[] array = new Integer[total];
+         for (int i = 0; i < total; i++) {
+             array[i] = i + 1;
+         }
+         List<Integer> list = new ArrayList<>();
+         Collections.addAll(list,array);
+         Collections.shuffle(list);
+         return list;
+     }
+
 
     /**
      * 修改藏品
