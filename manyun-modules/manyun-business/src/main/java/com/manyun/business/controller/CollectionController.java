@@ -4,6 +4,7 @@ package com.manyun.business.controller;
 import com.github.pagehelper.PageHelper;
 import com.manyun.business.domain.form.CollectionOrderSellForm;
 import com.manyun.business.domain.form.CollectionSellForm;
+import com.manyun.business.domain.form.PushMuseumForm;
 import com.manyun.business.domain.form.ShareCollectionForm;
 import com.manyun.business.domain.query.CollectionQuery;
 import com.manyun.business.domain.query.UseAssertQuery;
@@ -142,9 +143,9 @@ public class CollectionController extends BaseController{
 
     @PostMapping("/pushMuseum")
     @ApiOperation("选择藏品到展馆")
-    public R pushMuseum(@RequestBody String[] collections) {
+    public R pushMuseum(@RequestBody PushMuseumForm pushMuseumForm) {
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        userCollectionService.pushMuseum(collections, notNullLoginBusinessUser.getUserId());
+        userCollectionService.pushMuseum(pushMuseumForm, notNullLoginBusinessUser.getUserId());
         return R.ok();
     }
 

@@ -3,6 +3,7 @@ package com.manyun.business.service;
 import com.manyun.business.domain.dto.UserCollectionCountDto;
 import com.manyun.business.domain.entity.UserCollection;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.manyun.business.domain.form.PushMuseumForm;
 import com.manyun.business.domain.vo.MuseumListVo;
 import com.manyun.business.domain.vo.UserCollectionVo;
 import com.manyun.common.core.domain.R;
@@ -47,7 +48,7 @@ public interface IUserCollectionService extends IService<UserCollection> {
 
     R<String> shareCollection(String userId, String myGoodsId);
 
-    void pushMuseum(String[] collections, String userId);
+    void pushMuseum(PushMuseumForm pushMuseumForm, String userId);
 
     List<MuseumListVo> museumList(String userId);
 

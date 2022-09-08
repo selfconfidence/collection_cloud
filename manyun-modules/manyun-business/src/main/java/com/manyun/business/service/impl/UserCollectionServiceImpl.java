@@ -15,6 +15,7 @@ import com.manyun.business.design.mychain.MyChainService;
 import com.manyun.business.domain.dto.*;
 import com.manyun.business.domain.entity.CntCollection;
 import com.manyun.business.domain.entity.UserCollection;
+import com.manyun.business.domain.form.PushMuseumForm;
 import com.manyun.business.domain.vo.MediaVo;
 import com.manyun.business.domain.vo.MuseumListVo;
 import com.manyun.business.domain.vo.UserCollectionVo;
@@ -521,7 +522,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
 
     @Override
     @Transactional
-    public void pushMuseum(String[] collections, String userId) {
+    public void pushMuseum(PushMuseumForm pushMuseumForm, String userId) {
 
         List<UserCollection> list = list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getUserId, userId).eq(UserCollection::getIsExist, 1)
                 .eq(UserCollection::getIsMuseum, 1));
@@ -532,9 +533,10 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
             }).collect(Collectors.toList());
             updateBatchById(list);
         }
-        Assert.isTrue(collections.length <= 15, "藏品数量已达上限，请核实");
-        ArrayList<String> idList = new ArrayList<>();
-        Collections.addAll(idList, collections);
+        Assert.isTrue(pushMuseumForm.getCollections().size() <= 15, "藏品数量已达上限，请核实");
+        /*ArrayList<String> idList = new ArrayList<>();
+        Collections.addAll(idList, collections);*/
+        List<String> idList = pushMuseumForm.getCollections();
 
         List<UserCollection> userCollections = listByIds(idList);
         List<UserCollection> collect = userCollections.parallelStream().map(item -> {
