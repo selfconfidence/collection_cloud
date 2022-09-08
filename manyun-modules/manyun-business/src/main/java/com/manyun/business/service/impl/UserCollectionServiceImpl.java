@@ -31,6 +31,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
@@ -519,9 +520,18 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
 
 
     @Override
+    @Transactional
     public void pushMuseum(String[] collections, String userId) {
-        /*List<UserCollection> list = list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getUserId, userId).eq(UserCollection::getIsExist, Integer.valueOf(1))
-                .eq(UserCollection::getIsMuseum, Integer.valueOf(1)));*/
+
+        List<UserCollection> list = list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getUserId, userId).eq(UserCollection::getIsExist, 1)
+                .eq(UserCollection::getIsMuseum, 1));
+        if (!list.isEmpty()) {
+            list = list.parallelStream().map(item -> {
+                item.setIsMuseum(2);
+                return item;
+            }).collect(Collectors.toList());
+            updateBatchById(list);
+        }
         Assert.isTrue(collections.length <= 15, "藏品数量已达上限，请核实");
         ArrayList<String> idList = new ArrayList<>();
         Collections.addAll(idList, collections);
@@ -534,6 +544,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
             return item;
         }).collect(Collectors.toList());
         updateBatchById(collect);
+
     }
 
 
