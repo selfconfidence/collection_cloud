@@ -601,6 +601,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             IBoxService boxServiceReal = boxService.getObject();
             Box box = boxServiceReal.getById(buiId);
             box.setBalance(box.getBalance() + goodsNum);
+            if (!box.getStatusBy().equals(DOWN_ACTION.getCode()))
             box.setStatusBy(UP_ACTION.getCode());
             box.setSelfBalance(box.getSelfBalance() - goodsNum);
             boxServiceReal.updateById(box);
@@ -610,6 +611,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             ICollectionService collectionServiceReal = collectionService.getObject();
             CntCollection cntCollection = collectionServiceReal.getById(buiId);
             cntCollection.setBalance(cntCollection.getBalance() + goodsNum);
+            if (!cntCollection.getStatusBy().equals(DOWN_ACTION.getCode()))
             cntCollection.setStatusBy(UP_ACTION.getCode());
             cntCollection.setSelfBalance(cntCollection.getSelfBalance() - goodsNum);
             collectionServiceReal.updateById(cntCollection);

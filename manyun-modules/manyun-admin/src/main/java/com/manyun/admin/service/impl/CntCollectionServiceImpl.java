@@ -34,8 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.manyun.common.core.enums.BoxStatus.NULL_ACTION;
-import static com.manyun.common.core.enums.BoxStatus.UP_ACTION;
+import static com.manyun.common.core.enums.BoxStatus.*;
 import static com.manyun.common.core.enums.CollectionLink.NOT_LINK;
 import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
 
@@ -647,7 +646,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void taskCheckStatus(){
-        update(Wrappers.<CntCollection>lambdaUpdate().eq(CntCollection::getStatusBy, UP_ACTION.getCode()).eq(CntCollection::getBalance, Integer.valueOf(0)).set(CntCollection::getStatusBy, NULL_ACTION.getCode()));
+        update(Wrappers.<CntCollection>lambdaUpdate().ne(CntCollection::getStatusBy, DOWN_ACTION.getCode()).eq(CntCollection::getBalance, Integer.valueOf(0)).set(CntCollection::getStatusBy, NULL_ACTION.getCode()));
 
     }
 
