@@ -2,20 +2,20 @@ package com.manyun.admin.service.impl;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
+import com.manyun.admin.domain.CntActionCollection;
 import com.manyun.admin.domain.CntActionTar;
 import com.manyun.admin.domain.CntCollection;
+import com.manyun.admin.domain.dto.ActionCollectionDto;
 import com.manyun.admin.domain.query.ActionQuery;
 import com.manyun.admin.domain.vo.CntActionVo;
+import com.manyun.admin.service.ICntActionCollectionService;
 import com.manyun.admin.service.ICntActionTarService;
 import com.manyun.admin.service.ICntCollectionService;
 import com.manyun.common.core.domain.Builder;
@@ -50,6 +50,9 @@ public class CntActionServiceImpl extends ServiceImpl<CntActionMapper,CntAction>
 
     @Autowired
     private ICntCollectionService collectionService;
+
+    @Autowired
+    private ICntActionCollectionService actionCollectionService;
 
     /**
      * 查询活动
@@ -92,6 +95,19 @@ public class CntActionServiceImpl extends ServiceImpl<CntActionMapper,CntAction>
     @Override
     public int insertCntAction(CntAction cntAction)
     {
+        //比较两个时间大小，前者大 = -1， 相等 =0，后者大 = 1
+        if (DateUtils.compareTo(new Date(), cntAction.getStartTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == 1) {
+            cntAction.setActionStatus(1);
+        }
+        if (DateUtils.compareTo(new Date(), cntAction.getEndTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == -1) {
+            cntAction.setActionStatus(3);
+        }
+        if(
+                (DateUtils.compareTo(new Date(), cntAction.getStartTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == -1 || DateUtils.compareTo(new Date(), cntAction.getStartTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == 0)
+                        && (DateUtils.compareTo(new Date(), cntAction.getEndTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == 1 || DateUtils.compareTo(new Date(), cntAction.getEndTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == 0)
+        ){
+            cntAction.setActionStatus(2);
+        }
         cntAction.setId(IdUtils.getSnowflakeNextIdStr());
         cntAction.setCreatedBy(SecurityUtils.getUsername());
         cntAction.setCreatedTime(DateUtils.getNowDate());
@@ -107,6 +123,19 @@ public class CntActionServiceImpl extends ServiceImpl<CntActionMapper,CntAction>
     @Override
     public int updateCntAction(CntAction cntAction)
     {
+        //比较两个时间大小，前者大 = -1， 相等 =0，后者大 = 1
+        if (DateUtils.compareTo(new Date(), cntAction.getStartTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == 1) {
+            cntAction.setActionStatus(1);
+        }
+        if (DateUtils.compareTo(new Date(), cntAction.getEndTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == -1) {
+            cntAction.setActionStatus(3);
+        }
+        if(
+                (DateUtils.compareTo(new Date(), cntAction.getStartTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == -1 || DateUtils.compareTo(new Date(), cntAction.getStartTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == 0)
+                        && (DateUtils.compareTo(new Date(), cntAction.getEndTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == 1 || DateUtils.compareTo(new Date(), cntAction.getEndTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == 0)
+        ){
+            cntAction.setActionStatus(2);
+        }
         cntAction.setUpdatedBy(SecurityUtils.getUsername());
         cntAction.setUpdatedTime(DateUtils.getNowDate());
         return updateById(cntAction)==true?1:0;
@@ -124,46 +153,62 @@ public class CntActionServiceImpl extends ServiceImpl<CntActionMapper,CntAction>
     {
         removeByIds(Arrays.asList(ids));
         actionTarService.remove(Wrappers.<CntActionTar>lambdaQuery().in(CntActionTar::getActionId,ids));
+        actionCollectionService.remove(Wrappers.<CntActionCollection>lambdaQuery().in(CntActionCollection::getActionId,ids));
         return 1;
     }
 
     @Override
     public void taskCheckStatus() {
         List<CntAction> actionList = list();
-        List<CntAction> updateBatchList = new ArrayList<>();
-        actionList.forEach(e -> {
-            //比较两个时间大小，前者大 = -1， 相等 =0，后者大 = 1
-            if (DateUtils.compareTo(new Date(), e.getStartTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == 1 && e.getActionStatus()!=1) {
-                updateBatchList.add(
-                        Builder.of(CntAction::new)
-                                .with(CntAction::setId,e.getId())
-                                .with(CntAction::setActionStatus,1)
-                        .build()
-                );
+        if(actionList.size()>0){
+            List<ActionCollectionDto> actionCollectionDtoList = actionCollectionService.totalQuantity(actionList.parallelStream().map(CntAction::getId).collect(Collectors.toList()));
+            List<CntAction> updateBatchList = new ArrayList<>();
+            actionList.forEach(e -> {
+                Optional<ActionCollectionDto> optional = actionCollectionDtoList.parallelStream().filter(ff -> e.getId().equals(ff.getActionId())).findFirst();
+                if(optional.get().getTotalQuantity()!=0){
+                    //比较两个时间大小，前者大 = -1， 相等 =0，后者大 = 1
+                    if (DateUtils.compareTo(new Date(), e.getStartTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == 1 && e.getActionStatus()!=1) {
+                        updateBatchList.add(
+                                Builder.of(CntAction::new)
+                                        .with(CntAction::setId,e.getId())
+                                        .with(CntAction::setActionStatus,1)
+                                        .build()
+                        );
+                    }
+                    if (DateUtils.compareTo(new Date(), e.getEndTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == -1 && e.getActionStatus()!=3) {
+                        updateBatchList.add(
+                                Builder.of(CntAction::new)
+                                        .with(CntAction::setId,e.getId())
+                                        .with(CntAction::setActionStatus,3)
+                                        .build()
+                        );
+                    }
+                    if(
+                            (DateUtils.compareTo(new Date(), e.getStartTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == -1 || DateUtils.compareTo(new Date(), e.getStartTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == 0)
+                                    && (DateUtils.compareTo(new Date(), e.getEndTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == 1 || DateUtils.compareTo(new Date(), e.getEndTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == 0)
+                                    && e.getActionStatus()!=2
+                    ){
+                        updateBatchList.add(
+                                Builder.of(CntAction::new)
+                                        .with(CntAction::setId,e.getId())
+                                        .with(CntAction::setActionStatus,2)
+                                        .build()
+                        );
+                    }
+                }else{
+                    if(optional.get().getTotalQuantity()==0 && e.getActionStatus()!=3){
+                        updateBatchList.add(
+                                Builder.of(CntAction::new)
+                                        .with(CntAction::setId,e.getId())
+                                        .with(CntAction::setActionStatus,3)
+                                        .build()
+                        );
+                    }
+                }
+            });
+            if(updateBatchList.size()>0){
+                updateBatchById(updateBatchList);
             }
-            if (DateUtils.compareTo(new Date(), e.getEndTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == -1 && e.getActionStatus()!=3) {
-                updateBatchList.add(
-                        Builder.of(CntAction::new)
-                                .with(CntAction::setId,e.getId())
-                                .with(CntAction::setActionStatus,3)
-                                .build()
-                );
-            }
-            if(
-                    (DateUtils.compareTo(new Date(), e.getStartTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == -1 || DateUtils.compareTo(new Date(), e.getStartTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == 0)
-                 && (DateUtils.compareTo(new Date(), e.getEndTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == 1 || DateUtils.compareTo(new Date(), e.getEndTime(), DateUtils.YYYY_MM_DD_HH_MM_SS) == 0)
-                 && e.getActionStatus()!=2
-            ){
-                updateBatchList.add(
-                        Builder.of(CntAction::new)
-                                .with(CntAction::setId,e.getId())
-                                .with(CntAction::setActionStatus,2)
-                                .build()
-                );
-            }
-        });
-        if(updateBatchList.size()>0){
-            updateBatchById(updateBatchList);
         }
     }
 

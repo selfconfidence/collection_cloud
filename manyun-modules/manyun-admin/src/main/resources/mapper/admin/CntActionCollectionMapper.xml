@@ -29,4 +29,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         order by created_time desc
     </select>
 
+    <select id="totalQuantity" resultType="com.manyun.admin.domain.dto.ActionCollectionDto">
+        select
+        action_id actionId,
+        sum( action_quantity ) totalQuantity
+        from
+        cnt_action_collection
+        where
+        action_id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        group by
+        action_id
+    </select>
+
 </mapper>
