@@ -3,6 +3,7 @@ package com.manyun.business.service.impl;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -20,7 +21,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.business.service.ICntUserTarService;
 import com.manyun.business.service.ICollectionService;
 import com.manyun.comm.api.RemoteBuiUserService;
+import com.manyun.comm.api.RemoteSmsService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
+import com.manyun.comm.api.domain.dto.SmsCommDto;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
@@ -35,6 +38,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.manyun.common.core.constant.BusinessConstants.SmsTemplateNumber.*;
 import static com.manyun.common.core.enums.TarResultFlag.FLAG_PROCESS;
 import static com.manyun.common.core.enums.TarResultFlag.FLAG_STOP;
 import static com.manyun.common.core.enums.TarStatus.*;
@@ -60,6 +64,9 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
 
     @Autowired
     private RemoteBuiUserService remoteBuiUserService;
+
+    @Autowired
+    private RemoteSmsService remoteSmsService;
 
 
 
@@ -135,11 +142,11 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
         // 发短信
         String format = cntTar.getOpenTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         CntUserDto cntUserDto = remoteBuiUserService.commUni(userId, SecurityConstants.INNER).getData();
-/*        remoteSmsService.sendCommPhone(Builder.of(SmsCommDto::new)
+        remoteSmsService.sendCommPhone(Builder.of(SmsCommDto::new)
                         .with(SmsCommDto::setPhoneNumber, cntUserDto.getPhone())
                         .with(SmsCommDto::setTemplateCode, TAR_MSG)
                         .with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().put("buiName", buiName).put("openTime", format).build())
-                .build());*/
+                .build());
         String msg = StrUtil.format("您已经参与对{}抽签了,抽签结果将在{}公布!", buiName, format);
         jpushUtil.sendMsg(BusinessConstants.JgPushConstant.PUSH_TITLE,msg, Arrays.asList(cntUserDto.getJgPush()));
         return msg;
@@ -212,6 +219,11 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
             cntUserTar.updateD(cntUserTar.getUserId());
             CntUserDto cntUserDto = remoteBuiUserService.commUni(cntUserTar.getUserId(), SecurityConstants.INNER).getData();
             if (StrUtil.isNotBlank(cntUserDto.getJgPush())) jgRegLists.add(cntUserDto.getJgPush());
+            remoteSmsService.sendCommPhone(Builder.of(SmsCommDto::new)
+                    .with(SmsCommDto::setPhoneNumber, cntUserDto.getPhone())
+                    .with(SmsCommDto::setTemplateCode, TAR_SUCCESS)
+                    .with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().build())
+                    .build());
         }
         userTarService.updateBatchById(cntUserTars);
         // 推送用户了表明中奖状态
@@ -229,6 +241,11 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
             cntUserTar.updateD(cntUserTar.getUserId());
             CntUserDto cntUserDto = remoteBuiUserService.commUni(cntUserTar.getUserId(), SecurityConstants.INNER).getData();
             if (StrUtil.isNotBlank(cntUserDto.getJgPush())) jgRegLists.add(cntUserDto.getJgPush());
+            remoteSmsService.sendCommPhone(Builder.of(SmsCommDto::new)
+                    .with(SmsCommDto::setPhoneNumber, cntUserDto.getPhone())
+                    .with(SmsCommDto::setTemplateCode, TAR_FAIL)
+                    .with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().build())
+                    .build());
         }
         userTarService.updateBatchById(cntUserTars);
         // 推送用户了表明中奖状态

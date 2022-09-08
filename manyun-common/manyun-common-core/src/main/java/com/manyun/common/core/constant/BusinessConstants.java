@@ -241,9 +241,14 @@ public interface BusinessConstants {
         //String ASSERT_SUCCESS = "SMS_250320015";
         String ASSERT_SUCCESS = "SMS_250435282";
 
-       //您已经参与对${buiName}抽签了,抽签结果将在${openTime}公布!
-        @Deprecated
+       //您已经参与了${buiName},结果将在${openTime}公布,尽请期待!
         String TAR_MSG = "SMS_250921176";
+
+        //您的活动结果已经公布,已成功参与,快去参与吧!
+        String TAR_SUCCESS = "SMS_250951390";
+
+        // 您活动结果已经公布,未能参与成功,再接再厉!
+        String TAR_FAIL = "SMS_250961367";
 
     }
 
