@@ -33,7 +33,7 @@ import static com.manyun.common.core.enums.TarResultFlag.FLAG_PROCESS;
 @RestController
 @RequestMapping("/tar")
 @Api(tags = "抽签相关apis")
-public class CntTarController extends BaseController {
+public class CntTarController{
 
 
     @Autowired
