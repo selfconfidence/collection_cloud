@@ -16,6 +16,7 @@ import com.manyun.business.domain.dto.*;
 import com.manyun.business.domain.entity.CntCollection;
 import com.manyun.business.domain.entity.UserCollection;
 import com.manyun.business.domain.vo.MediaVo;
+import com.manyun.business.domain.vo.MuseumListVo;
 import com.manyun.business.domain.vo.UserCollectionVo;
 import com.manyun.business.mapper.UserCollectionMapper;
 import com.manyun.business.service.*;
@@ -39,10 +40,8 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.manyun.common.core.constant.BusinessConstants.CommDict.REAL_COMPANY;
 import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.POLL_SOURCE;
@@ -518,4 +517,43 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         }
     }
 
+
+    @Override
+    public void pushMuseum(String[] collections, String userId) {
+        /*List<UserCollection> list = list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getUserId, userId).eq(UserCollection::getIsExist, Integer.valueOf(1))
+                .eq(UserCollection::getIsMuseum, Integer.valueOf(1)));*/
+        Assert.isTrue(collections.length <= 15, "藏品数量已达上限，请核实");
+        ArrayList<String> idList = new ArrayList<>();
+        Collections.addAll(idList, collections);
+
+        List<UserCollection> userCollections = listByIds(idList);
+        List<UserCollection> collect = userCollections.parallelStream().map(item -> {
+            Assert.isTrue(Objects.nonNull(item), "选择藏品有误，请核实");
+            Assert.isTrue(userId.equals(item.getUserId()), "藏品有误，请核实");
+            item.setIsMuseum(1);
+            return item;
+        }).collect(Collectors.toList());
+        updateBatchById(collect);
+    }
+
+
+    @Override
+    public List<MuseumListVo> museumList(String userId) {
+        List<UserCollection> list = list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getUserId, userId).eq(UserCollection::getIsExist, 1)
+                .eq(UserCollection::getIsMuseum, 1));
+        if (list.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<MuseumListVo> museumList = new ArrayList<>();
+
+        for (UserCollection userCollection : list) {
+            MuseumListVo museumListVo = new MuseumListVo();
+            museumListVo.setMyGoodsId(userCollection.getId());
+            museumListVo.setGoodsId(userCollection.getCollectionId());
+            museumListVo.setMediaUrl(mediaService.initMediaVos(userCollection.getCollectionId(), COLLECTION_MODEL_TYPE).get(0).getMediaUrl());
+            museumList.add(museumListVo);
+        }
+        return museumList;
+
+    }
 }

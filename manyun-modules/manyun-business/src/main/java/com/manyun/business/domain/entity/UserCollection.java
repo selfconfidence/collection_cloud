@@ -74,6 +74,9 @@ public class UserCollection implements Serializable {
     @ApiModelProperty("分享藏品")
     private String shareUrl;
 
+    @ApiModelProperty("是否在3d展馆；1，存在；2，不存在")
+    private Integer isMuseum;
+
 
     public void createD(String createId){
         this.createdBy = createId;
