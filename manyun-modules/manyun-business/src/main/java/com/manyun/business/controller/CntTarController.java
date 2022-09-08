@@ -9,6 +9,7 @@ import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.security.annotation.InnerAuth;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +34,7 @@ import static com.manyun.common.core.enums.TarResultFlag.FLAG_PROCESS;
 @RestController
 @RequestMapping("/tar")
 @Api(tags = "抽签相关apis")
+@Slf4j
 public class CntTarController{
 
 
@@ -46,6 +48,7 @@ public class CntTarController{
     public R taskEndFlag(){
         // 查询出将要开奖的抽签主体
         List<CntTar> cntTarList = cntTarService.list(Wrappers.<CntTar>lambdaQuery().eq(CntTar::getEndFlag, FLAG_PROCESS.getCode()).le(CntTar::getOpenTime, LocalDateTime.now()));
+        log.info("本次抽签公布个数有{}",cntTarList.size());
         for (CntTar cntTar : cntTarList) {
             cntTarService.openTarResult(cntTar.getId());
         }

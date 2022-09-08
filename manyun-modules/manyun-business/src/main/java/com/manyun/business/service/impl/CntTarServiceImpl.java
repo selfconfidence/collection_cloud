@@ -158,7 +158,7 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
     public void openTarResult(String tarId){
         CntTar cntTar = getById(tarId);
         // 幂等校验
-        if (FLAG_PROCESS.getCode().equals( cntTar.getEndFlag()))return;
+        if (FLAG_STOP.getCode().equals( cntTar.getEndFlag()))return;
         execProcessBatchResult(tarId);
         cntTar.setEndFlag(FLAG_STOP.getCode());
         updateById(cntTar);
