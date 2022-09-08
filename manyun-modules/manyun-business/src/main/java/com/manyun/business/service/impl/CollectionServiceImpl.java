@@ -130,8 +130,11 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         // 是否能够购买? 预先状态判定
         collectionAllVo.setTarStatus(NO_TAR.getCode());
         // 低耦性校验
-        if (StrUtil.isNotBlank(cntCollection.getTarId()) && StringUtils.isNotBlank(userId))
-        collectionAllVo.setTarStatus(tarService.tarStatus(userId,id));
+        if (StrUtil.isNotBlank(cntCollection.getTarId()) && StringUtils.isNotBlank(userId)){
+            collectionAllVo.setTarStatus(tarService.tarStatus(userId,id));
+            collectionAllVo.setOpenTime(tarService.getById(cntCollection.getTarId()).getOpenTime());
+        }
+
 
         Integer postTime = null;
         //提前购?
@@ -378,7 +381,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
      * @return
      */
     @Override
-    public Integer tarCollection(String id, String userId) {
+    public String tarCollection(String id, String userId) {
         // 开始抽签
         return tarService.tarCollection(getById(id),userId);
     }
@@ -447,9 +450,15 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
      */
     private void tarCheckCollection(CntCollection cntCollection,String userId){
         // 是否需要抽？
-        if (StrUtil.isNotBlank(cntCollection.getTarId()))
+        if (StrUtil.isNotBlank(cntCollection.getTarId())){
             if (!CEN_YES_TAR.getCode().equals(tarService.tarStatus(userId,cntCollection.getId())))
                 Assert.isFalse(Boolean.TRUE,"未参与抽签,或暂未购买资格!");
+
+            Assert.isFalse(tarService.isSell(userId,cntCollection.getId()),"不可复购,只可购买一次!");
+        }
+
+
+
 
 
     }

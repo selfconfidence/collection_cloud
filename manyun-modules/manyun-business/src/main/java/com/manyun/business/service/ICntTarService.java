@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.entity.Box;
 import com.manyun.business.domain.entity.CntCollection;
 import com.manyun.business.domain.entity.CntTar;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>
@@ -17,7 +18,14 @@ public interface ICntTarService extends IService<CntTar> {
 
     Integer tarStatus(String userId, String buiId);
 
-    Integer tarCollection(CntCollection cntCollection, String userId);
+    boolean isSell(String userId, String buiId);
 
-    Integer tarBox(Box box, String userId);
+    String tarCollection(CntCollection cntCollection, String userId);
+
+    String tarBox(Box box, String userId);
+
+    void overSelf(String userId, String id);
+
+    // 开始公布抽签结果
+    void openTarResult(String tarId);
 }

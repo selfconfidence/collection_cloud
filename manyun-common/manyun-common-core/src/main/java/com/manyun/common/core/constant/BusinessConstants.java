@@ -241,6 +241,14 @@ public interface BusinessConstants {
         //String ASSERT_SUCCESS = "SMS_250320015";
         String ASSERT_SUCCESS = "SMS_250435282";
 
+       //您已经参与对${buiName}抽签了,抽签结果将在${openTime}公布!
+        @Deprecated
+        String TAR_MSG = "SMS_250921176";
+
+    }
+
+    interface JgPushConstant{
+        String PUSH_TITLE = "CNT";
     }
 
 

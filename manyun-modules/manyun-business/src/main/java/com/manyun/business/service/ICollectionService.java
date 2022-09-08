@@ -36,7 +36,7 @@ public interface ICollectionService extends IService<CntCollection> {
 
     List<KeywordVo> queryDict(String keyword);
 
-    Integer tarCollection(String id, String userId);
+    String tarCollection(String id, String userId);
 
     CollectionVo getBaseCollectionVo(@NotNull String collectionId);
 

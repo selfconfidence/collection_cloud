@@ -33,6 +33,10 @@ public class CntUserDto implements Serializable {
     @ApiModelProperty("区块链地址")
     private String linkAddr;
 
+    @ApiModelProperty("激光推送编号 uuid")
+    private String jgPush;
+
+
     @ApiModelProperty("是否实名;1=未实名,1=实名")
     private Integer isReal;
 

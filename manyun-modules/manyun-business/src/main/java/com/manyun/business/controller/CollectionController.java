@@ -76,8 +76,8 @@ public class CollectionController extends BaseController{
     }
 
     @GetMapping("/tarCollection/{id}")
-    @ApiOperation(value = "对需要抽签的藏品,进行抽签",notes = " id = 藏品编号  \rdata = 状态,(1=抽中,2=未抽中)")
-    public synchronized R<Integer> tarCollection(@PathVariable String id){
+    @ApiOperation(value = "对需要抽签的藏品,进行抽签",notes = " id = 藏品编号  \rdata = 提示信息 例如 您已经参与对${buiName}抽签了,抽签结果将在${openTime}公布!\n")
+    public synchronized R<String> tarCollection(@PathVariable String id){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(collectionService.tarCollection(id,notNullLoginBusinessUser.getUserId()));
     }

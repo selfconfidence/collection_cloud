@@ -143,8 +143,12 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         // 是否能够购买? 预先状态判定
         boxVo.setTarStatus(NO_TAR.getCode());
         // 低耦性校验
-        if (StrUtil.isNotBlank(box.getTarId()) && StringUtils.isNotBlank(userId))
+        if (StrUtil.isNotBlank(box.getTarId()) && StringUtils.isNotBlank(userId)){
             boxVo.setTarStatus(tarService.tarStatus(userId,id));
+            CntTar cntTar = tarService.getById(box.getTarId());
+            boxVo.setOpenTime(cntTar.getOpenTime());
+        }
+
 
 
         Integer postTime = null;
@@ -325,7 +329,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
     }
 
     @Override
-    public Integer tarBox(String id, String userId) {
+    public String tarBox(String id, String userId) {
         return cntTarService.tarBox(getById(id),userId);
     }
 
@@ -400,10 +404,12 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
      */
     private void tarCheckBox(Box box,String userId){
         // 是否需要抽？
-        if (StrUtil.isNotBlank(box.getTarId()))
+        if (StrUtil.isNotBlank(box.getTarId())){
             if (!CEN_YES_TAR.getCode().equals(tarService.tarStatus(userId,box.getId())))
                 Assert.isFalse(Boolean.TRUE,"未参与抽签,或暂未购买资格!");
+            Assert.isFalse(tarService.isSell(userId,box.getId()),"不可复购,只可购买一次!");
 
+        }
     }
 
     /**

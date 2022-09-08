@@ -1,6 +1,7 @@
 package com.manyun.admin.domain;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -25,6 +26,12 @@ public class CntTar implements Serializable
     @ApiModelProperty("抽签类型;(1=盲盒,2=藏品)")
     private Integer tarType;
 
+    @ApiModelProperty("1=正常,2=暂停(已经开奖)")
+    private Integer endFlag;
+
+    @ApiModelProperty("开奖时间")
+    private LocalDateTime openTime;
+
     @ApiModelProperty("创建人")
     private String createdBy;
 
@@ -38,6 +45,22 @@ public class CntTar implements Serializable
     @ApiModelProperty("更新时间")
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedTime;
+
+    public LocalDateTime getOpenTime() {
+        return openTime;
+    }
+
+    public void setOpenTime(LocalDateTime openTime) {
+        this.openTime = openTime;
+    }
+
+    public Integer getEndFlag() {
+        return endFlag;
+    }
+
+    public void setEndFlag(Integer endFlag) {
+        this.endFlag = endFlag;
+    }
 
     public String getId() {
         return id;
