@@ -191,7 +191,15 @@ public class CntDictServiceImpl implements CntDictService
     @Override
     public R drawRulesDict(DrawRulesDictQuery drawRulesDictQuery)
     {
-        return R.ok(cntTarService.list(Wrappers.<CntTar>lambdaQuery().eq(CntTar::getTarType,drawRulesDictQuery.getTarType()).orderByDesc(CntTar::getCreatedTime)).stream().map(m->{
+        List<String> collectionTarIds = collectionService.list(Wrappers.<CntCollection>lambdaQuery().isNotNull(CntCollection::getTarId)).parallelStream().map(CntCollection::getTarId).collect(Collectors.toList());
+        List<String> boxTarIds = boxService.list(Wrappers.<CntBox>lambdaQuery().isNotNull(CntBox::getTarId)).parallelStream().map(CntBox::getTarId).collect(Collectors.toList());
+        List<CntTar> cntTars = null;
+        if(collectionTarIds.size()>0 || boxTarIds.size()>0){
+            cntTars = cntTarService.list(Wrappers.<CntTar>lambdaQuery().eq(CntTar::getTarType, drawRulesDictQuery.getTarType()).eq(CntTar::getEndFlag, 1).notIn(CntTar::getId, drawRulesDictQuery.getTarType() == 1 ? boxTarIds : collectionTarIds).orderByDesc(CntTar::getCreatedTime));
+        }else {
+            cntTars = cntTarService.list(Wrappers.<CntTar>lambdaQuery().eq(CntTar::getTarType, drawRulesDictQuery.getTarType()).eq(CntTar::getEndFlag, 1).orderByDesc(CntTar::getCreatedTime));
+        }
+        return R.ok(cntTars.parallelStream().map(m->{
             DrawRulesDictVo drawRulesDictVo=new DrawRulesDictVo();
             BeanUtil.copyProperties(m,drawRulesDictVo);
             return drawRulesDictVo;

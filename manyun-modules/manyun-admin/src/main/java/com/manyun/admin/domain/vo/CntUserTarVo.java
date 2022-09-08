@@ -5,29 +5,36 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.math.BigDecimal;
+import java.io.Serializable;
 import java.util.Date;
 
-@ApiModel("抽签规则(盲盒,藏品)返回视图")
+@ApiModel("用户抽签购买藏品或盲盒中间对象返回视图")
 @Data
-public class CntTarVo
+public class CntUserTarVo implements Serializable
 {
+    private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键")
     private String id;
 
-    @ApiModelProperty("抽签比例(%百分比, 抽中比例)")
-    private BigDecimal tarPro;
-
-    @ApiModelProperty("抽签类型;(1=盲盒,2=藏品)")
-    private Integer tarType;
-
-    @ApiModelProperty("1=正常,2=暂停(已经开奖)")
-    private Integer endFlag;
+    @ApiModelProperty("抽签编号")
+    private String tarId;
 
     @ApiModelProperty("开奖时间")
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date openTime;
+
+    @ApiModelProperty("用户昵称")
+    private String nickName;
+
+    @ApiModelProperty("是否购买，1=未购买,2=已购买")
+    private Integer goSell;
+
+    @ApiModelProperty("业务编号;(盲盒,藏品的编号)")
+    private String buiId;
+
+    @ApiModelProperty("1=已抽中,2=未抽中,4等待开奖")
+    private Integer isFull;
 
     @ApiModelProperty("创建时间")
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")

@@ -7,6 +7,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap type="CntTar" id="CntTarResult">
         <result property="id"    column="id"    />
         <result property="tarPro"    column="tar_pro"    />
+        <result property="endFlag"    column="end_flag"    />
+        <result property="openTime"    column="open_time"    />
         <result property="tarType"    column="tar_type"    />
         <result property="createdBy"    column="created_by"    />
         <result property="createdTime"    column="created_time"    />
@@ -15,18 +17,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectCntTarVo">
-        select id, tar_pro, tar_type, created_by, created_time, updated_by, updated_time from cnt_tar
+        select id, tar_pro, end_flag, open_time, tar_type, created_by, created_time, updated_by, updated_time from cnt_tar
     </sql>
 
-    <select id="selectCntTarList" parameterType="CntTar" resultMap="CntTarResult">
+    <select id="selectCntTarList" parameterType="CntTarQuery" resultMap="CntTarResult">
         <include refid="selectCntTarVo"/>
         <where>
-            <if test="tarPro != null "> and tar_pro = #{tarPro}</if>
+            <if test="id != null  and id != ''"> and id = #{id}</if>
+            <if test="endFlag != null "> and end_flag = #{endFlag}</if>
             <if test="tarType != null "> and tar_type = #{tarType}</if>
-            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
-            <if test="createdTime != null "> and created_time = #{createdTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
-            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
         </where>
         order by created_time desc
     </select>

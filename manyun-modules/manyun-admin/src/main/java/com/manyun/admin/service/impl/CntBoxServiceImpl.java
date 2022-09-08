@@ -18,9 +18,7 @@ import com.manyun.admin.domain.dto.CntBoxAlterCombineDto;
 import com.manyun.admin.domain.query.BoxQuery;
 import com.manyun.admin.domain.query.OrderQuery;
 import com.manyun.admin.domain.vo.*;
-import com.manyun.admin.service.ICntBoxCollectionService;
-import com.manyun.admin.service.ICntCollectionLableService;
-import com.manyun.admin.service.ICntMediaService;
+import com.manyun.admin.service.*;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
@@ -33,7 +31,6 @@ import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.manyun.admin.mapper.CntBoxMapper;
-import com.manyun.admin.service.ICntBoxService;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.manyun.common.core.enums.BoxStatus.*;
@@ -58,6 +55,9 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
 
     @Autowired
     private ICntCollectionLableService collectionLableService;
+
+    @Autowired
+    private ICntTarService cntTarService;
 
     /**
      * 查询盲盒;盲盒主体详情
@@ -257,6 +257,22 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
     }
 
     public R check(CntBoxAlterVo boxAlterVo, CntLableAlterVo lableAlterVo, MediaAlterVo mediaAlterVo){
+        Date publishTime = boxAlterVo.getPublishTime();
+        String tarId = boxAlterVo.getTarId();
+        if(StringUtils.isNotBlank(tarId)){
+            CntTar tar = cntTarService.getById(tarId);
+            if(Objects.nonNull(tar)){
+                //比较两个时间大小，前者大 = -1， 相等 =0，后者大 = 1
+                if(tar.getEndFlag()==1){
+                    if (DateUtils.compareTo(tar.getOpenTime(), publishTime, DateUtils.YYYY_MM_DD_HH_MM_SS) == -1) {
+                        return R.fail("改藏品已设置抽签,开奖时间为: "+DateUtils.getDateToStr(tar.getOpenTime(),DateUtils.YYYY_MM_DD_HH_MM_SS)+" 发售时间不能小于开奖时间!");
+                    }
+                }
+            }else {
+                return R.fail("未获取到抽签规则信息!");
+            }
+
+        }
         //验证提前购分钟是否在范围内
         Integer postTime = boxAlterVo.getPostTime();
         if(postTime!=null){

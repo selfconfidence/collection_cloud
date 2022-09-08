@@ -1,6 +1,5 @@
 package com.manyun.admin.domain;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -10,27 +9,33 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import java.io.Serializable;
 
-@ApiModel("抽签规则(盲盒,藏品)对象")
-@TableName("cnt_tar")
-public class CntTar implements Serializable
+@ApiModel("用户抽签购买藏品或盲盒中间对象")
+@TableName("cnt_user_tar")
+public class CntUserTar implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键")
     private String id;
 
-    @ApiModelProperty("抽签比例(%百分比, 抽中比例)")
-    private BigDecimal tarPro;
-
-    @ApiModelProperty("1=正常,2=暂停(已经开奖)")
-    private Integer endFlag;
+    @ApiModelProperty("抽签编号")
+    private String tarId;
 
     @ApiModelProperty("开奖时间")
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date openTime;
 
-    @ApiModelProperty("抽签类型;(1=盲盒,2=藏品)")
-    private Integer tarType;
+    @ApiModelProperty("用户编号")
+    private String userId;
+
+    @ApiModelProperty("是否购买，1=未购买,2=已购买")
+    private Integer goSell;
+
+    @ApiModelProperty("业务编号;(盲盒,藏品的编号)")
+    private String buiId;
+
+    @ApiModelProperty("1=已抽中,2=未抽中,4等待开奖")
+    private Integer isFull;
 
     @ApiModelProperty("创建人")
     private String createdBy;
@@ -55,23 +60,14 @@ public class CntTar implements Serializable
     {
         return id;
     }
-    public void setTarPro(BigDecimal tarPro)
+    public void setTarId(String tarId)
     {
-        this.tarPro = tarPro;
+        this.tarId = tarId;
     }
 
-    public BigDecimal getTarPro()
+    public String getTarId()
     {
-        return tarPro;
-    }
-    public void setEndFlag(Integer endFlag)
-    {
-        this.endFlag = endFlag;
-    }
-
-    public Integer getEndFlag()
-    {
-        return endFlag;
+        return tarId;
     }
     public void setOpenTime(Date openTime)
     {
@@ -82,14 +78,41 @@ public class CntTar implements Serializable
     {
         return openTime;
     }
-    public void setTarType(Integer tarType)
+    public void setUserId(String userId)
     {
-        this.tarType = tarType;
+        this.userId = userId;
     }
 
-    public Integer getTarType()
+    public String getUserId()
     {
-        return tarType;
+        return userId;
+    }
+    public void setGoSell(Integer goSell)
+    {
+        this.goSell = goSell;
+    }
+
+    public Integer getGoSell()
+    {
+        return goSell;
+    }
+    public void setBuiId(String buiId)
+    {
+        this.buiId = buiId;
+    }
+
+    public String getBuiId()
+    {
+        return buiId;
+    }
+    public void setIsFull(Integer isFull)
+    {
+        this.isFull = isFull;
+    }
+
+    public Integer getIsFull()
+    {
+        return isFull;
     }
     public void setCreatedBy(String createdBy)
     {
@@ -131,15 +154,17 @@ public class CntTar implements Serializable
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-                .append("id", getId())
-                .append("tarPro", getTarPro())
-                .append("endFlag", getEndFlag())
-                .append("openTime", getOpenTime())
-                .append("tarType", getTarType())
-                .append("createdBy", getCreatedBy())
-                .append("createdTime", getCreatedTime())
-                .append("updatedBy", getUpdatedBy())
-                .append("updatedTime", getUpdatedTime())
-                .toString();
+            .append("id", getId())
+            .append("tarId", getTarId())
+            .append("openTime", getOpenTime())
+            .append("userId", getUserId())
+            .append("goSell", getGoSell())
+            .append("buiId", getBuiId())
+            .append("isFull", getIsFull())
+            .append("createdBy", getCreatedBy())
+            .append("createdTime", getCreatedTime())
+            .append("updatedBy", getUpdatedBy())
+            .append("updatedTime", getUpdatedTime())
+            .toString();
     }
 }

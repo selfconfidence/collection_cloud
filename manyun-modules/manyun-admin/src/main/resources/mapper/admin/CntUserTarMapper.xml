@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntUserTarMapper">
+
+    <resultMap type="CntUserTar" id="CntUserTarResult">
+        <result property="id"    column="id"    />
+        <result property="tarId"    column="tar_id"    />
+        <result property="openTime"    column="open_time"    />
+        <result property="userId"    column="user_id"    />
+        <result property="goSell"    column="go_sell"    />
+        <result property="buiId"    column="bui_id"    />
+        <result property="isFull"    column="is_full"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCntUserTarVo">
+        select id, tar_id, open_time, user_id, go_sell, bui_id, is_full, created_by, created_time, updated_by, updated_time from cnt_user_tar
+    </sql>
+
+    <select id="selectCntUserTarList" parameterType="UserTarQuery" resultType="com.manyun.admin.domain.vo.CntUserTarVo">
+        select
+            ut.id,
+            ut.tar_id tarId,
+            u.nick_name nickName,
+            ut.go_sell goSell,
+            ut.bui_id buiId,
+            ut.is_full isFull,
+            ut.open_time openTime,
+            ut.created_time createdTime,
+            ut.updated_time updatedTime
+        from
+            cnt_user_tar ut
+        left join
+            cnt_user u
+        on ut.user_id=u.id
+        <where>
+            <if test="nickName != null  and nickName != ''"> and u.nick_name like concat('%', #{nickName}, '%')</if>
+            <if test="tarId != null  and tarId != ''"> and ut.tar_id = #{tarId}</if>
+            <if test="goSell != null "> and ut.go_sell = #{goSell}</if>
+            <if test="isFull != null "> and ut.is_full = #{isFull}</if>
+        </where>
+        order by ut.created_time desc
+    </select>
+
+</mapper>

@@ -3,6 +3,7 @@ package com.manyun.admin.service;
 import java.util.List;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntTar;
+import com.manyun.admin.domain.query.CntTarQuery;
 import com.manyun.admin.domain.vo.CntTarVo;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
@@ -26,10 +27,10 @@ public interface ICntTarService extends IService<CntTar>
     /**
      * 查询抽签规则(盲盒,藏品)列表
      *
-     * @param pageQuery
+     * @param cntTarQuery
      * @return 抽签规则(盲盒,藏品)集合
      */
-    public TableDataInfo<CntTarVo> selectCntTarList(PageQuery pageQuery);
+    public TableDataInfo<CntTarVo> selectCntTarList(CntTarQuery cntTarQuery);
 
     /**
      * 新增抽签规则(盲盒,藏品)

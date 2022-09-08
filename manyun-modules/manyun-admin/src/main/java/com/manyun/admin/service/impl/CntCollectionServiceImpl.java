@@ -77,6 +77,9 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
     @Autowired
     private RedisService redisService;
 
+    @Autowired
+    private ICntTarService cntTarService;
+
     /**
      * 查询藏品详情
      *
@@ -345,6 +348,22 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
     }
 
     public R check(CntCollectionAlterVo collectionAlterVo,CntLableAlterVo lableAlterVo ,MediaAlterVo mediaAlterVo){
+        Date publishTime = collectionAlterVo.getPublishTime();
+        String tarId = collectionAlterVo.getTarId();
+        if(StringUtils.isNotBlank(tarId)){
+            CntTar tar = cntTarService.getById(tarId);
+            if(Objects.nonNull(tar)){
+                //比较两个时间大小，前者大 = -1， 相等 =0，后者大 = 1
+                if(tar.getEndFlag()==1){
+                    if (DateUtils.compareTo(tar.getOpenTime(), publishTime, DateUtils.YYYY_MM_DD_HH_MM_SS) == -1) {
+                        return R.fail("改藏品已设置抽签,开奖时间为: "+DateUtils.getDateToStr(tar.getOpenTime(),DateUtils.YYYY_MM_DD_HH_MM_SS)+" 发售时间不能小于开奖时间!");
+                    }
+                }
+            }else {
+                return R.fail("未获取到抽签规则信息!");
+            }
+
+        }
         //验证提前购分钟是否在范围内
         Integer postTime = collectionAlterVo.getPostTime();
         if(postTime!=null){
@@ -474,7 +493,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
     {
         if (StringUtils.isNull(bachAirdopExcels) || bachAirdopExcels.size() == 0)
         {
-            R.fail("导入批量空投数据不能为空!");
+           return R.fail("导入批量空投数据不能为空!");
          }
         List<CntAirdropRecord> errorAirdropRecord = new ArrayList<CntAirdropRecord>();
         //判断藏品id是否一致

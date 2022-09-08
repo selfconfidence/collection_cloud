@@ -1,6 +1,7 @@
 package com.manyun.admin.controller;
 
 
+import com.manyun.admin.domain.query.CntTarQuery;
 import com.manyun.admin.domain.vo.CntTarVo;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.PageQuery;
@@ -42,9 +43,9 @@ public class CntTarController extends BaseController
     //@RequiresPermissions("admin:tar:list")
     @GetMapping("/list")
     @ApiOperation("查询抽签规则(盲盒,藏品)列表")
-    public TableDataInfo<CntTarVo> list(PageQuery pageQuery)
+    public TableDataInfo<CntTarVo> list(CntTarQuery cntTarQuery)
     {
-        return cntTarService.selectCntTarList(pageQuery);
+        return cntTarService.selectCntTarList(cntTarQuery);
     }
 
     /**

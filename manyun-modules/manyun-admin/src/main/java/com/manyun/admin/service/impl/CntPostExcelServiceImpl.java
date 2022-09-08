@@ -95,7 +95,7 @@ public class CntPostExcelServiceImpl extends ServiceImpl<CntPostExcelMapper,CntP
     {
         if (StringUtils.isNull(postExcelList) || postExcelList.size() == 0)
         {
-            R.fail("导入提前购数据不能为空!");
+           return R.fail("导入提前购数据不能为空!");
         }
 
         Optional<PostExcel> postExcel = postExcelList.stream().findFirst();
