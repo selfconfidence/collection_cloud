@@ -8,6 +8,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.CntBoxCollection;
+import com.manyun.admin.domain.dto.ActionCollectionDto;
 import com.manyun.admin.domain.dto.SaveActionCollectionDto;
 import com.manyun.admin.domain.query.ActionCollectionQuery;
 import com.manyun.admin.domain.vo.ActionCollectionVo;
@@ -125,6 +126,16 @@ public class CntActionCollectionServiceImpl extends ServiceImpl<CntActionCollect
             updateBatchById(updateBatchList);
         }
         return 1;
+    }
+
+    /**
+     * 查询当前活动目标藏品总库存
+     * @param
+     * @return
+     */
+    @Override
+    public List<ActionCollectionDto> totalQuantity(List<String> ids) {
+        return cntActionCollectionMapper.totalQuantity(ids);
     }
 
 }

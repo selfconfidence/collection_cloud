@@ -140,5 +140,21 @@ public class CollectionController extends BaseController{
         return userCollectionService.shareCollection(notNullLoginBusinessUser.getUserId(),shareCollectionForm.getMyGoodsId() );
     }
 
+    @PostMapping("/pushMuseum")
+    @ApiOperation("选择藏品到展馆")
+    public R pushMuseum(@RequestBody String[] collections) {
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        userCollectionService.pushMuseum(collections, notNullLoginBusinessUser.getUserId());
+        return R.ok();
+    }
+
+    @PostMapping("/museumList")
+    @ApiOperation("展馆列表")
+    public R<List<MuseumListVo>> museumList() {
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        List<MuseumListVo> museumListVos = userCollectionService.museumList(notNullLoginBusinessUser.getUserId());
+        return R.ok(museumListVos);
+    }
+
 }
 

@@ -339,7 +339,11 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
          List<ActionCollection> actionCollections = actionCollectionService.list(Wrappers.<ActionCollection>lambdaQuery().eq(ActionCollection::getActionId, id));
         Assert.isTrue(actionTarList.size()>0,"获取合成藏品信息失败!");
         List<ActionCollection> actionCollectionList = actionCollections.parallelStream().filter(f -> f.getActionQuantity() != Integer.valueOf(0)).collect(Collectors.toList());
-        Assert.isTrue(actionCollectionList.size()>0,"本次所有合成藏品已经售罄,请联系客服人员!");
+        if(actionCollectionList.size()==0){
+            action.setActionStatus(3);
+            updateById(action);
+            return R.fail("活动结束,本次所有合成藏品已经售罄,请联系客服人员!");
+        }
         List<String> collectionIds = actionTarList.stream().map(ActionTar::getCollectionId).collect(Collectors.toList());
         List<UserCollectionCountDto> userCollectionCountDtos=userCollectionService.selectUserCollectionCount(collectionIds,userId);
         map.put("action",action);

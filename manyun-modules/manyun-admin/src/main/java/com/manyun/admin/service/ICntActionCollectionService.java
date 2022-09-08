@@ -3,6 +3,7 @@ package com.manyun.admin.service;
 import java.util.List;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntActionCollection;
+import com.manyun.admin.domain.dto.ActionCollectionDto;
 import com.manyun.admin.domain.dto.SaveActionCollectionDto;
 import com.manyun.admin.domain.query.ActionCollectionQuery;
 import com.manyun.admin.domain.vo.ActionCollectionVo;
@@ -34,4 +35,10 @@ public interface ICntActionCollectionService extends IService<CntActionCollectio
      */
     public int insertCntActionCollection(SaveActionCollectionDto saveActionCollectionDto);
 
+    /**
+     * 查询当前活动目标藏品总库存
+     * @param
+     * @return
+     */
+    List<ActionCollectionDto> totalQuantity(List<String> ids);
 }
