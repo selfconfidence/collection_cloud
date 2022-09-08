@@ -112,7 +112,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
 
     @Autowired
-    private RemoteSmsService remoteSmsService;
+    private ICntTarService cntTarService;
 
     @Autowired
     private RemoteBuiUserService remoteBuiUserService;
@@ -216,6 +216,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             Box box = boxService.getObject().getById(order.getBuiId());
             if (Objects.nonNull(box.getPostTime()))
             cntPostExcelService.orderExec(order.getUserId(),order.getBuiId());
+            // 是否是抽签购的？
+            if (StrUtil.isNotBlank(box.getTarId()))
+                cntTarService.overSelf(order.getUserId(),box.getId());
+
             return;
         }
 
@@ -228,6 +232,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             CntCollection collection = collectionService.getObject().getById(order.getBuiId());
             if (Objects.nonNull(collection.getPostTime()))
                 cntPostExcelService.orderExec(order.getUserId(),order.getBuiId());
+
+            // 是否是抽签购的？
+            if (StrUtil.isNotBlank(collection.getTarId()))
+                cntTarService.overSelf(order.getUserId(),collection.getId());
             return;
         }
         throw new IllegalStateException("not fount order good_type = " + goodsType);
@@ -322,6 +330,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      * @param outHost
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void notifyPayConsignmentSuccess(String outHost) {
 /*        Order order = getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, outHost));
         Assert.isTrue(Objects.nonNull(order),"找不到对应订单编号!");
@@ -380,8 +389,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         cntConsignment.setFormInfo("买方已经支付!");
         cntConsignment.setToPay(WAIT_TO_PAY.getCode());
         consignmentService.updateById(cntConsignment);
-        CntUserDto cntUserDto = remoteBuiUserService.commUni(cntConsignment.getSendUserId(), SecurityConstants.INNER).getData();
-        remoteSmsService.sendCommPhone(Builder.<SmsCommDto>of(SmsCommDto::new).with(SmsCommDto::setTemplateCode, BusinessConstants.SmsTemplateNumber.ASSERT_OK).with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().build()).with(SmsCommDto::setPhoneNumber,cntUserDto.getPhone()).build());    }
+       // CntUserDto cntUserDto = remoteBuiUserService.commUni(cntConsignment.getSendUserId(), SecurityConstants.INNER).getData();
+        //remoteSmsService.sendCommPhone(Builder.<SmsCommDto>of(SmsCommDto::new).with(SmsCommDto::setTemplateCode, BusinessConstants.SmsTemplateNumber.ASSERT_OK).with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().build()).with(SmsCommDto::setPhoneNumber,cntUserDto.getPhone()).build());
+
+        // 直接审核成功
+        consignmentService.consignmentSuccess(cntConsignment.getId());
+
+    }
+
 
     @Override
     public OrderInfoVo info(String id) {

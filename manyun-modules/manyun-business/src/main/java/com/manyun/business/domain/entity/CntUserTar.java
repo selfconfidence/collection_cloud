@@ -27,14 +27,26 @@ public class CntUserTar implements Serializable {
     @ApiModelProperty("主键")
     private String id;
 
+
+    @ApiModelProperty("抽签编号")
+    private String tarId;
+
+
+    @ApiModelProperty("开奖时间")
+    private LocalDateTime openTime;
+
     @ApiModelProperty("用户编号")
     private String userId;
 
     @ApiModelProperty("业务编号;(盲盒,藏品的编号)")
     private String buiId;
 
-    @ApiModelProperty("抽签状态;1=已抽中,2=未抽中")
+    @ApiModelProperty("抽签状态;1=已抽中,2=未抽中,4等待开奖")
     private Integer isFull;
+
+    @ApiModelProperty("内部字段 是否购买，1=未购买,2=已购买")
+    private Integer goSell;
+
 
     @ApiModelProperty("创建人")
     private String createdBy;

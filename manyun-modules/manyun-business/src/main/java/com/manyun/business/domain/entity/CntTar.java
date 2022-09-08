@@ -34,6 +34,12 @@ public class CntTar implements Serializable {
     @ApiModelProperty("抽签类型;(1=盲盒,2=藏品)")
     private Integer tarType;
 
+    @ApiModelProperty("1=正常,2=暂停(已经开奖)")
+    private Integer endFlag;
+
+    @ApiModelProperty("开奖时间")
+    private LocalDateTime openTime;
+
     @ApiModelProperty("创建人")
     private String createdBy;
 

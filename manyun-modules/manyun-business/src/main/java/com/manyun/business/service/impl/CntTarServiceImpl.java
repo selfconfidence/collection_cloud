@@ -1,27 +1,45 @@
 package com.manyun.business.service.impl;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.manyun.business.domain.entity.Box;
 import com.manyun.business.domain.entity.CntCollection;
 import com.manyun.business.domain.entity.CntTar;
 import com.manyun.business.domain.entity.CntUserTar;
 import com.manyun.business.mapper.CntTarMapper;
+import com.manyun.business.service.IBoxService;
 import com.manyun.business.service.ICntTarService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.business.service.ICntUserTarService;
+import com.manyun.business.service.ICollectionService;
+import com.manyun.comm.api.RemoteBuiUserService;
+import com.manyun.comm.api.domain.dto.CntUserDto;
+import com.manyun.common.core.constant.BusinessConstants;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.utils.jg.JpushUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import static com.manyun.common.core.enums.TarResultFlag.FLAG_PROCESS;
+import static com.manyun.common.core.enums.TarResultFlag.FLAG_STOP;
 import static com.manyun.common.core.enums.TarStatus.*;
+import static com.manyun.common.core.enums.UserTaSell.NO_SELL;
+import static com.manyun.common.core.enums.UserTaSell.SELL_OK;
 
 /**
  * <p>
@@ -37,6 +55,11 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
     @Autowired
     private ICntUserTarService userTarService;
 
+    @Autowired
+    private JpushUtil jpushUtil;
+
+    @Autowired
+    private RemoteBuiUserService remoteBuiUserService;
 
 
 
@@ -56,32 +79,157 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
         return userTar.getIsFull();
     }
 
-    @Override
-    public Integer tarCollection(CntCollection cntCollection, String userId) {
-        return tarComm(cntCollection.getId(),cntCollection.getTarId(),userId);
+
+    /**
+     * 买过了没有呢?
+     * @param buiId
+     * @param userId
+     * @return
+     */
+     @Override
+    public boolean isSell(String userId, String buiId){
+        if (CEN_NOT_TAR.getCode().equals(tarStatus(userId, buiId)))return Boolean.FALSE;
+        // 查询当前是否买过了？
+          CntUserTar userTar = userTarService.getOne(Wrappers.<CntUserTar>lambdaQuery().eq(CntUserTar::getUserId, userId).eq(CntUserTar::getBuiId, buiId));
+         return  SELL_OK.getCode().equals( userTar.getGoSell());
+
+
     }
 
     @Override
-    public Integer tarBox(Box box, String userId) {
-        return tarComm(box.getId(),box.getTarId(),userId);
+    public String tarCollection(CntCollection cntCollection, String userId) {
+        return tarComm(cntCollection.getCollectionName(),cntCollection.getId(),cntCollection.getTarId(),userId);
     }
 
-    private Integer tarComm(String buiId,String tarId,String userId){
+    @Override
+    public String tarBox(Box box, String userId) {
+        return tarComm(box.getBoxTitle(),box.getId(),box.getTarId(),userId);
+    }
+
+    @Override
+    public void overSelf(String userId, String id) {
+        CntUserTar userTar = userTarService.getOne(Wrappers.<CntUserTar>lambdaQuery().eq(CntUserTar::getUserId, userId).eq(CntUserTar::getBuiId, id));
+        userTar.setGoSell(SELL_OK.getCode());
+        userTar.updateD(userId);
+        userTarService.updateById(userTar);
+    }
+
+    private String tarComm(String buiName,String buiId,String tarId,String userId){
         Assert.isTrue(CEN_NOT_TAR.getCode().equals(tarStatus(userId,buiId)),"您已经抽过签了!");
         // 开始抽签
         CntTar cntTar = getOne(Wrappers.<CntTar>lambdaQuery().eq(CntTar::getId,tarId));
+        Assert.isTrue(FLAG_PROCESS.getCode().equals(cntTar.getEndFlag()),"抽签时间已过,敬请期待!");
         // 抽签算法 按照比例计算
         //1=已抽中,2=未抽中
-        Integer isFull = nowTimeIndex(cntTar.getTarPro());
+        //Integer isFull = nowTimeIndex(cntTar.getTarPro());
         CntUserTar cntUserTar = Builder.of(CntUserTar::new)
                 .with(CntUserTar::setUserId,userId)
                 .with(CntUserTar::setBuiId,buiId)
+                .with(CntUserTar::setTarId,tarId)
+                .with(CntUserTar::setGoSell, NO_SELL.getCode())
                 .with(CntUserTar::setId, IdUtil.getSnowflakeNextIdStr())
-                .with(CntUserTar::setIsFull,isFull)
+                .with(CntUserTar::setIsFull,CEN_WAIT_TAR.getCode())
                 .with(CntUserTar::createD,userId)
                 .build();
         userTarService.save(cntUserTar);
-        return isFull;
+        // 发短信
+        String format = cntTar.getOpenTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        CntUserDto cntUserDto = remoteBuiUserService.commUni(userId, SecurityConstants.INNER).getData();
+/*        remoteSmsService.sendCommPhone(Builder.of(SmsCommDto::new)
+                        .with(SmsCommDto::setPhoneNumber, cntUserDto.getPhone())
+                        .with(SmsCommDto::setTemplateCode, TAR_MSG)
+                        .with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().put("buiName", buiName).put("openTime", format).build())
+                .build());*/
+        jpushUtil.sendMsg(BusinessConstants.JgPushConstant.PUSH_TITLE,format, Arrays.asList(cntUserDto.getJgPush()));
+        return StrUtil.format("您已经参与对{}抽签了,抽签结果将在{}公布!",buiName,format);
+    }
+
+    // 开始公布抽签结果
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void openTarResult(String tarId){
+        CntTar cntTar = getById(tarId);
+        // 幂等校验
+        if (FLAG_PROCESS.getCode().equals( cntTar.getEndFlag()))return;
+        execProcessBatchResult(tarId);
+        cntTar.setEndFlag(FLAG_STOP.getCode());
+        updateById(cntTar);
+
+
+    }
+
+    private void execProcessBatchResult(String tarId) {
+        // 找到所有抽签记录
+        List<CntUserTar> cntUserTars = userTarService.list(Wrappers.<CntUserTar>lambdaQuery().eq(CntUserTar::getTarId, tarId));
+        // 看下当前库存量（中奖量）
+        if (!cntUserTars.isEmpty()){
+            // 得到资产主体
+            CntUserTar cntUserTar = cntUserTars.stream().findFirst().get();
+            // 是藏品还是盲盒? 得到对应库存即可
+            Integer count = null;
+            CntCollection cntCollection = SpringUtil.getBean(ICollectionService.class).getById(cntUserTar.getBuiId());
+            Box box = SpringUtil.getBean(IBoxService.class).getById(cntUserTar.getBuiId());
+            if ((count = Objects.isNull(cntCollection) ? null : cntCollection.getBalance()) != null  || (count = Objects.isNull(box) ? null : box.getBalance()) != null);
+            // 1.1 如果 中奖量 比抽签记录 >= 全部中奖即可
+            if (count >= cntUserTars.size()) {
+               openSuccess(cntUserTars);
+               return;
+            }
+            // 1.2 如果 中奖量 比抽签记录 <
+            // 1.2.1 找到所有抽签记录 中奖的记录 统计起来
+            List<CntUserTar> successUserTarLists = cntUserTars.parallelStream().filter(item -> CEN_YES_TAR.getCode().equals(item.getIsFull())).collect(Collectors.toList());
+
+            List<CntUserTar> whatUserTarLists = cntUserTars.parallelStream().filter(item -> CEN_WAIT_TAR.getCode().equals(item.getIsFull())).collect(Collectors.toList());
+
+            //         当一个 总数 -  中奖量  = 余下的名单, 开始派发其他未中奖的即可.
+             int tempPoint;
+             int successBalance =  tempPoint  =  count - successUserTarLists.size();
+             //successBalance 还有剩余的中奖次数
+               Collections.shuffle(whatUserTarLists);
+            for (int i = 0; i < successBalance; i++) {
+                CntUserTar whatSuccessUserTar = whatUserTarLists.get(i);
+                successUserTarLists.add(whatSuccessUserTar);
+            }
+            // 1.3 推送通知信息 未中奖的，中奖的人
+            openSuccess(successUserTarLists);
+            openFail(ListUtil.sub(whatUserTarLists, tempPoint, whatUserTarLists.size()));
+        }
+    }
+
+
+    /**
+     * 中奖的
+     * @param cntUserTars
+     */
+    private void openSuccess(List<CntUserTar> cntUserTars) {
+        ArrayList<String> jgRegLists = Lists.newArrayList();
+        for (CntUserTar cntUserTar : cntUserTars) {
+            cntUserTar.setIsFull(CEN_YES_TAR.getCode());
+            cntUserTar.setOpenTime(LocalDateTime.now());
+            cntUserTar.updateD(cntUserTar.getUserId());
+            CntUserDto cntUserDto = remoteBuiUserService.commUni(cntUserTar.getUserId(), SecurityConstants.INNER).getData();
+            if (StrUtil.isNotBlank(cntUserDto.getJgPush())) jgRegLists.add(cntUserDto.getJgPush());
+        }
+        userTarService.updateBatchById(cntUserTars);
+        // 推送用户了表明中奖状态
+        jpushUtil.sendMsg(BusinessConstants.JgPushConstant.PUSH_TITLE,"您抽签结果已经公布,已抽中,快去购买吧!",jgRegLists);
+    }
+    /**
+     * 未中奖的
+     * @param cntUserTars
+     */
+    private void openFail(List<CntUserTar> cntUserTars) {
+        ArrayList<String> jgRegLists = Lists.newArrayList();
+        for (CntUserTar cntUserTar : cntUserTars) {
+            cntUserTar.setIsFull(CEN_NO_TAR.getCode());
+            cntUserTar.setOpenTime(LocalDateTime.now());
+            cntUserTar.updateD(cntUserTar.getUserId());
+            CntUserDto cntUserDto = remoteBuiUserService.commUni(cntUserTar.getUserId(), SecurityConstants.INNER).getData();
+            if (StrUtil.isNotBlank(cntUserDto.getJgPush())) jgRegLists.add(cntUserDto.getJgPush());
+        }
+        userTarService.updateBatchById(cntUserTars);
+        // 推送用户了表明中奖状态
+        jpushUtil.sendMsg(BusinessConstants.JgPushConstant.PUSH_TITLE,"您抽签结果已经公布,未抽中,再接再厉!",jgRegLists);
     }
 
     /**

@@ -5,6 +5,7 @@ import com.manyun.admin.service.ICntCollectionService;
 import com.manyun.comm.api.RemoteAuctionService;
 import com.manyun.comm.api.RemoteConsignmentService;
 import com.manyun.comm.api.RemoteOrderService;
+import com.manyun.comm.api.RemoteTarService;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.redis.service.RedisService;
@@ -34,6 +35,9 @@ public class BuiTask
 
     @Resource
     private RemoteConsignmentService remoteConsignmentService;
+
+    @Resource
+    private RemoteTarService remoteTarService;
 
     @Autowired
     private RedisService redisService;
@@ -123,6 +127,13 @@ public class BuiTask
     public void doTaskExe(){
         boxService.taskCheckStatus();
         cntCollectionService.taskCheckStatus();
+    }
+
+    /**
+     * 定时公布抽签开奖结果
+     */
+    public void doPublishTarOpen(){
+        remoteTarService.taskEndFlag(SecurityConstants.INNER);
     }
 
 }
