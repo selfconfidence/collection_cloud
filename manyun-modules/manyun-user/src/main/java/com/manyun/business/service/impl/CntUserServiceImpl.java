@@ -33,6 +33,7 @@ import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.utils.MD5Util;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.jg.JgAuthLoginUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -133,6 +134,8 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         CntUser cntUser = getById(userId);
         UserInfoVo userInfoVo = new UserInfoVo();
         BeanUtil.copyProperties(cntUser,userInfoVo);
+        userInfoVo.setPayPass(MD5Util.encode(IdUtil.getSnowflakeNextIdStr()));
+        userInfoVo.setLoginPass(MD5Util.encode(IdUtil.getSnowflakeNextIdStr()));
         return userInfoVo;
     }
 
@@ -349,6 +352,8 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     private UserInfoVo initUserLevelVo(CntUser cntUser) {
         UserInfoVo userInfoVo = Builder.of(UserInfoVo::new).build();
         BeanUtil.copyProperties(cntUser,userInfoVo);
+        userInfoVo.setPayPass(MD5Util.encode(IdUtil.getSnowflakeNextIdStr()));
+        userInfoVo.setLoginPass(MD5Util.encode(IdUtil.getSnowflakeNextIdStr()));
         if (StrUtil.isNotBlank(userInfoVo.getPhone()) && userInfoVo.getPhone().length() >= 11)
             userInfoVo.setPhone(DesensitizedUtil.mobilePhone(userInfoVo.getPhone()));
         return userInfoVo;
