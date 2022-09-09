@@ -254,7 +254,7 @@ public class CntUserController extends BaseController {
 
     @PostMapping("/checkPaySecure")
     @ApiOperation(value = "检查支付密码是否一致",notes = "{\"paySecure\":\"123321123\"}")
-    public R checkPaySecure(@RequestBody JSONObject jsonObject){
+    public R checkPaySecure(@RequestBodyRsa JSONObject jsonObject){
         String paySecure = jsonObject.getString("paySecure");
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         userService.checkPaySecure(paySecure,notNullLoginBusinessUser.getUserId());
