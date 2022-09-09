@@ -154,10 +154,10 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
 //        if (Integer.valueOf(1).equals(consignmentQuery.getIsNew()))
 //            lambdaQueryWrapper.orderByDesc(CntConsignment::getUpdatedTime);
 
-        lambdaQueryWrapper.orderBy(true, Integer.valueOf(1).equals(consignmentQuery.getPriceOrder()),CntConsignment::getConsignmentPrice)
-                .orderBy(true, Integer.valueOf(1).equals(consignmentQuery.getTimeOrder()), CntConsignment::getCreatedTime);
+        /*lambdaQueryWrapper.orderBy(true, Integer.valueOf(1).equals(consignmentQuery.getPriceOrder()),CntConsignment::getConsignmentPrice)
+                .orderBy(true, Integer.valueOf(1).equals(consignmentQuery.getTimeOrder()), CntConsignment::getCreatedTime);*/
 
-        /*if (!Integer.valueOf(-1).equals(consignmentQuery.getPriceOrder())){
+        if (!Integer.valueOf(-1).equals(consignmentQuery.getPriceOrder())){
             if (Objects.nonNull(consignmentQuery.getPriceOrder()) && Integer.valueOf(0).equals(consignmentQuery.getPriceOrder()))
                 lambdaQueryWrapper.orderByDesc(CntConsignment::getConsignmentPrice);
             if (Objects.nonNull(consignmentQuery.getPriceOrder()) && Integer.valueOf(1).equals(consignmentQuery.getPriceOrder()))
@@ -170,7 +170,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
                 lambdaQueryWrapper.orderByDesc(CntConsignment::getCreatedTime);
             if (Objects.nonNull(consignmentQuery.getTimeOrder()) && Integer.valueOf(1).equals(consignmentQuery.getTimeOrder()))
                 lambdaQueryWrapper.orderByAsc(CntConsignment::getCreatedTime);
-        }*/
+        }
 
         return lambdaQueryWrapper;
     }
