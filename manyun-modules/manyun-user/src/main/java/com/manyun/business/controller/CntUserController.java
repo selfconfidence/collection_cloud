@@ -178,7 +178,7 @@ public class CntUserController extends BaseController {
     // 修改支付密码
     @PostMapping("/changePayPass")
     @ApiOperation(value = "修改支付密码")
-    public R changePayPass(@RequestBodyRsa @Valid UserChangePayPass userChangePayPass){
+    public R changePayPass(@RequestBody @Valid UserChangePayPass userChangePayPass){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         String phone = notNullLoginBusinessUser.getCntUser().getPhone();
         codeCheck(phone,userChangePayPass.getPhoneCode(), PhoneCodeType.CHANGE_PAY_PASS.getType());
