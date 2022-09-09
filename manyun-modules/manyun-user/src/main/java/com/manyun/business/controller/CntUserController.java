@@ -67,7 +67,7 @@ public class CntUserController extends BaseController {
 
     @PostMapping("/regUser")
     @ApiOperation("用户注册 - 手机号验证码的方式")
-    public R regUser(@RequestBodyRsa @Valid UserRegForm userRegForm){
+    public R regUser(@RequestBody @Valid UserRegForm userRegForm){
         String phoneCode = (String) redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(userRegForm.getPhone().concat(PhoneCodeType.REG_CODE.getType())));
         Assert.isTrue(userRegForm.getPhoneCode().equals(phoneCode),"验证码输入错误,请核实!");
         userService.regUser(userRegForm);

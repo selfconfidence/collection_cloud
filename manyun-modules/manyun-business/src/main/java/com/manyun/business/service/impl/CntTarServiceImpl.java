@@ -148,7 +148,9 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
                         .with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().put("buiName", buiName).put("openTime", format).build())
                 .build());
         String msg = StrUtil.format("您已经参与对{}抽签了,抽签结果将在{}公布!", buiName, format);
+        if (StrUtil.isNotBlank(cntUserDto.getJgPush()))
         jpushUtil.sendMsg(BusinessConstants.JgPushConstant.PUSH_TITLE,msg, Arrays.asList(cntUserDto.getJgPush()));
+
         return msg;
     }
 

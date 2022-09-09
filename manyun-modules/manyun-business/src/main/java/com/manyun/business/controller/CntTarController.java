@@ -48,7 +48,7 @@ public class CntTarController{
     public R taskEndFlag(){
         // 查询出将要开奖的抽签主体
         List<CntTar> cntTarList = cntTarService.list(Wrappers.<CntTar>lambdaQuery().eq(CntTar::getEndFlag, FLAG_PROCESS.getCode()).le(CntTar::getOpenTime, LocalDateTime.now()));
-        log.info("本次抽签公布个数有{}",cntTarList.size());
+        if (!cntTarList.isEmpty())log.info("本次抽签公布个数有{}",cntTarList.size());
         for (CntTar cntTar : cntTarList) {
             cntTarService.openTarResult(cntTar.getId());
         }
