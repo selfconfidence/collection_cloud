@@ -114,7 +114,7 @@ public class CntUserController extends BaseController {
     // 实名认证
     @PostMapping("/realUser")
     @ApiOperation("实名认证 -- 银联")
-    public R realUser(@RequestBodyRsa @Valid UserRealForm userRealForm){
+    public R realUser(@RequestBody @Valid UserRealForm userRealForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         codeCheck(userRealForm.getPhone(),userRealForm.getPhoneCode(), PhoneCodeType.REAL_CODE.getType());
         return userService.userRealName(userRealForm, notNullLoginBusinessUser.getUserId());
