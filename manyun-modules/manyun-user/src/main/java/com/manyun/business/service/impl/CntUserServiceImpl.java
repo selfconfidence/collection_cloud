@@ -256,7 +256,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         }
         R r = unionRealConfig.unionReal(userRealForm);
         if (200 != r.getCode()) {
-            return R.fail(r.getMsg());
+            return R.fail("实名认证失败:" + r.getMsg());
         }
         UserRealMoneyForm userRealMoneyForm = Builder.of(UserRealMoneyForm::new).build();
         userRealMoneyForm.setUserId(userId);
