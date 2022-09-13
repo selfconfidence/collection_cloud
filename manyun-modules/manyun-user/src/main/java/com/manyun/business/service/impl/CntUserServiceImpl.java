@@ -67,7 +67,6 @@ import static com.manyun.common.core.enums.UserRealStatus.OK_REAL;
  * @since 2022-06-17
  */
 @Service
-@Slf4j
 public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> implements ICntUserService {
 
     @Autowired
@@ -246,9 +245,9 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     public R userRealName(UserRealForm userRealForm, String userId) {
         R<String> stringR = remoteBuiMoneyService.checkIdentity(userRealForm.getCartNo(), SecurityConstants.INNER);
 
-        log.info("身份证验证返回值----" + stringR.getCode()+ "-----------" + stringR.getData()+ "msg-----" + stringR.getMsg());
+        //log.info("身份证验证返回值----" + stringR.getCode()+ "-----------" + stringR.getData()+ "msg-----" + stringR.getMsg());
         if (remoteBuiMoneyService.checkIdentity(userRealForm.getCartNo(), SecurityConstants.INNER).getCode() != 200) {
-            if (StrUtil.isNotBlank(stringR.getData()) && getById(stringR.getData()) != null  && getById(stringR.getData()).getIsReal() == 2) {
+            if (StrUtil.isNotBlank(stringR.getMsg()) && getById(stringR.getMsg()) != null  && getById(stringR.getMsg()).getIsReal() == 2) {
                 return R.fail("当前身份证已用于实名，请勿重复验证");
             }
             /*String data = stringR.getData();
@@ -257,7 +256,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         }
         R r = unionRealConfig.unionReal(userRealForm);
         if (200 != r.getCode()) {
-            return R.fail("实名认证失败");
+            return R.fail(r.getMsg());
         }
         UserRealMoneyForm userRealMoneyForm = Builder.of(UserRealMoneyForm::new).build();
         userRealMoneyForm.setUserId(userId);
