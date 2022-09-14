@@ -67,6 +67,7 @@ import static com.manyun.common.core.enums.UserRealStatus.OK_REAL;
  * @since 2022-06-17
  */
 @Service
+@Slf4j
 public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> implements ICntUserService {
 
     @Autowired
@@ -351,6 +352,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         cntUser.setLinkAddr(hash);
         cntUser.updateD(userId);
         updateById(cntUser);
+        log.info("实名认证调用上链");
     }
 
 

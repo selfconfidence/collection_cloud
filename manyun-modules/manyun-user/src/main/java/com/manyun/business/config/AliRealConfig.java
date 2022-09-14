@@ -2,6 +2,7 @@ package com.manyun.business.config;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.json.JSONUtil;
 import com.aliyun.cloudauth20200618.Client;
 import com.aliyun.cloudauth20200618.models.DescribeSmartVerifyRequest;
 import com.aliyun.cloudauth20200618.models.DescribeSmartVerifyResponse;
@@ -92,6 +93,7 @@ public class AliRealConfig {
     @SneakyThrows
     public void checkCertifyIdH5Status(String certifyId){
 // 等App客户端提交刷脸认证后，在客户端SDK的回调函数中，由客户端通知服务端运行以下代码查询认证结果。
+        log.info("开始h5实名认证查询！");
         DescribeFaceVerifyRequest request2 = new DescribeFaceVerifyRequest();
         request2.setCertifyId(certifyId);
         request2.setSceneId(h5SceneId);
@@ -106,6 +108,7 @@ public class AliRealConfig {
 //        System.out.println(response2.getResultObject().getIdentityInfo());
         Assert.isTrue("200".equals(response.getCode()),response.getMessage());
         Assert.isTrue("200".equals(response.getResultObject().getSubCode()),response.getResultObject().getPassed());
+        log.info("h5实名认证结果！{}", JSONUtil.toJsonStr(response.getResultObject()));
     }
 
 
