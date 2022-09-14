@@ -112,7 +112,7 @@ public class LLPayNotifyController {
                 String txnStatus = resultObj.getString("txn_status");
                 JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
                 if("TRADE_SUCCESS".equals(txnStatus) && Objects.nonNull(orderInfo)){
-                    log.info("txn_seqno:======="+resultObj.getString("txn_seqno"));
+                    log.info("txn_seqno:======="+orderInfo.getString("txn_seqno"));
 
                 }else {
                     log.info("响应结果异常!");
@@ -194,8 +194,8 @@ public class LLPayNotifyController {
                 String txnStatus = resultObj.getString("txn_status");
                 JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
                 if("TRADE_SUCCESS".equals(txnStatus) && Objects.nonNull(orderInfo)){
-                    log.info("txn_seqno:======="+resultObj.getString("txn_seqno"));
-                    orderService.notifyPaySuccess(resultObj.getString("txn_seqno"));
+                    log.info("txn_seqno:======="+orderInfo.getString("txn_seqno"));
+                    orderService.notifyPaySuccess(orderInfo.getString("txn_seqno"));
                 }else {
                     log.info("响应结果异常!");
                     return null;
@@ -235,8 +235,8 @@ public class LLPayNotifyController {
                 String txnStatus = resultObj.getString("txn_status");
                 JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
                 if("TRADE_SUCCESS".equals(txnStatus) && Objects.nonNull(orderInfo)){
-                    log.info("txn_seqno:======="+resultObj.getString("txn_seqno"));
-               orderService.notifyPayConsignmentSuccess(resultObj.getString("txn_seqno"));
+                    log.info("txn_seqno:======="+orderInfo.getString("txn_seqno"));
+               orderService.notifyPayConsignmentSuccess(orderInfo.getString("txn_seqno"));
                 }else {
                     log.info("响应结果异常!");
                     return null;
