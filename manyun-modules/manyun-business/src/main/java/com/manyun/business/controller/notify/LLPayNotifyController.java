@@ -274,7 +274,7 @@ public class LLPayNotifyController {
                 JSONObject resultObj = JSONObject.parseObject(resultSB.toString());
                 String txnStatus = resultObj.getString("txn_status");
                 JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
-                String tradeNo = resultObj.getString("txn_seqno");
+                String tradeNo = orderInfo.getString("txn_seqno");
                 if("TRADE_SUCCESS".equals(txnStatus) && Objects.nonNull(orderInfo)){
                     log.info("txn_seqno:======="+resultObj.getString("txn_seqno"));
                     auctionPriceService.notifyPayMarginSuccess(tradeNo);
@@ -292,7 +292,7 @@ public class LLPayNotifyController {
 
     @PostMapping(value = "/auctionNotify")
     @ResponseBody
-    @ApiOperation(value = "保证金支付",hidden = true)
+    @ApiOperation(value = "拍卖支付",hidden = true)
     public String auctionNotify(HttpServletRequest req) throws IOException {
         String sign = req.getHeader("Signature-Data");
         //获取request的输入流，并设置格式为UTF-8
@@ -315,7 +315,7 @@ public class LLPayNotifyController {
                 JSONObject resultObj = JSONObject.parseObject(resultSB.toString());
                 String txnStatus = resultObj.getString("txn_status");
                 JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
-                String tradeNo = resultObj.getString("txn_seqno");
+                String tradeNo = orderInfo.getString("txn_seqno");
                 if("TRADE_SUCCESS".equals(txnStatus) && Objects.nonNull(orderInfo)){
                     log.info("txn_seqno:======="+resultObj.getString("txn_seqno"));
                     auctionOrderService.notifyPaySuccess(tradeNo);
@@ -333,7 +333,7 @@ public class LLPayNotifyController {
 
     @PostMapping(value = "/auctionFixNotify")
     @ResponseBody
-    @ApiOperation(value = "保证金支付",hidden = true)
+    @ApiOperation(value = "一口价支付",hidden = true)
     public String auctionFixNotify(HttpServletRequest req) throws IOException {
         String sign = req.getHeader("Signature-Data");
         //获取request的输入流，并设置格式为UTF-8
@@ -356,7 +356,7 @@ public class LLPayNotifyController {
                 JSONObject resultObj = JSONObject.parseObject(resultSB.toString());
                 String txnStatus = resultObj.getString("txn_status");
                 JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
-                String tradeNo = resultObj.getString("txn_seqno");
+                String tradeNo = orderInfo.getString("txn_seqno");
                 if("TRADE_SUCCESS".equals(txnStatus) && Objects.nonNull(orderInfo)){
                     log.info("txn_seqno:======="+resultObj.getString("txn_seqno"));
                     auctionOrderService.notifyPaySuccess(tradeNo);
