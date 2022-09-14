@@ -1,13 +1,11 @@
 package com.manyun.admin.service.impl;
 
-import java.util.List;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
@@ -26,6 +24,7 @@ import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
+import javafx.geometry.Pos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.manyun.admin.mapper.CntPostExcelMapper;
@@ -84,6 +83,33 @@ public class CntPostExcelServiceImpl extends ServiceImpl<CntPostExcelMapper,CntP
         return removeByIds(Arrays.asList(ids))==true?1:0;
     }
 
+    public static void main(String[] args) {
+        List<PostExcel> postExcels = new ArrayList<>();
+        PostExcel postExcel=new PostExcel();
+        postExcel.setPhone("15036380340");
+        postExcel.setBuiName("123321");
+        postExcel.setTypeName("1");
+        PostExcel postExcel1=new PostExcel();
+        postExcel1.setPhone("15036380340");
+        postExcel1.setBuiName("123321");
+        postExcel1.setTypeName("1");
+        PostExcel postExcel2=new PostExcel();
+        postExcel2.setPhone("15036380340");
+        postExcel2.setBuiName("123321");
+        postExcel2.setTypeName("1");
+        //postExcels.add(postExcel);
+        postExcels.add(postExcel1);
+        postExcels.add(postExcel2);
+        ArrayList<PostExcel> collect = postExcels.parallelStream().collect(
+                Collectors
+                        .collectingAndThen(
+                                Collectors.toCollection(() -> new TreeSet<>(
+                                        Comparator.comparing(o -> o.getPhone() + ";" + o.getBuiName() + ";" + o.getTypeName()))), ArrayList::new
+                        )
+        );
+        System.out.println(collect.size());
+    }
+
     /***
      * 获取导入的数据,并处理
      *
@@ -97,6 +123,28 @@ public class CntPostExcelServiceImpl extends ServiceImpl<CntPostExcelMapper,CntP
         {
            return R.fail("导入提前购数据不能为空!");
         }
+
+        ArrayList<PostExcel> collect = postExcelList.parallelStream().collect(
+                Collectors
+                        .collectingAndThen(
+                                Collectors.toCollection(() -> new TreeSet<>(
+                                        Comparator.comparing(o -> o.getPhone() + ";" + o.getBuiName() + ";" + o.getTypeName()))), ArrayList::new
+                        )
+        );
+        Assert.isTrue(postExcelList.size()==collect.size(),"导入数据中存在重复数据,请检查!");
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         Optional<PostExcel> postExcel = postExcelList.stream().findFirst();
         String typeName = postExcel.get().getTypeName();

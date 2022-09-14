@@ -1,7 +1,17 @@
 package com.manyun.business.controller;
 
 
+import cn.hutool.core.util.IdUtil;
 import com.manyun.business.config.cashier.sdk.CertUtil;
+import com.manyun.business.design.pay.LLPayUtils;
+import com.manyun.business.design.pay.ShandePay;
+import com.manyun.business.design.pay.bean.query.AcctserialAcctbal;
+import com.manyun.business.design.pay.bean.query.LinkedAcctlist;
+import com.manyun.business.domain.dto.PayInfoDto;
+import com.manyun.business.domain.query.LLGeneralConsumeQuery;
+import com.manyun.business.domain.query.LLInnerUserQuery;
+import com.manyun.business.domain.query.LLUserTopupQuery;
+import com.manyun.common.core.domain.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,10 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * <p>
@@ -41,8 +48,47 @@ public class ActionTarController {
 
     @GetMapping("/test")
     @ResponseBody
-    public PublicKey test() {
-        return CertUtil.getPublicKey();
+    public String test() {
+        //开户
+       /*return LLPayUtils.innerUser(
+               Builder.of(LLInnerUserQuery::new)
+                       .with(LLInnerUserQuery::setUserId,"1556912957824274432")
+                       .with(LLInnerUserQuery::setPhone,"15036380340")
+                       .with(LLInnerUserQuery::setRealName,"高丰雷")
+                       .with(LLInnerUserQuery::setCartNo,"410381200004224034")
+                       .with(LLInnerUserQuery::setReturnUrl,"http://h5.dcalliance.com.cn/")
+               .build()
+       );*/
+       //充值
+      /* return LLPayUtils.userTopup(
+               Builder.of(LLUserTopupQuery::new)
+               .with(LLUserTopupQuery::setUserId,"1556912957824274432")
+               .with(LLUserTopupQuery::setRealName,"高丰雷")
+               .with(LLUserTopupQuery::setPhone,"15036380340")
+               .with(LLUserTopupQuery::setIpAddr,"172.16.14.194")
+               .with(LLUserTopupQuery::setAmount,BigDecimal.valueOf(0.05))
+               .with(LLUserTopupQuery::setReturnUrl,"http://h5.dcalliance.com.cn/")
+               .build()
+       );*/
+      //消费
+        return LLPayUtils.generalConsume(
+                Builder.of(LLGeneralConsumeQuery::new)
+                .with(LLGeneralConsumeQuery::setOrderId, IdUtil.getSnowflakeNextIdStr())
+                .with(LLGeneralConsumeQuery::setGoodsName, "啦啦啦")
+                .with(LLGeneralConsumeQuery::setAmount, BigDecimal.valueOf(0.2))
+                .with(LLGeneralConsumeQuery::setUserId,"1556912957824274432")
+                .with(LLGeneralConsumeQuery::setRealName,"高丰雷")
+                .with(LLGeneralConsumeQuery::setPhone,"15036380340")
+                .with(LLGeneralConsumeQuery::setIpAddr,"127.0.0.1")
+                .with(LLGeneralConsumeQuery::setReturnUrl,"http://h5.dcalliance.com.cn/")
+                .build()
+        );
+        //余额
+        //return LLPayUtils.queryAcctinfo("1556912957824274432");
+        //绑卡列表数据
+        //return LLPayUtils.queryLinkedacct("LLianPayTest-In-User-12345");
+        //资金流水
+        //return LLPayUtils.queryAcctserial("1556912957824274432","20220913000000","20220914000000","1","10");
     }
 
     /**
