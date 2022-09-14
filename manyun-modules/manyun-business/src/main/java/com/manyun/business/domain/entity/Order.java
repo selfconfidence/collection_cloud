@@ -62,7 +62,7 @@ public class Order implements Serializable {
     @ApiModelProperty("订单状态;0待付款，1已完成，2已取消，-1支付未回调，3=进行中(这个比较特殊 属于寄售的时候用的)")
     private Integer orderStatus;
 
-    @ApiModelProperty("支付方式;0平台，1支付宝，2微信，3银联,4杉德")
+    @ApiModelProperty("支付方式;0平台，1支付宝，2微信，3银联,4杉德,5连连")
     private Integer payType;
 
     @ApiModelProperty("购买数量,默认为1")

@@ -24,4 +24,6 @@ public class LLGeneralConsumeQuery {
     //ios Android h5 表单提交之后跳转回app的地址
     private String returnUrl;
 
+    private String notifyUrl;
+
 }

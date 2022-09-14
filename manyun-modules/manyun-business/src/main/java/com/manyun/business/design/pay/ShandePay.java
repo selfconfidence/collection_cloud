@@ -34,6 +34,9 @@ public class ShandePay implements RootPayServer {
     @Autowired
     private IMoneyService moneyService;
 
+    @Autowired
+    private LianLianPay lianLianPay;
+
     public static final String defaultReturnUrl = "http://h5.dcalliance.com.cn/";
 
     /**
@@ -47,7 +50,7 @@ public class ShandePay implements RootPayServer {
             String body = pay(payInfoDto);
             return Builder.of(PayVo::new).with(PayVo::setBody, body).with(PayVo::setPayType, payInfoDto.getPayType()).with(PayVo::setOutHost, payInfoDto.getOutHost()).build();
         }
-        throw new IllegalArgumentException("not fount pay_type = " + payInfoDto.getPayType());
+        return lianLianPay.execPayVo(payInfoDto);
 
     }
 

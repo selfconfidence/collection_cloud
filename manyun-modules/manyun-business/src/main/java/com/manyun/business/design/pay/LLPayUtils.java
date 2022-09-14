@@ -306,7 +306,7 @@ public class LLPayUtils {
         匿名用户：ANONYMOUS
          */
         params.setUser_type("REGISTERED");
-        params.setNotify_url(LianLianPayEnum.GENERAL_CONSUME.getNotifyUrl());
+        params.setNotify_url(llGeneralConsumeQuery.getNotifyUrl());
         params.setReturn_url(llGeneralConsumeQuery.getReturnUrl());
         // 交易发起渠道设置
         params.setFlag_chnl("H5");

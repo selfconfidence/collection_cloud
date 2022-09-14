@@ -12,6 +12,11 @@ import lombok.Getter;
 public enum LianLianPayEnum
 {
 
+    COLLECTION_BOX_SHANDE_PAY("https://dcalliance.com.cn/prod-api/business/notify_pay/LlPay/collectionJoinBoxNotify", "盲盒藏品支付",""),
+    CONSIGNMENT_SHANDE_PAY("https://dcalliance.com.cn/prod-api/business/notify_pay/LlPay/consignmentNotify", "寄售支付",""),
+    AUCTION_MARGIN_SHANDE_PAY("https://dcalliance.com.cn/prod-api/business/notify_pay/LlPay/auctionMarginNotify", "保证金支付", ""),
+    AUCTION_SHANDE_PAY("https://dcalliance.com.cn/prod-api/business/notify_pay/LlPay/auctionNotify", "拍卖支付", ""),
+    AUCTION_FIX_SHANDE_PAY("https://dcalliance.com.cn/prod-api/business/notify_pay/LlPay/auctionFixNotify", "一口价支付", ""),
     INNER_USER("https://dcalliance.com.cn/prod-api/business/notify_pay/LlPay/LlInnerUserNotify", "连连支付开户回调", ""),
     BIND_CARD_APPLY("https://dcalliance.com.cn/prod-api/business/notify_pay/LlPay/LlBindCardApplyNotify", "连连支付新增绑卡申请回调", ""),
     USER_TOPUP("https://dcalliance.com.cn/prod-api/business/notify_pay/LlPay/LlUserTopupNotify", "连连支付充值回调", ""),

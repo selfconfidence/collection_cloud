@@ -40,7 +40,7 @@ public class AliRealNotifyController {
             cntUserService.checkCertifyIdH5Status(certifyId,cntUser.getId());
           return "success";
         } catch (Exception e) {
-
+              log.error("h5回调实名认证失败", e.getMessage());
             return "failure";
         }
     }
