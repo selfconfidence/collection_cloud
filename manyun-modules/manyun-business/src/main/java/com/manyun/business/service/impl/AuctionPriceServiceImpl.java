@@ -32,6 +32,7 @@ import com.manyun.common.core.domain.CodeStatus;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.AuctionSendStatus;
 import com.manyun.common.core.enums.AuctionStatus;
+import com.manyun.common.core.enums.LianLianPayEnum;
 import com.manyun.common.core.enums.ShandePayEnum;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
@@ -411,6 +412,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .sendAuctionId(auctionPayForm.getAuctionSendId())
                 .userId(payUserId).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));*/
         ShandePayEnum shandePayEnum = ShandePayEnum.AUCTION_SHANDE_PAY.setReturnUrl(auctionPayForm.getReturnUrl(), auctionPayForm.getReturnUrl());
+        LianLianPayEnum lianLianPayEnum = LianLianPayEnum.AUCTION_SHANDE_PAY.setReturnUrl(auctionPayForm.getReturnUrl(), auctionPayForm.getReturnUrl());
 
         PayVo payVo =  rootPay.execPayVo(
                 PayInfoDto.builder()
@@ -420,6 +422,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                         .aliPayEnum(AUCTION_ALI_PAY)
                         .wxPayEnum(AUCTION_WECHAT_PAY)
                         .shandePayEnum(shandePayEnum)
+                        .lianlianPayEnum(lianLianPayEnum)
                         .ipaddr(Ipv4Util.LOCAL_IP)
                         .goodsName(auctionOrder.getGoodsName())
                         .userId(payUserId).build());
@@ -499,7 +502,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .eq(AuctionMargin::getAuctionSendId, auctionPayMarginForm.getAuctionSendId()));
 
         ShandePayEnum shandePayEnum = ShandePayEnum.AUCTION_MARGIN_SHANDE_PAY.setReturnUrl(auctionPayMarginForm.getReturnUrl(), auctionPayMarginForm.getReturnUrl());
-
+        LianLianPayEnum lianLianPayEnum = LianLianPayEnum.AUCTION_MARGIN_SHANDE_PAY.setReturnUrl(auctionPayMarginForm.getReturnUrl(), auctionPayMarginForm.getReturnUrl());
         PayVo payVo = rootPay.execPayVo(PayInfoDto.builder()
                 .payType(auctionPayMarginForm.getPayType())
                 .realPayMoney(auctionMargin1.getMargin().subtract(auctionMargin1.getMoneyBln()))
@@ -507,6 +510,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .aliPayEnum(MARGIN_ALI_PAY)
                 .wxPayEnum(MARGIN_WECHAT_PAY)
                 .shandePayEnum(shandePayEnum)
+                .lianlianPayEnum(lianLianPayEnum)
                 .ipaddr(Ipv4Util.LOCAL_IP)
                 .goodsName(auctionSend.getGoodsName())
                 .userId(payUserId).build());
@@ -607,6 +611,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         }
 
         ShandePayEnum shandePayEnum = ShandePayEnum.AUCTION_FIX_SHANDE_PAY.setReturnUrl(auctionPayFixedForm.getReturnUrl(), auctionPayFixedForm.getReturnUrl());
+        LianLianPayEnum lianLianPayEnum = LianLianPayEnum.AUCTION_FIX_SHANDE_PAY.setReturnUrl(auctionPayFixedForm.getReturnUrl(), auctionPayFixedForm.getReturnUrl());
         PayVo payVo = rootPay.execPayVo(PayInfoDto.builder()
                 .payType(auctionPayFixedForm.getPayType())
                 .realPayMoney(auctionOrder.getOrderAmount().subtract(auctionOrder.getMoneyBln()))
@@ -614,6 +619,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .aliPayEnum(FIXED_ALI_PAY)
                 .wxPayEnum(FIXED_WECHAT_PAY)
                 .shandePayEnum(shandePayEnum)
+                .lianlianPayEnum(lianLianPayEnum)
                 .ipaddr(Ipv4Util.LOCAL_IP)
                 .goodsName(auctionOrder.getGoodsName())
                 .userId(userId).build());

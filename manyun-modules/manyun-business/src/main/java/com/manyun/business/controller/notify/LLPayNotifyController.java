@@ -1,6 +1,8 @@
 package com.manyun.business.controller.notify;
 
 import com.alibaba.fastjson.JSONObject;
+import com.manyun.business.service.IAuctionOrderService;
+import com.manyun.business.service.IAuctionPriceService;
 import com.manyun.business.service.IOrderService;
 import com.manyun.common.pays.utils.llpay.security.LLianPayAccpSignature;
 import io.swagger.annotations.Api;
@@ -27,6 +29,12 @@ import java.util.Objects;
 public class LLPayNotifyController {
     @Autowired
     private IOrderService orderService;
+
+    @Autowired
+    private IAuctionPriceService auctionPriceService;
+
+    @Autowired
+    private IAuctionOrderService auctionOrderService;
 
 
     @PostMapping(value = "/LlInnerUserNotify")
@@ -229,6 +237,129 @@ public class LLPayNotifyController {
                 if("TRADE_SUCCESS".equals(txnStatus) && Objects.nonNull(orderInfo)){
                     log.info("txn_seqno:======="+resultObj.getString("txn_seqno"));
                orderService.notifyPayConsignmentSuccess(resultObj.getString("txn_seqno"));
+                }else {
+                    log.info("响应结果异常!");
+                    return null;
+                }
+            }
+        }else {
+            log.error("返回响应验证签名异常，请核实！");
+            return null;
+        }
+        return "Success";
+    }
+
+    @PostMapping(value = "/auctionMarginNotify")
+    @ResponseBody
+    @ApiOperation(value = "保证金支付",hidden = true)
+    public String auctionMarginNotify(HttpServletRequest req) throws IOException {
+        String sign = req.getHeader("Signature-Data");
+        //获取request的输入流，并设置格式为UTF-8
+        BufferedReader streamReader = new BufferedReader(new InputStreamReader(req.getInputStream(), "UTF-8"));
+        //将输入流数据放入StringBuilder
+        StringBuilder resultSB = new StringBuilder();
+        String inputStr = null;
+        while ((inputStr = streamReader.readLine()) != null) {
+            resultSB.append(inputStr);
+        }
+        log.info(String.format("响应结果：%s", resultSB));
+        if (!"".equalsIgnoreCase(sign)) {
+            log.info(String.format("响应签名：%s", sign));
+            boolean checksign = LLianPayAccpSignature.getInstance().checkSign(resultSB.toString(), sign);
+            if (!checksign) {
+                log.error("返回响应验证签名异常，请核实！");
+                return null;
+            } else {
+                log.info(String.format("响应验签通过！"));
+                JSONObject resultObj = JSONObject.parseObject(resultSB.toString());
+                String txnStatus = resultObj.getString("txn_status");
+                JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
+                String tradeNo = resultObj.getString("txn_seqno");
+                if("TRADE_SUCCESS".equals(txnStatus) && Objects.nonNull(orderInfo)){
+                    log.info("txn_seqno:======="+resultObj.getString("txn_seqno"));
+                    auctionPriceService.notifyPayMarginSuccess(tradeNo);
+                }else {
+                    log.info("响应结果异常!");
+                    return null;
+                }
+            }
+        }else {
+            log.error("返回响应验证签名异常，请核实！");
+            return null;
+        }
+        return "Success";
+    }
+
+    @PostMapping(value = "/auctionNotify")
+    @ResponseBody
+    @ApiOperation(value = "保证金支付",hidden = true)
+    public String auctionNotify(HttpServletRequest req) throws IOException {
+        String sign = req.getHeader("Signature-Data");
+        //获取request的输入流，并设置格式为UTF-8
+        BufferedReader streamReader = new BufferedReader(new InputStreamReader(req.getInputStream(), "UTF-8"));
+        //将输入流数据放入StringBuilder
+        StringBuilder resultSB = new StringBuilder();
+        String inputStr = null;
+        while ((inputStr = streamReader.readLine()) != null) {
+            resultSB.append(inputStr);
+        }
+        log.info(String.format("响应结果：%s", resultSB));
+        if (!"".equalsIgnoreCase(sign)) {
+            log.info(String.format("响应签名：%s", sign));
+            boolean checksign = LLianPayAccpSignature.getInstance().checkSign(resultSB.toString(), sign);
+            if (!checksign) {
+                log.error("返回响应验证签名异常，请核实！");
+                return null;
+            } else {
+                log.info(String.format("响应验签通过！"));
+                JSONObject resultObj = JSONObject.parseObject(resultSB.toString());
+                String txnStatus = resultObj.getString("txn_status");
+                JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
+                String tradeNo = resultObj.getString("txn_seqno");
+                if("TRADE_SUCCESS".equals(txnStatus) && Objects.nonNull(orderInfo)){
+                    log.info("txn_seqno:======="+resultObj.getString("txn_seqno"));
+                    auctionOrderService.notifyPaySuccess(tradeNo);
+                }else {
+                    log.info("响应结果异常!");
+                    return null;
+                }
+            }
+        }else {
+            log.error("返回响应验证签名异常，请核实！");
+            return null;
+        }
+        return "Success";
+    }
+
+    @PostMapping(value = "/auctionFixNotify")
+    @ResponseBody
+    @ApiOperation(value = "保证金支付",hidden = true)
+    public String auctionFixNotify(HttpServletRequest req) throws IOException {
+        String sign = req.getHeader("Signature-Data");
+        //获取request的输入流，并设置格式为UTF-8
+        BufferedReader streamReader = new BufferedReader(new InputStreamReader(req.getInputStream(), "UTF-8"));
+        //将输入流数据放入StringBuilder
+        StringBuilder resultSB = new StringBuilder();
+        String inputStr = null;
+        while ((inputStr = streamReader.readLine()) != null) {
+            resultSB.append(inputStr);
+        }
+        log.info(String.format("响应结果：%s", resultSB));
+        if (!"".equalsIgnoreCase(sign)) {
+            log.info(String.format("响应签名：%s", sign));
+            boolean checksign = LLianPayAccpSignature.getInstance().checkSign(resultSB.toString(), sign);
+            if (!checksign) {
+                log.error("返回响应验证签名异常，请核实！");
+                return null;
+            } else {
+                log.info(String.format("响应验签通过！"));
+                JSONObject resultObj = JSONObject.parseObject(resultSB.toString());
+                String txnStatus = resultObj.getString("txn_status");
+                JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
+                String tradeNo = resultObj.getString("txn_seqno");
+                if("TRADE_SUCCESS".equals(txnStatus) && Objects.nonNull(orderInfo)){
+                    log.info("txn_seqno:======="+resultObj.getString("txn_seqno"));
+                    auctionOrderService.notifyPaySuccess(tradeNo);
                 }else {
                     log.info("响应结果异常!");
                     return null;
