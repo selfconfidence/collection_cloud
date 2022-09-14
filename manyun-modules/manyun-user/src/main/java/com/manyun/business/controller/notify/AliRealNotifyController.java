@@ -34,6 +34,7 @@ public class AliRealNotifyController {
     @ApiOperation(value = "阿里云sdk 金融版 h5对接实名认证回调",hidden = true)
     public String real(@RequestParam("callbackToken") String callbackToken,@RequestParam("certifyId") String certifyId,@RequestParam("passed") String passed) {
         try {
+              log.info("/notify_real/real 回调成功!{},{},{}",callbackToken,certifyId,passed);
             CntUser cntUser = cntUserService.commUni(callbackToken);
             if (Objects.nonNull(cntUser))
             cntUserService.checkCertifyIdH5Status(certifyId,cntUser.getId());
