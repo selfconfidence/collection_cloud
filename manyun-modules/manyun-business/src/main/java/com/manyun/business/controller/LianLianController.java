@@ -41,6 +41,14 @@ public class LianLianController {
     @Autowired
     private IMoneyService moneyService;
 
+    @GetMapping("/isAccountOpening")
+    @ApiOperation(value = "是否开户",notes = ("true==已开户   false==未开户"))
+    public R<Boolean> isAccountOpening(){
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId,loginBusinessUser.getUserId()));
+        return R.ok("0".equalsIgnoreCase(money.getLlAccountStatus())?false:true);
+    }
+
     @GetMapping("/innerUser/{returnUrl}")
     @ApiOperation(value = "连连开户")
     public R<String> innerUser(@PathVariable String returnUrl){
@@ -50,9 +58,7 @@ public class LianLianController {
         String userId = loginBusinessUser.getUserId();
         String phone = loginBusinessUser.getCntUser().getPhone();
         Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId,userId));
-        if("1".equals(money.getLlAccountStatus())){
-            return R.fail("0000","用户已开户!");
-        }
+        Assert.isTrue("1".equals(money.getLlAccountStatus()),"用户已开户!");
         Assert.isTrue(Objects.nonNull(money),"请求参数有误!");
         return R.ok(
                 LLPayUtils.innerUser(
