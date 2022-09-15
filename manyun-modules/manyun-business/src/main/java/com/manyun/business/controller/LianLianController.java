@@ -9,6 +9,7 @@ import com.manyun.business.design.pay.bean.query.LinkedAcctlist;
 import com.manyun.business.domain.entity.Money;
 import com.manyun.business.domain.query.*;
 import com.manyun.business.domain.vo.AcctSerIalVo;
+import com.manyun.business.domain.vo.InnerUserVo;
 import com.manyun.business.service.IMoneyService;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.domain.Builder;
@@ -49,10 +50,10 @@ public class LianLianController {
         return R.ok("0".equalsIgnoreCase(money.getLlAccountStatus())?false:true);
     }
 
-    @GetMapping("/innerUser/{returnUrl}")
+    @PostMapping("/innerUser")
     @ApiOperation(value = "连连开户")
-    public R<String> innerUser(@PathVariable String returnUrl){
-        Assert.isTrue(StringUtils.isNotBlank(returnUrl),"请求参数有误!");
+    public R<String> innerUser(@RequestBody InnerUserVo innerUserVo){
+        Assert.isTrue(StringUtils.isNotBlank(innerUserVo.getReturnUrl()),"请求参数有误!");
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         if(loginBusinessUser.getCntUser().getIsReal()==1)return R.fail("用户暂未实名,请先实名!");
         String userId = loginBusinessUser.getUserId();
@@ -67,7 +68,7 @@ public class LianLianController {
                         .with(LLInnerUserQuery::setPhone,phone)
                         .with(LLInnerUserQuery::setRealName,money.getRealName())
                         .with(LLInnerUserQuery::setCartNo,money.getCartNo())
-                        .with(LLInnerUserQuery::setReturnUrl,returnUrl)
+                        .with(LLInnerUserQuery::setReturnUrl,innerUserVo.getReturnUrl())
                         .build()
                 )
         );
