@@ -145,6 +145,20 @@ public class CntUserController extends BaseController {
         return R.ok(userService.getH5CertifyId(userAliyunRealForm,notNullLoginBusinessUser.getUserId()));
     }
 
+    @GetMapping("/h5RealMsg")
+    @ApiOperation(value = "h5实名认证消息",notes = "返回状态信息 1=无操作,2=实名认证成功.弹出 , 3=实名认证失败.请重试")
+    public synchronized R<Integer> h5RealMsg(){
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        CntUserDto cntUser = notNullLoginBusinessUser.getCntUser();
+        CntUser user = userService.getById(cntUser.getId());
+        Integer h5RealStatus = user.getH5RealStatus();
+        if (Integer.valueOf(2).equals(user.getH5RealStatus()) || Integer.valueOf(3).equals(user.getH5RealStatus())){
+            user.setH5RealStatus(1);
+            userService.updateById(user);
+        }
+        return R.ok(h5RealStatus);
+    }
+
     @GetMapping("/checkCertifyIdH5Status/{certifyId}")
     @ApiOperation(value = "查询阿里云刷脸实名认证信息 - h5",notes = "h5 端 \n version 1.0.1")
     public R checkCertifyIdH5Status(@PathVariable String certifyId){

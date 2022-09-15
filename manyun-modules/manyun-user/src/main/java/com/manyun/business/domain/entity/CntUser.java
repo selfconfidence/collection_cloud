@@ -30,6 +30,9 @@ public class CntUser implements Serializable {
     @ApiModelProperty("认证ID")
     private String certifyId;
 
+    @ApiModelProperty("H5认证专用字段,1=正常,2=已完成,3=失败了")
+    private Integer h5RealStatus;
+
     @ApiModelProperty("用户昵称")
     private String nickName;
 

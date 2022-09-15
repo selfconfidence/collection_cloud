@@ -354,6 +354,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         callAccountDto.setRealPhone(StrUtil.nullToDefault(cntUser.getPhone(), "CNT_"+cntUser.getUserId()));
         String hash = myChainxSystemService.accountCreate(callAccountDto, SecurityConstants.INNER).getData();
         cntUser.setLinkAddr(hash);
+        cntUser.setH5RealStatus(2);
         cntUser.updateD(userId);
         updateById(cntUser);
         log.info("实名认证调用上链");
