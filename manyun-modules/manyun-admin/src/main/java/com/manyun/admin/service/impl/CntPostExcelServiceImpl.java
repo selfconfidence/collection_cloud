@@ -31,6 +31,8 @@ import com.manyun.admin.mapper.CntPostExcelMapper;
 import com.manyun.admin.service.ICntPostExcelService;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.Size;
+
 /**
  * 提前购格Service业务层处理
  *
@@ -124,6 +126,9 @@ public class CntPostExcelServiceImpl extends ServiceImpl<CntPostExcelMapper,CntP
            return R.fail("导入提前购数据不能为空!");
         }
 
+        List<PostExcel> postExcels = postExcelList.parallelStream().filter(f -> !f.getTypeName().equals("1") && !f.getTypeName().equals("2")).collect(Collectors.toList());
+        Assert.isTrue(postExcels.size()==0,"请求数据有误!");
+
         ArrayList<PostExcel> collect = postExcelList.parallelStream().collect(
                 Collectors
                         .collectingAndThen(
@@ -133,76 +138,74 @@ public class CntPostExcelServiceImpl extends ServiceImpl<CntPostExcelMapper,CntP
         );
         Assert.isTrue(postExcelList.size()==collect.size(),"导入数据中存在重复数据,请检查!");
 
+        //查询用户
+        List<CntUser> userList = userService.list(Wrappers.<CntUser>lambdaQuery().in(CntUser::getPhone, postExcelList.parallelStream().filter(f -> StringUtils.isNotBlank(f.getPhone())).map(PostExcel::getPhone).collect(Collectors.toList())));
+        Assert.isTrue(userList.size()>0,"用户不存在!");
+
+        //查询盲盒和藏品
+        List<String> boxNames = postExcelList.parallelStream().filter(f -> f.getTypeName().equals("1") && StringUtils.isNotBlank(f.getBuiName())).map(PostExcel::getBuiName).collect(Collectors.toList());
+        List<String> collectionNames = postExcelList.parallelStream().filter(f -> f.getTypeName().equals("2") && StringUtils.isNotBlank(f.getBuiName())).map(PostExcel::getBuiName).collect(Collectors.toList());
+        List<CntBox> boxList = boxService.list(Wrappers.<CntBox>lambdaQuery().in(boxNames.size()>0,CntBox::getBoxTitle, boxNames));
+        List<CntCollection> cntCollectionList = collectionService.list(Wrappers.<CntCollection>lambdaQuery().in(collectionNames.size()>0,CntCollection::getCollectionName,collectionNames ));
 
 
-
-
-
-
-
-
-
-
-
-
-
-        Optional<PostExcel> postExcel = postExcelList.stream().findFirst();
-        String typeName = postExcel.get().getTypeName();
-        //校验
-        CntUser user = userService.getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPhone, postExcel.get().getPhone()));
-        Assert.isTrue(Objects.nonNull(user),"用户不存在!");
-
-        CntBox box=null;
-        CntCollection collection=null;
-        if("1".equals(typeName)){
-            box = boxService.getOne(Wrappers.<CntBox>lambdaQuery().eq(CntBox::getBoxTitle,postExcel.get().getBuiName()));
-        }else if("2".equals(typeName)){
-            collection = collectionService.getOne(Wrappers.<CntCollection>lambdaQuery().eq(CntCollection::getCollectionName, postExcel.get().getBuiName()));
-        }else {
-            return R.fail("参数类型有误!");
-        }
-
-        if(("1".equals(typeName) && Objects.nonNull(box)) || ("2".equals(typeName) && Objects.nonNull(collection))){
-            CntPostExcel cntPostExcel = getOne(
-                    Wrappers.<CntPostExcel>lambdaQuery()
-                            .eq(CntPostExcel::getUserId, user.getId())
-                            .eq(CntPostExcel::getBuiId,"1".equals(typeName)?box.getId():collection.getId())
-                            .eq(CntPostExcel::getTypeName,typeName));
-            if(Objects.isNull(cntPostExcel)){
-                save(
-                        Builder.of(CntPostExcel::new)
-                                .with(CntPostExcel::setId, IdUtils.getSnowflakeNextIdStr())
-                                .with(CntPostExcel::setUserId, user.getId())
-                                .with(CntPostExcel::setPhone, user.getPhone())
-                                .with(CntPostExcel::setBuiId, "1".equals(typeName)?box.getId():collection.getId())
-                                .with(CntPostExcel::setBuiName,"1".equals(typeName)?box.getBoxTitle():collection.getCollectionName())
-                                .with(CntPostExcel::setBuyFrequency,postExcel.get().getBuyFrequency()==null?0:postExcel.get().getBuyFrequency())
-                                .with(CntPostExcel::setTypeName, postExcel.get().getTypeName())
-                                .with(CntPostExcel::setReMark, postExcel.get().getReMark())
-                                .with(CntPostExcel::setCreatedBy,SecurityUtils.getUsername())
-                                .with(CntPostExcel::setCreatedTime,DateUtils.getNowDate())
-                                .build()
-                );
-            }else {
-                updateById(
-                        Builder.of(CntPostExcel::new)
-                                .with(CntPostExcel::setId, cntPostExcel.getId())
-                                .with(CntPostExcel::setUserId, user.getId())
-                                .with(CntPostExcel::setPhone, user.getPhone())
-                                .with(CntPostExcel::setBuiId, "1".equals(typeName)?box.getId():collection.getId())
-                                .with(CntPostExcel::setBuiName,"1".equals(typeName)?box.getBoxTitle():collection.getCollectionName())
-                                .with(CntPostExcel::setBuyFrequency,postExcel.get().getBuyFrequency()==null?0:postExcel.get().getBuyFrequency())
-                                .with(CntPostExcel::setTypeName, postExcel.get().getTypeName())
-                                .with(CntPostExcel::setReMark, postExcel.get().getReMark())
-                                .with(CntPostExcel::setUpdatedBy,SecurityUtils.getUsername())
-                                .with(CntPostExcel::setUpdatedTime,DateUtils.getNowDate())
-                                .build()
-                );
+        List<CntPostExcel> savePostExcel = new ArrayList<>();
+        List<CntPostExcel> updatePostExcel = new ArrayList<>();
+        postExcelList.parallelStream().forEach(e->{
+            if(StringUtils.isNotBlank(e.getPhone()) && StringUtils.isNotBlank(e.getBuiName())) {
+                Optional<CntUser> user = userList.parallelStream().filter(ff -> ff.getPhone().equals(e.getPhone())).findFirst();
+                Optional<CntBox> box = boxList.parallelStream().filter(ff -> ff.getBoxTitle().equals(e.getBuiName())).findFirst();
+                Optional<CntCollection> collection = cntCollectionList.parallelStream().filter(ff -> ff.getCollectionName().equals(e.getBuiName())).findFirst();
+                if (("1".equals(e.getTypeName()) && box.isPresent() && user.isPresent()) || ("2".equals(e.getTypeName()) && collection.isPresent() && user.isPresent())) {
+                    CntPostExcel cntPostExcel = getOne(
+                            Wrappers.<CntPostExcel>lambdaQuery()
+                                    .eq(CntPostExcel::getUserId, user.get().getId())
+                                    .eq(CntPostExcel::getBuiId, "1".equals(e.getTypeName()) ? box.get().getId() : collection.get().getId())
+                                    .eq(CntPostExcel::getTypeName, e.getTypeName()));
+                    if (Objects.isNull(cntPostExcel)) {
+                        savePostExcel.add(
+                                Builder.of(CntPostExcel::new)
+                                        .with(CntPostExcel::setId, IdUtils.getSnowflakeNextIdStr())
+                                        .with(CntPostExcel::setUserId, user.get().getId())
+                                        .with(CntPostExcel::setPhone, user.get().getPhone())
+                                        .with(CntPostExcel::setBuiId, "1".equals(e.getTypeName()) ? box.get().getId() : collection.get().getId())
+                                        .with(CntPostExcel::setBuiName, "1".equals(e.getTypeName()) ? box.get().getBoxTitle() : collection.get().getCollectionName())
+                                        .with(CntPostExcel::setBuyFrequency, e.getBuyFrequency() == null ? 1 : e.getBuyFrequency())
+                                        .with(CntPostExcel::setTypeName, e.getTypeName())
+                                        .with(CntPostExcel::setReMark, e.getReMark())
+                                        .with(CntPostExcel::setCreatedBy, SecurityUtils.getUsername())
+                                        .with(CntPostExcel::setCreatedTime, DateUtils.getNowDate())
+                                        .build()
+                        );
+                    } else {
+                        updatePostExcel.add(
+                                Builder.of(CntPostExcel::new)
+                                        .with(CntPostExcel::setId, cntPostExcel.getId())
+                                        .with(CntPostExcel::setUserId, user.get().getId())
+                                        .with(CntPostExcel::setPhone, user.get().getPhone())
+                                        .with(CntPostExcel::setBuiId, "1".equals(e.getTypeName()) ? box.get().getId() : collection.get().getId())
+                                        .with(CntPostExcel::setBuiName, "1".equals(e.getTypeName()) ? box.get().getBoxTitle() : collection.get().getCollectionName())
+                                        .with(CntPostExcel::setBuyFrequency, e.getBuyFrequency() == null ? 1 : e.getBuyFrequency())
+                                        .with(CntPostExcel::setTypeName, e.getTypeName())
+                                        .with(CntPostExcel::setReMark, e.getReMark())
+                                        .with(CntPostExcel::setUpdatedBy, SecurityUtils.getUsername())
+                                        .with(CntPostExcel::setUpdatedTime, DateUtils.getNowDate())
+                                        .build()
+                        );
+                    }
+                }
             }
-        }else {
-            return R.fail("商品信息不存在!");
+        });
+
+        if(savePostExcel.size()>0){
+            saveBatch(savePostExcel);
         }
-        return R.ok(null,"导入提前购数据成功!");
+
+        if(updatePostExcel.size()>0){
+            updateBatchById(updatePostExcel);
+        }
+
+        return R.ok("导入提前购数据成功!");
     }
 
 }
