@@ -191,10 +191,11 @@ public class CntDictServiceImpl implements CntDictService
     @Override
     public R drawRulesDict(DrawRulesDictQuery drawRulesDictQuery)
     {
+        if(drawRulesDictQuery.getTarType()!=1 && drawRulesDictQuery.getTarType()!=2)return R.ok(new ArrayList<DrawRulesDictVo>());
         List<String> collectionTarIds = collectionService.list(Wrappers.<CntCollection>lambdaQuery().isNotNull(CntCollection::getTarId)).parallelStream().map(CntCollection::getTarId).collect(Collectors.toList());
         List<String> boxTarIds = boxService.list(Wrappers.<CntBox>lambdaQuery().isNotNull(CntBox::getTarId)).parallelStream().map(CntBox::getTarId).collect(Collectors.toList());
         List<CntTar> cntTars = null;
-        if(collectionTarIds.size()>0 || boxTarIds.size()>0){
+        if((collectionTarIds.size()>0 && drawRulesDictQuery.getTarType()==2) || (boxTarIds.size()>0 && drawRulesDictQuery.getTarType()==1)){
             cntTars = cntTarService.list(Wrappers.<CntTar>lambdaQuery().eq(CntTar::getTarType, drawRulesDictQuery.getTarType()).eq(CntTar::getEndFlag, 1).notIn(CntTar::getId, drawRulesDictQuery.getTarType() == 1 ? boxTarIds : collectionTarIds).orderByDesc(CntTar::getCreatedTime));
         }else {
             cntTars = cntTarService.list(Wrappers.<CntTar>lambdaQuery().eq(CntTar::getTarType, drawRulesDictQuery.getTarType()).eq(CntTar::getEndFlag, 1).orderByDesc(CntTar::getCreatedTime));
