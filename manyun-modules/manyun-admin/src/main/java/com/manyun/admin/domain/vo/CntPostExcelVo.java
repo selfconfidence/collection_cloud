@@ -18,6 +18,9 @@ public class CntPostExcelVo
     @ApiModelProperty("用户编号")
     private String userId;
 
+    @ApiModelProperty("用户昵称")
+    private String nickName;
+
     @ApiModelProperty("用户手机号")
     private String phone;
 

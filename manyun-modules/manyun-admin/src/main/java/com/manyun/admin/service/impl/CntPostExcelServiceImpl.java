@@ -66,9 +66,14 @@ public class CntPostExcelServiceImpl extends ServiceImpl<CntPostExcelMapper,CntP
     {
         PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
         List<CntPostExcel> cntPostExcels = cntPostExcelMapper.selectCntPostExcelList(new CntPostExcel());
+        List<CntUser> userList = userService.list();
         return TableDataInfoUtil.pageTableDataInfo(cntPostExcels.parallelStream().map(m->{
+            Optional<CntUser> user = userList.parallelStream().filter(ff -> ff.getId().equals(m.getUserId())).findFirst();
             CntPostExcelVo postExcelVo=new CntPostExcelVo();
             BeanUtil.copyProperties(m,postExcelVo);
+            if(user.isPresent()){
+                postExcelVo.setNickName(user.get().getNickName());
+            }
             return postExcelVo;
         }).collect(Collectors.toList()),cntPostExcels);
     }
