@@ -300,9 +300,10 @@ public class LLPayUtils {
 
     /**
      * 普通消费
-     * @param
+     * @param llGeneralConsumeQuery 消费所需参数
+     * @param type 交易类型 type==true 用户交易用户 type==false 用户交易商户
      */
-    public static String generalConsume(LLGeneralConsumeQuery llGeneralConsumeQuery) {
+    public static String generalConsume(LLGeneralConsumeQuery llGeneralConsumeQuery,Boolean type) {
         CashierPayCreateParams params = new CashierPayCreateParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
         params.setTimestamp(timestamp);
@@ -348,10 +349,10 @@ public class LLPayUtils {
 
         // 设置收款方信息
         CashierPayCreatePayeeInfo mPayeeInfo = new CashierPayCreatePayeeInfo();
-        mPayeeInfo.setPayee_id(LLianPayConstant.OidPartner);
-        mPayeeInfo.setPayee_type("MERCHANT");
+        mPayeeInfo.setPayee_id(type==true?llGeneralConsumeQuery.getPayeeUserId():LLianPayConstant.OidPartner);
+        mPayeeInfo.setPayee_type(type==true?"USER":"MERCHANT");
         mPayeeInfo.setPayee_amount(llGeneralConsumeQuery.getAmount());
-        mPayeeInfo.setPayee_memo("用户购买商品");
+        mPayeeInfo.setPayee_memo(type==true?"用户商品交易":"用户购买商品");
         params.setPayeeInfo(new CashierPayCreatePayeeInfo[]{mPayeeInfo});
 
         // 设置付款方信息
