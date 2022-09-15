@@ -61,6 +61,9 @@ public class Money implements Serializable {
     @ApiModelProperty("银行开户行")
     private String bankOpen;
 
+    @ApiModelProperty("连连开户状态")
+    private String llAccountStatus;
+
     @ApiModelProperty("创建人")
     private String createdBy;
 

@@ -16,6 +16,9 @@ import com.manyun.business.design.pay.bean.random.GetRandomParams;
 import com.manyun.business.design.pay.bean.random.GetRandomResult;
 import com.manyun.business.design.pay.bean.txn.*;
 import com.manyun.business.domain.query.*;
+import com.manyun.business.domain.vo.AcctSerIalListVo;
+import com.manyun.business.domain.vo.AcctSerIalVo;
+import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.enums.LianLianPayEnum;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.StringUtils;
@@ -139,9 +142,11 @@ public class LLPayUtils {
 
     /**
      * 提现
-     * @param
+     * @param   userId 用户Id
+     * @param   passWord 支付密码
+     * @param   amount 提现金额
      */
-    public static Map<String,String> withdraw(LLWithdrawQuery llWithdrawQuery) {
+    public static Map<String,String> withdraw(String userId, String passWord, BigDecimal amount) {
         Map<String,String> map = new HashMap<String, String>();
         WithDrawalParams params = new WithDrawalParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
@@ -154,16 +159,16 @@ public class LLPayUtils {
         WithDrawalOrderInfo orderInfo = new WithDrawalOrderInfo();
         orderInfo.setTxn_seqno(IdUtils.getSnowflakeNextIdStr());
         orderInfo.setTxn_time(timestamp);
-        orderInfo.setTotal_amount(llWithdrawQuery.getAmount());
+        orderInfo.setTotal_amount(amount);
         orderInfo.setPostscript("用户提现");
         params.setOrderInfo(orderInfo);
 
         // 设置付款方信息
         WithDrawalPayerInfo payerInfo = new WithDrawalPayerInfo();
         payerInfo.setPayer_type("USER");
-        payerInfo.setPayer_id(llWithdrawQuery.getUserId());
+        payerInfo.setPayer_id(userId);
         // 用户：LLianPayTest-In-User-12345 密码：qwerty，本地测试环境测试，没接入密码控件，使用本地加密方法加密密码（仅限测试环境使用）
-        payerInfo.setPassword(LLianPayAccpSignature.getInstance().localEncrypt(llWithdrawQuery.getPassWord()));
+        payerInfo.setPassword(LLianPayAccpSignature.getInstance().localEncrypt(passWord));
         params.setPayerInfo(payerInfo);
 
         LLianPayClient lLianPayClient = new LLianPayClient();
@@ -227,16 +232,21 @@ public class LLPayUtils {
 
     /**
      * 用户充值
-     * @param
+     * @param userId 用户id
+     * @param realName 用户真实姓名
+     * @param phone 手机号
+     * @param ipAddr
+     * @param amount 充值金额
+     * @param returnUrl ios Android h5 表单提交之后跳转回app的地址
      */
-    public static String userTopup(LLUserTopupQuery llUserTopupQuery) {
+    public static String userTopup(String userId, String realName, String phone, String ipAddr, BigDecimal amount, String returnUrl) {
         CashierPayCreateParams params = new CashierPayCreateParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
         params.setTimestamp(timestamp);
         params.setOid_partner(LLianPayConstant.OidPartner);
         // 用户充值
         params.setTxn_type("USER_TOPUP");
-        params.setUser_id(llUserTopupQuery.getUserId());
+        params.setUser_id(userId);
         /*
         用户类型。默认：注册用户。
         注册用户：REGISTERED
@@ -244,7 +254,7 @@ public class LLPayUtils {
          */
         params.setUser_type("REGISTERED");
         params.setNotify_url(LianLianPayEnum.BIND_CARD_APPLY.getNotifyUrl());
-        params.setReturn_url(llUserTopupQuery.getReturnUrl());
+        params.setReturn_url(returnUrl);
         // 交易发起渠道设置
         params.setFlag_chnl("H5");
         // 测试风控参数
@@ -252,15 +262,15 @@ public class LLPayUtils {
                 "{" +
                         "\"frms_ware_category\":\"4007\"," +
                         "\"goods_name\":\"用户充值\"," +
-                        "\"user_info_mercht_userno\":\"" +llUserTopupQuery.getUserId()+ "\"," +
+                        "\"user_info_mercht_userno\":\"" +userId+ "\"," +
                         "\"user_info_dt_register\":\"" +timestamp+ "\"," +
-                        "\"user_info_bind_phone\":\"" +llUserTopupQuery.getPhone()+ "\"," +
-                        "\"user_info_full_name\":\"" +llUserTopupQuery.getRealName()+ "\"," +
+                        "\"user_info_bind_phone\":\"" +phone+ "\"," +
+                        "\"user_info_full_name\":\"" +realName+ "\"," +
                         "\"user_info_id_no\":\"\"," +
                         "\"user_info_identify_type\":\"4\"," +
                         "\"user_info_id_type\":\"0\"," +
                         "\"frms_client_chnl\":\" H5\"," +
-                        "\"frms_ip_addr\":\"" +llUserTopupQuery.getIpAddr()+ "\"," +
+                        "\"frms_ip_addr\":\"" +ipAddr+ "\"," +
                         "\"user_auth_flag\":\"1\"" +
                         "}"
         );
@@ -270,13 +280,13 @@ public class LLPayUtils {
         CashierPayCreateOrderInfo orderInfo = new CashierPayCreateOrderInfo();
         orderInfo.setTxn_seqno(IdUtils.getSnowflakeNextIdStr());
         orderInfo.setTxn_time(timestamp);
-        orderInfo.setTotal_amount(llUserTopupQuery.getAmount());
+        orderInfo.setTotal_amount(amount);
         orderInfo.setGoods_name("用户充值");
         params.setOrderInfo(orderInfo);
 
         // 设置付款方信息
         CashierPayCreatePayerInfo payerInfo = new CashierPayCreatePayerInfo();
-        payerInfo.setPayer_id(llUserTopupQuery.getUserId());
+        payerInfo.setPayer_id(userId);
         payerInfo.setPayer_type("USER");
         params.setPayerInfo(payerInfo);
 
@@ -410,7 +420,7 @@ public class LLPayUtils {
      * @param pageNo 请求页码。表示当前请求第几页，从1开始计数。
      * @param pageSize 每页记录数。每页最大记录数为10。
      */
-    public static List<AcctserialAcctbal> queryAcctserial(String userId,String startDate,String endDate,String pageNo,String pageSize) {
+    public static AcctSerIalVo queryAcctserial(String userId, String startDate, String endDate, String pageNo, String pageSize) {
         Assert.isTrue(StringUtils.isNotBlank(userId) || StringUtils.isNotBlank(startDate) || StringUtils.isNotBlank(endDate),"请求参数有误,请检查!");
         AcctserialParams params = new AcctserialParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
@@ -429,16 +439,46 @@ public class LLPayUtils {
         USEROWN_AVAILABLE	用户自有可用账户
          */
         params.setAcct_type("USEROWN_PSETTLE");
-        params.setDate_start(startDate);
-        params.setDate_end(endDate);
+        params.setDate_start(StringUtils.isNotBlank(startDate)==true?startDate:"20220913000000");
+        params.setDate_end(StringUtils.isNotBlank(endDate)==true?endDate:DateUtils.dateTimeNow());
         params.setPage_no(StringUtils.isNotBlank(pageNo)==true?pageNo:"1");
         params.setPage_size(StringUtils.isNotBlank(pageSize)==true?pageSize:"10");
+        params.setSort_type("DESC");
 
         LLianPayClient lLianPayClient = new LLianPayClient();
         String resultJsonStr = lLianPayClient.sendRequest(queryAcctserial, JSON.toJSONString(params));
         AcctserialResult acctserialResult = JSON.parseObject(resultJsonStr, AcctserialResult.class);
         Assert.isTrue("0000".equalsIgnoreCase(acctserialResult.getRet_code()),acctserialResult.getRet_msg());
-        return acctserialResult.getAcctbal_list();
+        AcctSerIalVo acctSerIalVo=new AcctSerIalVo();
+        acctSerIalVo.setUserId(acctserialResult.getUser_id());
+        acctSerIalVo.setTotalOutAmt(acctserialResult.getTotal_out_amt());
+        acctSerIalVo.setTotalInAmt(acctserialResult.getTotal_in_amt());
+        List<AcctSerIalListVo> acctSerIalListVos = new ArrayList<>();
+        acctserialResult.getAcctbal_list().parallelStream().forEach(e->{
+            acctSerIalListVos.add(
+                    Builder.of(AcctSerIalListVo::new)
+                            .with(AcctSerIalListVo::setAccpTxnno,e.getAccp_txnno())
+                            .with(AcctSerIalListVo::setAmt,e.getAmt())
+                            .with(AcctSerIalListVo::setAmtBal,e.getAmt_bal())
+                            .with(AcctSerIalListVo::setTxnType,
+                                    e.getTxn_type().equals("USER_TOPUP")?"用户充值"
+                                            :e.getTxn_type().equals("MCH_TOPUP")?"商户充值"
+                                            :e.getTxn_type().equals("GENERAL_CONSUME")?"普通消费"
+                                            :e.getTxn_type().equals("SECURED_CONSUME")?"担保消费"
+                                            :e.getTxn_type().equals("SERVICE_FEE")?"手续费收取"
+                                            :e.getTxn_type().equals("INNER_FUND_EXCHANGE")?"内部代发"
+                                            :e.getTxn_type().equals("OUTER_FUND_EXCHANGE")?"外部代发"
+                                            :e.getTxn_type().equals("ACCT_CASH_OUT")?"账户提现"
+                                            :e.getTxn_type().equals("SECURED_CONFIRM")?"担保确认"
+                                            :e.getTxn_type().equals("CAPITAL_CANCEL")?"手续费应收应付核销"
+                                            :e.getTxn_type().equals("INNER_DIRECT_EXCHANGE")?"定向内部代发":""
+                                    )
+                            .with(AcctSerIalListVo::setTxnTime,DateUtils.getDateToDate(DateUtils.getStrToDate(e.getTxn_time(), DateUtils.YYYYMMDDHHMMSS),DateUtils.YYYY_MM_DD_HH_MM_SS))
+                    .build()
+            );
+        });
+        acctSerIalVo.setAcctSerIalListVos(acctSerIalListVos);
+        return acctSerIalVo;
     }
 
 
