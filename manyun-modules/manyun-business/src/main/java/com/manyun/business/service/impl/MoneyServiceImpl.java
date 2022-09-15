@@ -207,6 +207,12 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         }
     }
 
+    @Override
+    public Boolean checkLlpayStatus(String userId) {
+        Money moneyUser = getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
+        return "1".equals(moneyUser.getLlAccountStatus());
+    }
+
     /**
      * 杉德支付所需参数
      * @param userId

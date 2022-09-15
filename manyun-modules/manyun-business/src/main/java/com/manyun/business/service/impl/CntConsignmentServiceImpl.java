@@ -375,7 +375,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void consignmentSuccess(String id) {
+    public void consignmentSuccess(String id, boolean canTrade) {
         // 1. 状态限制是否成功
         CntConsignment cntConsignment = getById(id);
         Assert.isTrue(WAIT_TO_PAY.getCode().equals(cntConsignment.getToPay()),"状态有误,请核实!");
@@ -385,7 +385,9 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         updateById(cntConsignment);
         // 给对应的用户加钱
         BigDecimal realMoney = cntConsignment.getConsignmentPrice().subtract(cntConsignment.getServerCharge());
-        moneyService.addMoney(cntConsignment.getSendUserId(),realMoney,StrUtil.format("寄售资产审核成功!"));
+        if (!canTrade) {
+            moneyService.addMoney(cntConsignment.getSendUserId(),realMoney,StrUtil.format("寄售资产审核成功!"));
+        }
         // 发送通知
         CntUserDto cntUserDto = remoteBuiUserService.commUni(cntConsignment.getSendUserId(), SecurityConstants.INNER).getData();
         remoteSmsService.sendCommPhone(Builder.<SmsCommDto>of(SmsCommDto::new).with(SmsCommDto::setTemplateCode, BusinessConstants.SmsTemplateNumber.ASSERT_SUCCESS).with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().put("money", realMoney.toString()).put("buiName",cntConsignment.getBuiName() ).build()).with(SmsCommDto::setPhoneNumber,cntUserDto.getPhone()).build());

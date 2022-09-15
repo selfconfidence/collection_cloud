@@ -48,4 +48,6 @@ public interface IMoneyService extends IService<Money> {
     UserMoneyDto userMoneyInfo(String userId);
 
     CheckOrderVo checkOrderPayStatus(CheckOrderPayQuery checkOrderPayQuery);
+
+    Boolean checkLlpayStatus(String userId);
 }

@@ -347,7 +347,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Assert.isTrue(WAIT_ORDER.getCode().equals(order.getOrderStatus()),"订单状态有误,请核实!");
         ICntConsignmentService consignmentService = cntConsignmentServiceObjectFactory.getObject();
         CntConsignment cntConsignment = consignmentService.getOne(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getOrderId, order.getId()));
+
         Assert.isTrue(Objects.nonNull(cntConsignment), "找不到对应寄售交易信息,请核实!");
+        boolean canTrade = false;
+        if (Integer.valueOf(5).equals(order.getPayType())) {
+            canTrade = moneyService.checkLlpayStatus(cntConsignment.getPayUserId()) && moneyService.checkLlpayStatus(cntConsignment.getSendUserId());
+        }
+
         // 更改订单状态, 绑定对应的 （藏品/盲盒）
         order.setOrderStatus(OVER_ORDER.getCode());
         order.updateD(order.getUserId());
@@ -394,7 +400,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         //remoteSmsService.sendCommPhone(Builder.<SmsCommDto>of(SmsCommDto::new).with(SmsCommDto::setTemplateCode, BusinessConstants.SmsTemplateNumber.ASSERT_OK).with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().build()).with(SmsCommDto::setPhoneNumber,cntUserDto.getPhone()).build());
 
         // 直接审核成功
-        consignmentService.consignmentSuccess(cntConsignment.getId());
+        consignmentService.consignmentSuccess(cntConsignment.getId(), canTrade);
 
     }
 
@@ -439,6 +445,18 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     public PayVo unifiedOrder(OrderPayForm orderPayForm,String userId) {
         Order order = getById(orderPayForm.getOrderId());
         checkUnified(order,userId,orderPayForm.getPayPass(),orderPayForm.getPayType());
+        ICntConsignmentService consignmentService = cntConsignmentServiceObjectFactory.getObject();
+        CntConsignment cntConsignment = consignmentService.getOne(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getOrderId, order.getId()));
+        boolean canTrade = false;
+        String sendUserId = null;
+        if (cntConsignment != null) {
+            canTrade = moneyService.checkLlpayStatus(userId) && moneyService.checkLlpayStatus(cntConsignment.getSendUserId());
+            sendUserId = cntConsignment.getSendUserId();
+            if (Integer.valueOf(5).equals(orderPayForm.getPayType())) {
+                Assert.isTrue(canTrade, "暂未开通连连支付，请选择其他支付方式");
+            }
+        }
+
         ShandePayEnum shandePayEnum =  switchCase(order.getId(),orderPayForm.getReturnUrl(), orderPayForm.getReturnUrl());
         LianLianPayEnum lianLianPayEnum =  switchCaseLianLian(order.getId(),orderPayForm.getReturnUrl(), orderPayForm.getReturnUrl());
 
@@ -449,6 +467,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                         .realPayMoney(order.getOrderAmount().subtract(order.getMoneyBln()))
                         .outHost(order.getOrderNo())
                         .shandePayEnum(shandePayEnum)
+                        .canTrade(canTrade)
+                        .receiveUserId(sendUserId)
                         .lianlianPayEnum(lianLianPayEnum)
                         .goodsName(order.getCollectionName())
                         .ipaddr(Ipv4Util.LOCAL_IP)

@@ -15,6 +15,8 @@ public class LLGeneralConsumeQuery {
     private BigDecimal amount;
     //用户id
     private String userId;
+    //收款方用户id  用户和用户交易时候所需
+    private String payeeUserId;
     //用户真实姓名
     private String realName;
     //用户手机号
@@ -23,7 +25,7 @@ public class LLGeneralConsumeQuery {
     private String ipAddr;
     //ios Android h5 表单提交之后跳转回app的地址
     private String returnUrl;
-
+    //回调地址
     private String notifyUrl;
 
 }

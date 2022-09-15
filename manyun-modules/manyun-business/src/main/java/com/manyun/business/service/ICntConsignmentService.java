@@ -42,5 +42,5 @@ public interface ICntConsignmentService extends IService<CntConsignment> {
 
     String consignmentCreateOrder(String payUserId, ConsignmentOrderSellForm consignmentOrderSellForm);
 
-    void consignmentSuccess(String id);
+    void consignmentSuccess(String id, boolean canTrade);
 }

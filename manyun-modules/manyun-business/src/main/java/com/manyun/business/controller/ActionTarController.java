@@ -50,15 +50,15 @@ public class ActionTarController {
     @ResponseBody
     public String test() {
         //开户
-       /*return LLPayUtils.innerUser(
+       return LLPayUtils.innerUser(
                Builder.of(LLInnerUserQuery::new)
-                       .with(LLInnerUserQuery::setUserId,"1556912957824274432")
-                       .with(LLInnerUserQuery::setPhone,"15036380340")
-                       .with(LLInnerUserQuery::setRealName,"高丰雷")
-                       .with(LLInnerUserQuery::setCartNo,"410381200004224034")
+                       .with(LLInnerUserQuery::setUserId,"1569888830315663360")
+                       .with(LLInnerUserQuery::setPhone,"15703977803")
+                       .with(LLInnerUserQuery::setRealName,"和飞杭")
+                       .with(LLInnerUserQuery::setCartNo,"41102419930808401X")
                        .with(LLInnerUserQuery::setReturnUrl,"http://h5.dcalliance.com.cn/")
                .build()
-       );*/
+       );
        //充值
       /* return LLPayUtils.userTopup(
                Builder.of(LLUserTopupQuery::new)
@@ -70,19 +70,19 @@ public class ActionTarController {
                .with(LLUserTopupQuery::setReturnUrl,"http://h5.dcalliance.com.cn/")
                .build()
        );*/
-      //消费
+      /*//消费
         return LLPayUtils.generalConsume(
                 Builder.of(LLGeneralConsumeQuery::new)
                 .with(LLGeneralConsumeQuery::setOrderId, IdUtil.getSnowflakeNextIdStr())
                 .with(LLGeneralConsumeQuery::setGoodsName, "啦啦啦")
                 .with(LLGeneralConsumeQuery::setAmount, BigDecimal.valueOf(0.2))
-                .with(LLGeneralConsumeQuery::setUserId,"1556912957824274432")
+                .with(LLGeneralConsumeQuery::setUserId,"4564623145465")
                 .with(LLGeneralConsumeQuery::setRealName,"高丰雷")
                 .with(LLGeneralConsumeQuery::setPhone,"15036380340")
                 .with(LLGeneralConsumeQuery::setIpAddr,"127.0.0.1")
                 .with(LLGeneralConsumeQuery::setReturnUrl,"http://h5.dcalliance.com.cn/")
                 .build()
-        );
+        );*/
         //余额
         //return LLPayUtils.queryAcctinfo("1556912957824274432");
         //绑卡列表数据

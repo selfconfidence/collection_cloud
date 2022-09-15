@@ -11,9 +11,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class DrawRulesDictQuery {
 
-    @ApiModelProperty(value = "抽签类型;(1=盲盒,2=藏品)",required = true)
-    @NotNull(message = "参数不能为空")
-    @Range(min = 1,max = 2,message = "参数传入有误")
+    @ApiModelProperty(value = "抽签类型;(1=盲盒,2=藏品)")
     private Integer tarType;
 
 }

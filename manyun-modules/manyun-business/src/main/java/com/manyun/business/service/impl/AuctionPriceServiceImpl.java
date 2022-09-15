@@ -396,11 +396,17 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     @Override
     @Transactional(rollbackFor = Exception.class)
     public synchronized PayVo payAuction(String payUserId, AuctionPayForm auctionPayForm) {
+
+
         CntUserDto cntUserDto = remoteBuiUserService.commUni(payUserId, SecurityConstants.INNER).getData();
         if (Integer.valueOf(0).equals(auctionPayForm.getPayType())) {
             Assert.isTrue(auctionPayForm.getPayPass().equals(cntUserDto.getPayPass()),"支付密码错误,请核实!");
         }
         AuctionSend auctionSend = auctionSendService.getById(auctionPayForm.getAuctionSendId());
+        boolean canTrade = moneyService.checkLlpayStatus(payUserId) && moneyService.checkLlpayStatus(auctionSend.getUserId());
+        if (Integer.valueOf(5).equals(auctionPayForm.getPayType())) {
+            Assert.isTrue(canTrade, "暂未开通连连支付，请选择其他支付方式");
+        }
         Assert.isFalse(auctionSend.getUserId().equals(payUserId), "自己不可购买自己送拍的产品");
         AuctionOrder auctionOrder = auctionOrderService.getById(auctionSend.getAuctionOrderId());
         /*String auctionOrderHost = auctionOrderService.createAuctionOrder(AuctionOrderCreateDto.builder()
@@ -425,6 +431,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                         .lianlianPayEnum(lianLianPayEnum)
                         .ipaddr(Ipv4Util.LOCAL_IP)
                         .goodsName(auctionOrder.getGoodsName())
+                        .receiveUserId(auctionSend.getUserId())
+                        .canTrade(canTrade)
                         .userId(payUserId).build());
 
         auctionOrder.setMoneyBln(auctionOrder.getMoneyBln().add(payVo.getMoneyBln()));
@@ -554,6 +562,10 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         LoginBusinessUser businessUser = SecurityUtils.getNotNullLoginBusinessUser();
 
         AuctionSend auctionSend = auctionSendService.getById(auctionPayFixedForm.getAuctionSendId());
+        boolean canTrade = moneyService.checkLlpayStatus(userId) && moneyService.checkLlpayStatus(auctionSend.getUserId());
+        if (Integer.valueOf(5).equals(auctionPayFixedForm.getPayType())) {
+            Assert.isTrue(canTrade, "暂未开通连连支付，请选择其他支付方式");
+        }
         Integer delayTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_DELAY_TIME, Integer.class);
 
         Assert.isFalse(LocalDateTime.now().isBefore(auctionSend.getStartTime()), "当前竞品尚未开拍，请稍后再试");
@@ -620,6 +632,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .wxPayEnum(FIXED_WECHAT_PAY)
                 .shandePayEnum(shandePayEnum)
                 .lianlianPayEnum(lianLianPayEnum)
+                .canTrade(canTrade)
+                .receiveUserId(auctionSend.getUserId())
                 .ipaddr(Ipv4Util.LOCAL_IP)
                 .goodsName(auctionOrder.getGoodsName())
                 .userId(userId).build());

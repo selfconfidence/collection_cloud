@@ -173,13 +173,21 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
         moneyService.updateById(buyerMoney);
         logsService.saveLogs(LogInfoDto.builder().buiId(auctionOrder.getToUserId()).jsonTxt("退还保证金").formInfo(auctionSend.getMargin().toString()).isType(PULL_SOURCE).modelType(MONEY_TYPE).build());
 
+        boolean canTrade = false;
+        if (Integer.valueOf(5).equals(auctionOrder.getPayType())) {
+            canTrade = moneyService.checkLlpayStatus(auctionOrder.getFromUserId()) && moneyService.checkLlpayStatus(auctionOrder.getToUserId());
+        }
         //扣除佣金,剩余钱加给卖方   需要后台审核
-        Money sellerMoney = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, auctionSend.getUserId()));
-        BigDecimal subtract = auctionOrder.getNowPrice().subtract(auctionOrder.getCommission());
-        sellerMoney.setMoneyBalance(sellerMoney.getMoneyBalance().add(subtract));
-        moneyService.updateById(sellerMoney);
-        logsService.saveLogs(LogInfoDto.builder().buiId(auctionSend.getUserId()).jsonTxt("拍卖成功").formInfo(auctionOrder.getNowPrice().toString()).isType(PULL_SOURCE).modelType(MONEY_TYPE).build());
-        logsService.saveLogs(LogInfoDto.builder().buiId(auctionSend.getUserId()).jsonTxt("扣除佣金").formInfo(auctionOrder.getCommission().toString()).isType(POLL_SOURCE).modelType(MONEY_TYPE).build());
+        if (!canTrade) {
+            Money sellerMoney = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, auctionSend.getUserId()));
+            BigDecimal subtract = auctionOrder.getNowPrice().subtract(auctionOrder.getCommission());
+            sellerMoney.setMoneyBalance(sellerMoney.getMoneyBalance().add(subtract));
+            moneyService.updateById(sellerMoney);
+            logsService.saveLogs(LogInfoDto.builder().buiId(auctionSend.getUserId()).jsonTxt("拍卖成功").formInfo(auctionOrder.getNowPrice().toString()).isType(PULL_SOURCE).modelType(MONEY_TYPE).build());
+            logsService.saveLogs(LogInfoDto.builder().buiId(auctionSend.getUserId()).jsonTxt("扣除佣金").formInfo(auctionOrder.getCommission().toString()).isType(POLL_SOURCE).modelType(MONEY_TYPE).build());
+        }
+
+
 
         Integer goodsType = auctionOrder.getGoodsType();
 

@@ -34,6 +34,14 @@ public class PayInfoDto implements Serializable {
     private ShandePayEnum shandePayEnum;
     private LianLianPayEnum lianlianPayEnum;
 
+    //收款方用户id
+    private String receiveUserId;
+
+    //是否可以用户之间交易
+    private boolean canTrade;
+
+
+
 
 
 
