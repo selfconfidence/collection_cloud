@@ -55,7 +55,8 @@ public class LianLianPay implements RootPayServer {
                             .with(LLGeneralConsumeQuery::setNotifyUrl, payInfoDto.getLianlianPayEnum().getNotifyUrl())
                             .with(LLGeneralConsumeQuery::setIpAddr,payInfoDto.getIpaddr())
                             .with(LLGeneralConsumeQuery::setReturnUrl,payInfoDto.getLianlianPayEnum().getReturnUrl())
-                            .build());
+                            .with(LLGeneralConsumeQuery::setPayeeUserId, payInfoDto.getReceiveUserId())
+                            .build(), payInfoDto.isCanTrade());
             return Builder.of(PayVo::new).with(PayVo::setBody, body).with(PayVo::setPayType, payInfoDto.getPayType()).with(PayVo::setOutHost, payInfoDto.getOutHost()).build();
         }
         throw new IllegalArgumentException("not fount pay_type = " + payInfoDto.getPayType());
