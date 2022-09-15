@@ -43,11 +43,11 @@ public class LianLianController {
     private IMoneyService moneyService;
 
     @GetMapping("/isAccountOpening")
-    @ApiOperation(value = "是否开户",notes = ("true==已开户   false==未开户"))
-    public R<Boolean> isAccountOpening(){
+    @ApiOperation(value = "是否开户",notes = ("已开户   未开户"))
+    public R<String> isAccountOpening(){
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId,loginBusinessUser.getUserId()));
-        return R.ok("0".equalsIgnoreCase(money.getLlAccountStatus())?false:true);
+        return R.ok("0".equalsIgnoreCase(money.getLlAccountStatus())?"未开户":"已开户");
     }
 
     @PostMapping("/innerUser")
