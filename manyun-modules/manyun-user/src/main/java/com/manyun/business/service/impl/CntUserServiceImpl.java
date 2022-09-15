@@ -275,7 +275,11 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
      */
     @Override
     public String getCertifyId(CntUserDto cntUser, UserAliyunRealForm userAliyunRealForm) {
-        return aliRealConfig.getCertifyId(userAliyunRealForm);
+        String certifyId = aliRealConfig.getCertifyId(userAliyunRealForm);
+        CntUser user = getById(cntUser.getUserId());
+        user.setCertifyId(certifyId);
+        updateById(user);
+        return certifyId;
     }
 
 
@@ -389,12 +393,16 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
 
     @Override
     public AliRealVo getH5CertifyId(UserAliyunRealForm userAliyunRealForm,String userId) {
-        return aliRealConfig.getCertifyIdH5(userAliyunRealForm,userId);
+        AliRealVo certifyIdH5 = aliRealConfig.getCertifyIdH5(userAliyunRealForm, userId);
+        CntUser cntUser = getById(userId);
+        cntUser.setCertifyId(certifyIdH5.getCertifyId());
+        updateById(cntUser);
+        return certifyIdH5;
     }
 
 
     @Override
-    public void checkCertifyIdH5Status(String certifyId, String userId ) {
+    public synchronized void checkCertifyIdH5Status(String certifyId, String userId ) {
         aliRealConfig.checkCertifyIdH5Status(certifyId);
         optimisticRealUser(userId);
     }

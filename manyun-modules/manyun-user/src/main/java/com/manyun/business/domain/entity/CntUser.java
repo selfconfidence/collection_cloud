@@ -27,6 +27,9 @@ public class CntUser implements Serializable {
     @ApiModelProperty("主键")
     private String id;
 
+    @ApiModelProperty("认证ID")
+    private String certifyId;
+
     @ApiModelProperty("用户昵称")
     private String nickName;
 

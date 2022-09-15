@@ -50,6 +50,8 @@ public class AliRealConfig {
     private String  h5ReturnUrl;
     private String  h5CallbackUrl;
 
+    private String h5Redirection;
+
 
     /**
      * 金融级实人方案 h5-进行的调用
@@ -73,7 +75,7 @@ public class AliRealConfig {
 // 固定值。
         request.setProductCode("ID_PRO");
 // Web SDK请求时为必填。
-        request.setReturnUrl(h5ReturnUrl);
+        request.setReturnUrl(h5Redirection.concat("?userId=").concat(userId));
         InitFaceVerifyResponse response = client.getAcsResponse(request);
         log.info(response.getRequestId());
         log.info(response.getCode());
