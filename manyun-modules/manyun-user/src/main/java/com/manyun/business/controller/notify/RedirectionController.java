@@ -41,9 +41,13 @@ public class RedirectionController {
             if (Objects.nonNull(cntUser) && StrUtil.isNotBlank(cntUser.getCertifyId()))
             cntUserService.checkCertifyIdH5Status(cntUser.getCertifyId(), userId);
             response.sendRedirect(aliRealConfig.getH5ReturnUrl());
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("h5RealRedirection",e.getMessage());
-            throw new RuntimeException(e);
+            try {
+                response.sendRedirect(aliRealConfig.getH5ReturnUrl());
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
 
     }

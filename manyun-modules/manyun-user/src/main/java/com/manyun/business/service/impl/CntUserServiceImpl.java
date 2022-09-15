@@ -404,7 +404,12 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
 
     @Override
     public synchronized void checkCertifyIdH5Status(String certifyId, String userId ) {
-        aliRealConfig.checkCertifyIdH5Status(certifyId);
+        try {
+            aliRealConfig.checkCertifyIdH5Status(certifyId);
+        }catch (Exception e){
+            CntUser cntUser = getById(userId);
+            cntUser.setCertifyId(e.getMessage());
+        }
         optimisticRealUser(userId);
     }
 
