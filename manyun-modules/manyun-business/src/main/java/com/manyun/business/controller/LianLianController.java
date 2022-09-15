@@ -51,7 +51,7 @@ public class LianLianController {
         String phone = loginBusinessUser.getCntUser().getPhone();
         Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId,userId));
         if("1".equals(money.getLlAccountStatus())){
-            return R.ok("用户已开户!");
+            return R.fail("0000","用户已开户!");
         }
         Assert.isTrue(Objects.nonNull(money),"请求参数有误!");
         return R.ok(
