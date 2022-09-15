@@ -147,6 +147,8 @@ public class LLPayUtils {
      * @param   amount 提现金额
      */
     public static Map<String,String> withdraw(String userId, String passWord, BigDecimal amount) {
+        List<LinkedAcctlist> linkedAcctlists = LLPayUtils.queryLinkedacct(userId);
+        Assert.isTrue(linkedAcctlists.size()>0,"请求参数有误!");
         Map<String,String> map = new HashMap<String, String>();
         WithDrawalParams params = new WithDrawalParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
@@ -154,6 +156,7 @@ public class LLPayUtils {
         params.setOid_partner(LLianPayConstant.OidPartner);
         params.setNotify_url(LianLianPayEnum.WITHDRAW.getNotifyUrl());
         params.setRisk_item("");
+        params.setLinked_agrtno(linkedAcctlists.parallelStream().map(LinkedAcctlist::getLinked_agrtno).findFirst().get());
 
         // 设置商户订单信息
         WithDrawalOrderInfo orderInfo = new WithDrawalOrderInfo();
@@ -189,8 +192,8 @@ public class LLPayUtils {
             map.put("token",drawalResult.getToken());
             return map;
         }
-        map.put("code","500");
-        map.put("msg","申请提现失败,系统异常!");
+        map.put("code",drawalResult.getRet_code());
+        map.put("msg",drawalResult.getRet_msg());
         return map;
     }
 
@@ -541,7 +544,7 @@ public class LLPayUtils {
         String timestamp = LLianPayDateUtils.getTimestamp();
         params.setTimestamp(timestamp);
         params.setOid_partner(LLianPayConstant.OidPartner);
-        params.setUser_id("userId");
+        params.setUser_id(userId);
         /*
         交易发起渠道。
         ANDROID
