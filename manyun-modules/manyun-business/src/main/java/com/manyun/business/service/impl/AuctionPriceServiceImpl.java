@@ -407,7 +407,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         }
         Assert.isFalse(auctionSend.getUserId().equals(payUserId), "自己不可购买自己送拍的产品");
         AuctionOrder auctionOrder = auctionOrderService.getById(auctionSend.getAuctionOrderId());
-        Assert.isFalse(Integer.valueOf(5).equals(auctionPayForm.getPayType()) && !auctionOrder.getMoneyBln().equals(BigDecimal.ZERO), "当前状态暂不支持此支付方式");
+        Assert.isTrue(Integer.valueOf(5).equals(auctionPayForm.getPayType()) && !auctionOrder.getMoneyBln().equals(BigDecimal.ZERO), "当前状态暂不支持此支付方式");
         /*String auctionOrderHost = auctionOrderService.createAuctionOrder(AuctionOrderCreateDto.builder()
                 .goodsId(auctionSend.getGoodsId())
                 .goodsName(auctionSend.getGoodsName())
@@ -623,7 +623,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
         ShandePayEnum shandePayEnum = ShandePayEnum.AUCTION_FIX_SHANDE_PAY.setReturnUrl(auctionPayFixedForm.getReturnUrl(), auctionPayFixedForm.getReturnUrl());
         LianLianPayEnum lianLianPayEnum = LianLianPayEnum.AUCTION_FIX_SHANDE_PAY.setReturnUrl(auctionPayFixedForm.getReturnUrl(), auctionPayFixedForm.getReturnUrl());
-        Assert.isFalse(Integer.valueOf(5).equals(auctionPayFixedForm.getPayType()) && !auctionOrder.getMoneyBln().equals(BigDecimal.ZERO), "当前状态暂不支持此支付方式");
+        Assert.isTrue(Integer.valueOf(5).equals(auctionPayFixedForm.getPayType()) && !auctionOrder.getMoneyBln().equals(BigDecimal.ZERO), "当前状态暂不支持此支付方式");
         PayVo payVo = rootPay.execPayVo(PayInfoDto.builder()
                 .payType(auctionPayFixedForm.getPayType())
                 .realPayMoney(auctionOrder.getOrderAmount().subtract(auctionOrder.getMoneyBln()))
