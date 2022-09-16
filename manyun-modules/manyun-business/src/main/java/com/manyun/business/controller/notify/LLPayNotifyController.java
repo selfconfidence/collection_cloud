@@ -4,7 +4,9 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.nacos.shaded.com.google.gson.JsonObject;
 import com.manyun.business.design.pay.bean.cashier.ResponsePayee;
+import com.manyun.business.design.pay.bean.cashier.ResponsePayer;
 import com.manyun.business.domain.dto.LogInfoDto;
 import com.manyun.business.domain.entity.Logs;
 import com.manyun.business.service.*;
@@ -153,13 +155,13 @@ public class LLPayNotifyController {
                 String txnStatus = resultObj.getString("txn_status");
                 if("TRADE_SUCCESS".equals(txnStatus)){
                     JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
-                    JSONObject payerInfo = JSONObject.parseObject(resultObj.getString("payerInfo"));
-                    String userId = payerInfo.getString("payer_id");
+                    List<ResponsePayer> responsePayerList = JSONObject.parseArray(resultObj.getJSONArray("payerInfo").toJSONString(), ResponsePayer.class);
+                    String payer_id = responsePayerList.parallelStream().filter(f -> f.getPayer_type().equals("USER")).findFirst().get().getPayer_id();
                     String amount = orderInfo.getString("total_amount");
                     logsService.saveLogs(
                             LogInfoDto
                                     .builder()
-                                    .buiId(userId)
+                                    .buiId(payer_id)
                                     .jsonTxt("账户余额充值")
                                     .formInfo(amount)
                                     .isType(PULL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
@@ -239,13 +241,13 @@ public class LLPayNotifyController {
                 log.info(String.format("响应验签通过！"));
                 JSONObject resultObj = JSONObject.parseObject(resultSB.toString());
                 JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
-                JSONObject payerInfo = JSONObject.parseObject(resultObj.getString("payerInfo"));
-                String payerId = payerInfo.getString("payer_id");
+                List<ResponsePayer> responsePayerList = JSONObject.parseArray(resultObj.getJSONArray("payerInfo").toJSONString(), ResponsePayer.class);
+                String payer_id = responsePayerList.parallelStream().filter(f -> f.getPayer_type().equals("USER")).findFirst().get().getPayer_id();
                 String amount = orderInfo.getString("total_amount");
                 logsService.saveLogs(
                         LogInfoDto
                                 .builder()
-                                .buiId(payerId)
+                                .buiId(payer_id)
                                 .jsonTxt("账户余额提现")
                                 .formInfo(amount)
                                 .isType(POLL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
@@ -284,13 +286,15 @@ public class LLPayNotifyController {
                 String txnStatus = resultObj.getString("txn_status");
                 if("TRADE_SUCCESS".equals(txnStatus)){
                     JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
-                    JSONObject payerInfo = JSONObject.parseObject(resultObj.getString("payerInfo"));
-                    log.info("txn_seqno:======="+orderInfo.getString("txn_seqno"));
-                    orderService.notifyPaySuccess(orderInfo.getString("txn_seqno"));
+                    List<ResponsePayer> payerList = JSONObject.parseArray(resultObj.getJSONArray("payerInfo").toJSONString(), ResponsePayer.class);
+                    String payer_id = payerList.parallelStream().filter(f -> f.getPayer_type().equals("USER")).findFirst().get().getPayer_id();
+                    log.info("txn_seqno:======="+orderInfo.getString("txn_seqno").split("-")[0]);
+                    log.info("payer_id:======="+payer_id);
+                    orderService.notifyPaySuccess(orderInfo.getString("txn_seqno").split("-")[0]);
                     logsService.saveLogs(
                             LogInfoDto
                                     .builder()
-                                    .buiId(payerInfo.getString("payer_id"))
+                                    .buiId(payer_id)
                                     .jsonTxt("用户购买商品")
                                     .formInfo(orderInfo.getString("total_amount"))
                                     .isType(POLL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
@@ -333,15 +337,16 @@ public class LLPayNotifyController {
                 String txnStatus = resultObj.getString("txn_status");
                 if("TRADE_SUCCESS".equals(txnStatus)){
                 JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
-                JSONObject payerInfo = JSONObject.parseObject(resultObj.getString("payerInfo"));
-                List<ResponsePayee> responsePayeeList = JSONObject.parseArray(resultObj.getString("payeeInfo"), ResponsePayee.class);
+                List<ResponsePayer> payerList = JSONObject.parseArray(resultObj.getJSONArray("payerInfo").toJSONString(), ResponsePayer.class);
+                String payer_id = payerList.parallelStream().filter(f -> f.getPayer_type().equals("USER")).findFirst().get().getPayer_id();
+                List<ResponsePayee> responsePayeeList = JSONObject.parseArray(resultObj.getJSONArray("payeeInfo").toJSONString(), ResponsePayee.class);
                 log.info("txn_seqno:======="+orderInfo.getString("txn_seqno"));
                 log.info("responsePayeeList:========"+responsePayeeList.toString());
-                orderService.notifyPayConsignmentSuccess(orderInfo.getString("txn_seqno"));
+                orderService.notifyPayConsignmentSuccess(orderInfo.getString("txn_seqno").split("-")[0]);
                 List<LogInfoDto> list = new ArrayList<>();
                 list.add(LogInfoDto
                         .builder()
-                        .buiId(payerInfo.getString("payer_id"))
+                        .buiId(payer_id)
                         .jsonTxt("用户寄售商品交易")
                         .formInfo(orderInfo.getString("total_amount"))
                         .isType(POLL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
@@ -404,7 +409,7 @@ public class LLPayNotifyController {
                 JSONObject resultObj = JSONObject.parseObject(resultSB.toString());
                 String txnStatus = resultObj.getString("txn_status");
                 JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
-                String tradeNo = orderInfo.getString("txn_seqno");
+                String tradeNo = orderInfo.getString("txn_seqno").split("-")[0];
                 if("TRADE_SUCCESS".equals(txnStatus) && Objects.nonNull(orderInfo)){
                     log.info("txn_seqno:======="+resultObj.getString("txn_seqno"));
                     auctionPriceService.notifyPayMarginSuccess(tradeNo);
@@ -446,15 +451,16 @@ public class LLPayNotifyController {
                 String txnStatus = resultObj.getString("txn_status");
                 if("TRADE_SUCCESS".equals(txnStatus)){
                     JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
-                    JSONObject payerInfo = JSONObject.parseObject(resultObj.getString("payerInfo"));
-                    List<ResponsePayee> responsePayeeList = JSONObject.parseArray(resultObj.getString("payeeInfo"), ResponsePayee.class);
+                    List<ResponsePayer> payerList = JSONObject.parseArray(resultObj.getJSONArray("payerInfo").toJSONString(), ResponsePayer.class);
+                    String payer_id = payerList.parallelStream().filter(f -> f.getPayer_type().equals("USER")).findFirst().get().getPayer_id();
+                    List<ResponsePayee> responsePayeeList = JSONObject.parseArray(resultObj.getJSONArray("payeeInfo").toJSONString(), ResponsePayee.class);
                     log.info("txn_seqno:======="+resultObj.getString("txn_seqno"));
                     log.info("responsePayeeList:======="+responsePayeeList.toString());
-                    auctionOrderService.notifyPaySuccess(orderInfo.getString("txn_seqno"));
+                    auctionOrderService.notifyPaySuccess(orderInfo.getString("txn_seqno").split("-")[0]);
                     List<LogInfoDto> list = new ArrayList<>();
                     list.add(LogInfoDto
                             .builder()
-                            .buiId(payerInfo.getString("payer_id"))
+                            .buiId(payer_id)
                             .jsonTxt("用户拍卖商品交易")
                             .formInfo(orderInfo.getString("total_amount"))
                             .isType(POLL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
@@ -518,16 +524,17 @@ public class LLPayNotifyController {
                 String txnStatus = resultObj.getString("txn_status");
                 if("TRADE_SUCCESS".equals(txnStatus)){
                     JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
-                    JSONObject payerInfo = JSONObject.parseObject(resultObj.getString("payerInfo"));
-                    List<ResponsePayee> responsePayeeList = JSONObject.parseArray(resultObj.getString("payeeInfo"), ResponsePayee.class);
+                    List<ResponsePayer> payerList = JSONObject.parseArray(resultObj.getJSONArray("payerInfo").toJSONString(), ResponsePayer.class);
+                    String payer_id = payerList.parallelStream().filter(f -> f.getPayer_type().equals("USER")).findFirst().get().getPayer_id();
+                    List<ResponsePayee> responsePayeeList = JSONObject.parseArray(resultObj.getJSONArray("payeeInfo").toJSONString(), ResponsePayee.class);
                     log.info("txn_seqno:======="+resultObj.getString("txn_seqno"));
                     log.info("responsePayeeList:======="+responsePayeeList.toString());
-                    auctionOrderService.notifyPaySuccess(orderInfo.getString("txn_seqno"));
+                    auctionOrderService.notifyPaySuccess(orderInfo.getString("txn_seqno").split("-")[0]);
                     List<LogInfoDto> list = new ArrayList<>();
                     list.add(LogInfoDto
                             .builder()
-                            .buiId(payerInfo.getString("payer_id"))
-                            .jsonTxt("用户一口价商品交易")
+                            .buiId(payer_id)
+                            .jsonTxt("用户商品交易")
                             .formInfo(orderInfo.getString("total_amount"))
                             .isType(POLL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
                     if(responsePayeeList.size()>0){
@@ -536,7 +543,7 @@ public class LLPayNotifyController {
                             list.add(LogInfoDto
                                     .builder()
                                     .buiId(optional.get().getPayer_id())
-                                    .jsonTxt("用户一口价商品交易")
+                                    .jsonTxt("用户商品交易")
                                     .formInfo(optional.get().getAmount())
                                     .isType(PULL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
                         }

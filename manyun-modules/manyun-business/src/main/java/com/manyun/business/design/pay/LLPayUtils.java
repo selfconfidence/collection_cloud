@@ -348,7 +348,7 @@ public class LLPayUtils {
         );
         // 设置商户订单信息
         CashierPayCreateOrderInfo orderInfo = new CashierPayCreateOrderInfo();
-        orderInfo.setTxn_seqno(llGeneralConsumeQuery.getOrderId());
+        orderInfo.setTxn_seqno((llGeneralConsumeQuery.getOrderId()+"-"+LLianPayDateUtils.getTimestamp()));
         orderInfo.setTxn_time(timestamp);
         orderInfo.setTotal_amount(llGeneralConsumeQuery.getAmount());
         orderInfo.setGoods_name(llGeneralConsumeQuery.getGoodsName());
