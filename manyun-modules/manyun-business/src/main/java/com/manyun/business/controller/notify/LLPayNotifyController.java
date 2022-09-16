@@ -352,7 +352,7 @@ public class LLPayNotifyController {
                 List<ResponsePayee> responsePayeeList = JSONObject.parseArray(resultObj.getJSONArray("payeeInfo").toJSONString(), ResponsePayee.class);
                 log.info("txn_seqno:======="+orderInfo.getString("txn_seqno"));
                 log.info("responsePayeeList:========"+responsePayeeList.toString());
-                //orderService.notifyPayConsignmentSuccess(orderInfo.getString("txn_seqno").split("-")[0]);
+                orderService.notifyPayConsignmentSuccess(orderInfo.getString("txn_seqno").split("-")[0]);
                 List<LogInfoDto> list = new ArrayList<>();
                 list.add(LogInfoDto
                         .builder()
