@@ -352,7 +352,7 @@ public class LLPayNotifyController {
                 List<ResponsePayee> responsePayeeList = JSONObject.parseArray(resultObj.getJSONArray("payeeInfo").toJSONString(), ResponsePayee.class);
                 log.info("txn_seqno:======="+orderInfo.getString("txn_seqno"));
                 log.info("responsePayeeList:========"+responsePayeeList.toString());
-                orderService.notifyPayConsignmentSuccess(orderInfo.getString("txn_seqno").split("-")[0]);
+                //orderService.notifyPayConsignmentSuccess(orderInfo.getString("txn_seqno").split("-")[0]);
                 List<LogInfoDto> list = new ArrayList<>();
                 list.add(LogInfoDto
                         .builder()
@@ -361,11 +361,11 @@ public class LLPayNotifyController {
                         .formInfo(orderInfo.getString("total_amount"))
                         .isType(POLL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
                 if(responsePayeeList.size()>0){
-                    Optional<ResponsePayee> optional = responsePayeeList.parallelStream().filter(f -> f.getPayer_type().equals("USER")).findFirst();
+                    Optional<ResponsePayee> optional = responsePayeeList.parallelStream().filter(f -> f.getPayee_type().equals("USER")).findFirst();
                     if(optional.isPresent()){
                         list.add(LogInfoDto
                                 .builder()
-                                .buiId(optional.get().getPayer_id())
+                                .buiId(optional.get().getPayee_id())
                                 .jsonTxt("用户寄售商品交易")
                                 .formInfo(optional.get().getAmount())
                                 .isType(PULL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
@@ -475,11 +475,11 @@ public class LLPayNotifyController {
                             .formInfo(orderInfo.getString("total_amount"))
                             .isType(POLL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
                     if(responsePayeeList.size()>0){
-                        Optional<ResponsePayee> optional = responsePayeeList.parallelStream().filter(f -> f.getPayer_type().equals("USER")).findFirst();
+                        Optional<ResponsePayee> optional = responsePayeeList.parallelStream().filter(f -> f.getPayee_type().equals("USER")).findFirst();
                         if(optional.isPresent()){
                             list.add(LogInfoDto
                                     .builder()
-                                    .buiId(optional.get().getPayer_id())
+                                    .buiId(optional.get().getPayee_id())
                                     .jsonTxt("用户拍卖商品交易")
                                     .formInfo(optional.get().getAmount())
                                     .isType(PULL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
@@ -548,11 +548,11 @@ public class LLPayNotifyController {
                             .formInfo(orderInfo.getString("total_amount"))
                             .isType(POLL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
                     if(responsePayeeList.size()>0){
-                        Optional<ResponsePayee> optional = responsePayeeList.parallelStream().filter(f -> f.getPayer_type().equals("USER")).findFirst();
+                        Optional<ResponsePayee> optional = responsePayeeList.parallelStream().filter(f -> f.getPayee_type().equals("USER")).findFirst();
                         if(optional.isPresent()){
                             list.add(LogInfoDto
                                     .builder()
-                                    .buiId(optional.get().getPayer_id())
+                                    .buiId(optional.get().getPayee_id())
                                     .jsonTxt("用户商品交易")
                                     .formInfo(optional.get().getAmount())
                                     .isType(PULL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());

@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 public class ResponsePayee {
 
-    private String payer_type;
+    private String payee_type;
 
-    private String payer_id;
+    private String payee_id;
 
     private String amount;
 
