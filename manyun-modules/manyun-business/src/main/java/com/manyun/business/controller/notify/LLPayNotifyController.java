@@ -133,6 +133,7 @@ public class LLPayNotifyController {
     @ResponseBody
     @ApiOperation(value = "连连支付充值回调",hidden = true)
     public String LlUserTopupNotify(HttpServletRequest req) throws IOException {
+        log.info("连连支付充值回调:=============================进入回调了");
         String sign = req.getHeader("Signature-Data");
         //获取request的输入流，并设置格式为UTF-8
         BufferedReader streamReader = new BufferedReader(new InputStreamReader(req.getInputStream(), "UTF-8"));
@@ -155,9 +156,13 @@ public class LLPayNotifyController {
                 String txnStatus = resultObj.getString("txn_status");
                 if("TRADE_SUCCESS".equals(txnStatus)){
                     JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
+                    log.info("订单信息:============================="+orderInfo.toString());
                     List<ResponsePayer> responsePayerList = JSONObject.parseArray(resultObj.getJSONArray("payerInfo").toJSONString(), ResponsePayer.class);
+                    log.info("付款方信息:============================="+responsePayerList.toString());
                     String payer_id = responsePayerList.parallelStream().filter(f -> f.getPayer_type().equals("USER")).findFirst().get().getPayer_id();
+                    log.info("用户id:============================="+payer_id);
                     String amount = orderInfo.getString("total_amount");
+                    log.info("多少钱:============================="+amount);
                     logsService.saveLogs(
                             LogInfoDto
                                     .builder()
@@ -221,6 +226,7 @@ public class LLPayNotifyController {
     @ResponseBody
     @ApiOperation(value = "连连支付提现回调",hidden = true)
     public String LlWithdrawNotify(HttpServletRequest req) throws IOException {
+        log.info("连连支付提现回调:=============================进入回调了");
         String sign = req.getHeader("Signature-Data");
         //获取request的输入流，并设置格式为UTF-8
         BufferedReader streamReader = new BufferedReader(new InputStreamReader(req.getInputStream(), "UTF-8"));
@@ -241,9 +247,13 @@ public class LLPayNotifyController {
                 log.info(String.format("响应验签通过！"));
                 JSONObject resultObj = JSONObject.parseObject(resultSB.toString());
                 JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
+                log.info("订单信息:============================="+orderInfo.toString());
                 List<ResponsePayer> responsePayerList = JSONObject.parseArray(resultObj.getJSONArray("payerInfo").toJSONString(), ResponsePayer.class);
+                log.info("付款方信息:============================="+responsePayerList.toString());
                 String payer_id = responsePayerList.parallelStream().filter(f -> f.getPayer_type().equals("USER")).findFirst().get().getPayer_id();
+                log.info("payer_id:============================="+payer_id);
                 String amount = orderInfo.getString("total_amount");
+                log.info("amount:============================="+amount);
                 logsService.saveLogs(
                         LogInfoDto
                                 .builder()
