@@ -355,13 +355,13 @@ public class LLPayUtils {
             CashierPayCreatePayeeInfo mPayeeInfo = new CashierPayCreatePayeeInfo();
             mPayeeInfo.setPayee_id(LLianPayConstant.OidPartner);
             mPayeeInfo.setPayee_type("MERCHANT");
-            mPayeeInfo.setPayee_amount((llGeneralConsumeQuery.getAmount().subtract(llGeneralConsumeQuery.getServiceCharge())));
+            mPayeeInfo.setPayee_amount(llGeneralConsumeQuery.getServiceCharge());
             mPayeeInfo.setPayee_memo("手续费");
 
             CashierPayCreatePayeeInfo uPayeeInfo = new CashierPayCreatePayeeInfo();
             uPayeeInfo.setPayee_id(llGeneralConsumeQuery.getPayeeUserId());
             uPayeeInfo.setPayee_type("USER");
-            uPayeeInfo.setPayee_amount(llGeneralConsumeQuery.getServiceCharge());
+            uPayeeInfo.setPayee_amount((llGeneralConsumeQuery.getAmount().subtract(llGeneralConsumeQuery.getServiceCharge())));
             uPayeeInfo.setPayee_memo("用户商品交易");
             params.setPayeeInfo(new CashierPayCreatePayeeInfo[]{mPayeeInfo, uPayeeInfo});
         }else {
