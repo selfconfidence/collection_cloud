@@ -18,6 +18,7 @@ import com.manyun.business.design.pay.bean.txn.*;
 import com.manyun.business.domain.query.*;
 import com.manyun.business.domain.vo.AcctSerIalListVo;
 import com.manyun.business.domain.vo.AcctSerIalVo;
+import com.manyun.business.domain.vo.LlBalanceVo;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.enums.LianLianPayEnum;
 import com.manyun.common.core.utils.DateUtils;
@@ -400,7 +401,7 @@ public class LLPayUtils {
      * 查询余额
      * @param userId 用户id
      */
-    public static String queryAcctinfo(String userId) {
+    public static LlBalanceVo queryAcctinfo(String userId) {
         Assert.isTrue(StringUtils.isNotBlank(userId),"请求参数有误,请检查!");
         Map<String,String> map = new HashMap<>();
         map.put("timestamp",LLianPayDateUtils.getTimestamp());
@@ -413,10 +414,15 @@ public class LLPayUtils {
         AcctInfoResult acctInfoResult = JSON.parseObject(resultJsonStr, AcctInfoResult.class);
         Assert.isTrue("0000".equalsIgnoreCase(acctInfoResult.getRet_code()),acctInfoResult.getRet_msg());
         Optional<AcctinfoList> optional = acctInfoResult.getAcctinfo_list().parallelStream().filter(f -> ("USEROWN_AVAILABLE".equals(f.getAcct_type()) && "NORMAL".equals(f.getAcct_state()))).findFirst();
-        if(!optional.isPresent()){
+        Optional<AcctinfoList> optional1 = acctInfoResult.getAcctinfo_list().parallelStream().filter(f -> ("USEROWN_PSETTLE".equals(f.getAcct_type()) && "NORMAL".equals(f.getAcct_state()))).findFirst();
+        if(!optional.isPresent() || !optional1.isPresent()){
             Assert.isTrue(Boolean.FALSE,"用户余额查询失败,请重试!");
         }
-        return optional.get().getAmt_balcur();
+        //可用余额
+        BigDecimal bigDecimal = new BigDecimal(optional.get().getAmt_balaval());
+        //待结算余额
+        BigDecimal bigDecimal1 = new BigDecimal(optional1.get().getAmt_balaval());
+        return Builder.of(LlBalanceVo::new).with(LlBalanceVo::setTotalBalance,(bigDecimal.add(bigDecimal1))).with(LlBalanceVo::setWithdrawBalance,bigDecimal).with(LlBalanceVo::setPsettleBalance,bigDecimal1).build();
     }
 
 

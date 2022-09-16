@@ -13,6 +13,7 @@ import com.manyun.business.domain.entity.Money;
 import com.manyun.business.domain.query.*;
 import com.manyun.business.domain.vo.AcctSerIalVo;
 import com.manyun.business.domain.vo.InnerUserVo;
+import com.manyun.business.domain.vo.LlBalanceVo;
 import com.manyun.business.domain.vo.MoneyLogVo;
 import com.manyun.business.service.ILogsService;
 import com.manyun.business.service.IMoneyService;
@@ -126,9 +127,20 @@ public class LianLianController {
 
     @GetMapping("/queryAcctinfo")
     @ApiOperation(value = "查询余额")
-    public R<String> queryAcctinfo(){
+    public R<LlBalanceVo> queryAcctinfo(){
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId,loginBusinessUser.getUserId()));
+        if("0".equalsIgnoreCase(money.getLlAccountStatus()))return R.ok(Builder.of(LlBalanceVo::new).with(LlBalanceVo::setTotalBalance,new BigDecimal(0)).with(LlBalanceVo::setWithdrawBalance,new BigDecimal(0)).with(LlBalanceVo::setPsettleBalance,new BigDecimal(0)).build());
         return R.ok(LLPayUtils.queryAcctinfo(loginBusinessUser.getUserId()));
+    }
+
+    public static void main(String[] args) {
+        LlBalanceVo llBalanceVo = new LlBalanceVo();
+        String a = "485780.43";
+        String b = "4015.00";
+        BigDecimal aa = new BigDecimal(a);
+        BigDecimal bb = new BigDecimal(b);
+        System.out.println(llBalanceVo.getTotalBalance());
     }
 
     @PostMapping("/queryAcctserial")
