@@ -145,8 +145,9 @@ public class LLPayUtils {
      * @param   userId 用户Id
      * @param   passWord 支付密码
      * @param   amount 提现金额
+     * @param   val 提现手续费 百分比
      */
-    public static Map<String,String> withdraw(String userId, String passWord, BigDecimal amount) {
+    public static Map<String,String> withdraw(String userId, String passWord, BigDecimal amount,BigDecimal val) {
         List<LinkedAcctlist> linkedAcctlists = LLPayUtils.queryLinkedacct(userId);
         Assert.isTrue(linkedAcctlists.size()>0,"请求参数有误!");
         Map<String,String> map = new HashMap<String, String>();
@@ -163,6 +164,9 @@ public class LLPayUtils {
         orderInfo.setTxn_seqno(IdUtils.getSnowflakeNextIdStr());
         orderInfo.setTxn_time(timestamp);
         orderInfo.setTotal_amount(amount);
+        if(val!=null){
+        orderInfo.setFee_amount(amount.multiply(val));
+        }
         orderInfo.setPostscript("用户提现");
         params.setOrderInfo(orderInfo);
 
@@ -388,8 +392,8 @@ public class LLPayUtils {
 
     public static void main(String[] args) {
         BigDecimal num1 = new BigDecimal("10");
-        BigDecimal num2 = new BigDecimal("5");
-        System.out.println(num1.subtract(num2));
+        BigDecimal num2 = new BigDecimal("0.2");
+        System.out.println(num1.subtract(num1.multiply(num2)));
     }
 
     /**
@@ -435,75 +439,6 @@ public class LLPayUtils {
         return linkeDacctResult.getLinked_acctlist();
     }
 
-
-    /**
-     * 查询资金流水列表
-     * @param userId 用户id
-     * @param startDate 账期开始时间。交易账期查询开始时间，必须小于等于当前时间，闭区间。格式：yyyyMMddHHmmss。
-     * @param endDate   账期结束时间。交易账期查询结束时间，必须大于等于开始时间且小于等于当前时间，闭区间。格式：yyyyMMddHHmmss。
-     * @param pageNo 请求页码。表示当前请求第几页，从1开始计数。
-     * @param pageSize 每页记录数。每页最大记录数为10。
-     */
-    public static AcctSerIalVo queryAcctserial(String userId, String startDate, String endDate, String pageNo, String pageSize) {
-        Assert.isTrue(StringUtils.isNotBlank(userId) || StringUtils.isNotBlank(startDate) || StringUtils.isNotBlank(endDate),"请求参数有误,请检查!");
-        AcctserialParams params = new AcctserialParams();
-        String timestamp = LLianPayDateUtils.getTimestamp();
-        params.setTimestamp(timestamp);
-        params.setOid_partner(LLianPayConstant.OidPartner);
-        params.setUser_id(userId);
-        /*
-        用户类型。
-        INNERMERCHANT:商户
-        INNERUSER：个人用户
-        INNERCOMPANY：企业用户
-         */
-        params.setUser_type("INNERUSER");
-        /*
-        USEROWN_PSETTLE	用户自有待结算账户
-        USEROWN_AVAILABLE	用户自有可用账户
-         */
-        params.setAcct_type("USEROWN_PSETTLE");
-        params.setDate_start(StringUtils.isNotBlank(startDate)==true?startDate:"20220913000000");
-        params.setDate_end(StringUtils.isNotBlank(endDate)==true?endDate:DateUtils.dateTimeNow());
-        params.setPage_no(StringUtils.isNotBlank(pageNo)==true?pageNo:"1");
-        params.setPage_size(StringUtils.isNotBlank(pageSize)==true?pageSize:"10");
-        params.setSort_type("DESC");
-
-        LLianPayClient lLianPayClient = new LLianPayClient();
-        String resultJsonStr = lLianPayClient.sendRequest(queryAcctserial, JSON.toJSONString(params));
-        AcctserialResult acctserialResult = JSON.parseObject(resultJsonStr, AcctserialResult.class);
-        Assert.isTrue("0000".equalsIgnoreCase(acctserialResult.getRet_code()),acctserialResult.getRet_msg());
-        AcctSerIalVo acctSerIalVo=new AcctSerIalVo();
-        acctSerIalVo.setUserId(acctserialResult.getUser_id());
-        acctSerIalVo.setTotalOutAmt(acctserialResult.getTotal_out_amt());
-        acctSerIalVo.setTotalInAmt(acctserialResult.getTotal_in_amt());
-        List<AcctSerIalListVo> acctSerIalListVos = new ArrayList<>();
-        acctserialResult.getAcctbal_list().parallelStream().forEach(e->{
-            acctSerIalListVos.add(
-                    Builder.of(AcctSerIalListVo::new)
-                            .with(AcctSerIalListVo::setAccpTxnno,e.getAccp_txnno())
-                            .with(AcctSerIalListVo::setAmt,e.getAmt())
-                            .with(AcctSerIalListVo::setAmtBal,e.getAmt_bal())
-                            .with(AcctSerIalListVo::setTxnType,
-                                    e.getTxn_type().equals("USER_TOPUP")?"用户充值"
-                                            :e.getTxn_type().equals("MCH_TOPUP")?"商户充值"
-                                            :e.getTxn_type().equals("GENERAL_CONSUME")?"普通消费"
-                                            :e.getTxn_type().equals("SECURED_CONSUME")?"担保消费"
-                                            :e.getTxn_type().equals("SERVICE_FEE")?"手续费收取"
-                                            :e.getTxn_type().equals("INNER_FUND_EXCHANGE")?"内部代发"
-                                            :e.getTxn_type().equals("OUTER_FUND_EXCHANGE")?"外部代发"
-                                            :e.getTxn_type().equals("ACCT_CASH_OUT")?"账户提现"
-                                            :e.getTxn_type().equals("SECURED_CONFIRM")?"担保确认"
-                                            :e.getTxn_type().equals("CAPITAL_CANCEL")?"手续费应收应付核销"
-                                            :e.getTxn_type().equals("INNER_DIRECT_EXCHANGE")?"定向内部代发":""
-                                    )
-                            .with(AcctSerIalListVo::setTxnTime,DateUtils.getDateToDate(DateUtils.getStrToDate(e.getTxn_time(), DateUtils.YYYYMMDDHHMMSS),DateUtils.YYYY_MM_DD_HH_MM_SS))
-                    .build()
-            );
-        });
-        acctSerIalVo.setAcctSerIalListVos(acctSerIalListVos);
-        return acctSerIalVo;
-    }
 
 
     /**

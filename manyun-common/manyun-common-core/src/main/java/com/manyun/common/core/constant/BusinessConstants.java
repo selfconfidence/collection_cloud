@@ -19,6 +19,9 @@ public interface BusinessConstants {
         // 钱包业务模块类型
         String MONEY_TYPE= "money_model_type";
 
+        // 连连钱包业务模块类型
+        String LL_MONEY_MODEL_TYPE= "ll_money_model_type";
+
         // 盲盒业务 标识码
         Integer BOX_TAYPE = Integer.valueOf(1);
         // 藏品业务 标识码
