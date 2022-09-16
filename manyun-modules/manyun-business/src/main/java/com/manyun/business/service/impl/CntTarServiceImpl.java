@@ -170,6 +170,7 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
 
     private void execProcessBatchResult(String tarId) {
         // 找到所有抽签记录
+        CntTar cntTar = getById(tarId);
         List<CntUserTar> cntUserTars = userTarService.list(Wrappers.<CntUserTar>lambdaQuery().eq(CntUserTar::getTarId, tarId));
         // 看下当前库存量（中奖量）
         if (!cntUserTars.isEmpty()){
@@ -182,8 +183,19 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
             if ((count = Objects.isNull(cntCollection) ? null : cntCollection.getBalance()) != null  || (count = Objects.isNull(box) ? null : box.getBalance()) != null);
             // 1.1 如果 中奖量 比抽签记录 >= 全部中奖即可
             if (count >= cntUserTars.size()) {
-               openSuccess(cntUserTars);
-               return;
+                //openSuccess(cntUserTars);
+
+                //是否中奖
+                List<CntUserTar> successUserTar = cntUserTars.parallelStream().filter(item -> CEN_YES_TAR.getCode().equals(nowTimeIndex(cntTar.getTarPro()))).collect(Collectors.toList());
+                if (!successUserTar.isEmpty())
+                    openSuccess(successUserTar);
+
+                Set<String> successIds = successUserTar.parallelStream().map(item -> item.getId()).collect(Collectors.toSet());
+                List<CntUserTar> failUserTar = cntUserTars.parallelStream().filter(item -> !successIds.contains(item.getId())).collect(Collectors.toList());
+                if (!failUserTar.isEmpty())
+                    openFail(failUserTar);
+
+                return;
             }
             // 1.2 如果 中奖量 比抽签记录 <
             // 1.2.1 找到所有抽签记录 中奖的记录 统计起来
@@ -198,13 +210,23 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
              Assert.isTrue(successBalance <=0,"see by system error!");
              //successBalance 还有剩余的中奖次数
                Collections.shuffle(whatUserTarLists);
-            for (int i = 0; i < successBalance; i++) {
+/*            for (int i = 0; i < successBalance; i++) {
                 CntUserTar whatSuccessUserTar = whatUserTarLists.get(i);
                 successUserTarLists.add(whatSuccessUserTar);
             }
             // 1.3 推送通知信息 未中奖的，中奖的人
             openSuccess(successUserTarLists);
-            openFail(ListUtil.sub(whatUserTarLists, tempPoint, whatUserTarLists.size()));
+            openFail(ListUtil.sub(whatUserTarLists, tempPoint, whatUserTarLists.size()));*/
+
+            List<CntUserTar> successUserTar = whatUserTarLists.parallelStream().filter(item -> CEN_YES_TAR.getCode().equals(nowTimeIndex(cntTar.getTarPro()))).collect(Collectors.toList());
+            successUserTarLists.addAll(successUserTar);
+            if (!successUserTarLists.isEmpty())
+                openSuccess(successUserTarLists);
+
+              Set<String> successIds = successUserTar.parallelStream().map(item -> item.getId()).collect(Collectors.toSet());
+            List<CntUserTar> failUserTar = whatUserTarLists.parallelStream().filter(item -> !successIds.contains(item.getId())).collect(Collectors.toList());
+            if (!failUserTar.isEmpty())
+                openFail(failUserTar);
         }
     }
 
