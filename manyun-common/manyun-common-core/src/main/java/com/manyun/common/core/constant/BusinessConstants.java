@@ -177,6 +177,11 @@ public interface BusinessConstants {
         String WITHDRAW_INFO = "withdraw_info";
 
         /**
+         * 提现手续费比例
+         */
+        String WITHDRAW_CHARGE = "withdraw_charge";
+
+        /**
          * 寄售须知
          */
         String CONSIGNMENT_INFO = "consignment_info";
