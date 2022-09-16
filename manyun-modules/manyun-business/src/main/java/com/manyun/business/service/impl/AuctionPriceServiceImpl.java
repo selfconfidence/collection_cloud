@@ -485,7 +485,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     @Override
     @Transactional(rollbackFor = Exception.class)
     public synchronized PayVo payMargin(String payUserId, AuctionPayMarginForm auctionPayMarginForm) {
-        Assert.isTrue(Integer.valueOf(5).equals(auctionPayMarginForm.getPayType()), "保证金暂不支持此支付方式");
+        Assert.isFalse(Integer.valueOf(5).equals(auctionPayMarginForm.getPayType()), "保证金暂不支持此支付方式");
 
         CntUserDto cntUserDto = remoteBuiUserService.commUni(payUserId, SecurityConstants.INNER).getData();
         if (Integer.valueOf(0).equals(auctionPayMarginForm.getPayType())) {
