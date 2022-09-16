@@ -444,7 +444,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     ///ShandePayEnum.COLLECTION_BOX_SHANDE_PAY.setReturnUrl(orderPayForm.getReturnUrl())
     public PayVo unifiedOrder(OrderPayForm orderPayForm,String userId) {
         Order order = getById(orderPayForm.getOrderId());
-        Assert.isFalse(Integer.valueOf(5).equals(orderPayForm.getPayType()) && !order.getMoneyBln().equals(BigDecimal.ZERO), "当前状态暂不支持此支付方式");
+        Assert.isFalse(Integer.valueOf(5).equals(orderPayForm.getPayType()) && order.getMoneyBln().compareTo(NumberUtil.add(0D)) >0, "当前状态暂不支持此支付方式");
         checkUnified(order,userId,orderPayForm.getPayPass(),orderPayForm.getPayType());
         ICntConsignmentService consignmentService = cntConsignmentServiceObjectFactory.getObject();
         CntConsignment cntConsignment = consignmentService.getOne(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getOrderId, order.getId()));
