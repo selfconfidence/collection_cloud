@@ -28,4 +28,7 @@ public class LLGeneralConsumeQuery {
     //回调地址
     private String notifyUrl;
 
+    //服务费
+    private BigDecimal serviceCharge;
+
 }

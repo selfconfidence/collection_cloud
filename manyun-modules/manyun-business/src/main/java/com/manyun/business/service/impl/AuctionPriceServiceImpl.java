@@ -402,7 +402,9 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         }
         AuctionSend auctionSend = auctionSendService.getById(auctionPayForm.getAuctionSendId());
         boolean canTrade = moneyService.checkLlpayStatus(payUserId) && moneyService.checkLlpayStatus(auctionSend.getUserId());
+        BigDecimal commission = BigDecimal.ZERO;
         if (Integer.valueOf(5).equals(auctionPayForm.getPayType())) {
+            commission = auctionSend.getCommission();
             Assert.isTrue(canTrade, "暂未开通连连支付，请选择其他支付方式");
         }
         Assert.isFalse(auctionSend.getUserId().equals(payUserId), "自己不可购买自己送拍的产品");
@@ -432,6 +434,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                         .goodsName(auctionOrder.getGoodsName())
                         .receiveUserId(auctionSend.getUserId())
                         .canTrade(canTrade)
+                        .serviceCharge(commission)
                         .userId(payUserId).build());
 
         auctionOrder.setMoneyBln(auctionOrder.getMoneyBln().add(payVo.getMoneyBln()));
@@ -482,6 +485,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     @Override
     @Transactional(rollbackFor = Exception.class)
     public synchronized PayVo payMargin(String payUserId, AuctionPayMarginForm auctionPayMarginForm) {
+        Assert.isTrue(Integer.valueOf(5).equals(auctionPayMarginForm.getPayType()), "保证金暂不支持此支付方式");
 
         CntUserDto cntUserDto = remoteBuiUserService.commUni(payUserId, SecurityConstants.INNER).getData();
         if (Integer.valueOf(0).equals(auctionPayMarginForm.getPayType())) {
@@ -562,7 +566,9 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
         AuctionSend auctionSend = auctionSendService.getById(auctionPayFixedForm.getAuctionSendId());
         boolean canTrade = moneyService.checkLlpayStatus(userId) && moneyService.checkLlpayStatus(auctionSend.getUserId());
+        BigDecimal commission = BigDecimal.ZERO;
         if (Integer.valueOf(5).equals(auctionPayFixedForm.getPayType())) {
+            commission = auctionSend.getCommission();
             Assert.isTrue(canTrade, "暂未开通连连支付，请选择其他支付方式");
         }
         Integer delayTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_DELAY_TIME, Integer.class);
@@ -634,6 +640,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .lianlianPayEnum(lianLianPayEnum)
                 .canTrade(canTrade)
                 .receiveUserId(auctionSend.getUserId())
+                .serviceCharge(commission)
                 .ipaddr(Ipv4Util.LOCAL_IP)
                 .goodsName(auctionOrder.getGoodsName())
                 .userId(userId).build());

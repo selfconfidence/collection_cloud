@@ -450,11 +450,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         CntConsignment cntConsignment = consignmentService.getOne(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getOrderId, order.getId()));
         boolean canTrade = false;
         String sendUserId = null;
+        BigDecimal serviceCharge = BigDecimal.ZERO;
         if (cntConsignment != null) {
             canTrade = moneyService.checkLlpayStatus(userId) && moneyService.checkLlpayStatus(cntConsignment.getSendUserId());
             sendUserId = cntConsignment.getSendUserId();
             if (Integer.valueOf(5).equals(orderPayForm.getPayType())) {
                 Assert.isTrue(canTrade, "暂未开通连连支付，请选择其他支付方式");
+                serviceCharge = cntConsignment.getServerCharge();
             }
         }
 
@@ -470,6 +472,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                         .shandePayEnum(shandePayEnum)
                         .canTrade(canTrade)
                         .receiveUserId(sendUserId)
+                        .serviceCharge(serviceCharge)
                         .lianlianPayEnum(lianLianPayEnum)
                         .goodsName(order.getCollectionName())
                         .ipaddr(Ipv4Util.LOCAL_IP)

@@ -56,6 +56,7 @@ public class LianLianPay implements RootPayServer {
                             .with(LLGeneralConsumeQuery::setIpAddr,payInfoDto.getIpaddr())
                             .with(LLGeneralConsumeQuery::setReturnUrl,payInfoDto.getLianlianPayEnum().getReturnUrl())
                             .with(LLGeneralConsumeQuery::setPayeeUserId, payInfoDto.getReceiveUserId())
+                            .with(LLGeneralConsumeQuery::setServiceCharge, payInfoDto.getServiceCharge())
                             .build(), payInfoDto.isCanTrade());
             return Builder.of(PayVo::new).with(PayVo::setBody, body).with(PayVo::setPayType, payInfoDto.getPayType()).with(PayVo::setOutHost, payInfoDto.getOutHost()).build();
         }
