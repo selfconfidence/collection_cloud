@@ -3,12 +3,14 @@ package com.manyun.business.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
+import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.manyun.business.domain.dto.LogInfoDto;
 import com.manyun.business.domain.dto.UserMoneyDto;
 import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.form.AccountInfoForm;
+import com.manyun.business.domain.form.SystemWithdrawForm;
 import com.manyun.business.domain.query.CheckOrderPayQuery;
 import com.manyun.business.domain.query.MoneyLogQuery;
 import com.manyun.business.domain.vo.AccountInfoVo;
@@ -17,7 +19,10 @@ import com.manyun.business.domain.vo.MoneyLogVo;
 import com.manyun.business.mapper.MoneyMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.comm.api.RemoteBuiUserService;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.domain.form.UserRealMoneyForm;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.AuctionStatus;
@@ -39,6 +44,7 @@ import java.util.stream.Collectors;
 import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.POLL_SOURCE;
 import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.PULL_SOURCE;
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.MONEY_TYPE;
+import static com.manyun.common.core.enums.UserRealStatus.OK_REAL;
 
 /**
  * <p>
@@ -68,6 +74,12 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
     @Autowired
     @Lazy
     private IAuctionOrderService auctionOrderService;
+
+    @Autowired
+    private ICntSystemWithdrawService withdrawService;
+
+    @Autowired
+    private RemoteBuiUserService remoteBuiUserService;
 
 
     /**
@@ -303,6 +315,27 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         checkOrderVo.setPayTime(payTime);
 
         return checkOrderVo;
+    }
+
+
+    @Override
+    public R systemWithdraw(SystemWithdrawForm systemWithdrawForm, String userId) {
+        Money userMoney = getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
+        R<CntUserDto> cntUserDtoR = remoteBuiUserService.commUni(userId, SecurityConstants.INNER);
+        CntUserDto data = cntUserDtoR.getData();
+        Assert.isTrue(systemWithdrawForm.getWithdrawAmount().compareTo(userMoney.getMoneyBalance()) <= 0, "提现金额不可大于钱包余额");
+        Assert.isTrue(OK_REAL.getCode().equals(data.getIsReal()),"暂未实名认证,请实名认证!");
+        Assert.isTrue(systemWithdrawForm.getPayPass().equals(data.getPayPass()),"支付密码错误,请核实!");
+        CntSystemWithdraw cntSystemWithdraw = new CntSystemWithdraw();
+        cntSystemWithdraw.setId(IdUtil.getSnowflakeNextIdStr());
+        cntSystemWithdraw.setBankCard(userMoney.getBankCart());
+        cntSystemWithdraw.setMoneyBalance(userMoney.getMoneyBalance());
+        cntSystemWithdraw.setWithdrawAmount(systemWithdrawForm.getWithdrawAmount());
+        cntSystemWithdraw.setPhone(data.getPhone());
+        cntSystemWithdraw.setUserName(userMoney.getRealName());
+        cntSystemWithdraw.createD(userId);
+        withdrawService.save(cntSystemWithdraw);
+        return R.ok();
     }
 
 }

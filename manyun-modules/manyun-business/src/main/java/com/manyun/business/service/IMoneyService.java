@@ -4,6 +4,7 @@ import com.manyun.business.domain.dto.UserMoneyDto;
 import com.manyun.business.domain.entity.Money;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.form.AccountInfoForm;
+import com.manyun.business.domain.form.SystemWithdrawForm;
 import com.manyun.business.domain.query.CheckOrderPayQuery;
 import com.manyun.business.domain.query.MoneyLogQuery;
 import com.manyun.business.domain.vo.AccountInfoVo;
@@ -50,4 +51,6 @@ public interface IMoneyService extends IService<Money> {
     CheckOrderVo checkOrderPayStatus(CheckOrderPayQuery checkOrderPayQuery);
 
     Boolean checkLlpayStatus(String userId);
+
+    R systemWithdraw(SystemWithdrawForm systemWithdrawForm, String userId);
 }

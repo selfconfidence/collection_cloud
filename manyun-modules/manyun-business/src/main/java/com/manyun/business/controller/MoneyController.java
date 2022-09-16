@@ -3,6 +3,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.domain.entity.Money;
 import com.manyun.business.domain.form.AccountInfoForm;
+import com.manyun.business.domain.form.SystemWithdrawForm;
 import com.manyun.business.domain.query.CheckOrderPayQuery;
 import com.manyun.business.domain.query.MoneyLogQuery;
 import com.manyun.business.domain.vo.AccountInfoVo;
@@ -141,6 +142,13 @@ public class MoneyController extends BaseController {
     @ApiOperation("检查支付返回结果")
     public R<CheckOrderVo> checkOrderPayStatus(@RequestBody @Valid CheckOrderPayQuery checkOrderPayQuery) {
         return R.ok(moneyService.checkOrderPayStatus(checkOrderPayQuery));
+    }
+
+    @PostMapping("/systemWithdraw")
+    @ApiOperation("系统余额提现")
+    public R systemWithdraw(@RequestBody @Valid SystemWithdrawForm systemWithdrawForm) {
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return moneyService.systemWithdraw(systemWithdrawForm, notNullLoginBusinessUser.getUserId());
     }
 
 
