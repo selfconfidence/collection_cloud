@@ -444,16 +444,19 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     ///ShandePayEnum.COLLECTION_BOX_SHANDE_PAY.setReturnUrl(orderPayForm.getReturnUrl())
     public PayVo unifiedOrder(OrderPayForm orderPayForm,String userId) {
         Order order = getById(orderPayForm.getOrderId());
+        Assert.isTrue(Integer.valueOf(5).equals(orderPayForm.getPayType()) && !order.getMoneyBln().equals(BigDecimal.ZERO), "当前状态暂不支持此支付方式");
         checkUnified(order,userId,orderPayForm.getPayPass(),orderPayForm.getPayType());
         ICntConsignmentService consignmentService = cntConsignmentServiceObjectFactory.getObject();
         CntConsignment cntConsignment = consignmentService.getOne(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getOrderId, order.getId()));
         boolean canTrade = false;
         String sendUserId = null;
+        BigDecimal serviceCharge = BigDecimal.ZERO;
         if (cntConsignment != null) {
             canTrade = moneyService.checkLlpayStatus(userId) && moneyService.checkLlpayStatus(cntConsignment.getSendUserId());
             sendUserId = cntConsignment.getSendUserId();
             if (Integer.valueOf(5).equals(orderPayForm.getPayType())) {
                 Assert.isTrue(canTrade, "暂未开通连连支付，请选择其他支付方式");
+                serviceCharge = cntConsignment.getServerCharge();
             }
         }
 
@@ -469,6 +472,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                         .shandePayEnum(shandePayEnum)
                         .canTrade(canTrade)
                         .receiveUserId(sendUserId)
+                        .serviceCharge(serviceCharge)
                         .lianlianPayEnum(lianLianPayEnum)
                         .goodsName(order.getCollectionName())
                         .ipaddr(Ipv4Util.LOCAL_IP)

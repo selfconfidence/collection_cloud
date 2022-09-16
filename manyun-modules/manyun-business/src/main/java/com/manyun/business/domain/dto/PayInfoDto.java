@@ -40,6 +40,9 @@ public class PayInfoDto implements Serializable {
     //是否可以用户之间交易
     private boolean canTrade;
 
+    //服务费，连连支付需传
+    private BigDecimal serviceCharge;
+
 
 
 

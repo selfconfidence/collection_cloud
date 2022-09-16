@@ -147,6 +147,8 @@ public class LLPayUtils {
      * @param   amount 提现金额
      */
     public static Map<String,String> withdraw(String userId, String passWord, BigDecimal amount) {
+        List<LinkedAcctlist> linkedAcctlists = LLPayUtils.queryLinkedacct(userId);
+        Assert.isTrue(linkedAcctlists.size()>0,"请求参数有误!");
         Map<String,String> map = new HashMap<String, String>();
         WithDrawalParams params = new WithDrawalParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
@@ -154,6 +156,7 @@ public class LLPayUtils {
         params.setOid_partner(LLianPayConstant.OidPartner);
         params.setNotify_url(LianLianPayEnum.WITHDRAW.getNotifyUrl());
         params.setRisk_item("");
+        params.setLinked_agrtno(linkedAcctlists.parallelStream().map(LinkedAcctlist::getLinked_agrtno).findFirst().get());
 
         // 设置商户订单信息
         WithDrawalOrderInfo orderInfo = new WithDrawalOrderInfo();
@@ -189,8 +192,8 @@ public class LLPayUtils {
             map.put("token",drawalResult.getToken());
             return map;
         }
-        map.put("code","500");
-        map.put("msg","申请提现失败,系统异常!");
+        map.put("code",drawalResult.getRet_code());
+        map.put("msg",drawalResult.getRet_msg());
         return map;
     }
 
@@ -348,12 +351,27 @@ public class LLPayUtils {
         params.setOrderInfo(orderInfo);
 
         // 设置收款方信息
-        CashierPayCreatePayeeInfo mPayeeInfo = new CashierPayCreatePayeeInfo();
-        mPayeeInfo.setPayee_id(type==true?llGeneralConsumeQuery.getPayeeUserId():LLianPayConstant.OidPartner);
-        mPayeeInfo.setPayee_type(type==true?"USER":"MERCHANT");
-        mPayeeInfo.setPayee_amount(llGeneralConsumeQuery.getAmount());
-        mPayeeInfo.setPayee_memo(type==true?"用户商品交易":"用户购买商品");
-        params.setPayeeInfo(new CashierPayCreatePayeeInfo[]{mPayeeInfo});
+        if(type){
+            CashierPayCreatePayeeInfo mPayeeInfo = new CashierPayCreatePayeeInfo();
+            mPayeeInfo.setPayee_id(LLianPayConstant.OidPartner);
+            mPayeeInfo.setPayee_type("MERCHANT");
+            mPayeeInfo.setPayee_amount(llGeneralConsumeQuery.getServiceCharge());
+            mPayeeInfo.setPayee_memo("手续费");
+
+            CashierPayCreatePayeeInfo uPayeeInfo = new CashierPayCreatePayeeInfo();
+            uPayeeInfo.setPayee_id(llGeneralConsumeQuery.getPayeeUserId());
+            uPayeeInfo.setPayee_type("USER");
+            uPayeeInfo.setPayee_amount((llGeneralConsumeQuery.getAmount().subtract(llGeneralConsumeQuery.getServiceCharge())));
+            uPayeeInfo.setPayee_memo("用户商品交易");
+            params.setPayeeInfo(new CashierPayCreatePayeeInfo[]{mPayeeInfo, uPayeeInfo});
+        }else {
+            CashierPayCreatePayeeInfo mPayeeInfo = new CashierPayCreatePayeeInfo();
+            mPayeeInfo.setPayee_id(LLianPayConstant.OidPartner);
+            mPayeeInfo.setPayee_type("MERCHANT");
+            mPayeeInfo.setPayee_amount(llGeneralConsumeQuery.getAmount());
+            mPayeeInfo.setPayee_memo("用户购买商品");
+            params.setPayeeInfo(new CashierPayCreatePayeeInfo[]{mPayeeInfo});
+        }
 
         // 设置付款方信息
         CashierPayCreatePayerInfo payerInfo = new CashierPayCreatePayerInfo();
@@ -368,6 +386,11 @@ public class LLPayUtils {
         return cashierPayCreateResult.getGateway_url();
     }
 
+    public static void main(String[] args) {
+        BigDecimal num1 = new BigDecimal("10");
+        BigDecimal num2 = new BigDecimal("5");
+        System.out.println(num1.subtract(num2));
+    }
 
     /**
      * 查询余额
@@ -385,7 +408,7 @@ public class LLPayUtils {
         String resultJsonStr = lLianPayClient.sendRequest(queryAcctinfo, JSON.toJSONString(map));
         AcctInfoResult acctInfoResult = JSON.parseObject(resultJsonStr, AcctInfoResult.class);
         Assert.isTrue("0000".equalsIgnoreCase(acctInfoResult.getRet_code()),acctInfoResult.getRet_msg());
-        Optional<AcctinfoList> optional = acctInfoResult.getAcctinfo_list().parallelStream().filter(f -> ("USEROWN_PSETTLE".equals(f.getAcct_type()) && "NORMAL".equals(f.getAcct_state()))).findFirst();
+        Optional<AcctinfoList> optional = acctInfoResult.getAcctinfo_list().parallelStream().filter(f -> ("USEROWN_AVAILABLE".equals(f.getAcct_type()) && "NORMAL".equals(f.getAcct_state()))).findFirst();
         if(!optional.isPresent()){
             Assert.isTrue(Boolean.FALSE,"用户余额查询失败,请重试!");
         }
@@ -541,7 +564,7 @@ public class LLPayUtils {
         String timestamp = LLianPayDateUtils.getTimestamp();
         params.setTimestamp(timestamp);
         params.setOid_partner(LLianPayConstant.OidPartner);
-        params.setUser_id("userId");
+        params.setUser_id(userId);
         /*
         交易发起渠道。
         ANDROID
