@@ -408,7 +408,7 @@ public class LLPayUtils {
         String resultJsonStr = lLianPayClient.sendRequest(queryAcctinfo, JSON.toJSONString(map));
         AcctInfoResult acctInfoResult = JSON.parseObject(resultJsonStr, AcctInfoResult.class);
         Assert.isTrue("0000".equalsIgnoreCase(acctInfoResult.getRet_code()),acctInfoResult.getRet_msg());
-        Optional<AcctinfoList> optional = acctInfoResult.getAcctinfo_list().parallelStream().filter(f -> ("USEROWN_PSETTLE".equals(f.getAcct_type()) && "NORMAL".equals(f.getAcct_state()))).findFirst();
+        Optional<AcctinfoList> optional = acctInfoResult.getAcctinfo_list().parallelStream().filter(f -> ("USEROWN_AVAILABLE".equals(f.getAcct_type()) && "NORMAL".equals(f.getAcct_state()))).findFirst();
         if(!optional.isPresent()){
             Assert.isTrue(Boolean.FALSE,"用户余额查询失败,请重试!");
         }
