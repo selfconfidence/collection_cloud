@@ -351,12 +351,27 @@ public class LLPayUtils {
         params.setOrderInfo(orderInfo);
 
         // 设置收款方信息
-        CashierPayCreatePayeeInfo mPayeeInfo = new CashierPayCreatePayeeInfo();
-        mPayeeInfo.setPayee_id(type==true?llGeneralConsumeQuery.getPayeeUserId():LLianPayConstant.OidPartner);
-        mPayeeInfo.setPayee_type(type==true?"USER":"MERCHANT");
-        mPayeeInfo.setPayee_amount(llGeneralConsumeQuery.getAmount());
-        mPayeeInfo.setPayee_memo(type==true?"用户商品交易":"用户购买商品");
-        params.setPayeeInfo(new CashierPayCreatePayeeInfo[]{mPayeeInfo});
+        if(type){
+            CashierPayCreatePayeeInfo mPayeeInfo = new CashierPayCreatePayeeInfo();
+            mPayeeInfo.setPayee_id(LLianPayConstant.OidPartner);
+            mPayeeInfo.setPayee_type("MERCHANT");
+            mPayeeInfo.setPayee_amount((llGeneralConsumeQuery.getAmount().subtract(llGeneralConsumeQuery.getServiceCharge())));
+            mPayeeInfo.setPayee_memo("手续费");
+
+            CashierPayCreatePayeeInfo uPayeeInfo = new CashierPayCreatePayeeInfo();
+            uPayeeInfo.setPayee_id(llGeneralConsumeQuery.getPayeeUserId());
+            uPayeeInfo.setPayee_type("USER");
+            uPayeeInfo.setPayee_amount(llGeneralConsumeQuery.getServiceCharge());
+            uPayeeInfo.setPayee_memo("用户商品交易");
+            params.setPayeeInfo(new CashierPayCreatePayeeInfo[]{mPayeeInfo, uPayeeInfo});
+        }else {
+            CashierPayCreatePayeeInfo mPayeeInfo = new CashierPayCreatePayeeInfo();
+            mPayeeInfo.setPayee_id(LLianPayConstant.OidPartner);
+            mPayeeInfo.setPayee_type("MERCHANT");
+            mPayeeInfo.setPayee_amount(llGeneralConsumeQuery.getAmount());
+            mPayeeInfo.setPayee_memo("用户购买商品");
+            params.setPayeeInfo(new CashierPayCreatePayeeInfo[]{mPayeeInfo});
+        }
 
         // 设置付款方信息
         CashierPayCreatePayerInfo payerInfo = new CashierPayCreatePayerInfo();
@@ -371,6 +386,11 @@ public class LLPayUtils {
         return cashierPayCreateResult.getGateway_url();
     }
 
+    public static void main(String[] args) {
+        BigDecimal num1 = new BigDecimal("10");
+        BigDecimal num2 = new BigDecimal("5");
+        System.out.println(num1.subtract(num2));
+    }
 
     /**
      * 查询余额
