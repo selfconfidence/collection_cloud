@@ -1,30 +1,44 @@
 package com.manyun.business.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.github.pagehelper.PageHelper;
 import com.manyun.business.design.pay.LLPayUtils;
 import com.manyun.business.design.pay.bean.query.AcctserialAcctbal;
 import com.manyun.business.design.pay.bean.query.LinkedAcctlist;
+import com.manyun.business.domain.entity.Logs;
 import com.manyun.business.domain.entity.Money;
 import com.manyun.business.domain.query.*;
 import com.manyun.business.domain.vo.AcctSerIalVo;
 import com.manyun.business.domain.vo.InnerUserVo;
+import com.manyun.business.domain.vo.MoneyLogVo;
+import com.manyun.business.service.ILogsService;
 import com.manyun.business.service.IMoneyService;
+import com.manyun.business.service.ISystemService;
 import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.DateUtils;
+import com.manyun.common.core.web.page.TableDataInfo;
+import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.LL_MONEY_MODEL_TYPE;
+import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.MONEY_TYPE;
 
 /**
  * <p>
@@ -41,6 +55,12 @@ public class LianLianController {
 
     @Autowired
     private IMoneyService moneyService;
+
+    @Autowired
+    private ISystemService systemService;
+
+    @Autowired
+    private ILogsService logsService;
 
     @GetMapping("/isAccountOpening")
     @ApiOperation(value = "是否开户",notes = ("已开户   未开户"))
@@ -74,11 +94,18 @@ public class LianLianController {
         );
     }
 
+    @GetMapping("/withdrawServerCharge")
+    @ApiOperation(value = "连连提现手续费",notes = "返回连连提现 百分比")
+    public R<BigDecimal> consignmentServerCharge(){
+        return R.ok(systemService.getVal(BusinessConstants.SystemTypeConstant.WITHDRAW_CHARGE,BigDecimal.class));
+    }
+
     @PostMapping("/withdraw")
     @ApiOperation("提现申请")
     public R<Map<String,String>> withdraw(@RequestBody LLWithdrawQuery llWithdrawQuery) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        return R.ok(LLPayUtils.withdraw(loginBusinessUser.getUserId(),llWithdrawQuery.getPassWord(),llWithdrawQuery.getAmount()));
+        BigDecimal val = systemService.getVal(BusinessConstants.SystemTypeConstant.WITHDRAW_CHARGE, BigDecimal.class);
+        return R.ok(LLPayUtils.withdraw(loginBusinessUser.getUserId(),llWithdrawQuery.getPassWord(),llWithdrawQuery.getAmount(),val));
     }
 
     @PostMapping("/validationSms")
@@ -106,15 +133,18 @@ public class LianLianController {
 
     @PostMapping("/queryAcctserial")
     @ApiOperation("查询资金流水")
-    public R<AcctSerIalVo> queryAcctserial(@RequestBody LLAcctserialQuery llAcctserialQuery) {
-        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        Date start = llAcctserialQuery.getStartDate();
-        Date end = llAcctserialQuery.getEndDate();
-        String startDate="";
-        String endDate="";
-        if(start!=null)startDate = DateUtils.getDateToStr(start,DateUtils.YYYYMMDDHHMMSS);
-        if(end!=null)endDate = DateUtils.getDateToStr(end,DateUtils.YYYYMMDDHHMMSS);
-        return R.ok(LLPayUtils.queryAcctserial(loginBusinessUser.getUserId(), start == null ? "" : endDate, end == null ? "" : endDate, llAcctserialQuery.getPageNo(), llAcctserialQuery.getPageSize()));
+    public R<TableDataInfo<MoneyLogVo>> queryAcctserial(@RequestBody MoneyLogQuery moneyLogQuery) {
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        PageHelper.startPage(moneyLogQuery.getPageNum(),moneyLogQuery.getPageSize());
+        List<Logs> logsList = logsService.list(Wrappers.<Logs>lambdaQuery().eq(Logs::getBuiId, notNullLoginBusinessUser.getUserId()).eq(Logs::getModelType, LL_MONEY_MODEL_TYPE).eq(Objects.nonNull(moneyLogQuery.getIsType()), Logs::getIsType, moneyLogQuery.getIsType()).apply(Objects.nonNull(moneyLogQuery.getCreatedTime()), "  DATE_FORMAT(created_time,'%Y-%m-%d') = '" + moneyLogQuery.getCreatedTime() + "' ").orderByDesc(Logs::getCreatedTime));
+        List<MoneyLogVo> moneyLogVos = logsList.parallelStream().map(this::initMoneyLogVo).collect(Collectors.toList());
+        return R.ok(TableDataInfoUtil.pageTableDataInfo(moneyLogVos,logsList));
+    }
+
+    private MoneyLogVo initMoneyLogVo(Logs logs) {
+        MoneyLogVo moneyLogVo = Builder.of(MoneyLogVo::new).build();
+        BeanUtil.copyProperties(logs,moneyLogVo);
+        return moneyLogVo;
     }
 
 }

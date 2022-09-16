@@ -1,12 +1,15 @@
 package com.manyun.business.controller.notify;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.IdUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.manyun.business.service.IAuctionOrderService;
-import com.manyun.business.service.IAuctionPriceService;
-import com.manyun.business.service.IOrderService;
+import com.manyun.business.design.pay.bean.cashier.ResponsePayee;
+import com.manyun.business.domain.dto.LogInfoDto;
+import com.manyun.business.domain.entity.Logs;
+import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.domain.entity.Money;
-import com.manyun.business.service.IMoneyService;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.pays.utils.llpay.security.LLianPayAccpSignature;
 import io.swagger.annotations.Api;
@@ -19,7 +22,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.POLL_SOURCE;
+import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.PULL_SOURCE;
+import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.*;
 
 /**
  * 连连支付    验证
@@ -42,6 +50,9 @@ public class LLPayNotifyController {
 
     @Autowired
     private IAuctionOrderService auctionOrderService;
+
+    @Autowired
+    private ILogsService logsService;
 
 
     @PostMapping(value = "/LlInnerUserNotify")
@@ -138,6 +149,24 @@ public class LLPayNotifyController {
                 return null;
             } else {
                 log.info(String.format("响应验签通过！"));
+                JSONObject resultObj = JSONObject.parseObject(resultSB.toString());
+                String txnStatus = resultObj.getString("txn_status");
+                if("TRADE_SUCCESS".equals(txnStatus)){
+                    JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
+                    JSONObject payerInfo = JSONObject.parseObject(resultObj.getString("payerInfo"));
+                    String userId = payerInfo.getString("payer_id");
+                    String amount = orderInfo.getString("total_amount");
+                    logsService.saveLogs(
+                            LogInfoDto
+                                    .builder()
+                                    .buiId(userId)
+                                    .jsonTxt("账户余额充值")
+                                    .formInfo(amount)
+                                    .isType(PULL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
+                }else {
+                    log.info("响应结果异常!");
+                    return null;
+                }
             }
         }else {
             log.error("返回响应验证签名异常，请核实！");
@@ -209,14 +238,17 @@ public class LLPayNotifyController {
             } else {
                 log.info(String.format("响应验签通过！"));
                 JSONObject resultObj = JSONObject.parseObject(resultSB.toString());
-                log.info("userId:======="+resultObj.getString("user_id"));
-                log.info("finish_time:======="+resultObj.getString("finish_time"));
-                log.info("txn_status:======="+resultObj.getString("txn_status"));
-                log.info("failure_reason:======="+resultObj.getString("failure_reason"));
                 JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
-                log.info("txn_seqno:======="+orderInfo.getString("txn_seqno"));
-                log.info("txn_time:======="+orderInfo.getString("txn_time"));
-                log.info("total_amount:======="+orderInfo.getString("total_amount"));
+                JSONObject payerInfo = JSONObject.parseObject(resultObj.getString("payerInfo"));
+                String payerId = payerInfo.getString("payer_id");
+                String amount = orderInfo.getString("total_amount");
+                logsService.saveLogs(
+                        LogInfoDto
+                                .builder()
+                                .buiId(payerId)
+                                .jsonTxt("账户余额提现")
+                                .formInfo(amount)
+                                .isType(POLL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
             }
         }else {
             log.error("返回响应验证签名异常，请核实！");
@@ -250,10 +282,18 @@ public class LLPayNotifyController {
                 log.info(String.format("响应验签通过！"));
                 JSONObject resultObj = JSONObject.parseObject(resultSB.toString());
                 String txnStatus = resultObj.getString("txn_status");
-                JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
-                if("TRADE_SUCCESS".equals(txnStatus) && Objects.nonNull(orderInfo)){
+                if("TRADE_SUCCESS".equals(txnStatus)){
+                    JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
+                    JSONObject payerInfo = JSONObject.parseObject(resultObj.getString("payerInfo"));
                     log.info("txn_seqno:======="+orderInfo.getString("txn_seqno"));
                     orderService.notifyPaySuccess(orderInfo.getString("txn_seqno"));
+                    logsService.saveLogs(
+                            LogInfoDto
+                                    .builder()
+                                    .buiId(payerInfo.getString("payer_id"))
+                                    .jsonTxt("用户购买商品")
+                                    .formInfo(orderInfo.getString("total_amount"))
+                                    .isType(POLL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
                 }else {
                     log.info("响应结果异常!");
                     return null;
@@ -291,10 +331,42 @@ public class LLPayNotifyController {
                 log.info(String.format("响应验签通过！"));
                 JSONObject resultObj = JSONObject.parseObject(resultSB.toString());
                 String txnStatus = resultObj.getString("txn_status");
+                if("TRADE_SUCCESS".equals(txnStatus)){
                 JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
-                if("TRADE_SUCCESS".equals(txnStatus) && Objects.nonNull(orderInfo)){
-                    log.info("txn_seqno:======="+orderInfo.getString("txn_seqno"));
-               orderService.notifyPayConsignmentSuccess(orderInfo.getString("txn_seqno"));
+                JSONObject payerInfo = JSONObject.parseObject(resultObj.getString("payerInfo"));
+                List<ResponsePayee> responsePayeeList = JSONObject.parseArray(resultObj.getString("payeeInfo"), ResponsePayee.class);
+                log.info("txn_seqno:======="+orderInfo.getString("txn_seqno"));
+                log.info("responsePayeeList:========"+responsePayeeList.toString());
+                orderService.notifyPayConsignmentSuccess(orderInfo.getString("txn_seqno"));
+                List<LogInfoDto> list = new ArrayList<>();
+                list.add(LogInfoDto
+                        .builder()
+                        .buiId(payerInfo.getString("payer_id"))
+                        .jsonTxt("用户寄售商品交易")
+                        .formInfo(orderInfo.getString("total_amount"))
+                        .isType(POLL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
+                if(responsePayeeList.size()>0){
+                    Optional<ResponsePayee> optional = responsePayeeList.parallelStream().filter(f -> f.getPayer_type().equals("USER")).findFirst();
+                    if(optional.isPresent()){
+                        list.add(LogInfoDto
+                                .builder()
+                                .buiId(optional.get().getPayer_id())
+                                .jsonTxt("用户寄售商品交易")
+                                .formInfo(optional.get().getAmount())
+                                .isType(PULL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
+                    }
+                }
+                if(list.size()>0){
+                    logsService.saveBatch(
+                            list.parallelStream().map(m->{
+                                Logs logs = Builder.of(Logs::new).build();
+                                BeanUtil.copyProperties(m,logs);
+                                logs.setId(IdUtil.getSnowflake().nextIdStr());
+                                logs.createD(m.getBuiId());
+                                return logs;
+                            }).collect(Collectors.toList())
+                    );
+                }
                 }else {
                     log.info("响应结果异常!");
                     return null;
@@ -372,11 +444,42 @@ public class LLPayNotifyController {
                 log.info(String.format("响应验签通过！"));
                 JSONObject resultObj = JSONObject.parseObject(resultSB.toString());
                 String txnStatus = resultObj.getString("txn_status");
-                JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
-                String tradeNo = orderInfo.getString("txn_seqno");
-                if("TRADE_SUCCESS".equals(txnStatus) && Objects.nonNull(orderInfo)){
+                if("TRADE_SUCCESS".equals(txnStatus)){
+                    JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
+                    JSONObject payerInfo = JSONObject.parseObject(resultObj.getString("payerInfo"));
+                    List<ResponsePayee> responsePayeeList = JSONObject.parseArray(resultObj.getString("payeeInfo"), ResponsePayee.class);
                     log.info("txn_seqno:======="+resultObj.getString("txn_seqno"));
-                    auctionOrderService.notifyPaySuccess(tradeNo);
+                    log.info("responsePayeeList:======="+responsePayeeList.toString());
+                    auctionOrderService.notifyPaySuccess(orderInfo.getString("txn_seqno"));
+                    List<LogInfoDto> list = new ArrayList<>();
+                    list.add(LogInfoDto
+                            .builder()
+                            .buiId(payerInfo.getString("payer_id"))
+                            .jsonTxt("用户拍卖商品交易")
+                            .formInfo(orderInfo.getString("total_amount"))
+                            .isType(POLL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
+                    if(responsePayeeList.size()>0){
+                        Optional<ResponsePayee> optional = responsePayeeList.parallelStream().filter(f -> f.getPayer_type().equals("USER")).findFirst();
+                        if(optional.isPresent()){
+                            list.add(LogInfoDto
+                                    .builder()
+                                    .buiId(optional.get().getPayer_id())
+                                    .jsonTxt("用户拍卖商品交易")
+                                    .formInfo(optional.get().getAmount())
+                                    .isType(PULL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
+                        }
+                    }
+                    if(list.size()>0){
+                        logsService.saveBatch(
+                                list.parallelStream().map(m->{
+                                    Logs logs = Builder.of(Logs::new).build();
+                                    BeanUtil.copyProperties(m,logs);
+                                    logs.setId(IdUtil.getSnowflake().nextIdStr());
+                                    logs.createD(m.getBuiId());
+                                    return logs;
+                                }).collect(Collectors.toList())
+                        );
+                    }
                 }else {
                     log.info("响应结果异常!");
                     return null;
@@ -413,11 +516,42 @@ public class LLPayNotifyController {
                 log.info(String.format("响应验签通过！"));
                 JSONObject resultObj = JSONObject.parseObject(resultSB.toString());
                 String txnStatus = resultObj.getString("txn_status");
-                JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
-                String tradeNo = orderInfo.getString("txn_seqno");
-                if("TRADE_SUCCESS".equals(txnStatus) && Objects.nonNull(orderInfo)){
+                if("TRADE_SUCCESS".equals(txnStatus)){
+                    JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
+                    JSONObject payerInfo = JSONObject.parseObject(resultObj.getString("payerInfo"));
+                    List<ResponsePayee> responsePayeeList = JSONObject.parseArray(resultObj.getString("payeeInfo"), ResponsePayee.class);
                     log.info("txn_seqno:======="+resultObj.getString("txn_seqno"));
-                    auctionOrderService.notifyPaySuccess(tradeNo);
+                    log.info("responsePayeeList:======="+responsePayeeList.toString());
+                    auctionOrderService.notifyPaySuccess(orderInfo.getString("txn_seqno"));
+                    List<LogInfoDto> list = new ArrayList<>();
+                    list.add(LogInfoDto
+                            .builder()
+                            .buiId(payerInfo.getString("payer_id"))
+                            .jsonTxt("用户一口价商品交易")
+                            .formInfo(orderInfo.getString("total_amount"))
+                            .isType(POLL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
+                    if(responsePayeeList.size()>0){
+                        Optional<ResponsePayee> optional = responsePayeeList.parallelStream().filter(f -> f.getPayer_type().equals("USER")).findFirst();
+                        if(optional.isPresent()){
+                            list.add(LogInfoDto
+                                    .builder()
+                                    .buiId(optional.get().getPayer_id())
+                                    .jsonTxt("用户一口价商品交易")
+                                    .formInfo(optional.get().getAmount())
+                                    .isType(PULL_SOURCE).modelType(LL_MONEY_MODEL_TYPE).build());
+                        }
+                    }
+                    if(list.size()>0){
+                        logsService.saveBatch(
+                                list.parallelStream().map(m->{
+                                    Logs logs = Builder.of(Logs::new).build();
+                                    BeanUtil.copyProperties(m,logs);
+                                    logs.setId(IdUtil.getSnowflake().nextIdStr());
+                                    logs.createD(m.getBuiId());
+                                    return logs;
+                                }).collect(Collectors.toList())
+                        );
+                    }
                 }else {
                     log.info("响应结果异常!");
                     return null;
