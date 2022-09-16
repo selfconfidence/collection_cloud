@@ -319,6 +319,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
 
 
     @Override
+    @Transactional
     public R systemWithdraw(SystemWithdrawForm systemWithdrawForm, String userId) {
         Money userMoney = getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
         R<CntUserDto> cntUserDtoR = remoteBuiUserService.commUni(userId, SecurityConstants.INNER);
@@ -335,6 +336,9 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         cntSystemWithdraw.setUserName(userMoney.getRealName());
         cntSystemWithdraw.createD(userId);
         withdrawService.save(cntSystemWithdraw);
+        //先将余额扣掉
+        userMoney.setMoneyBalance(userMoney.getMoneyBalance().subtract(systemWithdrawForm.getWithdrawAmount()));
+        updateById(userMoney);
         return R.ok();
     }
 
