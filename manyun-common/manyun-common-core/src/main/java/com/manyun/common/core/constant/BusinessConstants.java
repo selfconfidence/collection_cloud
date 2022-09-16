@@ -171,6 +171,18 @@ public interface BusinessConstants {
          */
         String SYNTHESIS_GIF = "synthesis_gif";
 
+        /**
+         * 提现规则
+         */
+        String WITHDRAW_INFO = "withdraw_info";
+
+        /**
+         * 寄售须知
+         */
+        String CONSIGNMENT_INFO = "consignment_info";
+
+
+
     }
 
 

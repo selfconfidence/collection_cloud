@@ -66,5 +66,17 @@ public class SystemController {
         return R.ok(systemService.getVal(SYNTHESIS_GIF, String.class));
     }
 
+    @GetMapping("/withdrawInfo")
+    @ApiOperation("提现规则")
+    public R<String> withdrawInfo() {
+        return R.ok(systemService.getVal(WITHDRAW_INFO, String.class));
+    }
+
+    @GetMapping("/consignmentInfo")
+    @ApiOperation("寄售须知")
+    public R<String> consignmentInfo() {
+        return R.ok(systemService.getVal(CONSIGNMENT_INFO, String.class));
+    }
+
 }
 
