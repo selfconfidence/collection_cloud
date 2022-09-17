@@ -207,7 +207,7 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
              int tempPoint;
              int successBalance =  tempPoint  =  count - successUserTarLists.size();
              // 预防特殊情况，后台管理没限制
-             Assert.isTrue(successBalance <=0,"see by system error!");
+            // Assert.isTrue(successBalance <=0,"see by system error!");
              //successBalance 还有剩余的中奖次数
                Collections.shuffle(whatUserTarLists);
 /*            for (int i = 0; i < successBalance; i++) {
