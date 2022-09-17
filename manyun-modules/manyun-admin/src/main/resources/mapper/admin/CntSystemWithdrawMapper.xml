@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyun.admin.mapper.CntSystemWithdrawMapper">
+
+    <resultMap type="CntSystemWithdraw" id="CntSystemWithdrawResult">
+        <result property="id"    column="id"    />
+        <result property="withdrawAmount"    column="withdraw_amount"    />
+        <result property="moneyBalance"    column="money_balance"    />
+        <result property="userName"    column="user_name"    />
+        <result property="phone"    column="phone"    />
+        <result property="bankCard"    column="bank_card"    />
+        <result property="withdrawStatus"    column="withdraw_status"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectCntSystemWithdrawVo">
+        select id, withdraw_amount, money_balance, user_name, phone, bank_card, withdraw_status, created_by, created_time, updated_by, updated_time from cnt_system_withdraw
+    </sql>
+
+    <select id="selectCntSystemWithdrawList" parameterType="CntSystemWithdraw" resultMap="CntSystemWithdrawResult">
+        <include refid="selectCntSystemWithdrawVo"/>
+        <where>
+            <if test="userName != null  and userName != ''"> and user_name like concat('%', #{userName}, '%')</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="bankCard != null  and bankCard != ''"> and bank_card = #{bankCard}</if>
+            <if test="withdrawStatus != null "> and withdraw_status = #{withdrawStatus}</if>
+        </where>
+        order by withdraw_status asc,created_time desc
+    </select>
+
+</mapper>
