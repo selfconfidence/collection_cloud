@@ -210,20 +210,21 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
             // Assert.isTrue(successBalance <=0,"see by system error!");
              //successBalance 还有剩余的中奖次数
                Collections.shuffle(whatUserTarLists);
-/*            for (int i = 0; i < successBalance; i++) {
+          for (int i = 0; i < successBalance; i++) {
                 CntUserTar whatSuccessUserTar = whatUserTarLists.get(i);
+                if (CEN_YES_TAR.getCode().equals(nowTimeIndex(cntTar.getTarPro())))
                 successUserTarLists.add(whatSuccessUserTar);
             }
             // 1.3 推送通知信息 未中奖的，中奖的人
-            openSuccess(successUserTarLists);
+/*            openSuccess(successUserTarLists);
             openFail(ListUtil.sub(whatUserTarLists, tempPoint, whatUserTarLists.size()));*/
 
-            List<CntUserTar> successUserTar = whatUserTarLists.parallelStream().filter(item -> CEN_YES_TAR.getCode().equals(nowTimeIndex(cntTar.getTarPro()))).collect(Collectors.toList());
-            successUserTarLists.addAll(successUserTar);
-            if (!successUserTarLists.isEmpty())
+//            List<CntUserTar> successUserTar = whatUserTarLists.parallelStream().filter(item -> CEN_YES_TAR.getCode().equals(nowTimeIndex(cntTar.getTarPro()))).collect(Collectors.toList());
+//            successUserTarLists.addAll(successUserTar);
+//            if (!successUserTarLists.isEmpty())
                 openSuccess(successUserTarLists);
 
-              Set<String> successIds = successUserTar.parallelStream().map(item -> item.getId()).collect(Collectors.toSet());
+              Set<String> successIds = successUserTarLists.parallelStream().map(item -> item.getId()).collect(Collectors.toSet());
             List<CntUserTar> failUserTar = whatUserTarLists.parallelStream().filter(item -> !successIds.contains(item.getId())).collect(Collectors.toList());
             if (!failUserTar.isEmpty())
                 openFail(failUserTar);
