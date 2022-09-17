@@ -67,9 +67,15 @@ public class SystemController {
     }
 
     @GetMapping("/withdrawInfo")
-    @ApiOperation("提现规则")
+    @ApiOperation("连连余额提现规则")
     public R<String> withdrawInfo() {
         return R.ok(systemService.getVal(WITHDRAW_INFO, String.class));
+    }
+
+    @GetMapping("/systemWithdrawInfo")
+    @ApiOperation("平台余额提现规则")
+    public R<String> systemWithdrawInfo() {
+        return R.ok(systemService.getVal(SYSTEM_WITHDRAW_INFO, String.class));
     }
 
     @GetMapping("/consignmentInfo")

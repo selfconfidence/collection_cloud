@@ -175,9 +175,14 @@ public interface BusinessConstants {
         String SYNTHESIS_GIF = "synthesis_gif";
 
         /**
-         * 提现规则
+         * 连连余额提现规则
          */
         String WITHDRAW_INFO = "withdraw_info";
+
+        /**
+         * 平台余额提现规则
+         */
+        String SYSTEM_WITHDRAW_INFO = "system_withdraw_info";
 
         /**
          * 提现手续费比例
