@@ -6,6 +6,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <resultMap type="CntUserBox" id="CntUserBoxResult">
         <result property="id"    column="id"    />
+        <result property="boxTitle"    column="box_title"    />
         <result property="boxOpen"    column="box_open"    />
         <result property="userId"    column="user_id"    />
         <result property="boxId"    column="box_id"    />
@@ -18,7 +19,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectCntUserBoxVo">
-        select id, box_open, user_id, box_id, is_exist, source_info, created_by, created_time, updated_by, updated_time from cnt_user_box
+        select id, box_title, box_open, user_id, box_id, is_exist, source_info, created_by, created_time, updated_by, updated_time from cnt_user_box
     </sql>
 
     <select id="myBoxList" resultType="com.manyun.admin.domain.vo.UserBoxVo">

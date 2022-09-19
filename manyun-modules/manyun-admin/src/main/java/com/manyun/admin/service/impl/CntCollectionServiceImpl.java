@@ -197,17 +197,27 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         }
         //图片
         MediaAlterVo mediaAlterVo = collectionAlterCombineDto.getMediaAlterVo();
+        List<CntMedia> mediaList = new ArrayList<>();
         if (Objects.nonNull(mediaAlterVo)) {
-            mediaService.save(
+            if(StringUtils.isNotBlank(mediaAlterVo.getImg()))mediaList.add(
+                    Builder.of(CntMedia::new)
+                    .with(CntMedia::setId, IdUtils.getSnowflakeNextIdStr())
+                    .with(CntMedia::setBuiId, idStr)
+                    .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)
+                    .with(CntMedia::setMediaUrl, mediaAlterVo.getImg())
+                    .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)
+                    .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
+                    .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build());
+            if(StringUtils.isNotBlank(mediaAlterVo.getThreeDimensional()))mediaList.add(
                     Builder.of(CntMedia::new)
                             .with(CntMedia::setId, IdUtils.getSnowflakeNextIdStr())
                             .with(CntMedia::setBuiId, idStr)
                             .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)
-                            .with(CntMedia::setMediaUrl, mediaAlterVo.getImg())
-                            .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)
+                            .with(CntMedia::setMediaUrl, mediaAlterVo.getThreeDimensional())
+                            .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.GLB)
                             .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
-                            .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
-            );
+                            .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build());
+            if(mediaList.size()>0)mediaService.saveBatch(mediaList);
         }
         List<Integer> list = autoNum(collectionAlterCombineDto.getCntCollectionAlterVo().getBalance());
 
@@ -320,29 +330,65 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         }
         //图片
         MediaAlterVo mediaAlterVo = collectionAlterCombineDto.getMediaAlterVo();
+        List<CntMedia> saveMediaList = new ArrayList<>();
+        List<CntMedia> updateMediaList = new ArrayList<>();
         if (Objects.nonNull(mediaAlterVo)) {
             List<MediaVo> mediaVos = mediaService.initMediaVos(collectionId, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
-            if (mediaVos.size() == 0) {
-                mediaService.save(
+
+            Optional<MediaVo> optional = mediaVos.parallelStream().filter(f ->
+                    (f.getBuiId().equals(collectionId)
+                            && f.getModelType().equals(BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)
+                            && f.getMediaType().equals(BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE))
+            ).findFirst();
+            if(optional.isPresent()){
+                updateMediaList.add(
                         Builder.of(CntMedia::new)
-                                .with(CntMedia::setId, IdUtils.getSnowflakeNextIdStr())
-                                .with(CntMedia::setBuiId, collectionId)
-                                .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)
-                                .with(CntMedia::setMediaUrl, mediaAlterVo.getImg())
-                                .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE.toString())
-                                .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
-                                .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
-                );
-            } else {
-                mediaService.updateById(
-                        Builder.of(CntMedia::new)
-                                .with(CntMedia::setId, mediaVos.get(0).getId())
+                                .with(CntMedia::setId, optional.get().getId())
                                 .with(CntMedia::setMediaUrl, mediaAlterVo.getImg())
                                 .with(CntMedia::setUpdatedBy, SecurityUtils.getUsername())
                                 .with(CntMedia::setUpdatedTime, DateUtils.getNowDate())
                                 .build()
                 );
+            }else {
+                saveMediaList.add(
+                        Builder.of(CntMedia::new)
+                                .with(CntMedia::setId, IdUtils.getSnowflakeNextIdStr())
+                                .with(CntMedia::setBuiId, collectionId)
+                                .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)
+                                .with(CntMedia::setMediaUrl, mediaAlterVo.getImg())
+                                .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)
+                                .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
+                                .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
+                );
             }
+            Optional<MediaVo> optional1 = mediaVos.parallelStream().filter(f ->
+                    (f.getBuiId().equals(collectionId)
+                            && f.getModelType().equals(BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)
+                            && f.getMediaType().equals(BusinessConstants.ModelTypeConstant.GLB))
+            ).findFirst();
+            if(optional1.isPresent()){
+                updateMediaList.add(
+                        Builder.of(CntMedia::new)
+                                .with(CntMedia::setId, optional1.get().getId())
+                                .with(CntMedia::setMediaUrl, mediaAlterVo.getThreeDimensional())
+                                .with(CntMedia::setUpdatedBy, SecurityUtils.getUsername())
+                                .with(CntMedia::setUpdatedTime, DateUtils.getNowDate())
+                                .build()
+                );
+            }else {
+                saveMediaList.add(
+                        Builder.of(CntMedia::new)
+                                .with(CntMedia::setId, IdUtils.getSnowflakeNextIdStr())
+                                .with(CntMedia::setBuiId, collectionId)
+                                .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)
+                                .with(CntMedia::setMediaUrl, mediaAlterVo.getThreeDimensional())
+                                .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.GLB)
+                                .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
+                                .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
+                );
+            }
+            if(saveMediaList.size()>0)mediaService.saveBatch(saveMediaList);
+            if(updateMediaList.size()>0)mediaService.updateBatchById(updateMediaList);
         }
         return R.ok();
     }
@@ -406,8 +452,9 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                             .with(CntAirdropRecord::setUserId,cntUsers.size()==0?"":cntUsers.get(0).getId())
                             .with(CntAirdropRecord::setNickName,cntUsers.size()==0?"":cntUsers.get(0).getNickName())
                             .with(CntAirdropRecord::setUserPhone,cntUsers.size()==0?airdropDto.getPhone():cntUsers.get(0).getPhone())
-                            .with(CntAirdropRecord::setCollectionId,Objects.isNull(collection)==true?"":collection.getId())
-                            .with(CntAirdropRecord::setCollectionName,Objects.isNull(collection)==true?"":collection.getCollectionName())
+                            .with(CntAirdropRecord::setGoodsId,Objects.isNull(collection)==true?"":collection.getId())
+                            .with(CntAirdropRecord::setGoodsName,Objects.isNull(collection)==true?"":collection.getCollectionName())
+                            .with(CntAirdropRecord::setGoodsType,0)
                             .with(CntAirdropRecord::setDeliveryStatus,1)
                             .with(CntAirdropRecord::setDeliveryType,0)
                             .with(CntAirdropRecord::setDeliveryInfo,cntUsers.size()==0?"用户不存在!":Objects.isNull(collection)==true?"藏品不存在!":cntUsers.get(0).getIsReal()==1?"当前用户未实名!":(Integer.valueOf(0)==collection.getBalance())==true?"库存不足!":"")
@@ -464,8 +511,9 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                 .with(CntAirdropRecord::setUserId,cntUsers.get(0).getId())
                 .with(CntAirdropRecord::setNickName,cntUsers.get(0).getNickName())
                 .with(CntAirdropRecord::setUserPhone,cntUsers.get(0).getPhone())
-                .with(CntAirdropRecord::setCollectionId,collection.getId())
-                .with(CntAirdropRecord::setCollectionName,collection.getCollectionName())
+                .with(CntAirdropRecord::setGoodsId,Objects.isNull(collection)==true?"":collection.getId())
+                .with(CntAirdropRecord::setGoodsName,Objects.isNull(collection)==true?"":collection.getCollectionName())
+                .with(CntAirdropRecord::setGoodsType,0)
                 .with(CntAirdropRecord::setDeliveryStatus,0)
                 .with(CntAirdropRecord::setDeliveryType,0)
                 .with(CntAirdropRecord::setDeliveryInfo,"投递藏品成功!")
@@ -504,7 +552,8 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                         Builder.of(CntAirdropRecord::new)
                                 .with(CntAirdropRecord::setId,IdUtils.getSnowflakeNextIdStr())
                                 .with(CntAirdropRecord::setUserPhone,e.getPhone())
-                                .with(CntAirdropRecord::setCollectionId,e.getCollectionId())
+                                .with(CntAirdropRecord::setGoodsId,e.getCollectionId())
+                                .with(CntAirdropRecord::setGoodsType,0)
                                 .with(CntAirdropRecord::setDeliveryStatus,1)
                                 .with(CntAirdropRecord::setDeliveryType,1)
                                 .with(CntAirdropRecord::setDeliveryInfo,"所选藏品不一致!")
@@ -538,7 +587,8 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                         Builder.of(CntAirdropRecord::new)
                                 .with(CntAirdropRecord::setId,IdUtils.getSnowflakeNextIdStr())
                                 .with(CntAirdropRecord::setUserPhone,e.getPhone())
-                                .with(CntAirdropRecord::setCollectionId,e.getCollectionId())
+                                .with(CntAirdropRecord::setGoodsId,e.getCollectionId())
+                                .with(CntAirdropRecord::setGoodsType,0)
                                 .with(CntAirdropRecord::setDeliveryStatus,1)
                                 .with(CntAirdropRecord::setDeliveryType,1)
                                 .with(CntAirdropRecord::setDeliveryInfo,cntUsers.size()==0?"用户不存在或用户未实名!":Objects.isNull(cntCollections)==true?"藏品不存在或库存不足!":"")
@@ -587,8 +637,9 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                                 .with(CntAirdropRecord::setUserId,user.get().getId())
                                 .with(CntAirdropRecord::setNickName,user.get().getNickName())
                                 .with(CntAirdropRecord::setUserPhone,user.get().getPhone())
-                                .with(CntAirdropRecord::setCollectionId,cntCollections.getId())
-                                .with(CntAirdropRecord::setCollectionName,cntCollections.getCollectionName())
+                                .with(CntAirdropRecord::setGoodsId,cntCollections.getId())
+                                .with(CntAirdropRecord::setGoodsName,cntCollections.getCollectionName())
+                                .with(CntAirdropRecord::setGoodsType,0)
                                 .with(CntAirdropRecord::setDeliveryStatus,0)
                                 .with(CntAirdropRecord::setDeliveryType,1)
                                 .with(CntAirdropRecord::setDeliveryInfo,"投递藏品成功!")
@@ -602,8 +653,9 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                         Builder.of(CntAirdropRecord::new)
                                 .with(CntAirdropRecord::setId,IdUtils.getSnowflakeNextIdStr())
                                 .with(CntAirdropRecord::setUserPhone,e.getPhone())
-                                .with(CntAirdropRecord::setCollectionId,cntCollections.getId())
-                                .with(CntAirdropRecord::setCollectionName,cntCollections.getCollectionName())
+                                .with(CntAirdropRecord::setGoodsId,cntCollections.getId())
+                                .with(CntAirdropRecord::setGoodsName,cntCollections.getCollectionName())
+                                .with(CntAirdropRecord::setGoodsType,0)
                                 .with(CntAirdropRecord::setDeliveryStatus,1)
                                 .with(CntAirdropRecord::setDeliveryType,1)
                                 .with(CntAirdropRecord::setDeliveryInfo,"用户不存在或用户未实名!")
@@ -620,7 +672,8 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                         Builder.of(CntAirdropRecord::new)
                                 .with(CntAirdropRecord::setId,IdUtils.getSnowflakeNextIdStr())
                                 .with(CntAirdropRecord::setUserPhone,e.getPhone())
-                                .with(CntAirdropRecord::setCollectionId,e.getCollectionId())
+                                .with(CntAirdropRecord::setGoodsId,e.getCollectionId())
+                                .with(CntAirdropRecord::setGoodsType,0)
                                 .with(CntAirdropRecord::setDeliveryStatus,1)
                                 .with(CntAirdropRecord::setDeliveryType,1)
                                 .with(CntAirdropRecord::setDeliveryInfo,"库存不足!")

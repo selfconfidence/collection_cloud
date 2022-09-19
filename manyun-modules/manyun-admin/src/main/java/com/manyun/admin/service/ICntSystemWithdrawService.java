@@ -31,4 +31,9 @@ public interface ICntSystemWithdrawService extends IService<CntSystemWithdraw>
      * @return
      */
     int updateWithdrawStatus(UpdateWithDrawDto withDrawDto);
+
+    /**
+     * 查询系统余额提现列表
+     */
+    List<SystemWithdrawVo> selectExportList();
 }

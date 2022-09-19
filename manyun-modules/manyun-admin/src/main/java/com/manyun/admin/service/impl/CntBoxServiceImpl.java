@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.*;
+import com.manyun.admin.domain.dto.BoxAirdropDto;
 import com.manyun.admin.domain.dto.BoxStateDto;
 import com.manyun.admin.domain.dto.CntBoxAlterCombineDto;
 import com.manyun.admin.domain.query.BoxQuery;
@@ -34,6 +35,8 @@ import com.manyun.admin.mapper.CntBoxMapper;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.manyun.common.core.enums.BoxStatus.*;
+import static com.manyun.common.core.enums.CollectionLink.NOT_LINK;
+import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
 
 /**
  * 盲盒;盲盒主体Service业务层处理
@@ -58,6 +61,15 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
 
     @Autowired
     private ICntTarService cntTarService;
+
+    @Autowired
+    private ICntUserService userService;
+
+    @Autowired
+    private ICntAirdropRecordService airdropRecordService;
+
+    @Autowired
+    private ICntUserBoxService userBoxService;
 
     /**
      * 查询盲盒;盲盒主体详情
@@ -330,6 +342,100 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
     @Transactional(rollbackFor = Exception.class)
     public void taskCheckStatus(){
         update(Wrappers.<CntBox>lambdaUpdate().ne(CntBox::getStatusBy, DOWN_ACTION.getCode()).eq(CntBox::getBalance, Integer.valueOf(0)).set(CntBox::getStatusBy, NULL_ACTION.getCode()));
+    }
+
+
+    @Override
+    public R airdrop(BoxAirdropDto boxAirdropDto) {
+        //验证用户
+        List<CntUser> cntUsers = userService.list(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPhone, boxAirdropDto.getPhone()));
+        List<CntBoxCollection> boxCollectionList = boxCollectionService.list(Wrappers.<CntBoxCollection>lambdaQuery().eq(CntBoxCollection::getBoxId, boxAirdropDto.getBoxId()));
+        CntBox box = getById(boxAirdropDto.getBoxId());
+        String boxId = box.getId();
+        Integer selfBalance = box.getSelfBalance();
+        Integer balance = box.getBalance();
+        if(cntUsers.size()==0 || Objects.isNull(box) || cntUsers.get(0).getIsReal()==1 || Integer.valueOf(0)==balance || boxCollectionList.size()==0){
+            //增加空投记录
+            airdropRecordService.save(
+                    Builder.of(CntAirdropRecord::new)
+                            .with(CntAirdropRecord::setId,IdUtils.getSnowflakeNextIdStr())
+                            .with(CntAirdropRecord::setUserId,cntUsers.size()==0?"":cntUsers.get(0).getId())
+                            .with(CntAirdropRecord::setNickName,cntUsers.size()==0?"":cntUsers.get(0).getNickName())
+                            .with(CntAirdropRecord::setUserPhone,cntUsers.size()==0?boxAirdropDto.getPhone():cntUsers.get(0).getPhone())
+                            .with(CntAirdropRecord::setGoodsId,Objects.isNull(box)==true?"":box.getId())
+                            .with(CntAirdropRecord::setGoodsName,Objects.isNull(box)==true?"":box.getBoxTitle())
+                            .with(CntAirdropRecord::setGoodsType,1)
+                            .with(CntAirdropRecord::setDeliveryStatus,1)
+                            .with(CntAirdropRecord::setDeliveryType,0)
+                            .with(CntAirdropRecord::setDeliveryInfo,cntUsers.size()==0?"用户不存在!":Objects.isNull(box)==true?"盲盒不存在!":cntUsers.get(0).getIsReal()==1?"当前用户未实名!":(Integer.valueOf(0)==balance)==true?"库存不足!":boxCollectionList.size()==0?"请先添加盲盒藏品!":"")
+                            .with(CntAirdropRecord::setCreatedBy,SecurityUtils.getUsername())
+                            .with(CntAirdropRecord::setCreatedTime,DateUtils.getNowDate())
+                            .build()
+            );
+            if(cntUsers.size() == 0){
+                return R.fail("用户不存在!");
+            }
+
+            if(Objects.isNull(box)){
+                return R.fail("盲盒不存在!");
+            }
+
+            if(boxCollectionList.size()==0){
+                return R.fail("请先添加盲盒藏品!");
+            }
+
+            if(cntUsers.get(0).getIsReal()==1){
+                return R.fail("当前用户未实名,请先实名认证!");
+            }
+
+            if(Integer.valueOf(0)==balance){
+                return R.fail("库存不足!");
+            }
+        }
+
+        //扣减库存
+        updateById(
+                Builder
+                        .of(CntBox::new)
+                        .with(CntBox::setId, boxId)
+                        .with(CntBox::setSelfBalance, (selfBalance + 1))
+                        .with(CntBox::setBalance, (balance - 1))
+                        .build()
+        );
+
+        //增加用户盲盒
+        String idStr = IdUtils.getSnowflakeNextIdStr();
+        userBoxService.save(
+                Builder
+                        .of(CntUserBox::new)
+                        .with(CntUserBox::setId, idStr)
+                        .with(CntUserBox::setBoxTitle, box.getBoxTitle())
+                        .with(CntUserBox::setBoxOpen, Long.valueOf(1))
+                        .with(CntUserBox::setUserId, cntUsers.get(0).getId())
+                        .with(CntUserBox::setBoxId, box.getId())
+                        .with(CntUserBox::setSourceInfo, "空投!")
+                        .with(CntUserBox::setCreatedBy, SecurityUtils.getUsername())
+                        .with(CntUserBox::setCreatedTime, DateUtils.getNowDate())
+                        .build()
+        );
+        //增加空投记录
+        airdropRecordService.save(
+                Builder.of(CntAirdropRecord::new)
+                        .with(CntAirdropRecord::setId,IdUtils.getSnowflakeNextIdStr())
+                        .with(CntAirdropRecord::setUserId,cntUsers.get(0).getId())
+                        .with(CntAirdropRecord::setNickName,cntUsers.get(0).getNickName())
+                        .with(CntAirdropRecord::setUserPhone,cntUsers.get(0).getPhone())
+                        .with(CntAirdropRecord::setGoodsId,Objects.isNull(box)==true?"":box.getId())
+                        .with(CntAirdropRecord::setGoodsName,Objects.isNull(box)==true?"":box.getBoxTitle())
+                        .with(CntAirdropRecord::setGoodsType,1)
+                        .with(CntAirdropRecord::setDeliveryStatus,0)
+                        .with(CntAirdropRecord::setDeliveryType,0)
+                        .with(CntAirdropRecord::setDeliveryInfo,"投递盲盒成功!")
+                        .with(CntAirdropRecord::setCreatedBy,SecurityUtils.getUsername())
+                        .with(CntAirdropRecord::setCreatedTime,DateUtils.getNowDate())
+                        .build()
+        );
+        return R.ok();
     }
 
 }

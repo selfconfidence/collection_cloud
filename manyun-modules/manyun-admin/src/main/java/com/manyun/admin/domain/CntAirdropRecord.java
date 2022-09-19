@@ -28,11 +28,14 @@ public class CntAirdropRecord implements Serializable
     @ApiModelProperty("用户手机号")
     private String userPhone;
 
-    @ApiModelProperty("藏品id")
-    private String collectionId;
+    @ApiModelProperty("商品id")
+    private String goodsId;
 
-    @ApiModelProperty("藏品名称")
-    private String collectionName;
+    @ApiModelProperty("商品名称")
+    private String goodsName;
+
+    @ApiModelProperty("商品类型 0:藏品 1:盲盒")
+    private Integer goodsType;
 
     @ApiModelProperty("投递类型 0:空投 1:批量空投")
     private Integer deliveryType;
@@ -93,23 +96,29 @@ public class CntAirdropRecord implements Serializable
     {
         return userPhone;
     }
-    public void setCollectionId(String collectionId)
-    {
-        this.collectionId = collectionId;
+
+    public String getGoodsId() {
+        return goodsId;
     }
 
-    public String getCollectionId()
-    {
-        return collectionId;
-    }
-    public void setCollectionName(String collectionName)
-    {
-        this.collectionName = collectionName;
+    public void setGoodsId(String goodsId) {
+        this.goodsId = goodsId;
     }
 
-    public String getCollectionName()
-    {
-        return collectionName;
+    public String getGoodsName() {
+        return goodsName;
+    }
+
+    public void setGoodsName(String goodsName) {
+        this.goodsName = goodsName;
+    }
+
+    public Integer getGoodsType() {
+        return goodsType;
+    }
+
+    public void setGoodsType(Integer goodsType) {
+        this.goodsType = goodsType;
     }
 
     public Integer getDeliveryType() {
@@ -180,8 +189,9 @@ public class CntAirdropRecord implements Serializable
             .append("userId", getUserId())
             .append("nickName", getNickName())
             .append("userPhone", getUserPhone())
-            .append("collectionId", getCollectionId())
-            .append("collectionName", getCollectionName())
+            .append("goodsId", getGoodsId())
+            .append("goodsName", getGoodsName())
+            .append("goodsType", getGoodsType())
             .append("deliveryType", getDeliveryType())
             .append("deliveryStatus", getDeliveryStatus())
             .append("deliveryInfo", getDeliveryInfo())

@@ -2,6 +2,7 @@ package com.manyun.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntBox;
+import com.manyun.admin.domain.dto.BoxAirdropDto;
 import com.manyun.admin.domain.dto.BoxStateDto;
 import com.manyun.admin.domain.dto.CntBoxAlterCombineDto;
 import com.manyun.admin.domain.query.BoxQuery;
@@ -67,4 +68,11 @@ public interface ICntBoxService extends IService<CntBox>
 
     @Transactional(rollbackFor = Exception.class)
     void taskCheckStatus();
+
+    /***
+     * 空投
+     * @param boxAirdropDto 空投请求参数
+     * @return
+     */
+    R airdrop(BoxAirdropDto boxAirdropDto);
 }

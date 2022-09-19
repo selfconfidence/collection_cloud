@@ -9,8 +9,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="userId"    column="user_id"    />
         <result property="nickName"    column="nick_name"    />
         <result property="userPhone"    column="user_phone"    />
-        <result property="collectionId"    column="collection_id"    />
-        <result property="collectionName"    column="collection_name"    />
+        <result property="goodsId"    column="goods_id"    />
+        <result property="goodsName"    column="goods_name"    />
+        <result property="goodsType"    column="goods_type"    />
         <result property="deliveryType"    column="delivery_type"    />
         <result property="deliveryStatus"    column="delivery_status"    />
         <result property="deliveryInfo"    column="delivery_info"    />
@@ -21,7 +22,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectCntAirdropRecordVo">
-        select id, user_id, nick_name, user_phone, collection_id, collection_name, delivery_type, delivery_status, delivery_info, created_by, created_time, updated_by, updated_time from cnt_airdrop_record
+        select id, user_id, nick_name, user_phone, goods_id, goods_name, goods_type, delivery_type, delivery_status, delivery_info, created_by, created_time, updated_by, updated_time from cnt_airdrop_record
     </sql>
 
     <select id="selectCntAirdropRecordList" parameterType="AirdropRecordQuery" resultMap="CntAirdropRecordResult">
@@ -31,7 +32,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="userPhone != null  and userPhone != ''"> and user_phone = #{userPhone}</if>
             <if test="deliveryStatus != null"> and delivery_status = #{deliveryStatus}</if>
             <if test="deliveryType != null"> and delivery_type = #{deliveryType}</if>
-            <if test="collectionName != null  and collectionName != ''"> and collection_name like concat('%', #{collectionName}, '%')</if>
+            <if test="goodsType != null"> and goods_type = #{goodsType}</if>
+            <if test="goodsName != null  and goodsName != ''"> and goods_name like concat('%', #{goodsName}, '%')</if>
         </where>
         order by created_time desc
     </select>

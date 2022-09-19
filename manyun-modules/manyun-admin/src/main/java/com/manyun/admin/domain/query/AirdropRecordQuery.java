@@ -16,8 +16,11 @@ public class AirdropRecordQuery extends PageQuery
     @ApiModelProperty("用户手机号")
     private String userPhone;
 
-    @ApiModelProperty("藏品名称")
-    private String collectionName;
+    @ApiModelProperty("商品名称")
+    private String goodsName;
+
+    @ApiModelProperty("商品类型 0:藏品 1:空投")
+    private Integer goodsType;
 
     @ApiModelProperty("投递类型 0:空投 1:批量空投")
     private Integer deliveryType;

@@ -18,6 +18,9 @@ public class CntUserBox implements Serializable
     @ApiModelProperty("主键")
     private String id;
 
+    @ApiModelProperty("盲盒标题")
+    private String boxTitle;
+
     @ApiModelProperty("1未开启,2已开启")
     private Long boxOpen;
 
@@ -56,6 +59,15 @@ public class CntUserBox implements Serializable
     {
         return id;
     }
+
+    public String getBoxTitle() {
+        return boxTitle;
+    }
+
+    public void setBoxTitle(String boxTitle) {
+        this.boxTitle = boxTitle;
+    }
+
     public void setBoxOpen(Long boxOpen)
     {
         this.boxOpen = boxOpen;

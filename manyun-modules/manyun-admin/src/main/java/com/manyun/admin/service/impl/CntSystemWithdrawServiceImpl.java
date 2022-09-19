@@ -64,4 +64,17 @@ public class CntSystemWithdrawServiceImpl extends ServiceImpl<CntSystemWithdrawM
         return update(systemWithdraw, Wrappers.<CntSystemWithdraw>lambdaUpdate().eq(CntSystemWithdraw::getId,withDrawDto.getId())) == true?1:0;
     }
 
+    /**
+     * 查询系统余额提现列表
+     */
+    @Override
+    public List<SystemWithdrawVo> selectExportList() {
+        List<CntSystemWithdraw> systemWithdraws = cntSystemWithdrawMapper.selectCntSystemWithdrawList(new SystemWithdrawQuery());
+        return systemWithdraws.parallelStream().map(m->{
+            SystemWithdrawVo systemWithdrawVo = new SystemWithdrawVo();
+            BeanUtils.copyProperties(m,systemWithdrawVo);
+            return systemWithdrawVo;
+        }).collect(Collectors.toList());
+    }
+
 }
