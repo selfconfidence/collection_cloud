@@ -151,6 +151,7 @@ public class LLPayUtils {
     public static Map<String,String> withdraw(String userId, String passWord, BigDecimal amount,BigDecimal val) {
         List<LinkedAcctlist> linkedAcctlists = LLPayUtils.queryLinkedacct(userId);
         Assert.isTrue(linkedAcctlists.size()>0,"请求参数有误!");
+        Assert.isTrue(amount.compareTo(BigDecimal.valueOf(1)) > 0, "提现金额需大于1元");
         Map<String,String> map = new HashMap<String, String>();
         WithDrawalParams params = new WithDrawalParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
@@ -166,7 +167,7 @@ public class LLPayUtils {
         orderInfo.setTxn_time(timestamp);
         orderInfo.setTotal_amount(amount);
         if(val!=null){
-        orderInfo.setFee_amount(amount.multiply(val));
+        orderInfo.setFee_amount(amount.multiply(val).compareTo(BigDecimal.valueOf(1)) > 0 ? amount.multiply(val) : BigDecimal.valueOf(1));
         }
         orderInfo.setPostscript("用户提现");
         params.setOrderInfo(orderInfo);
