@@ -29,3 +29,4 @@ spring:
           - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
   main:
     allow-bean-definition-overriding: true
+    allow-circular-references: true

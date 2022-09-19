@@ -36,8 +36,14 @@ public class UserMoneyVo {
     @ApiModelProperty("父编码")
     private String parentId;
 
-    @ApiModelProperty("邀请人数")
+    @ApiModelProperty("邀请总人数")
     private Long inviteNumber;
+
+    @ApiModelProperty("已实名人数")
+    private Long realNumber;
+
+    @ApiModelProperty("购买过某商品人数")
+    private Long inviteGoodsNumber;
 
     @ApiModelProperty("真实姓名")
     private String realName;

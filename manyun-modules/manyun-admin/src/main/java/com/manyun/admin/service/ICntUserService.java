@@ -28,7 +28,7 @@ public interface ICntUserService extends IService<CntUser>
      * @param userMoneyQuery 用户和钱包信息
      * @return 结果
      */
-    TableDataInfo<UserMoneyVo> selectUserMoneyList(UserMoneyQuery userMoneyQuery);
+    TableDataInfo selectUserMoneyList(UserMoneyQuery userMoneyQuery);
 
     /**
      * 修改用户

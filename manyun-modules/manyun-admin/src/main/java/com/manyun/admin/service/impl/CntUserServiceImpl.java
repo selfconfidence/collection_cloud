@@ -3,8 +3,7 @@ package com.manyun.admin.service.impl;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
-import com.manyun.admin.domain.CntMoney;
-import com.manyun.admin.domain.CntUserCollection;
+import com.manyun.admin.domain.*;
 import com.manyun.admin.domain.dto.MyBoxDto;
 import com.manyun.admin.domain.dto.MyCollectionDto;
 import com.manyun.admin.domain.dto.MyOrderDto;
@@ -15,20 +14,18 @@ import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.service.*;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
-import com.manyun.common.core.domain.R;
+import com.manyun.common.core.enums.CntSystemEnum;
 import com.manyun.common.core.utils.DateUtils;
-import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.manyun.admin.mapper.CntUserMapper;
-import com.manyun.admin.domain.CntUser;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -58,6 +55,12 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> imple
     @Autowired
     private ICntUserBoxService userBoxService;
 
+    @Autowired
+    private ICntConsignmentService consignmentService;
+
+    @Autowired
+    private ICntSystemService systemService;
+
 
     /**
      * 用户和钱包信息
@@ -71,8 +74,26 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> imple
         PageHelper.startPage(userMoneyQuery.getPageNum(),userMoneyQuery.getPageSize());
         List<UserMoneyVo> userMoneyVos = cntUserMapper.selectUserMoneyList(userMoneyQuery);
         List<CntUser> cntUsers = list();
+        CntSystem system = systemService.getOne(Wrappers.<CntSystem>lambdaQuery().eq(CntSystem::getSystemType, CntSystemEnum.INVITEPEOPLE_ISBUY_GOODS));
+        List<CntOrder> orderList = orderService.list(
+                Wrappers
+                        .<CntOrder>lambdaQuery()
+                        .eq(CntOrder::getOrderStatus, 1)
+                        .eq(StringUtils.isNotBlank(system.getSystemVal()),CntOrder::getBuiId,system.getSystemVal())
+                        .notIn(
+                                CntOrder::getId,
+                                consignmentService.list(Wrappers.<CntConsignment>lambdaQuery().isNotNull(CntConsignment::getOrderId).select(CntConsignment::getOrderId))
+                        )
+        ).parallelStream().collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getUserId()))), ArrayList::new));
         return TableDataInfoUtil.pageTableDataInfo(userMoneyVos.parallelStream().map(m->{
             m.setInviteNumber(cntUsers.parallelStream().filter(ff->(m.getId().equals(ff.getParentId()))).count());
+            m.setRealNumber(cntUsers.parallelStream().filter(ff->(m.getId().equals(ff.getParentId()) && ff.getIsReal()==2)).count());
+            if(Objects.nonNull(system) && StringUtils.isNotBlank(system.getSystemVal())){
+               List<String> userIds = cntUsers.parallelStream().filter(ff->(m.getId().equals(ff.getParentId()) && ff.getIsReal()==2)).map(CntUser::getId).collect(Collectors.toList());
+               m.setInviteGoodsNumber(orderList.parallelStream().filter(ff->userIds.contains(ff.getUserId())).count());
+            }else {
+                m.setInviteGoodsNumber(Long.valueOf(0));
+            }
             return m;
         }).collect(Collectors.toList()), userMoneyVos);
     }

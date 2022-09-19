@@ -9,7 +9,8 @@ public enum CntSystemEnum
     INVITE_URL("invite_url"),
     USER_DEFAULT_LINK("USER_DEFAULT_LINK"),
     SYNTHESIS_GIF("synthesis_gif"),
-    OPEN_BOX_GIF("open_box_gif");
+    OPEN_BOX_GIF("open_box_gif"),
+    INVITEPEOPLE_ISBUY_GOODS("invitePeople_isBuy_goods");
 
     private final String type;
 
