@@ -523,7 +523,6 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
     @Override
     @Transactional
     public void pushMuseum(PushMuseumForm pushMuseumForm, String userId) {
-
         List<UserCollection> list = list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getUserId, userId).eq(UserCollection::getIsExist, 1)
                 .eq(UserCollection::getIsMuseum, 1));
         if (!list.isEmpty()) {
@@ -537,7 +536,9 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         /*ArrayList<String> idList = new ArrayList<>();
         Collections.addAll(idList, collections);*/
         List<String> idList = pushMuseumForm.getCollections();
-
+        if (idList.isEmpty()) {
+            return;
+        }
         List<UserCollection> userCollections = listByIds(idList);
         List<UserCollection> collect = userCollections.parallelStream().map(item -> {
             Assert.isTrue(Objects.nonNull(item), "选择藏品有误，请核实");
