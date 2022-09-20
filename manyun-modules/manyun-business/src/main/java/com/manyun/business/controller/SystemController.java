@@ -2,17 +2,15 @@ package com.manyun.business.controller;
 
 
 import com.manyun.business.service.ISystemService;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.security.annotation.InnerAuth;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RestController;
 
 import static com.manyun.common.core.constant.BusinessConstants.SystemTypeConstant.*;
 
@@ -82,6 +80,11 @@ public class SystemController {
     @ApiOperation("寄售须知")
     public R<String> consignmentInfo() {
         return R.ok(systemService.getVal(CONSIGNMENT_INFO, String.class));
+    }
+
+    @PostMapping("/testRedisson")
+    public R<String> testRedisson() throws InterruptedException {
+        return R.ok(systemService.testRedisson());
     }
 
 }

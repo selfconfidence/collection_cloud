@@ -1,5 +1,9 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.manyun.common.redis.configure.RedisConfig,\
-  com.manyun.common.redis.service.RedisService
+  com.manyun.common.redis.service.RedisService,\
+  com.manyun.common.redis.configure.RedissonConfiguration,\
+  com.manyun.common.redis.configure.LockAnnotationParser,\
+  com.manyun.common.redis.service.LockManager
+
 
   

@@ -7,9 +7,12 @@ import com.manyun.business.domain.entity.System;
 import com.manyun.business.mapper.SystemMapper;
 import com.manyun.business.service.ISystemService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.common.core.annotation.Lock;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+
+import static com.manyun.common.core.constant.BusinessConstants.SystemTypeConstant.CONSIGNMENT_INFO;
 
 /**
  * <p>
@@ -28,5 +31,13 @@ public class SystemServiceImpl extends ServiceImpl<SystemMapper, System> impleme
         Assert.isTrue(Objects.nonNull(system),"not font system  type = " + type);
         String systemVal = system.getSystemVal();
         return (T)Convert.convert(classType,systemVal);
+    }
+
+
+    @Override
+    @Lock("testRedisson")
+    public String testRedisson() throws InterruptedException {
+        Thread.sleep(3000);
+      return getVal(CONSIGNMENT_INFO, String.class);
     }
 }

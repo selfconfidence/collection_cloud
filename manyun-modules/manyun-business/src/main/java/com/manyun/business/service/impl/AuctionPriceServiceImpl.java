@@ -173,7 +173,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
             auctionSend.setEndTime(LocalDateTime.now().plusMinutes(delayTime));
 
             // 分钟为单位
-            long l = TimeUnit.MINUTES.toSeconds(delayTime);
+            /*long l = TimeUnit.MINUTES.toSeconds(delayTime);
             delayQueue.put(auctionSend.getId(),l, new DelayAbsAspect<String>() {
                 @Override
                 public void invocationSuccess(String s) {
@@ -186,7 +186,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 public void invocationFail(String s) {
 
                 }
-            });
+            });*/
 
 
             auctionSendService.updateById(auctionSend);

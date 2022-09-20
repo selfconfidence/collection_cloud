@@ -15,4 +15,5 @@ public interface ISystemService extends IService<System> {
 
      <T> T  getVal(String type, Class<T> classType);
 
+     String testRedisson() throws InterruptedException;
 }
