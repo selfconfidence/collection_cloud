@@ -13,4 +13,7 @@ public class MediaAlterVo implements Serializable {
     @ApiModelProperty("主图")
     private String img;
 
+    @ApiModelProperty("三维图")
+    private String threeDimensional;
+
 }

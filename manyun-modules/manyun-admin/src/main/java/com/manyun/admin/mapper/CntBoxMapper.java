@@ -7,6 +7,7 @@ import com.manyun.admin.domain.CntBox;
 import com.manyun.admin.domain.query.BoxQuery;
 import com.manyun.admin.domain.query.OrderQuery;
 import com.manyun.admin.domain.vo.CntBoxOrderVo;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 盲盒;盲盒主体Mapper接口
@@ -29,4 +30,6 @@ public interface CntBoxMapper extends BaseMapper<CntBox>
      * 查询盲盒订单列表
      */
     List<CntBoxOrderVo> boxOrderList(OrderQuery orderQuery);
+
+    int updateLock(@Param("id") String id, @Param("sellNum") Integer sellNum);
 }

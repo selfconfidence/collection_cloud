@@ -5,6 +5,7 @@ import com.manyun.admin.domain.CntBox;
 import com.manyun.admin.domain.dto.BoxAirdropDto;
 import com.manyun.admin.domain.dto.BoxStateDto;
 import com.manyun.admin.domain.dto.CntBoxAlterCombineDto;
+import com.manyun.admin.domain.excel.BoxBachAirdopExcel;
 import com.manyun.admin.domain.query.BoxQuery;
 import com.manyun.admin.domain.query.OrderQuery;
 import com.manyun.admin.domain.vo.CntBoxDetailsVo;
@@ -13,6 +14,8 @@ import com.manyun.admin.domain.vo.CntBoxVo;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.TableDataInfo;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 盲盒;盲盒主体Service接口
@@ -75,4 +78,11 @@ public interface ICntBoxService extends IService<CntBox>
      * @return
      */
     R airdrop(BoxAirdropDto boxAirdropDto);
+
+    /***
+     * 批量空投
+     * @param boxBachAirdopExcels 批量空投请求参数
+     * @return
+     */
+    R postExcelList(List<BoxBachAirdopExcel> boxBachAirdopExcels);
 }

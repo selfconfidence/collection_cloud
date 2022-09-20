@@ -15,6 +15,8 @@ public interface BusinessConstants {
         // 藏品业务模块类型
         String COLLECTION_MODEL_TYPE= "collection_model_type";
 
+        // 媒体类型
+        String GLB = "glb";
 
         // 钱包业务模块类型
         String MONEY_TYPE= "money_model_type";
@@ -71,6 +73,11 @@ public interface BusinessConstants {
          * 是否开启拍卖（1开启，0关闭）
          */
         String AUCTION_ACC = "auction_acc";
+
+        /**
+         * 被邀请人是否购买过此商品
+         */
+        String INVITEPEOPLE_ISBUY_GOODS = "invitePeople_isBuy_goods";
 
         /**
          * 拍卖出售须知

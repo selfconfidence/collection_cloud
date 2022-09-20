@@ -1,32 +1,30 @@
 package com.manyun.admin.controller;
 
-import com.manyun.admin.domain.dto.AirdropDto;
 import com.manyun.admin.domain.dto.BoxAirdropDto;
 import com.manyun.admin.domain.dto.BoxStateDto;
 import com.manyun.admin.domain.dto.CntBoxAlterCombineDto;
+import com.manyun.admin.domain.excel.BoxBachAirdopExcel;
 import com.manyun.admin.domain.query.BoxQuery;
 import com.manyun.admin.domain.query.OrderQuery;
 import com.manyun.admin.domain.vo.CntBoxDetailsVo;
 import com.manyun.admin.domain.vo.CntBoxOrderVo;
 import com.manyun.admin.domain.vo.CntBoxVo;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.utils.poi.ExcelUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.manyun.common.log.annotation.Log;
 import com.manyun.common.log.enums.BusinessType;
 import com.manyun.admin.service.ICntBoxService;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.core.web.page.TableDataInfo;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/box")
@@ -89,6 +87,23 @@ public class CntBoxController extends BaseController
     public R airdrop(@Valid @RequestBody BoxAirdropDto boxAirdropDto)
     {
         return cntBoxService.airdrop(boxAirdropDto);
+    }
+
+    @ApiOperation("批量空投下载模板")
+    @PostMapping("/importTemplate")
+    public void importTemplate(HttpServletResponse response)
+    {
+        ExcelUtil<BoxBachAirdopExcel> util = new ExcelUtil<BoxBachAirdopExcel>(BoxBachAirdopExcel.class);
+        util.importTemplateExcel(response, "批量空投数据");
+    }
+
+    @ApiOperation("批量空投获取导入的数据,并处理")
+    @PostMapping("/importData")
+    public R importData(@RequestPart("file") MultipartFile file) throws Exception
+    {
+        ExcelUtil<BoxBachAirdopExcel> util = new ExcelUtil<BoxBachAirdopExcel>(BoxBachAirdopExcel.class);
+        List<BoxBachAirdopExcel> boxBachAirdopExcels = util.importExcel(file.getInputStream());
+        return cntBoxService.postExcelList(boxBachAirdopExcels);
     }
 
 }
