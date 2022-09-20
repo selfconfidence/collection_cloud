@@ -157,5 +157,12 @@ public class CollectionController extends BaseController{
         return R.ok(museumListVos);
     }
 
+    @GetMapping("/museumListForApp/{userId}")
+    @ApiOperation("展馆列表(app查询)")
+    public R<List<MuseumListVo>> museumListForApp(@PathVariable String userId) {
+        List<MuseumListVo> museumListVos = userCollectionService.museumList(userId);
+        return R.ok(museumListVos);
+    }
+
 }
 
