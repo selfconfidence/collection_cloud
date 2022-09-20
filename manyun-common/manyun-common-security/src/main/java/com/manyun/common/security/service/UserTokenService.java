@@ -107,7 +107,9 @@ public class UserTokenService
             if (StringUtils.isNotEmpty(token))
             {
                 String userkey = JwtUtils.getUserKey(token);
+                log.info("userKey={]",userkey);
                 user = redisService.getCacheObject(getTokenKey(userkey));
+                log.info("user={]",user);
                 return user;
             }
         }
