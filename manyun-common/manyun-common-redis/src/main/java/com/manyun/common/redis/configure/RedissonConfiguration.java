@@ -23,6 +23,10 @@ public class RedissonConfiguration {
     @Value("${spring.redis.password}")
     private String password;
 
+    @Value("${spring.redis.database}")
+    private Integer database;
+
+
     @Bean
     public RedissonClient redisson() {
         Config config = new Config();
@@ -35,7 +39,8 @@ public class RedissonConfiguration {
                 .setConnectionPoolSize(64)              // 连接池大小
                 .setConnectionMinimumIdleSize(8)        // 保持最小连接数
                 .setConnectTimeout(1500)                // 建立连接超时时间
-                .setTimeout(2000)                       // 执行命令的超时时间, 从命令发送成功时开始计时
+                .setTimeout(2000)
+                .setDatabase(database)// 执行命令的超时时间, 从命令发送成功时开始计时
                 .setRetryAttempts(2)                    // 命令执行失败重试次数
                 .setRetryInterval(1000);                // 命令重试发送时间间隔
         logger.info("创建redissonClient");
