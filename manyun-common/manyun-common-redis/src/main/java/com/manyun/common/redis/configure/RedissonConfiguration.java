@@ -14,15 +14,20 @@ public class RedissonConfiguration {
 
     public static Logger logger = LoggerFactory.getLogger(RedissonConfiguration.class);
 
-    //@Value("${redis.addr}")
-    private String addr = "127.0.0.1:6379";
+    @Value("${spring.redis.host}")
+    private String addr;
+
+    @Value("${spring.redis.port}")
+    private String port;
 
     @Bean
     public RedissonClient redisson() {
         Config config = new Config();
+        String redis = addr + ":" + port;
         logger.info("加载redisson配置");
+        logger.info("redis地址--------" + redis);
         config.useSingleServer()
-                .setAddress(String.format("%s%s", "redis://", addr))
+                .setAddress(String.format("%s%s", "redis://", redis))
                 .setConnectionPoolSize(64)              // 连接池大小
                 .setConnectionMinimumIdleSize(8)        // 保持最小连接数
                 .setConnectTimeout(1500)                // 建立连接超时时间

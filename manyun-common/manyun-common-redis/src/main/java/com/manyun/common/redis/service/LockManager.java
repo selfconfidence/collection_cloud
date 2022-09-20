@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 @Service
 @Slf4j
 public class LockManager {
-    private static final int MIN_WAIT_TIME = 50;
+    private static final int MIN_WAIT_TIME = 5000;
 
     @Resource
     private RedissonClient redisson;
