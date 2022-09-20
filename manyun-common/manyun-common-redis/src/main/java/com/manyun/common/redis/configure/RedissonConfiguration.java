@@ -20,6 +20,9 @@ public class RedissonConfiguration {
     @Value("${spring.redis.port}")
     private String port;
 
+    @Value("${spring.redis.password}")
+    private String password;
+
     @Bean
     public RedissonClient redisson() {
         Config config = new Config();
@@ -28,6 +31,7 @@ public class RedissonConfiguration {
         logger.info("redis地址--------" + redis);
         config.useSingleServer()
                 .setAddress(String.format("%s%s", "redis://", redis))
+                .setPassword(password)
                 .setConnectionPoolSize(64)              // 连接池大小
                 .setConnectionMinimumIdleSize(8)        // 保持最小连接数
                 .setConnectTimeout(1500)                // 建立连接超时时间
