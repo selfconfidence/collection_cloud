@@ -23,11 +23,11 @@ public class SyntheticActivityVo {
     @ApiModelProperty("活动状态;1=待开始,2=进行中,3=结束")
     private Integer actionStatus;
 
-    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd")
     @ApiModelProperty("活动开始时间")
     private LocalDateTime startTime;
 
-    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd")
     @ApiModelProperty("活动结束时间")
     private LocalDateTime endTime;
 
