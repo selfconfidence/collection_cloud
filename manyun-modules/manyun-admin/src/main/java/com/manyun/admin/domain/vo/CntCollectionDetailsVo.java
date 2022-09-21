@@ -60,6 +60,12 @@ public class CntCollectionDetailsVo
     @ApiModelProperty("主图")
     private List<MediaVo> mediaVos;
 
+    @ApiModelProperty("缩略图")
+    private List<MediaVo> thumbnailImgMediaVos;
+
+    @ApiModelProperty("3D图")
+    private List<MediaVo> threeDimensionalMediaVos;
+
     @ApiModelProperty("购买须知")
     private String customerTail;
 

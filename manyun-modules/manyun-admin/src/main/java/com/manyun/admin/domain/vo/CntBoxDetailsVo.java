@@ -57,6 +57,12 @@ public class CntBoxDetailsVo
     @ApiModelProperty("主图")
     private List<MediaVo> mediaVos;
 
+    @ApiModelProperty("缩略图")
+    private List<MediaVo> thumbnailImgMediaVos;
+
+    @ApiModelProperty("3D图")
+    private List<MediaVo> threeDimensionalMediaVos;
+
     @ApiModelProperty("是否推送寄售市场(0=可以，1=不可以)")
     private Integer pushConsignment;
 }

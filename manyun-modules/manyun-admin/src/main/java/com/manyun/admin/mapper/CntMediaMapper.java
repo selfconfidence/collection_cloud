@@ -16,4 +16,9 @@ import org.apache.ibatis.annotations.Param;
 public interface CntMediaMapper extends BaseMapper<CntMedia>
 {
     List<MediaVo> initMediaVos(@Param("buiId") String buiId,@Param("modelType") String modelType);
+
+    List<MediaVo> thumbnailImgMediaVos(@Param("buiId") String buiId,@Param("modelType") String modelType);
+
+    List<MediaVo> threeDimensionalMediaVos(@Param("buiId") String buiId,@Param("modelType") String modelType);
+
 }

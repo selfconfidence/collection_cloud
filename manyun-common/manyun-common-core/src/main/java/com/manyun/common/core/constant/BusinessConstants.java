@@ -16,7 +16,11 @@ public interface BusinessConstants {
         String COLLECTION_MODEL_TYPE= "collection_model_type";
 
         // 媒体类型
+        //3D图
         String GLB = "glb";
+
+        //缩略图
+        String THUMBNAIL_IMG = "thumbnail_img";
 
         // 钱包业务模块类型
         String MONEY_TYPE= "money_model_type";

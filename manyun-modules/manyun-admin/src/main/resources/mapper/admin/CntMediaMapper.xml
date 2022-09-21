@@ -14,6 +14,41 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         from
         cnt_media
         <where>
+            and media_type in ('collection_model_type','box_model_type')
+            <if test="modelType != null  and modelType != ''"> and model_type = #{modelType}</if>
+            <if test="buiId != null  and buiId != ''"> and bui_id = #{buiId}</if>
+        </where>
+        order by created_time desc
+    </select>
+
+    <select id="thumbnailImgMediaVos" resultType="com.manyun.admin.domain.vo.MediaVo">
+        select
+        id,
+        bui_id as buiId,
+        model_type as modelType,
+        media_url as mediaUrl,
+        media_type as mediaType
+        from
+        cnt_media
+        <where>
+            and media_type = 'thumbnail_img'
+            <if test="modelType != null  and modelType != ''"> and model_type = #{modelType}</if>
+            <if test="buiId != null  and buiId != ''"> and bui_id = #{buiId}</if>
+        </where>
+        order by created_time desc
+    </select>
+
+    <select id="threeDimensionalMediaVos" resultType="com.manyun.admin.domain.vo.MediaVo">
+        select
+        id,
+        bui_id as buiId,
+        model_type as modelType,
+        media_url as mediaUrl,
+        media_type as mediaType
+        from
+        cnt_media
+        <where>
+            and media_type = 'glb'
             <if test="modelType != null  and modelType != ''"> and model_type = #{modelType}</if>
             <if test="buiId != null  and buiId != ''"> and bui_id = #{buiId}</if>
         </where>
