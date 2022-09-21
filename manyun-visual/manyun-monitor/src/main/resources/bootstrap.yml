@@ -25,4 +25,4 @@ spring:
   boot:
     admin:
       discovery:
-        ignored-services: ruoyi-system
+        ignored-services: ruoyi-system,manyun-admin
