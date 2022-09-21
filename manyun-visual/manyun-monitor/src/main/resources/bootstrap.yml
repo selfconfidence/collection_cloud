@@ -3,7 +3,7 @@ server:
   port: 9100
 
 # Spring
-spring: 
+spring:
   application:
     # 应用名称
     name: manyun-monitor
@@ -23,3 +23,10 @@ spring:
         # 共享配置
         shared-configs:
           - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+  boot:
+    admin:
+      discovery:
+        ignored-services:
+          - ruoyi-system
+          - ruoyi*
+          - \\*ruoyi

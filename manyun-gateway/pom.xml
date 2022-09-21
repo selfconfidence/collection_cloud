@@ -86,6 +86,12 @@ route 维度：即在 Spring 配置文件中配置的路由条目，资源名为
         <dependency>
             <groupId>com.manyun</groupId>
             <artifactId>manyun-common-redis</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Swagger -->
