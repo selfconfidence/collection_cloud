@@ -25,9 +25,4 @@ spring:
   boot:
     admin:
       discovery:
-        ignored-services:
-          - ruoyi-system*
-          - ruoyi*
-          - manyun-admin
-          - \\*ruoyi
-          - 804017d66eef*
+        ignored-services: ruoyi-system
