@@ -69,11 +69,11 @@ public class LockManager {
         }
 
         if (exceptionSupplier != null && LockResultStatus.FAILURE.equals(result.getLockResultStatus())) {
-            log.warn("Redis 加锁失败, key: {}", key + "失败原因：--" + exceptionSupplier.get().getMessage());
+            //log.warn("Redis 加锁失败, key: {}", key + "失败原因：--" + exceptionSupplier.get().getMessage());
             throw exceptionSupplier.get();
         }
 
-        log.info("Redis 加锁结果：{}, key: {}", result.getLockResultStatus(), key);
+        //log.info("Redis 加锁结果：{}, key: {}", result.getLockResultStatus(), key);
         return result;
     }
 
