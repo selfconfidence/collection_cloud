@@ -18,6 +18,7 @@ import com.manyun.business.domain.vo.MediaVo;
 import com.manyun.business.mapper.AuctionOrderMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.enums.AuctionSendStatus;
@@ -144,7 +145,8 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized void notifyPaySuccess(String outHost) {
+    @Lock("notifyPaySuccessAuction")
+    public void notifyPaySuccess(String outHost) {
         AuctionOrder auctionOrder = getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getOrderNo, outHost));
         String info = StrUtil.format("购买成功,本次消费{}，来源为拍卖市场", auctionOrder.getOrderAmount().toString());
         Assert.isTrue(Objects.nonNull(auctionOrder),"找不到对应订单编号!");
@@ -211,7 +213,8 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public synchronized void timeCancelAuction() {
+    @Lock("timeCancelAuction")
+    public void timeCancelAuction() {
         List<AuctionOrder> auctionOrderList = list(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getAuctionStatus, AuctionStatus.WAIT_PAY.getCode()).lt(AuctionOrder::getEndTime, LocalDateTime.now()));
         if (auctionOrderList.isEmpty()) return;
         List<AuctionSend> auctionSendList = auctionSendService.list(Wrappers.<AuctionSend>lambdaQuery().in(AuctionSend::getAuctionOrderId, auctionOrderList.parallelStream().map(item -> item.getId()).collect(Collectors.toSet()))

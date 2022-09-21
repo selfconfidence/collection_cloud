@@ -13,6 +13,7 @@ import com.manyun.comm.api.domain.vo.AccTokenVo;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.comm.api.model.LoginPhoneCodeForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.annotation.RequestBodyRsa;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
@@ -147,7 +148,8 @@ public class CntUserController extends BaseController {
 
     @GetMapping("/h5RealMsg")
     @ApiOperation(value = "h5实名认证消息",notes = "返回状态信息 1=无操作,2=实名认证成功.弹出 , 3=实名认证失败.请重试")
-    public synchronized R<Integer> h5RealMsg(){
+    @Lock("h5RealMsg")
+    public R<Integer> h5RealMsg(){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         CntUserDto cntUser = notNullLoginBusinessUser.getCntUser();
         CntUser user = userService.getById(cntUser.getId());
@@ -219,7 +221,8 @@ public class CntUserController extends BaseController {
 
     @GetMapping("/openPleaseBox/{id}")
     @ApiOperation(value = "邀请奖励进行领取 id 为领取编号",notes = "返回的 data 是消息提示,给用户看即可!")
-    public synchronized R<String> openPleaseBox(@PathVariable String id){
+    @Lock("openPleaseBox")
+    public R<String> openPleaseBox(@PathVariable String id){
         String userId = SecurityUtils.getNotNullLoginBusinessUser().getUserId();
         String msg = userService.openPleaseBox(userId,id);
         return R.ok(msg);

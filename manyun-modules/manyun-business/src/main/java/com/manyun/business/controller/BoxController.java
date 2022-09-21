@@ -11,6 +11,7 @@ import com.manyun.business.service.IUserBoxService;
 import com.manyun.comm.api.domain.dto.BoxListDto;
 import com.manyun.comm.api.domain.dto.OpenPleaseBoxDto;
 import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.annotation.RequestBodyRsa;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
@@ -66,7 +67,8 @@ public class BoxController extends BaseController {
 
     @GetMapping("/tarBox/{id}")
     @ApiOperation(value = "对需要抽签的盲盒,进行抽签",notes = " id = 盲盒编号  \r data = 提示信息 例如 您已经参与对${buiName}抽签了,抽签结果将在${openTime}公布!")
-    public synchronized R<String> tarBox(@PathVariable String id){
+    @Lock("tarBox")
+    public R<String> tarBox(@PathVariable String id){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(boxService.tarBox(id,notNullLoginBusinessUser.getUserId()));
     }
@@ -93,14 +95,16 @@ public class BoxController extends BaseController {
     @PostMapping("/sellBox")
     @ApiOperation("购买普通盲盒")
     @Deprecated
-    public synchronized R<PayVo> sellBox(@Valid @RequestBody BoxSellForm boxSellForm){
+    @Lock("sellBox")
+    public R<PayVo> sellBox(@Valid @RequestBody BoxSellForm boxSellForm){
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(boxService.sellBox(boxSellForm,loginBusinessUser.getUserId(),loginBusinessUser.getIpaddr()));
     }
 
     @PostMapping("/sellOrderBox")
     @ApiOperation(value = "购买盲盒_预先_生成订单",notes = "用来预先 生成一个待支付订单,返回订单编号,用来二次提交支付\n version 1.0.1")
-    public synchronized R<String> sellOrderBox(@Valid @RequestBodyRsa BoxOrderSellForm boxOrderSellForm){
+    @Lock("sellOrderBox")
+    public R<String> sellOrderBox(@Valid @RequestBodyRsa BoxOrderSellForm boxOrderSellForm){
         String userId = SecurityUtils.getBuiUserId();
         return R.ok(boxService.sellOrderBox(boxOrderSellForm,userId));
     }

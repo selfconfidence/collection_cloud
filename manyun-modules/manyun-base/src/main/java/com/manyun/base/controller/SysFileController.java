@@ -33,7 +33,7 @@ public class SysFileController
      */
     @PostMapping("upload")
     @ApiOperation(value = "文件上传api",notes = "支持单文件上传")
-    public synchronized R<String> upload(MultipartFile file)
+    public R<String> upload(MultipartFile file)
     {
         try
         {

@@ -28,6 +28,7 @@ import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.RemoteSmsService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.domain.dto.SmsCommDto;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
@@ -212,7 +213,8 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized PayVo businessConsignment(String payUserId, ConsignmentSellForm consignmentSellForm) {
+    @Lock("businessConsignment")
+    public PayVo businessConsignment(String payUserId, ConsignmentSellForm consignmentSellForm) {
         CntConsignment consignment = getById(consignmentSellForm.getBuiId());
         // 校验 购买条件是否符合！！！
         checkBusinessConsignment(payUserId,consignment);
@@ -299,7 +301,8 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public  synchronized void  cancelSchedulingConsignment() {
+    @Lock("cancelSchedulingConsignment")
+    public void  cancelSchedulingConsignment() {
         // 小时为单位
         Integer time = systemService.getVal(CONSIGNMENT_DE_TIME, Integer.class);
         List<CntConsignment> cntConsignments = list(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getConsignmentStatus,PUSH_CONSIGN.getCode()).lt(CntConsignment::getCreatedTime, LocalDateTime.now().minusMinutes(time)));
@@ -319,7 +322,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized void cancelConsignmentById(String id,String sendUserId) {
+    public void cancelConsignmentById(String id,String sendUserId) {
         CntConsignment consignment = getOne(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getId, id).eq(CntConsignment::getSendUserId, sendUserId).eq(CntConsignment::getConsignmentStatus, PUSH_CONSIGN.getCode()));
         // 判定条件是否符合
         Assert.isTrue(Objects.nonNull(consignment),"取消寄售资产有误,请核实当前寄售状态!");

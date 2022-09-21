@@ -7,6 +7,7 @@ import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.ICollectionService;
 import com.manyun.business.service.IOrderService;
 import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.annotation.RequestBodyRsa;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
@@ -74,7 +75,8 @@ public class OrderController extends BaseController {
      */
     @GetMapping("/cancelOrder/{id}")
     @ApiOperation(value = "取消订单",notes = "根据订单编号取消订单即可\t 寄售订单也可以通过该接口进行取消 \n version 1.0.1")
-    public synchronized R cancelOrder(@PathVariable String id){
+    @Lock("cancelOrder")
+    public R cancelOrder(@PathVariable String id){
         orderService.cancelOrder(id);
         return R.ok();
     }
@@ -83,7 +85,8 @@ public class OrderController extends BaseController {
     @ApiOperation(value = "(普通订单 & 寄售订单)根据订单编号统一下单支付",notes = "传递订单编号,待支付订单都可以通过此接口二次支付!\t " +
             "如果当前支付类型是 (组合支付)0 余额支付,那么用户余额不够的情况下直接扣除所有的余额,其他的调用银联进行支付!" +
             " \n version 1.0.1")
-    public synchronized R<PayVo> unifiedOrder(@RequestBodyRsa @Valid OrderPayForm orderPayForm){
+    @Lock("unifiedOrder")
+    public R<PayVo> unifiedOrder(@RequestBodyRsa @Valid OrderPayForm orderPayForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(orderService.unifiedOrder(orderPayForm,notNullLoginBusinessUser.getUserId()));
     }

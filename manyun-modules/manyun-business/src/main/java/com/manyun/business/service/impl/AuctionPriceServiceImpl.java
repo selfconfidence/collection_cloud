@@ -25,6 +25,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
@@ -146,7 +147,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
 
     @Override
-    public synchronized R<BigDecimal> myAuctionPrice(AuctionPriceForm auctionPriceForm, String userId) {
+    public R<BigDecimal> myAuctionPrice(AuctionPriceForm auctionPriceForm, String userId) {
         realCheck(userId);
         LoginBusinessUser businessUser = SecurityUtils.getNotNullLoginBusinessUser();
         AuctionSend auctionSend = auctionSendService.getById(auctionPriceForm.getAuctionSendId());
@@ -395,7 +396,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     //竞拍结束后支付
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized PayVo payAuction(String payUserId, AuctionPayForm auctionPayForm) {
+    @Lock("payAuction")
+    public PayVo payAuction(String payUserId, AuctionPayForm auctionPayForm) {
         CntUserDto cntUserDto = remoteBuiUserService.commUni(payUserId, SecurityConstants.INNER).getData();
         if (Integer.valueOf(0).equals(auctionPayForm.getPayType())) {
             Assert.isTrue(auctionPayForm.getPayPass().equals(cntUserDto.getPayPass()),"支付密码错误,请核实!");
@@ -484,7 +486,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized PayVo payMargin(String payUserId, AuctionPayMarginForm auctionPayMarginForm) {
+    public PayVo payMargin(String payUserId, AuctionPayMarginForm auctionPayMarginForm) {
         Assert.isFalse(Integer.valueOf(5).equals(auctionPayMarginForm.getPayType()), "保证金暂不支持此支付方式");
 
         CntUserDto cntUserDto = remoteBuiUserService.commUni(payUserId, SecurityConstants.INNER).getData();
@@ -541,7 +543,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized void notifyPayMarginSuccess(String outHost) {
+    @Lock("notifyPayMarginSuccess")
+    public void notifyPayMarginSuccess(String outHost) {
         AuctionMargin auctionMargin = auctionMarginService.getById(outHost);
         //支付成功，将保证金状态置为已成功
         auctionMargin.setPayMarginStatus(Integer.valueOf(1));
@@ -556,7 +559,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized PayVo payFixed(String userId, AuctionPayFixedForm auctionPayFixedForm) {
+    public PayVo payFixed(String userId, AuctionPayFixedForm auctionPayFixedForm) {
         realCheck(userId);
         CntUserDto cntUserDto = remoteBuiUserService.commUni(userId, SecurityConstants.INNER).getData();
         if (Integer.valueOf(0).equals(auctionPayFixedForm.getPayType())) {
@@ -680,7 +683,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public synchronized void checkAuctionEnd() {
+    @Lock("checkAuctionEnd")
+    public void checkAuctionEnd() {
         List<AuctionSend> sendList = auctionSendService.list(Wrappers.<AuctionSend>lambdaQuery().le(
                 AuctionSend::getEndTime, LocalDateTime.now())
                 .eq(AuctionSend::getAuctionSendStatus, AuctionSendStatus.BID_BIDING.getCode()));
@@ -720,7 +724,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public synchronized void checkWinner() {
+    @Lock("checkWinner")
+    public void checkWinner() {
         List<AuctionSend> sendList = auctionSendService.list(Wrappers.<AuctionSend>lambdaQuery().le(
                 AuctionSend::getEndTime, LocalDateTime.now())
                 .eq(AuctionSend::getIsDelay, 1)
@@ -738,7 +743,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public synchronized void checkDelayWinner() {
+    @Lock("checkDelayWinner")
+    public void checkDelayWinner() {
         List<AuctionSend> sendList = auctionSendService.list(Wrappers.<AuctionSend>lambdaQuery().le(
                 AuctionSend::getEndTime, LocalDateTime.now())
                 .eq(AuctionSend::getIsDelay, 2)
@@ -755,7 +761,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public synchronized void checkPayMarginFail() {
+    @Lock("checkPayMarginFail")
+    public  void checkPayMarginFail() {
         List<AuctionMargin> list = auctionMarginService.list(Wrappers.<AuctionMargin>lambdaQuery().eq(AuctionMargin::getPayMarginStatus, Integer.valueOf(0))
                 .lt(AuctionMargin::getEndTime, LocalDateTime.now()));
         if (list.isEmpty()) {

@@ -8,6 +8,7 @@ import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.ICntConsignmentService;
 import com.manyun.business.service.ISystemService;
 import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.annotation.RequestBodyRsa;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.R;
@@ -53,7 +54,8 @@ public class CntConsignmentController {
 
     @PostMapping("/consignmentAssets")
     @ApiOperation("对资产进行寄售")
-    public synchronized R  consignmentAssets(@RequestBodyRsa @Valid UserConsignmentForm userConsignmentForm){
+    @Lock("consignmentAssets")
+    public R  consignmentAssets(@RequestBodyRsa @Valid UserConsignmentForm userConsignmentForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         cntConsignmentService.consignmentAssets(userConsignmentForm,notNullLoginBusinessUser.getUserId());
         return R.ok();
@@ -91,7 +93,8 @@ public class CntConsignmentController {
 
     @PostMapping("/consignmentCreateOrder")
     @ApiOperation(value = "购买寄售_预先_生成订单",notes = "用来预先 生成一个待支付订单,返回订单编号,用来二次提交支付\n version 1.0.1")
-    public synchronized R<String>  consignmentCreateOrder(@RequestBodyRsa @Valid ConsignmentOrderSellForm consignmentOrderSellForm){
+    @Lock("consignmentCreateOrder")
+    public R<String>  consignmentCreateOrder(@RequestBodyRsa @Valid ConsignmentOrderSellForm consignmentOrderSellForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         String payUserId = notNullLoginBusinessUser.getUserId();
         return R.ok(cntConsignmentService.consignmentCreateOrder( payUserId,consignmentOrderSellForm));
@@ -117,7 +120,8 @@ public class CntConsignmentController {
 
     @GetMapping("/cancelConsignmentById/{id}")
     @ApiOperation(value = "寄售方取消寄售市场中的资产",notes = "id 为寄售订单的id")
-    public synchronized R cancelConsignmentById(@PathVariable String id){
+    @Lock("cancelConsignmentById")
+    public R cancelConsignmentById(@PathVariable String id){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         cntConsignmentService.cancelConsignmentById(id,notNullLoginBusinessUser.getUserId());
         return R.ok();
@@ -126,7 +130,8 @@ public class CntConsignmentController {
     @GetMapping("/consignmentSuccess/{id}")
     @ApiOperation(value = "审核通过;id = 寄售编号",hidden = true)
     @InnerAuth
-    public synchronized R  consignmentSuccess(@PathVariable(name = "id") String id){
+    @Lock("consignmentSuccess")
+    public R  consignmentSuccess(@PathVariable(name = "id") String id){
         //cntConsignmentService.consignmentSuccess(id);
         return R.ok();
     }

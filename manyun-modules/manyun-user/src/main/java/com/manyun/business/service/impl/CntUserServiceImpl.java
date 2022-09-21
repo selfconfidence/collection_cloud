@@ -29,6 +29,7 @@ import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.domain.form.JgLoginTokenForm;
 import com.manyun.comm.api.domain.form.UserRealMoneyForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
@@ -403,7 +404,8 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
 
 
     @Override
-    public synchronized void checkCertifyIdH5Status(String certifyId, String userId ) {
+    @Lock("checkCertifyIdH5Status")
+    public void checkCertifyIdH5Status(String certifyId, String userId ) {
         try {
             aliRealConfig.checkCertifyIdH5Status(certifyId);
         }catch (Exception e){

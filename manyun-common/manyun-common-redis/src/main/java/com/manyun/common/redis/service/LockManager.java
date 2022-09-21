@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 @Service
 @Slf4j
 public class LockManager {
-    private static final int MIN_WAIT_TIME = 5000;
+    private static final int MIN_WAIT_TIME = 8000;
 
     @Resource
     private RedissonClient redisson;
@@ -31,7 +31,6 @@ public class LockManager {
      * @return LockResult  加锁结果
      */
     public LockResult lock(String key, long expireTime, long waitTime) {
-        System.out.println("1111111111111");
         return lock(key, expireTime, waitTime, () -> new BizException("COMMON_FREQUENT_OPERATION_ERROR"));
     }
 
@@ -45,7 +44,6 @@ public class LockManager {
      * @return LockResult  加锁结果
      */
     private LockResult lock(String key, long expireTime, long waitTime, Supplier<BizException> exceptionSupplier){
-        System.out.println("加锁");
         if (waitTime < MIN_WAIT_TIME) {
             waitTime = MIN_WAIT_TIME;
         }
@@ -76,7 +74,6 @@ public class LockManager {
         }
 
         log.info("Redis 加锁结果：{}, key: {}", result.getLockResultStatus(), key);
-        System.out.println("Redis 加锁结果："+result.getLockResultStatus() + "+, key: " + key);
         return result;
     }
 
