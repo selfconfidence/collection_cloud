@@ -25,8 +25,8 @@ public class CntAirdropRecordVo
     @ApiModelProperty("商品名称")
     private String goodsName;
 
-    @ApiModelProperty("主图")
-    private List<MediaVo> mediaVos;
+    @ApiModelProperty("商品缩略图")
+    private List<MediaVo> thumbnailImgMediaVos;
 
     @ApiModelProperty("商品类型")
     private Integer goodsType;

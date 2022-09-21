@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @ApiModel("拍卖订单对象返回视图")
 @Data
@@ -35,11 +36,14 @@ public class CntAuctionOrderVo
     @ApiModelProperty("商品类型;1藏品，2盲盒")
     private Integer goodsType;
 
+    @ApiModelProperty("商品id")
+    private String goodsId;
+
     @ApiModelProperty("商品名称")
     private String goodsName;
 
-    @ApiModelProperty("商品图片")
-    private String goodsImg;
+    @ApiModelProperty("商品缩略图")
+    private List<MediaVo> thumbnailImgMediaVos;
 
     @ApiModelProperty("保证金")
     private BigDecimal margin;

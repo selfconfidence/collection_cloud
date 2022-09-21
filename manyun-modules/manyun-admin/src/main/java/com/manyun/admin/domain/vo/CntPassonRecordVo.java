@@ -40,8 +40,8 @@ public class CntPassonRecordVo
     @ApiModelProperty("商品名称")
     private String goodsName;
 
-    @ApiModelProperty("商品主图")
-    private List<MediaVo> mediaVos;
+    @ApiModelProperty("商品缩略图")
+    private List<MediaVo> thumbnailImgMediaVos;
 
     @ApiModelProperty("价格")
     private BigDecimal price;

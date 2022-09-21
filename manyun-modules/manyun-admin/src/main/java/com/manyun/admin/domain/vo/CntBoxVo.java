@@ -19,8 +19,8 @@ public class CntBoxVo {
     @ApiModelProperty("盲盒标题")
     private String boxTitle;
 
-    @ApiModelProperty("盲盒主图")
-    private List<MediaVo> mediaVos;
+    @ApiModelProperty("盲盒缩略图")
+    private List<MediaVo> thumbnailImgMediaVos;
 
     @ApiModelProperty("藏品原价")
     private BigDecimal sourcePrice;

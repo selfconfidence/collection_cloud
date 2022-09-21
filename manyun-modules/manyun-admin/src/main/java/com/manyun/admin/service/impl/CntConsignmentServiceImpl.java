@@ -59,7 +59,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         List<CntOrderVo> cntOrderVos = orderService.orderList(orderListQuery);
         List<CntUserCollection> userCollections = userCollectionService.list();
         return TableDataInfoUtil.pageTableDataInfo(cntOrderVos.parallelStream().map(m->{
-            m.setMediaVos(mediaService.initMediaVos(m.getBuiId(),m.getGoodsType()==0? BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE:BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+            m.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(m.getBuiId(),m.getGoodsType()==0? BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE:BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
             if(m.getGoodsType() == 0){
                 Optional<CntUserCollection> optional = userCollections.parallelStream().filter(ff -> ff.getId().equals(m.getUserBuiId())).findFirst();
                 if(optional.isPresent()){
@@ -78,7 +78,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
     public R<CntOrderVo> orderInfo(OrderInfoDto orderInfoDto) {
         CntOrderVo cntOrderVo = orderService.orderInfo(orderInfoDto);
         List<CntUserCollection> userCollections = userCollectionService.list();
-        cntOrderVo.setMediaVos(mediaService.initMediaVos(cntOrderVo.getBuiId(),cntOrderVo.getGoodsType()==0? BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE:BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+        cntOrderVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(cntOrderVo.getBuiId(),cntOrderVo.getGoodsType()==0? BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE:BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
         if(cntOrderVo.getGoodsType() == 0){
             Optional<CntUserCollection> optional = userCollections.parallelStream().filter(ff -> ff.getId().equals(cntOrderVo.getUserBuiId())).findFirst();
             if(optional.isPresent()){

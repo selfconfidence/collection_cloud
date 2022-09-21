@@ -50,7 +50,7 @@ public class CntAirdropRecordServiceImpl extends ServiceImpl<CntAirdropRecordMap
             CntAirdropRecordVo cntAirdropRecordVo=new CntAirdropRecordVo();
             BeanUtils.copyProperties(m,cntAirdropRecordVo);
             if(StringUtils.isNotBlank(m.getGoodsName()) && m.getGoodsType()!=null){
-                cntAirdropRecordVo.setMediaVos(mediaService.initMediaVos(m.getGoodsId(), m.getGoodsType()==0?BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE:BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+                cntAirdropRecordVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(m.getGoodsId(), m.getGoodsType()==0?BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE:BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
             }
             return cntAirdropRecordVo;
         }).collect(Collectors.toList()), cntAirdropRecords);
