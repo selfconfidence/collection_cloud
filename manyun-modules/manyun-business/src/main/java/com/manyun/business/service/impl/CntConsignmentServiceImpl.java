@@ -607,8 +607,8 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         cntConsignment.setBuiName(buiName);
         save(cntConsignment);
         // 发送短信好了.
-        CntUserDto cntUserDto = remoteBuiUserService.commUni(userId, SecurityConstants.INNER).getData();
-        remoteSmsService.sendCommPhone(Builder.<SmsCommDto>of(SmsCommDto::new).with(SmsCommDto::setTemplateCode, BusinessConstants.SmsTemplateNumber.ASSERT_UP).with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().put("buiName",cntConsignment.getBuiName() ).build()).with(SmsCommDto::setPhoneNumber,cntUserDto.getPhone()).build());
+        //CntUserDto cntUserDto = remoteBuiUserService.commUni(userId, SecurityConstants.INNER).getData();
+        //remoteSmsService.sendCommPhone(Builder.<SmsCommDto>of(SmsCommDto::new).with(SmsCommDto::setTemplateCode, BusinessConstants.SmsTemplateNumber.ASSERT_UP).with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().put("buiName",cntConsignment.getBuiName() ).build()).with(SmsCommDto::setPhoneNumber,cntUserDto.getPhone()).build());
     }
 
 

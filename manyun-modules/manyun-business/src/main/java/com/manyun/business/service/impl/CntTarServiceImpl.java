@@ -142,11 +142,11 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
         // 发短信
         String format = cntTar.getOpenTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         CntUserDto cntUserDto = remoteBuiUserService.commUni(userId, SecurityConstants.INNER).getData();
-        remoteSmsService.sendCommPhone(Builder.of(SmsCommDto::new)
+        /*remoteSmsService.sendCommPhone(Builder.of(SmsCommDto::new)
                         .with(SmsCommDto::setPhoneNumber, cntUserDto.getPhone())
                         .with(SmsCommDto::setTemplateCode, TAR_MSG)
                         .with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().put("buiName", buiName).put("openTime", format).build())
-                .build());
+                .build());*/
         String msg = StrUtil.format("您已经参与对{}抽签了,抽签结果将在{}公布!", buiName, format);
         if (StrUtil.isNotBlank(cntUserDto.getJgPush()))
         jpushUtil.sendMsg(BusinessConstants.JgPushConstant.PUSH_TITLE,msg, Arrays.asList(cntUserDto.getJgPush()));
