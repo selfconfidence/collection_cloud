@@ -19,6 +19,7 @@ import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
@@ -458,7 +459,8 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized void timeStartAuction() {
+    @Lock("timeStartAuction")
+    public void timeStartAuction() {
         List<AuctionSend> list = list(Wrappers.<AuctionSend>lambdaQuery().eq(AuctionSend::getAuctionSendStatus, AuctionSendStatus.WAIT_START.getCode()));
         if (list.isEmpty()) return;
         for (AuctionSend auctionSend : list) {

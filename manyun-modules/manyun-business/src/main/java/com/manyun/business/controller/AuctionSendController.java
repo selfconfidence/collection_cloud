@@ -9,6 +9,7 @@ import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.IAuctionSendService;
 import com.manyun.business.service.ISystemService;
 import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.annotation.RequestBodyRsa;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.R;
@@ -53,7 +54,8 @@ public class AuctionSendController {
 
     @PostMapping("/auctionSend")
     @ApiOperation("提交送拍")
-    public synchronized R auctionSend(@Valid @RequestBodyRsa AuctionSendForm auctionSendForm) {
+    @Lock("auctionSend")
+    public R auctionSend(@Valid @RequestBodyRsa AuctionSendForm auctionSendForm) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return auctionSendService.auctionSend(auctionSendForm, loginBusinessUser.getUserId());
     }
@@ -72,7 +74,8 @@ public class AuctionSendController {
 
     @PostMapping("/reAuctionSend")
     @ApiOperation("重新送拍")
-    public synchronized R reAuctionSend(@Valid @RequestBodyRsa AuctionSendForm auctionSendForm, String auctionSendId) {
+    @Lock("reAuctionSend")
+    public R reAuctionSend(@Valid @RequestBodyRsa AuctionSendForm auctionSendForm, String auctionSendId) {
         return auctionSendService.reAuctionSend(auctionSendForm, auctionSendId);
     }
 

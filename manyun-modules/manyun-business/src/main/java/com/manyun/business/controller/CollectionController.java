@@ -13,6 +13,7 @@ import com.manyun.business.service.ICollectionService;
 import com.manyun.business.service.ILogsService;
 import com.manyun.business.service.IUserCollectionService;
 import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.annotation.RequestBodyRsa;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
@@ -78,7 +79,8 @@ public class CollectionController extends BaseController{
 
     @GetMapping("/tarCollection/{id}")
     @ApiOperation(value = "对需要抽签的藏品,进行抽签",notes = " id = 藏品编号  \rdata = 提示信息 例如 您已经参与对${buiName}抽签了,抽签结果将在${openTime}公布!\n")
-    public synchronized R<String> tarCollection(@PathVariable String id){
+    @Lock("tarCollection")
+    public R<String> tarCollection(@PathVariable String id){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(collectionService.tarCollection(id,notNullLoginBusinessUser.getUserId()));
     }
@@ -87,7 +89,8 @@ public class CollectionController extends BaseController{
     @PostMapping("/sellCollection")
     @ApiOperation("购买藏品")
     @Deprecated
-    public synchronized R<PayVo> sellCollection(@RequestBody @Valid CollectionSellForm collectionSellForm){
+    @Lock("sellCollection")
+    public R<PayVo> sellCollection(@RequestBody @Valid CollectionSellForm collectionSellForm){
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(collectionService.sellCollection(loginBusinessUser.getUserId(),collectionSellForm));
     }
@@ -95,7 +98,8 @@ public class CollectionController extends BaseController{
 
     @PostMapping("/sellOrderCollection")
     @ApiOperation(value = "购买藏品_预先_生成订单",notes = "用来预先 生成一个待支付订单,返回订单编号,用来二次提交支付\n version 1.0.1")
-    public synchronized R<String> sellOrderCollection(@RequestBodyRsa @Valid CollectionOrderSellForm collectionOrderSellForm){
+    @Lock("sellOrderCollection")
+    public R<String> sellOrderCollection(@RequestBodyRsa @Valid CollectionOrderSellForm collectionOrderSellForm){
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(collectionService.sellOrderCollection(loginBusinessUser.getUserId(),collectionOrderSellForm));
     }

@@ -24,6 +24,7 @@ import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.RemoteSmsService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.domain.dto.SmsCommDto;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.constant.BusinessConstants;
@@ -199,7 +200,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized void notifyPaySuccess(String outHost) {
+    @Lock("notifyPaySuccess")
+    public void notifyPaySuccess(String outHost) {
         Order order = getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, outHost));
         String info = StrUtil.format("从平台购买,本次消费{},来源为平台发售", order.getOrderAmount().toString());
         Assert.isTrue(Objects.nonNull(order),"找不到对应订单编号!");
@@ -253,7 +255,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public synchronized  void timeCancel(){
+    @Lock("timeCancel")
+    public void timeCancel(){
         List<Order> orderList = list(Wrappers.<Order>lambdaQuery().eq(Order::getOrderStatus, WAIT_ORDER.getCode()).lt(Order::getEndTime, LocalDateTime.now()));
         if (orderList.isEmpty()) return;
         List<CntConsignment> cntConsignments = cntConsignmentServiceObjectFactory.getObject().list(Wrappers.<CntConsignment>lambdaQuery().in(CntConsignment::getOrderId, orderList.parallelStream().map(item -> item.getId()).collect(Collectors.toSet())).eq(CntConsignment::getConsignmentStatus, LOCK_CONSIGN.getCode()));
@@ -388,8 +391,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             order.setUserBuiId(userCollection.getId());
             updateById(order);
             // 增加流转记录
-            stepService.saveBatch(StepDto.builder().buiId(userCollection.getLinkAddr()).userId(cntConsignment.getSendUserId()).modelType(COLLECTION_MODEL_TYPE).reMark("转让方").formHash(userCollection.getLinkAddr()).formInfo("寄售市场已寄售成功").build()
-                    ,StepDto.builder().buiId(userCollection.getLinkAddr()).userId(cntConsignment.getPayUserId()).modelType(COLLECTION_MODEL_TYPE).formHash(userCollection.getLinkAddr()).reMark("受让方").formInfo(info).build());
+            stepService.saveBatch(StepDto.builder().buiId(userCollection.getLinkAddr()).userId(cntConsignment.getSendUserId()).modelType(COLLECTION_MODEL_TYPE).reMark("转让方").formHash(userCollection.getCollectionHash()).formInfo("寄售市场已寄售成功").build()
+                    ,StepDto.builder().buiId(userCollection.getLinkAddr()).userId(cntConsignment.getPayUserId()).modelType(COLLECTION_MODEL_TYPE).formHash(userCollection.getCollectionHash()).reMark("受让方").formInfo(info).build());
 
         }
 

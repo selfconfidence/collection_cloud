@@ -25,6 +25,7 @@ import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
@@ -298,7 +299,8 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized OpenBoxCollectionVo openBox(String userBoxId, String userId) {
+    @Lock("openBox")
+    public OpenBoxCollectionVo openBox(String userBoxId, String userId) {
         UserBox userBox = userBoxService.getOne(Wrappers.<UserBox>lambdaQuery().eq(UserBox::getId, userBoxId).eq(UserBox::getUserId, userId).eq(UserBox::getBoxOpen, NO_OPEN.getCode()));
         Assert.isTrue(Objects.nonNull(userBox),"盲盒已被开启,请核实!");
        // 什么样的随机算法 去得到概率性的藏品？

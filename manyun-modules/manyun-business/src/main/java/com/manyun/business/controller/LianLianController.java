@@ -11,10 +11,7 @@ import com.manyun.business.design.pay.bean.query.LinkedAcctlist;
 import com.manyun.business.domain.entity.Logs;
 import com.manyun.business.domain.entity.Money;
 import com.manyun.business.domain.query.*;
-import com.manyun.business.domain.vo.AcctSerIalVo;
-import com.manyun.business.domain.vo.InnerUserVo;
-import com.manyun.business.domain.vo.LlBalanceVo;
-import com.manyun.business.domain.vo.MoneyLogVo;
+import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.ILogsService;
 import com.manyun.business.service.IMoneyService;
 import com.manyun.business.service.ISystemService;
@@ -157,6 +154,14 @@ public class LianLianController {
         MoneyLogVo moneyLogVo = Builder.of(MoneyLogVo::new).build();
         BeanUtil.copyProperties(logs,moneyLogVo);
         return moneyLogVo;
+    }
+
+
+    @PostMapping("/getRandom")
+    @ApiOperation("随机因子获取")
+    public R<GetRandomVo> getRandom(@RequestBody getRandomQuery getRandomQuery) {
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return R.ok(LLPayUtils.getRandom(notNullLoginBusinessUser.getUserId(),getRandomQuery.getFlagChnl(),getRandomQuery.getPkgName(),getRandomQuery.getAppName()));
     }
 
 }
