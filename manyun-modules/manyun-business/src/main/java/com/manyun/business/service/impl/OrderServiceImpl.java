@@ -391,8 +391,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             order.setUserBuiId(userCollection.getId());
             updateById(order);
             // 增加流转记录
-            stepService.saveBatch(StepDto.builder().buiId(userCollection.getLinkAddr()).userId(cntConsignment.getSendUserId()).modelType(COLLECTION_MODEL_TYPE).reMark("转让方").formHash(userCollection.getLinkAddr()).formInfo("寄售市场已寄售成功").build()
-                    ,StepDto.builder().buiId(userCollection.getLinkAddr()).userId(cntConsignment.getPayUserId()).modelType(COLLECTION_MODEL_TYPE).formHash(userCollection.getLinkAddr()).reMark("受让方").formInfo(info).build());
+            stepService.saveBatch(StepDto.builder().buiId(userCollection.getLinkAddr()).userId(cntConsignment.getSendUserId()).modelType(COLLECTION_MODEL_TYPE).reMark("转让方").formHash(userCollection.getCollectionHash()).formInfo("寄售市场已寄售成功").build()
+                    ,StepDto.builder().buiId(userCollection.getLinkAddr()).userId(cntConsignment.getPayUserId()).modelType(COLLECTION_MODEL_TYPE).formHash(userCollection.getCollectionHash()).reMark("受让方").formInfo(info).build());
 
         }
 
