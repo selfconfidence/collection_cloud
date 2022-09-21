@@ -1,7 +1,6 @@
 # Tomcat
 server:
   port: 9100
-
 # Spring
 spring:
   application:
@@ -27,7 +26,7 @@ spring:
     admin:
       discovery:
         ignored-services:
-          - ruoyi-system
+          - ruoyi-system*
           - ruoyi*
           - \\*ruoyi
-          - 804017d66eef
+          - 804017d66eef*
