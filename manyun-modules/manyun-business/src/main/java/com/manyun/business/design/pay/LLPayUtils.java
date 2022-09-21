@@ -16,12 +16,10 @@ import com.manyun.business.design.pay.bean.random.GetRandomParams;
 import com.manyun.business.design.pay.bean.random.GetRandomResult;
 import com.manyun.business.design.pay.bean.txn.*;
 import com.manyun.business.domain.query.*;
-import com.manyun.business.domain.vo.AcctSerIalListVo;
-import com.manyun.business.domain.vo.AcctSerIalVo;
+import com.manyun.business.domain.vo.GetRandomVo;
 import com.manyun.business.domain.vo.LlBalanceVo;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.enums.LianLianPayEnum;
-import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.manyun.common.pays.utils.llpay.LLianPayDateUtils;
@@ -501,27 +499,32 @@ public class LLPayUtils {
      * 随机因子获取
      * @param
      */
-    private static GetRandomResult getRandom(String userId) {
+    public static GetRandomVo getRandom(String userId, String flagChnl, String pkgName, String appName) {
+        Assert.isTrue(StringUtils.isNotBlank(userId) || StringUtils.isNotBlank(flagChnl),"请求参数有误,请检查!");
         GetRandomParams params = new GetRandomParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
         params.setTimestamp(timestamp);
         params.setOid_partner(LLianPayConstant.OidPartner);
         params.setUser_id(userId);
-        /*
-        交易发起渠道。
-        ANDROID
-        IOS
-        H5
-        PC
-         */
-        params.setFlag_chnl("H5");
+        params.setFlag_chnl(flagChnl);
+        if(StringUtils.isNotBlank(pkgName)){
+            params.setPkg_name(pkgName);
+        }
+        if(StringUtils.isNotBlank(appName)){
+            params.setApp_name(appName);
+        }
         params.setEncrypt_algorithm("RSA");
-
         LLianPayClient lLianPayClient = new LLianPayClient();
         String resultJsonStr = lLianPayClient.sendRequest(getRandom, JSON.toJSONString(params));
         GetRandomResult getRandomResult = JSON.parseObject(resultJsonStr, GetRandomResult.class);
         Assert.isTrue("0000".equalsIgnoreCase(getRandomResult.getRet_code()),getRandomResult.getRet_msg());
-        return getRandomResult;
+        return Builder.of(GetRandomVo::new)
+                .with(GetRandomVo::setUserId,getRandomResult.getUser_id())
+                .with(GetRandomVo::setRandomKey,getRandomResult.getRandom_key())
+                .with(GetRandomVo::setRandomValue,getRandomResult.getRandom_value())
+                .with(GetRandomVo::setLicense,getRandomResult.getLicense())
+                .with(GetRandomVo::setRsaPublicContent,getRandomResult.getRsa_public_content())
+                .build();
     }
 
 }
