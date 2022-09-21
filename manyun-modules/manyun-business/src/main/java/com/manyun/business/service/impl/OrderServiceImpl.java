@@ -12,10 +12,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.manyun.business.design.pay.RootPay;
 import com.manyun.business.design.pay.ShandePay;
-import com.manyun.business.domain.dto.MsgCommDto;
-import com.manyun.business.domain.dto.MsgThisDto;
-import com.manyun.business.domain.dto.OrderCreateDto;
-import com.manyun.business.domain.dto.PayInfoDto;
+import com.manyun.business.domain.dto.*;
 import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.form.OrderPayForm;
 import com.manyun.business.domain.query.OrderQuery;
@@ -50,6 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE;
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
 import static com.manyun.common.core.enums.BoxStatus.UP_ACTION;
 import static com.manyun.common.core.enums.CollectionLink.NOT_LINK;
@@ -110,6 +108,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Autowired
     private ICntPostExcelService cntPostExcelService;
+
+    @Autowired
+    private IStepService stepService;
 
 
     @Autowired
@@ -386,6 +387,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             userCollectionService.save(userCollection);
             order.setUserBuiId(userCollection.getId());
             updateById(order);
+            // 增加流转记录
+            stepService.saveBatch(StepDto.builder().buiId(userCollection.getLinkAddr()).userId(cntConsignment.getSendUserId()).modelType(COLLECTION_MODEL_TYPE).reMark("转让方").formHash(userCollection.getLinkAddr()).formInfo("寄售市场已寄售成功").build()
+                    ,StepDto.builder().buiId(userCollection.getLinkAddr()).userId(cntConsignment.getPayUserId()).modelType(COLLECTION_MODEL_TYPE).formHash(userCollection.getLinkAddr()).reMark("受让方").formInfo(info).build());
+
         }
 
         // 2. 寄售人已经解除绑定关系了 -- 无需判定
@@ -401,6 +406,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         // 直接审核成功
         consignmentService.consignmentSuccess(cntConsignment.getId(), canTrade);
+
 
     }
 
