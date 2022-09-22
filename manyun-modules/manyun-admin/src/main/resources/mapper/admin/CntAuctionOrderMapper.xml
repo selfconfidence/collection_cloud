@@ -46,6 +46,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             tuu.nick_name toUserName,
             tuu.phone toUserPhone,
             ao.goods_type goodsType,
+            ao.goods_id   goodsId,
             ao.goods_name goodsName,
             ao.goods_img goodsImg,
             ao.margin,

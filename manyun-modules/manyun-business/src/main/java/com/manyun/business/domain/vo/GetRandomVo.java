@@ -23,4 +23,6 @@ public class GetRandomVo {
     @ApiModelProperty("连连RSA公钥")
     private String rsaPublicContent;
 
+    @ApiModelProperty("映射数组,flag_chnl为H5时返回")
+    private String mapArr;
 }

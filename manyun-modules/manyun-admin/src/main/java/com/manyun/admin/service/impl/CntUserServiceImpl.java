@@ -122,7 +122,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> imple
         List<CntOrderVo> cntOrderVos = orderService.myOrderList(orderDto.getUserId());
         List<CntUserCollection> userCollections = userCollectionService.list();
         return TableDataInfoUtil.pageTableDataInfo(cntOrderVos.parallelStream().map(m->{
-            m.setMediaVos(mediaService.initMediaVos(m.getBuiId(),m.getGoodsType()==0?BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE:BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+            m.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(m.getBuiId(),m.getGoodsType()==0?BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE:BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
             if(m.getGoodsType() == 0){
                 Optional<CntUserCollection> optional = userCollections.parallelStream().filter(ff -> ff.getId().equals(m.getUserBuiId())).findFirst();
                 if(optional.isPresent()){
@@ -142,7 +142,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> imple
         PageHelper.startPage(collectionDto.getPageNum(),collectionDto.getPageSize());
         List<UserCollectionVo> userCollectionVos = userCollectionService.myCollectionList(collectionDto.getUserId());
         return TableDataInfoUtil.pageTableDataInfo(userCollectionVos.parallelStream().map(m->{
-            m.setMediaVos(mediaService.initMediaVos(m.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
+            m.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(m.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
             return m;
         }).collect(Collectors.toList()),userCollectionVos);
     }
@@ -157,7 +157,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> imple
         PageHelper.startPage(boxDto.getPageNum(),boxDto.getPageSize());
         List<UserBoxVo> userBoxVos = userBoxService.myBoxList(boxDto.getUserId());
         return TableDataInfoUtil.pageTableDataInfo(userBoxVos.parallelStream().map(m->{
-            m.setMediaVos(mediaService.initMediaVos(m.getBoxId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+            m.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(m.getBoxId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
             return m;
         }).collect(Collectors.toList()),userBoxVos);
     }

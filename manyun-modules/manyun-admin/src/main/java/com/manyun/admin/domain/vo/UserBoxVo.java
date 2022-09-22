@@ -28,8 +28,8 @@ public class UserBoxVo {
     @ApiModelProperty("盲盒标题")
     private String boxTitle;
 
-    @ApiModelProperty("藏品主图")
-    private List<MediaVo> mediaVos;
+    @ApiModelProperty("藏品缩略图")
+    private List<MediaVo> thumbnailImgMediaVos;
 
     @ApiModelProperty("盲盒详情")
     private String boxInfo;

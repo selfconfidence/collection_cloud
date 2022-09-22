@@ -84,6 +84,8 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         BeanUtil.copyProperties(cntBox, boxDetailsVo);
         boxDetailsVo.setLableIds(collectionLableService.list(Wrappers.<CntCollectionLable>lambdaQuery().eq(CntCollectionLable::getCollectionId, id)).stream().map(CntCollectionLable::getLableId).collect(Collectors.toList()));
         boxDetailsVo.setMediaVos(mediaService.initMediaVos(cntBox.getId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+        boxDetailsVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(cntBox.getId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+        boxDetailsVo.setThreeDimensionalMediaVos(mediaService.threeDimensionalMediaVos(cntBox.getId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
         return boxDetailsVo;
     }
 
@@ -102,7 +104,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
                     CntBoxVo cntBoxVo = new CntBoxVo();
                     BeanUtil.copyProperties(item, cntBoxVo);
                     cntBoxVo.setTotalBalance(item.getBalance().intValue() + item.getSelfBalance().intValue());
-                    cntBoxVo.setMediaVos(mediaService.initMediaVos(item.getId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+                    cntBoxVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(item.getId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
                     return cntBoxVo;
                 }).collect(Collectors.toList()),cntBoxList);
     }
@@ -167,8 +169,9 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         }
         //图片
         MediaAlterVo mediaAlterVo = boxAlterCombineDto.getMediaAlterVo();
+        List<CntMedia> mediaList = new ArrayList<>();
         if (Objects.nonNull(mediaAlterVo)) {
-            mediaService.save(
+            if(StringUtils.isNotBlank(mediaAlterVo.getImg()))mediaList.add(
                     Builder.of(CntMedia::new)
                             .with(CntMedia::setId, IdUtils.getSnowflake().nextIdStr())
                             .with(CntMedia::setBuiId, idStr)
@@ -178,6 +181,27 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
                             .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
                             .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
             );
+            if(StringUtils.isNotBlank(mediaAlterVo.getThumbnailImg()))mediaList.add(
+                    Builder.of(CntMedia::new)
+                            .with(CntMedia::setId, IdUtils.getSnowflake().nextIdStr())
+                            .with(CntMedia::setBuiId, idStr)
+                            .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
+                            .with(CntMedia::setMediaUrl, mediaAlterVo.getThumbnailImg())
+                            .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.THUMBNAIL_IMG)
+                            .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
+                            .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
+            );
+            if(StringUtils.isNotBlank(mediaAlterVo.getThreeDimensional()))mediaList.add(
+                    Builder.of(CntMedia::new)
+                            .with(CntMedia::setId, IdUtils.getSnowflake().nextIdStr())
+                            .with(CntMedia::setBuiId, idStr)
+                            .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
+                            .with(CntMedia::setMediaUrl, mediaAlterVo.getThreeDimensional())
+                            .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.GLB)
+                            .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
+                            .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
+            );
+            if(mediaList.size()>0)mediaService.saveBatch(mediaList);
         }
         return R.ok();
     }
@@ -239,13 +263,16 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         }
         //图片
         MediaAlterVo mediaAlterVo = boxAlterCombineDto.getMediaAlterVo();
+        List<CntMedia> saveMediaList = new ArrayList<>();
+        List<CntMedia> updateMediaList = new ArrayList<>();
         if (Objects.nonNull(mediaAlterVo)) {
             List<MediaVo> mediaVos = mediaService.initMediaVos(boxId, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
+            List<MediaVo> thumbnailImgMediaVos = mediaService.thumbnailImgMediaVos(boxId, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
+
             if (mediaVos.size() == 0) {
-                mediaService.save(
+                saveMediaList.add(
                         Builder.of(CntMedia::new)
                                 .with(CntMedia::setId, IdUtils.getSnowflakeNextIdStr())
-
                                 .with(CntMedia::setBuiId, boxId)
                                 .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
                                 .with(CntMedia::setMediaUrl, mediaAlterVo.getImg())
@@ -254,15 +281,55 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
                                 .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
                 );
             } else {
-                mediaService.updateById(
+                if(StringUtils.isNotBlank(mediaAlterVo.getImg())){
+                    updateMediaList.add(
+                            Builder.of(CntMedia::new)
+                                    .with(CntMedia::setId, mediaVos.get(0).getId())
+                                    .with(CntMedia::setMediaUrl, mediaAlterVo.getImg())
+                                    .with(CntMedia::setUpdatedBy, SecurityUtils.getUsername())
+                                    .with(CntMedia::setUpdatedTime, DateUtils.getNowDate())
+                                    .build()
+                    );
+                }
+            }
+            if(thumbnailImgMediaVos.size()==0){
+                saveMediaList.add(
                         Builder.of(CntMedia::new)
-                                .with(CntMedia::setId, mediaVos.get(0).getId())
-                                .with(CntMedia::setMediaUrl, mediaAlterVo.getImg())
-                                .with(CntMedia::setUpdatedBy, SecurityUtils.getUsername())
-                                .with(CntMedia::setUpdatedTime, DateUtils.getNowDate())
-                                .build()
+                                .with(CntMedia::setId, IdUtils.getSnowflake().nextIdStr())
+                                .with(CntMedia::setBuiId, boxId)
+                                .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
+                                .with(CntMedia::setMediaUrl, mediaAlterVo.getThumbnailImg())
+                                .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.THUMBNAIL_IMG)
+                                .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
+                                .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
+                );
+            }else {
+                if(StringUtils.isNotBlank(mediaAlterVo.getThumbnailImg())){
+                    updateMediaList.add(
+                            Builder.of(CntMedia::new)
+                                    .with(CntMedia::setId, thumbnailImgMediaVos.get(0).getId())
+                                    .with(CntMedia::setMediaUrl, mediaAlterVo.getThumbnailImg())
+                                    .with(CntMedia::setUpdatedBy, SecurityUtils.getUsername())
+                                    .with(CntMedia::setUpdatedTime, DateUtils.getNowDate())
+                                    .build()
+                    );
+                }
+            }
+            if(StringUtils.isNotBlank(mediaAlterVo.getThreeDimensional())){
+                saveMediaList.add(
+                        Builder.of(CntMedia::new)
+                                .with(CntMedia::setId, IdUtils.getSnowflake().nextIdStr())
+                                .with(CntMedia::setBuiId, boxId)
+                                .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
+                                .with(CntMedia::setMediaUrl, mediaAlterVo.getThreeDimensional())
+                                .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.GLB)
+                                .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
+                                .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
                 );
             }
+            mediaService.remove(Wrappers.<CntMedia>lambdaQuery().eq(CntMedia::getBuiId,boxId).eq(CntMedia::getModelType,BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE).eq(CntMedia::getMediaType,BusinessConstants.ModelTypeConstant.GLB));
+            if(saveMediaList.size()>0)mediaService.saveBatch(saveMediaList);
+            if(updateMediaList.size()>0)mediaService.updateBatchById(updateMediaList);
         }
         return R.ok();
     }

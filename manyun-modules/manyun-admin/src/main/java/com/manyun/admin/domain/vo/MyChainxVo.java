@@ -28,8 +28,8 @@ public class MyChainxVo {
     @ApiModelProperty("藏品名称")
     private String collectionName;
 
-    @ApiModelProperty("藏品主图")
-    private List<MediaVo> mediaVos;
+    @ApiModelProperty("藏品缩略图")
+    private List<MediaVo> thumbnailImgMediaVos;
 
     @ApiModelProperty("来源")
     private String sourceInfo;

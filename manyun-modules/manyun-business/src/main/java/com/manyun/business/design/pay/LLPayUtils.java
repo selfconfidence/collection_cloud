@@ -524,6 +524,7 @@ public class LLPayUtils {
                 .with(GetRandomVo::setRandomValue,getRandomResult.getRandom_value())
                 .with(GetRandomVo::setLicense,getRandomResult.getLicense())
                 .with(GetRandomVo::setRsaPublicContent,getRandomResult.getRsa_public_content())
+                .with(GetRandomVo::setMapArr, getRandomResult.getMap_arr())
                 .build();
     }
 

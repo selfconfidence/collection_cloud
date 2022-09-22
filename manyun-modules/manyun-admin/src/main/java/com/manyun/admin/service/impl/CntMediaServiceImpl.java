@@ -27,4 +27,14 @@ public class CntMediaServiceImpl extends ServiceImpl<CntMediaMapper,CntMedia> im
         return cntMediaMapper.initMediaVos(buiId,modelType);
     }
 
+    @Override
+    public List<MediaVo> thumbnailImgMediaVos(String buiId, String modelType) {
+        return cntMediaMapper.thumbnailImgMediaVos(buiId,modelType);
+    }
+
+    @Override
+    public List<MediaVo> threeDimensionalMediaVos(String buiId, String modelType) {
+        return cntMediaMapper.threeDimensionalMediaVos(buiId,modelType);
+    }
+
 }

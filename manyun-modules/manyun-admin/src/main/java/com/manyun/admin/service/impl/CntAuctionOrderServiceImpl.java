@@ -11,8 +11,10 @@ import com.manyun.admin.domain.vo.AuctionPriceVo;
 import com.manyun.admin.domain.vo.CntAuctionOrderVo;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.admin.service.ICntAuctionPriceService;
+import com.manyun.admin.service.ICntMediaService;
 import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
+import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
@@ -46,6 +48,9 @@ public class CntAuctionOrderServiceImpl extends ServiceImpl<CntAuctionOrderMappe
     @Autowired
     private RemoteBuiUserService remoteBuiUserService;
 
+    @Autowired
+    private ICntMediaService mediaService;
+
     /**
      * 查询拍卖订单列表
      *
@@ -57,7 +62,10 @@ public class CntAuctionOrderServiceImpl extends ServiceImpl<CntAuctionOrderMappe
     {
         PageHelper.startPage(auctionOrderQuery.getPageNum(),auctionOrderQuery.getPageSize());
         List<CntAuctionOrderVo> cntAuctionOrderVos = cntAuctionOrderMapper.selectCntAuctionOrderList(auctionOrderQuery);
-        return TableDataInfoUtil.pageTableDataInfo(cntAuctionOrderVos,cntAuctionOrderVos);
+        return TableDataInfoUtil.pageTableDataInfo(cntAuctionOrderVos.parallelStream().map(m->{
+            m.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(m.getGoodsId(), m.getGoodsType()==1?BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE:BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+            return m;
+        }).collect(Collectors.toList()), cntAuctionOrderVos);
     }
 
     /**

@@ -92,6 +92,8 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         CntCollectionDetailsVo cntCollectionDetailsVo = cntCollectionMapper.selectCntCollectionDetailsById(id);
         cntCollectionDetailsVo.setLableIds(collectionLableService.list(Wrappers.<CntCollectionLable>lambdaQuery().eq(CntCollectionLable::getCollectionId, id)).stream().map(CntCollectionLable::getLableId).collect(Collectors.toList()));
         cntCollectionDetailsVo.setMediaVos(mediaService.initMediaVos(id, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
+        cntCollectionDetailsVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(id, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
+        cntCollectionDetailsVo.setThreeDimensionalMediaVos(mediaService.threeDimensionalMediaVos(id, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
         return cntCollectionDetailsVo;
     }
 
@@ -110,7 +112,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
             CntCollectionVo cntCollectionVo = new CntCollectionVo();
             BeanUtil.copyProperties(m, cntCollectionVo);
             cntCollectionVo.setTotalBalance(m.getBalance().intValue() + m.getSelfBalance().intValue());
-            cntCollectionVo.setMediaVos(mediaService.initMediaVos(m.getId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
+            cntCollectionVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(m.getId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
             return cntCollectionVo;
         }).collect(Collectors.toList()), cntCollectionList);
     }
@@ -208,6 +210,15 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                     .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)
                     .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
                     .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build());
+            if(StringUtils.isNotBlank(mediaAlterVo.getThumbnailImg()))mediaList.add(
+                    Builder.of(CntMedia::new)
+                            .with(CntMedia::setId, IdUtils.getSnowflakeNextIdStr())
+                            .with(CntMedia::setBuiId, idStr)
+                            .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)
+                            .with(CntMedia::setMediaUrl, mediaAlterVo.getThumbnailImg())
+                            .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.THUMBNAIL_IMG)
+                            .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
+                            .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build());
             if(StringUtils.isNotBlank(mediaAlterVo.getThreeDimensional()))mediaList.add(
                     Builder.of(CntMedia::new)
                             .with(CntMedia::setId, IdUtils.getSnowflakeNextIdStr())
@@ -334,22 +345,8 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         List<CntMedia> updateMediaList = new ArrayList<>();
         if (Objects.nonNull(mediaAlterVo)) {
             List<MediaVo> mediaVos = mediaService.initMediaVos(collectionId, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
-
-            Optional<MediaVo> optional = mediaVos.parallelStream().filter(f ->
-                    (f.getBuiId().equals(collectionId)
-                            && f.getModelType().equals(BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)
-                            && f.getMediaType().equals(BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE))
-            ).findFirst();
-            if(optional.isPresent()){
-                updateMediaList.add(
-                        Builder.of(CntMedia::new)
-                                .with(CntMedia::setId, optional.get().getId())
-                                .with(CntMedia::setMediaUrl, mediaAlterVo.getImg())
-                                .with(CntMedia::setUpdatedBy, SecurityUtils.getUsername())
-                                .with(CntMedia::setUpdatedTime, DateUtils.getNowDate())
-                                .build()
-                );
-            }else {
+            List<MediaVo> thumbnailImgMediaVos = mediaService.thumbnailImgMediaVos(collectionId, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
+            if(mediaVos.size()==0){
                 saveMediaList.add(
                         Builder.of(CntMedia::new)
                                 .with(CntMedia::setId, IdUtils.getSnowflakeNextIdStr())
@@ -360,22 +357,42 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                                 .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
                                 .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
                 );
+            }else {
+                if(StringUtils.isNotBlank(mediaAlterVo.getImg())){
+                    updateMediaList.add(
+                            Builder.of(CntMedia::new)
+                                    .with(CntMedia::setId, mediaVos.get(0).getId())
+                                    .with(CntMedia::setMediaUrl, mediaAlterVo.getImg())
+                                    .with(CntMedia::setUpdatedBy, SecurityUtils.getUsername())
+                                    .with(CntMedia::setUpdatedTime, DateUtils.getNowDate())
+                                    .build()
+                    );
+                }
             }
-            Optional<MediaVo> optional1 = mediaVos.parallelStream().filter(f ->
-                    (f.getBuiId().equals(collectionId)
-                            && f.getModelType().equals(BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)
-                            && f.getMediaType().equals(BusinessConstants.ModelTypeConstant.GLB))
-            ).findFirst();
-            if(optional1.isPresent()){
-                updateMediaList.add(
+            if(thumbnailImgMediaVos.size()==0){
+                saveMediaList.add(
                         Builder.of(CntMedia::new)
-                                .with(CntMedia::setId, optional1.get().getId())
-                                .with(CntMedia::setMediaUrl, mediaAlterVo.getThreeDimensional())
-                                .with(CntMedia::setUpdatedBy, SecurityUtils.getUsername())
-                                .with(CntMedia::setUpdatedTime, DateUtils.getNowDate())
-                                .build()
+                                .with(CntMedia::setId, IdUtils.getSnowflakeNextIdStr())
+                                .with(CntMedia::setBuiId, collectionId)
+                                .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE)
+                                .with(CntMedia::setMediaUrl, mediaAlterVo.getThumbnailImg())
+                                .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.THUMBNAIL_IMG)
+                                .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
+                                .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
                 );
             }else {
+                if(StringUtils.isNotBlank(mediaAlterVo.getThumbnailImg())){
+                    updateMediaList.add(
+                            Builder.of(CntMedia::new)
+                                    .with(CntMedia::setId, thumbnailImgMediaVos.get(0).getId())
+                                    .with(CntMedia::setMediaUrl, mediaAlterVo.getThumbnailImg())
+                                    .with(CntMedia::setUpdatedBy, SecurityUtils.getUsername())
+                                    .with(CntMedia::setUpdatedTime, DateUtils.getNowDate())
+                                    .build()
+                    );
+                }
+            }
+            if(StringUtils.isNotBlank(mediaAlterVo.getThreeDimensional())){
                 saveMediaList.add(
                         Builder.of(CntMedia::new)
                                 .with(CntMedia::setId, IdUtils.getSnowflakeNextIdStr())
@@ -387,6 +404,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                                 .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
                 );
             }
+            mediaService.remove(Wrappers.<CntMedia>lambdaQuery().eq(CntMedia::getBuiId,collectionId).eq(CntMedia::getModelType,BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE).eq(CntMedia::getMediaType,BusinessConstants.ModelTypeConstant.GLB));
             if(saveMediaList.size()>0)mediaService.saveBatch(saveMediaList);
             if(updateMediaList.size()>0)mediaService.updateBatchById(updateMediaList);
         }

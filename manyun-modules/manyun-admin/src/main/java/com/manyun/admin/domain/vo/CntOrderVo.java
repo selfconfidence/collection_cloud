@@ -37,8 +37,8 @@ public class CntOrderVo {
     @ApiModelProperty("商品名称")
     private String collectionName;
 
-    @ApiModelProperty("商品图片")
-    private List<MediaVo> mediaVos;
+    @ApiModelProperty("商品缩略图")
+    private List<MediaVo> thumbnailImgMediaVos;
 
     @ApiModelProperty("购买数量")
     private Integer goodsNum;

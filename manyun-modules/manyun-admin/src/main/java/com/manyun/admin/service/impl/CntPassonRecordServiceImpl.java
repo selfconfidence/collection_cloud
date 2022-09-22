@@ -49,7 +49,7 @@ public class CntPassonRecordServiceImpl extends ServiceImpl<CntPassonRecordMappe
         return TableDataInfoUtil.pageTableDataInfo(cntPassonRecords.parallelStream().map(item -> {
             CntPassonRecordVo passonRecordVo = new CntPassonRecordVo();
             BeanUtil.copyProperties(item, passonRecordVo);
-            passonRecordVo.setMediaVos(mediaService.initMediaVos(item.getPictureId(),"0".equals(item.getPictureType())?BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE:BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+            passonRecordVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(item.getPictureId(),"0".equals(item.getPictureType())?BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE:BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
 
             return passonRecordVo;
         }).collect(Collectors.toList()),cntPassonRecords);
