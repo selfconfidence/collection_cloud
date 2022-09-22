@@ -91,6 +91,7 @@ public class CntUserTarServiceImpl extends ServiceImpl<CntUserTarMapper,CntUserT
         }
         List<CntUserTar> insertList = new ArrayList<CntUserTar>();
         List<CntUserTar> updateList = new ArrayList<CntUserTar>();
+        List<String> awardUserIds = new ArrayList<>();
         Set<String> tarIds = userTarExcels.parallelStream().map(UserTarExcel::getTarId).collect(Collectors.toSet());
         Assert.isTrue(tarIds.size()==1,"所选抽签编号不一致!");
         CntTar cntTar = tarService.getById(tarIds.parallelStream().findFirst().get());
@@ -117,6 +118,7 @@ public class CntUserTarServiceImpl extends ServiceImpl<CntUserTarMapper,CntUserT
                                     .with(CntUserTar::setUpdatedBy, SecurityUtils.getUsername())
                                     .with(CntUserTar::setUpdatedTime, DateUtils.getNowDate()).build()
                     );
+                    if(e.getIsFull()==1)awardUserIds.add(e.getUserId());
                 }else {
                     insertList.add(
                             Builder.of(CntUserTar::new)
@@ -129,9 +131,12 @@ public class CntUserTarServiceImpl extends ServiceImpl<CntUserTarMapper,CntUserT
                                     .with(CntUserTar::setCreatedTime, DateUtils.getNowDate())
                                     .build()
                     );
+                    if(e.getIsFull()==1)awardUserIds.add(e.getUserId());
                 }
             }
         });
+        Integer balance = cntTar.getTarType()==1?cntBox.getBalance():cntCollection.getBalance();
+        Assert.isTrue(balance>=awardUserIds.size(),"商品库存不足!");
         if(updateList.size()>0){
             updateBatchById(updateList);
         }
