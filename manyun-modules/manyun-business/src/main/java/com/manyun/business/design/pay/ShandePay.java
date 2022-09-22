@@ -38,7 +38,7 @@ public class ShandePay implements RootPayServer {
     @Autowired
     private LianLianPay lianLianPay;
 
-    @Value("{open.url}")
+    @Value("${open.url}")
     private String url;
 
     public static final String defaultReturnUrl = "http://h5.dcalliance.com.cn/";
