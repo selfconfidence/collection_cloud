@@ -249,7 +249,7 @@ public class LLPayUtils {
      * @param returnUrl ios Android h5 表单提交之后跳转回app的地址
      * @param notifyUrl 回调地址
      */
-    public static String userTopup(String userId, String realName, String phone, String cartNo,  String ipAddr, BigDecimal amount, String returnUrl ,String notifyUrl) {
+    public static String userTopup(String userId, String realName, String phone, String cartNo,  String ipAddr, String registerTime, BigDecimal amount, String returnUrl ,String notifyUrl) {
         CashierPayCreateParams params = new CashierPayCreateParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
         params.setTimestamp(timestamp);
@@ -273,7 +273,7 @@ public class LLPayUtils {
                         "\"frms_ware_category\":\"4007\"," +
                         "\"goods_name\":\"用户充值\"," +
                         "\"user_info_mercht_userno\":\"" +userId+ "\"," +
-                        "\"user_info_dt_register\":\"" +timestamp+ "\"," +
+                        "\"user_info_dt_register\":\"" +registerTime+ "\"," +
                         "\"user_info_bind_phone\":\"" +phone+ "\"," +
                         "\"user_info_full_name\":\"" +realName+ "\"," +
                         "\"user_info_id_no\":\"" + cartNo + "\"," +
@@ -337,7 +337,7 @@ public class LLPayUtils {
                         "\"frms_ware_category\":\"4007\"," +
                         "\"goods_name\":\"" +llGeneralConsumeQuery.getGoodsName()+ "\"," +
                         "\"user_info_mercht_userno\":\"" +llGeneralConsumeQuery.getUserId()+ "\"," +
-                        "\"user_info_dt_register\":\"" +timestamp+ "\"," +
+                        "\"user_info_dt_register\":\"" +llGeneralConsumeQuery.getRegisterTime()+ "\"," +
                         "\"user_info_bind_phone\":\"" +llGeneralConsumeQuery.getPhone()+ "\"," +
                         "\"user_info_full_name\":\"" +llGeneralConsumeQuery.getRealName()+ "\"," +
                         "\"user_info_id_no\":\"" + llGeneralConsumeQuery.getCartNo() + "\"," +

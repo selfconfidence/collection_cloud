@@ -15,6 +15,7 @@ import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.ILogsService;
 import com.manyun.business.service.IMoneyService;
 import com.manyun.business.service.ISystemService;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
@@ -123,9 +124,19 @@ public class LianLianController {
     @ApiOperation("充值")
     public R<String> userTopup(@RequestBody LLUserTopupQuery llUserTopupQuery) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        CntUserDto cntUser = loginBusinessUser.getCntUser();
         Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId,loginBusinessUser.getUserId()));
         Assert.isTrue(Objects.nonNull(money),"请求参数有误!");
-        return R.ok(LLPayUtils.userTopup(loginBusinessUser.getUserId(),money.getRealName(),loginBusinessUser.getCntUser().getPhone(),money.getCartNo(),loginBusinessUser.getIpaddr(),llUserTopupQuery.getAmount(),llUserTopupQuery.getReturnUrl(),(url+LianLianPayEnum.USER_TOPUP.getNotifyUrl())));
+        return R.ok(LLPayUtils.userTopup(
+                loginBusinessUser.getUserId(),
+                money.getRealName(),
+                loginBusinessUser.getCntUser().getPhone(),
+                money.getCartNo(),
+                loginBusinessUser.getIpaddr(),
+                DateUtils.getDateToStr(DateUtils.toDate(cntUser.getCreatedTime()),DateUtils.YYYYMMDDHHMMSS),
+                llUserTopupQuery.getAmount(),
+                llUserTopupQuery.getReturnUrl()
+                ,(url+LianLianPayEnum.USER_TOPUP.getNotifyUrl())));
     }
 
     @GetMapping("/queryAcctinfo")
