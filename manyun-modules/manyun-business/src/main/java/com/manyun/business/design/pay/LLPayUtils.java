@@ -26,6 +26,7 @@ import com.manyun.common.pays.utils.llpay.LLianPayDateUtils;
 import com.manyun.common.pays.utils.llpay.client.LLianPayClient;
 import com.manyun.common.pays.utils.llpay.config.LLianPayConstant;
 import com.manyun.common.pays.utils.llpay.security.LLianPayAccpSignature;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -58,6 +59,9 @@ public class LLPayUtils {
     //随机因子获取
     private final static String getRandom = "https://accpapi.lianlianpay.com/v1/acctmgr/get-random";
 
+    @Value("{open.url}")
+    private static String url;
+
     //使用时,需确认用户实名状况,必须是实名用户
     /**
      * 开户
@@ -89,7 +93,7 @@ public class LLPayUtils {
         // 交易完成回跳页面地址，H5/PC渠道必传。
         params.setReturn_url(innerUserQuery.getReturnUrl());
         // 交易结果异步通知接收地址，建议HTTPS协议。
-        params.setNotify_url(LianLianPayEnum.INNER_USER.getNotifyUrl());
+        params.setNotify_url(url+LianLianPayEnum.INNER_USER.getNotifyUrl());
         /*
         用户类型。
         INNERUSER：个人用户
@@ -155,7 +159,7 @@ public class LLPayUtils {
         String timestamp = LLianPayDateUtils.getTimestamp();
         params.setTimestamp(timestamp);
         params.setOid_partner(LLianPayConstant.OidPartner);
-        params.setNotify_url(LianLianPayEnum.WITHDRAW.getNotifyUrl());
+        params.setNotify_url(url+LianLianPayEnum.WITHDRAW.getNotifyUrl());
         params.setRisk_item("");
         params.setLinked_agrtno(linkedAcctlists.parallelStream().map(LinkedAcctlist::getLinked_agrtno).findFirst().get());
 
@@ -260,7 +264,7 @@ public class LLPayUtils {
         匿名用户：ANONYMOUS
          */
         params.setUser_type("REGISTERED");
-        params.setNotify_url(LianLianPayEnum.USER_TOPUP.getNotifyUrl());
+        params.setNotify_url(url+LianLianPayEnum.USER_TOPUP.getNotifyUrl());
         params.setReturn_url(returnUrl);
         // 交易发起渠道设置
         params.setFlag_chnl("H5");
@@ -324,7 +328,7 @@ public class LLPayUtils {
         匿名用户：ANONYMOUS
          */
         params.setUser_type("REGISTERED");
-        params.setNotify_url(llGeneralConsumeQuery.getNotifyUrl());
+        params.setNotify_url(url+llGeneralConsumeQuery.getNotifyUrl());
         params.setReturn_url(llGeneralConsumeQuery.getReturnUrl());
         // 交易发起渠道设置
         params.setFlag_chnl("H5");
@@ -459,7 +463,7 @@ public class LLPayUtils {
         params.setUser_id(llTiedCardQuery.getUserId());
         params.setTxn_seqno(IdUtils.getSnowflakeNextIdStr());
         params.setTxn_time(timestamp);
-        params.setNotify_url(LianLianPayEnum.BIND_CARD_APPLY.getNotifyUrl());
+        params.setNotify_url(url+LianLianPayEnum.BIND_CARD_APPLY.getNotifyUrl());
         // 设置银行卡号
         params.setLinked_acctno(llTiedCardQuery.getLinkedAcctno());
         // 设置绑卡手机号

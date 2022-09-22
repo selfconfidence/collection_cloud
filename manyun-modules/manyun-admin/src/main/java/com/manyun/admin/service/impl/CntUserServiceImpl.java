@@ -84,7 +84,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> imple
                         .notIn(
                                 cntConsignmentList.size()>0,
                                 CntOrder::getId,
-                                cntConsignmentList
+                                cntConsignmentList.parallelStream().map(CntConsignment::getOrderId).collect(Collectors.toList())
                         )
         ).parallelStream().collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getUserId()))), ArrayList::new));
         return TableDataInfoUtil.pageTableDataInfo(userMoneyVos.parallelStream().map(m->{
