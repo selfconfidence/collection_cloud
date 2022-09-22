@@ -274,6 +274,7 @@ public class LLPayNotifyController {
     @ResponseBody
     @ApiOperation(value = "盲盒藏品支付",hidden = true)
     public String collectionJoinBoxNotify(HttpServletRequest req) throws IOException {
+        log.info("进入连连盲盒藏品支付回调");
         String sign = req.getHeader("Signature-Data");
         //获取request的输入流，并设置格式为UTF-8
         BufferedReader streamReader = new BufferedReader(new InputStreamReader(req.getInputStream(), "UTF-8"));
