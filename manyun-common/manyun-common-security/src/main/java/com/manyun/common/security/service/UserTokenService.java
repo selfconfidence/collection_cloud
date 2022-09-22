@@ -168,9 +168,8 @@ public class UserTokenService
         // 判定之前是否有过登录痕迹?
         if (redisService.hasKey(loginTokenLogs)) {
             // 有的话,清理之前的
-            Object serviceCacheObject = redisService.getCacheObject(loginTokenLogs);
             redisService.deleteObject(loginTokenLogs);
-            redisService.deleteObject(getTokenKey(serviceCacheObject.toString()));
+            redisService.deleteObject(getTokenKey(loginUser.getToken()));
         }
         loginUser.setLoginTime(System.currentTimeMillis());
         loginUser.setExpireTime(loginUser.getLoginTime() + expireTime * MILLIS_MINUTE);
