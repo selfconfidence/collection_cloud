@@ -7,10 +7,7 @@ package com.manyun.common.pays.utils.llpay.config;
  */
 public class LLianPayConstant {
     // 连连账户+ 公钥（无需进行替换）
-    public final static String LLianPayPublicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCuS7600xdM7dddfKCim2cy1z8P\n" +
-            "BqK1ylTH9qFshILXm0UmviC8sE1nZCLvVry+tdiG/SFtckyRPmoaA5Uypx30CZp+\n" +
-            "Tz6VkYOrTpNMl53ITzdTOtVs5n08mM/A/8pgVJqxO9NU5bj07Xw5754ZCcynwjXI\n" +
-            "pOfl20tMHWMw3oOKwQIDAQAB";
+    public final static String LLianPayPublicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCSS/DiwdCf/aZsxxcacDnooGph3d2JOj5GXWi+q3gznZauZjkNP8SKl3J2liP0O6rU/Y/29+IUe+GTMhMOFJuZm1htAtKiu5ekW0GlBMWxf4FPkYlQkPE0FtaoMP3gYfh+OwI+fIRrpW3ySn3mScnc6Z700nU/VYrRkfcSCbSnRwIDAQAB";
     // 商户系统（服务器）私钥（测试环境无需替换，正式环境需要替换）
     // 目前配置的为测试商户号：2020042200284052 的私钥，需要替换成商户自己的私钥
     public final static String MerchantPrivateKey = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAK5LvrTTF0zt1118\n" +
