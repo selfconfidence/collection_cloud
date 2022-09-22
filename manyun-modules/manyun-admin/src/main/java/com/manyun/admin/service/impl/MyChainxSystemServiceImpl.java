@@ -46,7 +46,7 @@ public class MyChainxSystemServiceImpl  implements  MyChainxSystemService
         PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
         List<MyChainxVo> myChainxVos = userCollectionService.myChainxList();
         return TableDataInfoUtil.pageTableDataInfo(myChainxVos.stream().map(m->{
-            m.setMediaVos(mediaService.initMediaVos(m.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
+            m.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(m.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
             return m;
         }).collect(Collectors.toList()),myChainxVos);
     }
