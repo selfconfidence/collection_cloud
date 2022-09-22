@@ -15,5 +15,6 @@ public class LLInnerUserQuery {
     private String cartNo;
     //ios Android h5 表单提交之后跳转回app的地址
     private String returnUrl;
-
+    //回调地址
+    private String notifyurl;
 }

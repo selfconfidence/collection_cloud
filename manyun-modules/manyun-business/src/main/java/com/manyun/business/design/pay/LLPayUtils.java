@@ -59,9 +59,6 @@ public class LLPayUtils {
     //随机因子获取
     private final static String getRandom = "https://accpapi.lianlianpay.com/v1/acctmgr/get-random";
 
-    @Value("{open.url}")
-    private static String url;
-
     //使用时,需确认用户实名状况,必须是实名用户
     /**
      * 开户
@@ -93,7 +90,7 @@ public class LLPayUtils {
         // 交易完成回跳页面地址，H5/PC渠道必传。
         params.setReturn_url(innerUserQuery.getReturnUrl());
         // 交易结果异步通知接收地址，建议HTTPS协议。
-        params.setNotify_url(url+LianLianPayEnum.INNER_USER.getNotifyUrl());
+        params.setNotify_url(innerUserQuery.getNotifyurl());
         /*
         用户类型。
         INNERUSER：个人用户
@@ -150,7 +147,7 @@ public class LLPayUtils {
      * @param   amount 提现金额
      * @param   val 提现手续费 百分比
      */
-    public static Map<String,String> withdraw(String userId, String passWord, BigDecimal amount,BigDecimal val) {
+    public static Map<String,String> withdraw(String userId, String passWord, BigDecimal amount,BigDecimal val, String notifyUrl) {
         List<LinkedAcctlist> linkedAcctlists = LLPayUtils.queryLinkedacct(userId);
         Assert.isTrue(linkedAcctlists.size()>0,"请求参数有误!");
         Assert.isTrue(amount.compareTo(BigDecimal.valueOf(1)) > 0, "提现金额需大于1元");
@@ -159,7 +156,7 @@ public class LLPayUtils {
         String timestamp = LLianPayDateUtils.getTimestamp();
         params.setTimestamp(timestamp);
         params.setOid_partner(LLianPayConstant.OidPartner);
-        params.setNotify_url(url+LianLianPayEnum.WITHDRAW.getNotifyUrl());
+        params.setNotify_url(notifyUrl);
         params.setRisk_item("");
         params.setLinked_agrtno(linkedAcctlists.parallelStream().map(LinkedAcctlist::getLinked_agrtno).findFirst().get());
 
@@ -250,8 +247,9 @@ public class LLPayUtils {
      * @param ipAddr
      * @param amount 充值金额
      * @param returnUrl ios Android h5 表单提交之后跳转回app的地址
+     * @param notifyUrl 回调地址
      */
-    public static String userTopup(String userId, String realName, String phone, String cartNo,  String ipAddr, BigDecimal amount, String returnUrl) {
+    public static String userTopup(String userId, String realName, String phone, String cartNo,  String ipAddr, BigDecimal amount, String returnUrl ,String notifyUrl) {
         CashierPayCreateParams params = new CashierPayCreateParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
         params.setTimestamp(timestamp);
@@ -265,7 +263,7 @@ public class LLPayUtils {
         匿名用户：ANONYMOUS
          */
         params.setUser_type("REGISTERED");
-        params.setNotify_url(url+LianLianPayEnum.USER_TOPUP.getNotifyUrl());
+        params.setNotify_url(notifyUrl);
         params.setReturn_url(returnUrl);
         // 交易发起渠道设置
         params.setFlag_chnl("H5");
@@ -329,7 +327,7 @@ public class LLPayUtils {
         匿名用户：ANONYMOUS
          */
         params.setUser_type("REGISTERED");
-        params.setNotify_url(url+llGeneralConsumeQuery.getNotifyUrl());
+        params.setNotify_url(llGeneralConsumeQuery.getNotifyUrl());
         params.setReturn_url(llGeneralConsumeQuery.getReturnUrl());
         // 交易发起渠道设置
         params.setFlag_chnl("H5");
@@ -464,7 +462,7 @@ public class LLPayUtils {
         params.setUser_id(llTiedCardQuery.getUserId());
         params.setTxn_seqno(IdUtils.getSnowflakeNextIdStr());
         params.setTxn_time(timestamp);
-        params.setNotify_url(url+LianLianPayEnum.BIND_CARD_APPLY.getNotifyUrl());
+        params.setNotify_url(LianLianPayEnum.BIND_CARD_APPLY.getNotifyUrl());
         // 设置银行卡号
         params.setLinked_acctno(llTiedCardQuery.getLinkedAcctno());
         // 设置绑卡手机号
