@@ -186,7 +186,7 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
                 //openSuccess(cntUserTars);
 
                 //是否中奖
-                List<CntUserTar> successUserTar = cntUserTars.parallelStream().filter(item -> CEN_YES_TAR.getCode().equals(nowTimeIndex(cntTar.getTarPro()))).collect(Collectors.toList());
+                List<CntUserTar> successUserTar = cntUserTars.parallelStream().filter(item -> CEN_YES_TAR.getCode().equals(nowTimeIndex(cntTar.getTarPro())) || CEN_YES_TAR.getCode().equals( item.getIsFull()) ).collect(Collectors.toList());
                 if (!successUserTar.isEmpty())
                     openSuccess(successUserTar);
 
