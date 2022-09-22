@@ -38,25 +38,25 @@ import java.util.*;
 public class LLPayUtils {
 
     //开户
-    private final static String openacctApply = "https://accpgw-ste.lianlianpay-inc.com/v1/acctmgr/openacct-apply";
+    private final static String openacctApply = "https://accpgw.lianlianpay.com/v1/acctmgr/openacct-apply";
     //绑卡申请
-    private final static String individualBindcardApply = "https://accpapi-ste.lianlianpay-inc.com/v1/acctmgr/individual-bindcard-apply";
+    private final static String individualBindcardApply = "https://accpapi.lianlianpay.com/v1/acctmgr/individual-bindcard-apply";
     //绑卡验证
-    private final static String individualBindcardVerify = "https://accpapi-ste.lianlianpay-inc.com/v1/acctmgr/individual-bindcard-verify";
+    private final static String individualBindcardVerify = "https://accpapi.lianlianpay.com/v1/acctmgr/individual-bindcard-verify";
     //提现申请
-    private final static String withdrawal = "https://accpapi-ste.lianlianpay-inc.com/v1/txn/withdrawal";
+    private final static String withdrawal = "https://accpapi.lianlianpay.com/v1/txn/withdrawal";
     //交易二次短信验证
-    private final static String validationSms = "https://accpapi-ste.lianlianpay-inc.com/v1/txn/validation-sms";
+    private final static String validationSms = "https://accpapi.lianlianpay.com/v1/txn/validation-sms";
     //充值丶消费
-    private final static String paycreate = "https://accpgw-ste.lianlianpay-inc.com/v1/cashier/paycreate";
+    private final static String paycreate = "https://accpgw.lianlianpay.com/v1/cashier/paycreate";
     //查询余额
-    private final static String queryAcctinfo = "https://accpapi-ste.lianlianpay-inc.com/v1/acctmgr/query-acctinfo";
+    private final static String queryAcctinfo = "https://accpapi.lianlianpay.com/v1/acctmgr/query-acctinfo";
     //查询绑卡列表
-    private final static String queryLinkedacct = "https://accpapi-ste.lianlianpay-inc.com/v1/acctmgr/query-linkedacct";
+    private final static String queryLinkedacct = "https://accpapi.lianlianpay.com/v1/acctmgr/query-linkedacct";
     //查询资金流水列表
-    private final static String queryAcctserial = "https://accpapi-ste.lianlianpay-inc.com/v1/acctmgr/query-acctserial";
+    private final static String queryAcctserial = "https://accpapi.lianlianpay.com/v1/acctmgr/query-acctserial";
     //随机因子获取
-    private final static String getRandom = "https://accpapi-ste.lianlianpay-inc.com/v1/acctmgr/get-random";
+    private final static String getRandom = "https://accpapi.lianlianpay.com/v1/acctmgr/get-random";
 
     //使用时,需确认用户实名状况,必须是实名用户
     /**
@@ -175,7 +175,7 @@ public class LLPayUtils {
         payerInfo.setPayer_type("USER");
         payerInfo.setPayer_id(userId);
         // 用户：LLianPayTest-In-User-12345 密码：qwerty，本地测试环境测试，没接入密码控件，使用本地加密方法加密密码（仅限测试环境使用）
-        payerInfo.setPassword(LLianPayAccpSignature.getInstance().localEncrypt(passWord));
+        payerInfo.setPassword(passWord);
         params.setPayerInfo(payerInfo);
 
         LLianPayClient lLianPayClient = new LLianPayClient();
