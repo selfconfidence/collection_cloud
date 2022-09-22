@@ -279,7 +279,7 @@ public class LLPayUtils {
                         "\"user_info_id_no\":\"" + cartNo + "\"," +
                         "\"user_info_identify_type\":\"4\"," +
                         "\"user_info_id_type\":\"0\"," +
-                        "\"frms_client_chnl\":\" H5\"," +
+                        "\"frms_client_chnl\":\" 16\"," +
                         "\"frms_ip_addr\":\"" +ipAddr+ "\"," +
                         "\"user_auth_flag\":\"1\"" +
                         "}"
@@ -341,10 +341,10 @@ public class LLPayUtils {
                         "\"user_info_bind_phone\":\"" +llGeneralConsumeQuery.getPhone()+ "\"," +
                         "\"user_info_full_name\":\"" +llGeneralConsumeQuery.getRealName()+ "\"," +
                         "\"user_info_id_no\":\"" + llGeneralConsumeQuery.getCartNo() + "\"," +
-                        "\"user_info_identify_state\":\"0\"," +
+                        "\"user_info_identify_state\":\"1\"," +
                         "\"user_info_identify_type\":\"4\"," +
                         "\"user_info_id_type\":\"0\"," +
-                        "\"frms_client_chnl\":\" H5\"," +
+                        "\"frms_client_chnl\":\" 16\"," +
                         "\"frms_ip_addr\":\"" +llGeneralConsumeQuery.getIpAddr()+ "\"," +
                         "\"user_auth_flag\":\"1\"" +
                         "}"
