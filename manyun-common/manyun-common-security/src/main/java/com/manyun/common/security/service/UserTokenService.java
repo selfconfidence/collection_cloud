@@ -168,8 +168,9 @@ public class UserTokenService
         // 判定之前是否有过登录痕迹?
         if (redisService.hasKey(loginTokenLogs)) {
             // 有的话,清理之前的
+            String userKey = redisService.getCacheObject(loginTokenLogs);
             redisService.deleteObject(loginTokenLogs);
-            redisService.deleteObject(getTokenKey(loginUser.getToken()));
+            redisService.deleteObject(userKey);
         }
         loginUser.setLoginTime(System.currentTimeMillis());
         loginUser.setExpireTime(loginUser.getLoginTime() + expireTime * MILLIS_MINUTE);
@@ -177,7 +178,7 @@ public class UserTokenService
         String userKey = getTokenKey(loginUser.getToken());
         redisService.setCacheObject(userKey, loginUser, expireTime, TimeUnit.MINUTES);
         // 再存一份,用来表示唯一
-        redisService.setCacheObject(getLoginTokenLogs(loginUser.getUserId()), loginUser.getToken(),expireTime, TimeUnit.MINUTES);
+        redisService.setCacheObject(getLoginTokenLogs(loginUser.getUserId()),userKey,expireTime, TimeUnit.MINUTES);
         log.info("登录！！！");
     }
 
