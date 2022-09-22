@@ -51,7 +51,13 @@ public class CntPassonRecordServiceImpl extends ServiceImpl<CntPassonRecordMappe
         passonRecordVo.setToPhoneNo(cntPassonRecord.getNewUserPhone());
         List<MediaVo> mediaVos = mediaService.initMediaVos(cntPassonRecord.getPictureId(), Integer.valueOf(0).toString()
                 .equals(cntPassonRecord.getPictureType()) ? BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE : BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
+        List<MediaVo> thumbnailImgMediaVos = mediaService.thumbnailImgMediaVos(cntPassonRecord.getPictureId(), Integer.valueOf(0).toString()
+                .equals(cntPassonRecord.getPictureType()) ? BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE : BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
+        List<MediaVo> threeDimensionalMediaVos = mediaService.threeDimensionalMediaVos(cntPassonRecord.getPictureId(), Integer.valueOf(0).toString()
+                .equals(cntPassonRecord.getPictureType()) ? BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE : BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
         passonRecordVo.setMediaUrl(mediaVos.get(0).getMediaUrl());
+        passonRecordVo.setThumbnailImg(thumbnailImgMediaVos.size()>0?thumbnailImgMediaVos.get(0).getMediaUrl():"");
+        passonRecordVo.setThreeDimensionalImg(threeDimensionalMediaVos.size()>0?threeDimensionalMediaVos.get(0).getMediaUrl():"");
         passonRecordVo.setGoodsName(cntPassonRecord.getGoodsName());
         passonRecordVo.setCreateTime(cntPassonRecord.getCreatedTime());
         return passonRecordVo;

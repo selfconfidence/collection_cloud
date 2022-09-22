@@ -24,6 +24,12 @@ public class CollectionVo implements Serializable {
     @ApiModelProperty("藏品主图")
     private List<MediaVo> mediaVos;
 
+    @ApiModelProperty("藏品缩略图")
+    private List<MediaVo> thumbnailImgMediaVos;
+
+    @ApiModelProperty("藏品3D图")
+    private List<MediaVo> threeDimensionalMediaVos;
+
     @ApiModelProperty("系列")
     private CateVo cateVo;
 

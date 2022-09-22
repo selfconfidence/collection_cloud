@@ -285,6 +285,8 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         // 数据组合
         List<UserBoxVo> tarData = userBoxList.parallelStream().map(item -> {
             item.setMediaVos(mediaService.initMediaVos(item.getBoxId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+            item.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(item.getBoxId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+            item.setThreeDimensionalMediaVos(mediaService.threeDimensionalMediaVos(item.getBoxId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
             return item;
         }).collect(Collectors.toList());
         return TableDataInfoUtil.pageTableDataInfo(tarData,userBoxList);
@@ -322,7 +324,14 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
 
         msgService.saveMsgThis(MsgThisDto.builder().userId(userId).msgForm(info).msgTitle(format).build());
         msgService.saveCommMsg(MsgCommDto.builder().msgTitle(format).msgForm(format).build());
-        return OpenBoxCollectionVo.builder().info(info).collectionName(luckCollection.getCollectionName()).mediaVos(mediaService.initMediaVos(luckCollection.getCollectionId(),COLLECTION_MODEL_TYPE)).build();
+        return OpenBoxCollectionVo
+                .builder()
+                .info(info)
+                .collectionName(luckCollection.getCollectionName())
+                .mediaVos(mediaService.initMediaVos(luckCollection.getCollectionId(),COLLECTION_MODEL_TYPE))
+                .thumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(luckCollection.getCollectionId(),COLLECTION_MODEL_TYPE))
+                .threeDimensionalMediaVos(mediaService.threeDimensionalMediaVos(luckCollection.getCollectionId(),COLLECTION_MODEL_TYPE))
+                .build();
     }
 
     @Override
@@ -478,6 +487,8 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         }
         // 需要集成图片服务
         boxListVo.setMediaVos(mediaService.initMediaVos(box.getId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+        boxListVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(box.getId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+        boxListVo.setThreeDimensionalMediaVos(mediaService.threeDimensionalMediaVos(box.getId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
         return boxListVo;
 
     }

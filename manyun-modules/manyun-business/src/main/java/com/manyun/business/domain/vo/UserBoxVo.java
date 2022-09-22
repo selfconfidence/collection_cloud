@@ -45,6 +45,12 @@ public class UserBoxVo  implements Serializable {
     @ApiModelProperty("盲盒主图")
     private List<MediaVo> mediaVos;
 
+    @ApiModelProperty("盲盒缩略图")
+    private List<MediaVo> thumbnailImgMediaVos;
+
+    @ApiModelProperty("盲盒3D图")
+    private List<MediaVo> threeDimensionalMediaVos;
+
     @ApiModelProperty("盲盒详情")
     private String boxInfo;
 

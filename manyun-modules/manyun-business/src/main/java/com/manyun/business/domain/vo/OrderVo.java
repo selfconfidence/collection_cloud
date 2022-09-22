@@ -8,6 +8,7 @@ import lombok.Data;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @ApiModel("订单返回视图")
@@ -34,6 +35,12 @@ public class OrderVo implements Serializable {
 
     @ApiModelProperty("商品图片")
     private String goodsImg;
+
+    @ApiModelProperty("商品缩略图")
+    private String thumbnailImg;
+
+    @ApiModelProperty("商品3D图")
+    private String threeDimensionalImg;
 
     @ApiModelProperty("商品类型;0藏品，1盲盒")
     private Integer goodsType;

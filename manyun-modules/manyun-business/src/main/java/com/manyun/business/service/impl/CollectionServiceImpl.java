@@ -282,7 +282,18 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         PageHelper.startPage(useAssertQuery.getPageNum(),useAssertQuery.getPageSize());
         List<UserCollectionVo> userCollectionVos =  userCollectionService.userCollectionPageList(userId,useAssertQuery.getCommName());
         // 组合数据
-        return TableDataInfoUtil.pageTableDataInfo(userCollectionVos.parallelStream().map(item -> {item.setMediaVos(mediaService.initMediaVos(item.getCollectionId(),COLLECTION_MODEL_TYPE)); return item;}).collect(Collectors.toList()),userCollectionVos);
+        return TableDataInfoUtil
+                .pageTableDataInfo(
+                        userCollectionVos
+                                .parallelStream()
+                                .map(item ->
+                                {
+                                    item.setMediaVos(mediaService.initMediaVos(item.getCollectionId(),COLLECTION_MODEL_TYPE));
+                                    item.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(item.getCollectionId(),COLLECTION_MODEL_TYPE));
+                                    item.setThreeDimensionalMediaVos(mediaService.threeDimensionalMediaVos(item.getCollectionId(),COLLECTION_MODEL_TYPE));
+                                    return item;
+                                }
+                                ).collect(Collectors.toList()),userCollectionVos);
     }
 
     /**
@@ -392,15 +403,27 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         cntCollectionMaps.forEach((key,val)->{
             for (CntCollection cntCollection : val) {
                 List<MediaVo> tempMediaVoList = null;
+                List<MediaVo> thumbnailImgMediaVos = null;
+                List<MediaVo> threeDimensionalMediaVos = null;
                 if ((tempMediaVoList = meMaps.get(cntCollection.getId())) == null){
                     tempMediaVoList = mediaService.initMediaVos(cntCollection.getId(),COLLECTION_MODEL_TYPE);
                     meMaps.put(cntCollection.getId(), tempMediaVoList);
+                }
+                if ((thumbnailImgMediaVos = meMaps.get(cntCollection.getId())) == null){
+                    thumbnailImgMediaVos = mediaService.thumbnailImgMediaVos(cntCollection.getId(),COLLECTION_MODEL_TYPE);
+                    meMaps.put(cntCollection.getId(), thumbnailImgMediaVos);
+                }
+                if ((threeDimensionalMediaVos = meMaps.get(cntCollection.getId())) == null){
+                    threeDimensionalMediaVos = mediaService.threeDimensionalMediaVos(cntCollection.getId(),COLLECTION_MODEL_TYPE);
+                    meMaps.put(cntCollection.getId(), threeDimensionalMediaVos);
                 }
                 UserCateCollectionVo userCateCollectionVo = Builder.of(UserCateCollectionVo::new).build();
                 userCateCollectionVo.setCollectionName(cntCollection.getCollectionName());
                 userCateCollectionVo.setId(cntCollection.getId());
                 userCateCollectionVo.setUserCollectionId(key);
                 userCateCollectionVo.setMediaVos(tempMediaVoList);
+                userCateCollectionVo.setThumbnailImgMediaVos(thumbnailImgMediaVos);
+                userCateCollectionVo.setThreeDimensionalMediaVos(threeDimensionalMediaVos);
                 userCateCollectionVoList.add(userCateCollectionVo);
             }
         });
@@ -525,6 +548,8 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         }
         collectionVo.setLableVos(initLableVos(CntCollection.getId()));
         collectionVo.setMediaVos(initMediaVos(CntCollection.getId()));
+        collectionVo.setThumbnailImgMediaVos(thumbnailImgMediaVos(CntCollection.getId()));
+        collectionVo.setThreeDimensionalMediaVos(threeDimensionalMediaVos(CntCollection.getId()));
         collectionVo.setCnfCreationdVo(initCnfCreationVo(CntCollection.getBindCreation()));
         collectionVo.setCateVo(initCateVo(CntCollection.getCateId()));
         return collectionVo;
@@ -545,6 +570,8 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         UserCollectionForVo userCollectionForVo = Builder.of(UserCollectionForVo::new).build();
         UserCollectionVo userCollectionVo = userCollectionService.userCollectionById(id);
         userCollectionVo.setMediaVos(initMediaVos(userCollectionVo.getCollectionId()));
+        userCollectionVo.setThumbnailImgMediaVos(thumbnailImgMediaVos(userCollectionVo.getCollectionId()));
+        userCollectionVo.setThreeDimensionalMediaVos(threeDimensionalMediaVos(userCollectionVo.getCollectionId()));
         // 增加流转记录信息
         userCollectionForVo.setUserCollectionVo(userCollectionVo);
         userCollectionForVo.setStepVos(initStepVo(userCollectionVo.getLinkAddr(),COLLECTION_MODEL_TYPE));
@@ -630,6 +657,24 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
      */
     private List<MediaVo> initMediaVos(String collectionId) {
       return  mediaService.initMediaVos(collectionId, COLLECTION_MODEL_TYPE);
+    }
+
+    /**
+     * 根据藏品编号 缩略图
+     * @param collectionId
+     * @return
+     */
+    private List<MediaVo> thumbnailImgMediaVos(String collectionId) {
+        return  mediaService.thumbnailImgMediaVos(collectionId, COLLECTION_MODEL_TYPE);
+    }
+
+    /**
+     * 根据藏品编号 3D图
+     * @param collectionId
+     * @return
+     */
+    private List<MediaVo> threeDimensionalMediaVos(String collectionId) {
+        return  mediaService.threeDimensionalMediaVos(collectionId, COLLECTION_MODEL_TYPE);
     }
 
     /**

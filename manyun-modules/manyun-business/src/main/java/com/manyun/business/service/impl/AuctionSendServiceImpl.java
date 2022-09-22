@@ -215,12 +215,14 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
             auctionSendVo.setEndPayTime(auctionSend.getEndPayTime());
         }
         if (auctionSend.getGoodsType() == 1) {
-            List<MediaVo> mediaVos = mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
-            auctionSendVo.setMediaVos(mediaVos);
+            auctionSendVo.setMediaVos(mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
+            auctionSendVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
+            auctionSendVo.setThreeDimensionalMediaVos(mediaService.threeDimensionalMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
         }
         if (auctionSend.getGoodsType() == 2) {
-            List<MediaVo> mediaVos = mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
-            auctionSendVo.setMediaVos(mediaVos);
+            auctionSendVo.setMediaVos(mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+            auctionSendVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+            auctionSendVo.setThreeDimensionalMediaVos(mediaService.threeDimensionalMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
         }
         return auctionSendVo;
     }
@@ -348,9 +350,13 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         BeanUtil.copyProperties(auctionSend, marketVo);
         if (auctionSend.getGoodsType() == 1) {
             marketVo.setMediaVos(mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
+            marketVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
+            marketVo.setThreeDimensionalMediaVos(mediaService.threeDimensionalMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
         }
         if (auctionSend.getGoodsType() == 2) {
             marketVo.setMediaVos(mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+            marketVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+            marketVo.setThreeDimensionalMediaVos(mediaService.threeDimensionalMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
         }
         return marketVo;
     }

@@ -46,6 +46,7 @@ import java.lang.System;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -65,7 +66,7 @@ import static com.manyun.common.core.enums.WxPayEnum.*;
  * 竞价表 服务实现类
  * </p>
  *
- * @author 
+ * @author
  * @since 2022-06-30
  */
 @Service
@@ -345,14 +346,21 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
             myAuctionPriceVo.setMoneyBln(auctionOrder.getMoneyBln());
         }
         String mediaUrl = "";
+        List<MediaVo> thumbnailImgMediaVos = new ArrayList<>();
+        List<MediaVo> threeDimensionalMediaVos = new ArrayList<>();
         if (auctionSend.getGoodsType() == 1) {
             mediaUrl = mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE).get(0).getMediaUrl();
+            thumbnailImgMediaVos = mediaService.thumbnailImgMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
+            threeDimensionalMediaVos = mediaService.threeDimensionalMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
         } else {
             mediaUrl = mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE).get(0).getMediaUrl();
+            thumbnailImgMediaVos = mediaService.thumbnailImgMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
+            threeDimensionalMediaVos = mediaService.threeDimensionalMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
         }
         myAuctionPriceVo.setGoodsName(auctionSend.getGoodsName());
         myAuctionPriceVo.setGoodsImg(mediaUrl);
-
+        myAuctionPriceVo.setThumbnailImg(thumbnailImgMediaVos.size()>0?thumbnailImgMediaVos.get(0).getMediaUrl():"");
+        myAuctionPriceVo.setThreeDimensionalImg(threeDimensionalMediaVos.size()>0?threeDimensionalMediaVos.get(0).getMediaUrl():"");
         return myAuctionPriceVo;
     }
 

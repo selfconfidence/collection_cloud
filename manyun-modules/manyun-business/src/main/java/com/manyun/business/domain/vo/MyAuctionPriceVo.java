@@ -27,6 +27,12 @@ public class MyAuctionPriceVo {
     @ApiModelProperty("竞品图片")
     private String goodsImg;
 
+    @ApiModelProperty("竞价缩略图")
+    private String thumbnailImg;
+
+    @ApiModelProperty("竞价3D图")
+    private String threeDimensionalImg;
+
     @ApiModelProperty("竞品拍卖相关信息")
     private AuctionVo auctionVo;
 

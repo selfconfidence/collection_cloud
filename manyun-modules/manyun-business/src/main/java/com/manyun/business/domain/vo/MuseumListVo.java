@@ -18,4 +18,11 @@ public class MuseumListVo implements Serializable {
 
     @ApiModelProperty("图片地址")
     private String mediaUrl;
+
+    @ApiModelProperty("缩略图地址")
+    private String thumbnailImg;
+
+    @ApiModelProperty("3D图地址")
+    private String threeDimensionalImg;
+
 }

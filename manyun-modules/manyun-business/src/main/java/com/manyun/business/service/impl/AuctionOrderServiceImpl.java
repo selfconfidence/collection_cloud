@@ -117,9 +117,15 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
 
         List<MediaVo> mediaVos = mediaService.initMediaVos(auctionOrderCreateDto.getGoodsId(), Integer.valueOf(1).toString()
                 .equals(auctionOrderCreateDto.getGoodsType()) ? BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE : BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
+        List<MediaVo> thumbnailImgMediaVos = mediaService.thumbnailImgMediaVos(auctionOrderCreateDto.getGoodsId(), Integer.valueOf(1).toString()
+                .equals(auctionOrderCreateDto.getGoodsType()) ? BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE : BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
+        List<MediaVo> threeDimensionalMediaVos = mediaService.threeDimensionalMediaVos(auctionOrderCreateDto.getGoodsId(), Integer.valueOf(1).toString()
+                .equals(auctionOrderCreateDto.getGoodsType()) ? BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE : BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
         if (!mediaVos.isEmpty()) {
             auctionOrder.setGoodsImg(mediaVos.get(0).getMediaUrl());
         }
+        auctionOrder.setThumbnailImg(thumbnailImgMediaVos.size()>0?thumbnailImgMediaVos.get(0).getMediaUrl():"");
+        auctionOrder.setThreeDimensionalImg(threeDimensionalMediaVos.size()>0?threeDimensionalMediaVos.get(0).getMediaUrl():"");
 
         String orderNo = IdUtil.objectId();
         auctionOrder.setOrderNo(orderNo);
