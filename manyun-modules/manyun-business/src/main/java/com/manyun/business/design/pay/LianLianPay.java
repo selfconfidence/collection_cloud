@@ -52,6 +52,7 @@ public class LianLianPay implements RootPayServer {
                             .with(LLGeneralConsumeQuery::setUserId,payInfoDto.getUserId())
                             .with(LLGeneralConsumeQuery::setRealName,money.getRealName())
                             .with(LLGeneralConsumeQuery::setPhone,cntUserDto.getPhone())
+                            .with(LLGeneralConsumeQuery::setCartNo,money.getCartNo())
                             .with(LLGeneralConsumeQuery::setNotifyUrl, payInfoDto.getLianlianPayEnum().getNotifyUrl())
                             .with(LLGeneralConsumeQuery::setIpAddr,payInfoDto.getIpaddr())
                             .with(LLGeneralConsumeQuery::setReturnUrl,payInfoDto.getLianlianPayEnum().getReturnUrl())

@@ -246,11 +246,12 @@ public class LLPayUtils {
      * @param userId 用户id
      * @param realName 用户真实姓名
      * @param phone 手机号
+     * @param cartNo 身份证号
      * @param ipAddr
      * @param amount 充值金额
      * @param returnUrl ios Android h5 表单提交之后跳转回app的地址
      */
-    public static String userTopup(String userId, String realName, String phone, String ipAddr, BigDecimal amount, String returnUrl) {
+    public static String userTopup(String userId, String realName, String phone, String cartNo,  String ipAddr, BigDecimal amount, String returnUrl) {
         CashierPayCreateParams params = new CashierPayCreateParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
         params.setTimestamp(timestamp);
@@ -277,7 +278,7 @@ public class LLPayUtils {
                         "\"user_info_dt_register\":\"" +timestamp+ "\"," +
                         "\"user_info_bind_phone\":\"" +phone+ "\"," +
                         "\"user_info_full_name\":\"" +realName+ "\"," +
-                        "\"user_info_id_no\":\"\"," +
+                        "\"user_info_id_no\":\"" + cartNo + "\"," +
                         "\"user_info_identify_type\":\"4\"," +
                         "\"user_info_id_type\":\"0\"," +
                         "\"frms_client_chnl\":\" H5\"," +
@@ -341,7 +342,7 @@ public class LLPayUtils {
                         "\"user_info_dt_register\":\"" +timestamp+ "\"," +
                         "\"user_info_bind_phone\":\"" +llGeneralConsumeQuery.getPhone()+ "\"," +
                         "\"user_info_full_name\":\"" +llGeneralConsumeQuery.getRealName()+ "\"," +
-                        "\"user_info_id_no\":\"\"," +
+                        "\"user_info_id_no\":\"" + llGeneralConsumeQuery.getCartNo() + "\"," +
                         "\"user_info_identify_state\":\"0\"," +
                         "\"user_info_identify_type\":\"4\"," +
                         "\"user_info_id_type\":\"0\"," +

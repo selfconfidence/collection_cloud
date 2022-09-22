@@ -119,7 +119,7 @@ public class LianLianController {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId,loginBusinessUser.getUserId()));
         Assert.isTrue(Objects.nonNull(money),"请求参数有误!");
-        return R.ok(LLPayUtils.userTopup(loginBusinessUser.getUserId(),money.getRealName(),loginBusinessUser.getCntUser().getPhone(),loginBusinessUser.getIpaddr(),llUserTopupQuery.getAmount(),llUserTopupQuery.getReturnUrl()));
+        return R.ok(LLPayUtils.userTopup(loginBusinessUser.getUserId(),money.getRealName(),loginBusinessUser.getCntUser().getPhone(),money.getCartNo(),loginBusinessUser.getIpaddr(),llUserTopupQuery.getAmount(),llUserTopupQuery.getReturnUrl()));
     }
 
     @GetMapping("/queryAcctinfo")
