@@ -26,6 +26,7 @@ import com.manyun.common.pays.utils.llpay.LLianPayDateUtils;
 import com.manyun.common.pays.utils.llpay.client.LLianPayClient;
 import com.manyun.common.pays.utils.llpay.config.LLianPayConstant;
 import com.manyun.common.pays.utils.llpay.security.LLianPayAccpSignature;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -38,25 +39,25 @@ import java.util.*;
 public class LLPayUtils {
 
     //开户
-    private final static String openacctApply = "https://accpgw-ste.lianlianpay-inc.com/v1/acctmgr/openacct-apply";
+    private final static String openacctApply = "https://accpgw.lianlianpay.com/v1/acctmgr/openacct-apply";
     //绑卡申请
-    private final static String individualBindcardApply = "https://accpapi-ste.lianlianpay-inc.com/v1/acctmgr/individual-bindcard-apply";
+    private final static String individualBindcardApply = "https://accpapi.lianlianpay.com/v1/acctmgr/individual-bindcard-apply";
     //绑卡验证
-    private final static String individualBindcardVerify = "https://accpapi-ste.lianlianpay-inc.com/v1/acctmgr/individual-bindcard-verify";
+    private final static String individualBindcardVerify = "https://accpapi.lianlianpay.com/v1/acctmgr/individual-bindcard-verify";
     //提现申请
-    private final static String withdrawal = "https://accpapi-ste.lianlianpay-inc.com/v1/txn/withdrawal";
+    private final static String withdrawal = "https://accpapi.lianlianpay.com/v1/txn/withdrawal";
     //交易二次短信验证
-    private final static String validationSms = "https://accpapi-ste.lianlianpay-inc.com/v1/txn/validation-sms";
+    private final static String validationSms = "https://accpapi.lianlianpay.com/v1/txn/validation-sms";
     //充值丶消费
-    private final static String paycreate = "https://accpgw-ste.lianlianpay-inc.com/v1/cashier/paycreate";
+    private final static String paycreate = "https://accpgw.lianlianpay.com/v1/cashier/paycreate";
     //查询余额
-    private final static String queryAcctinfo = "https://accpapi-ste.lianlianpay-inc.com/v1/acctmgr/query-acctinfo";
+    private final static String queryAcctinfo = "https://accpapi.lianlianpay.com/v1/acctmgr/query-acctinfo";
     //查询绑卡列表
-    private final static String queryLinkedacct = "https://accpapi-ste.lianlianpay-inc.com/v1/acctmgr/query-linkedacct";
+    private final static String queryLinkedacct = "https://accpapi.lianlianpay.com/v1/acctmgr/query-linkedacct";
     //查询资金流水列表
-    private final static String queryAcctserial = "https://accpapi-ste.lianlianpay-inc.com/v1/acctmgr/query-acctserial";
+    private final static String queryAcctserial = "https://accpapi.lianlianpay.com/v1/acctmgr/query-acctserial";
     //随机因子获取
-    private final static String getRandom = "https://accpapi-ste.lianlianpay-inc.com/v1/acctmgr/get-random";
+    private final static String getRandom = "https://accpapi.lianlianpay.com/v1/acctmgr/get-random";
 
     //使用时,需确认用户实名状况,必须是实名用户
     /**
@@ -89,7 +90,7 @@ public class LLPayUtils {
         // 交易完成回跳页面地址，H5/PC渠道必传。
         params.setReturn_url(innerUserQuery.getReturnUrl());
         // 交易结果异步通知接收地址，建议HTTPS协议。
-        params.setNotify_url(LianLianPayEnum.INNER_USER.getNotifyUrl());
+        params.setNotify_url(innerUserQuery.getNotifyurl());
         /*
         用户类型。
         INNERUSER：个人用户
@@ -146,7 +147,7 @@ public class LLPayUtils {
      * @param   amount 提现金额
      * @param   val 提现手续费 百分比
      */
-    public static Map<String,String> withdraw(String userId, String passWord, BigDecimal amount,BigDecimal val) {
+    public static Map<String,String> withdraw(String userId, String passWord, BigDecimal amount,BigDecimal val, String notifyUrl) {
         List<LinkedAcctlist> linkedAcctlists = LLPayUtils.queryLinkedacct(userId);
         Assert.isTrue(linkedAcctlists.size()>0,"请求参数有误!");
         Assert.isTrue(amount.compareTo(BigDecimal.valueOf(1)) > 0, "提现金额需大于1元");
@@ -155,7 +156,7 @@ public class LLPayUtils {
         String timestamp = LLianPayDateUtils.getTimestamp();
         params.setTimestamp(timestamp);
         params.setOid_partner(LLianPayConstant.OidPartner);
-        params.setNotify_url(LianLianPayEnum.WITHDRAW.getNotifyUrl());
+        params.setNotify_url(notifyUrl);
         params.setRisk_item("");
         params.setLinked_agrtno(linkedAcctlists.parallelStream().map(LinkedAcctlist::getLinked_agrtno).findFirst().get());
 
@@ -175,7 +176,7 @@ public class LLPayUtils {
         payerInfo.setPayer_type("USER");
         payerInfo.setPayer_id(userId);
         // 用户：LLianPayTest-In-User-12345 密码：qwerty，本地测试环境测试，没接入密码控件，使用本地加密方法加密密码（仅限测试环境使用）
-        payerInfo.setPassword(LLianPayAccpSignature.getInstance().localEncrypt(passWord));
+        payerInfo.setPassword(passWord);
         params.setPayerInfo(payerInfo);
 
         LLianPayClient lLianPayClient = new LLianPayClient();
@@ -242,11 +243,13 @@ public class LLPayUtils {
      * @param userId 用户id
      * @param realName 用户真实姓名
      * @param phone 手机号
+     * @param cartNo 身份证号
      * @param ipAddr
      * @param amount 充值金额
      * @param returnUrl ios Android h5 表单提交之后跳转回app的地址
+     * @param notifyUrl 回调地址
      */
-    public static String userTopup(String userId, String realName, String phone, String ipAddr, BigDecimal amount, String returnUrl) {
+    public static String userTopup(String userId, String realName, String phone, String cartNo,  String ipAddr, String registerTime, BigDecimal amount, String returnUrl ,String notifyUrl) {
         CashierPayCreateParams params = new CashierPayCreateParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
         params.setTimestamp(timestamp);
@@ -260,7 +263,7 @@ public class LLPayUtils {
         匿名用户：ANONYMOUS
          */
         params.setUser_type("REGISTERED");
-        params.setNotify_url(LianLianPayEnum.USER_TOPUP.getNotifyUrl());
+        params.setNotify_url(notifyUrl);
         params.setReturn_url(returnUrl);
         // 交易发起渠道设置
         params.setFlag_chnl("H5");
@@ -270,13 +273,13 @@ public class LLPayUtils {
                         "\"frms_ware_category\":\"4007\"," +
                         "\"goods_name\":\"用户充值\"," +
                         "\"user_info_mercht_userno\":\"" +userId+ "\"," +
-                        "\"user_info_dt_register\":\"" +timestamp+ "\"," +
+                        "\"user_info_dt_register\":\"" +registerTime+ "\"," +
                         "\"user_info_bind_phone\":\"" +phone+ "\"," +
                         "\"user_info_full_name\":\"" +realName+ "\"," +
-                        "\"user_info_id_no\":\"\"," +
+                        "\"user_info_id_no\":\"" + cartNo + "\"," +
                         "\"user_info_identify_type\":\"4\"," +
                         "\"user_info_id_type\":\"0\"," +
-                        "\"frms_client_chnl\":\" H5\"," +
+                        "\"frms_client_chnl\":\" 16\"," +
                         "\"frms_ip_addr\":\"" +ipAddr+ "\"," +
                         "\"user_auth_flag\":\"1\"" +
                         "}"
@@ -334,14 +337,14 @@ public class LLPayUtils {
                         "\"frms_ware_category\":\"4007\"," +
                         "\"goods_name\":\"" +llGeneralConsumeQuery.getGoodsName()+ "\"," +
                         "\"user_info_mercht_userno\":\"" +llGeneralConsumeQuery.getUserId()+ "\"," +
-                        "\"user_info_dt_register\":\"" +timestamp+ "\"," +
+                        "\"user_info_dt_register\":\"" +llGeneralConsumeQuery.getRegisterTime()+ "\"," +
                         "\"user_info_bind_phone\":\"" +llGeneralConsumeQuery.getPhone()+ "\"," +
                         "\"user_info_full_name\":\"" +llGeneralConsumeQuery.getRealName()+ "\"," +
-                        "\"user_info_id_no\":\"\"," +
-                        "\"user_info_identify_state\":\"0\"," +
+                        "\"user_info_id_no\":\"" + llGeneralConsumeQuery.getCartNo() + "\"," +
+                        "\"user_info_identify_state\":\"1\"," +
                         "\"user_info_identify_type\":\"4\"," +
                         "\"user_info_id_type\":\"0\"," +
-                        "\"frms_client_chnl\":\" H5\"," +
+                        "\"frms_client_chnl\":\" 16\"," +
                         "\"frms_ip_addr\":\"" +llGeneralConsumeQuery.getIpAddr()+ "\"," +
                         "\"user_auth_flag\":\"1\"" +
                         "}"

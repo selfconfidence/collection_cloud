@@ -15,10 +15,12 @@ import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.ILogsService;
 import com.manyun.business.service.IMoneyService;
 import com.manyun.business.service.ISystemService;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.enums.LianLianPayEnum;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
@@ -26,6 +28,7 @@ import com.manyun.common.security.utils.SecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -60,6 +63,9 @@ public class LianLianController {
     @Autowired
     private ILogsService logsService;
 
+    @Value("${open.url}")
+    private String url;
+
     @GetMapping("/isAccountOpening")
     @ApiOperation(value = "是否开户",notes = ("已开户   未开户"))
     public R<String> isAccountOpening(){
@@ -87,6 +93,7 @@ public class LianLianController {
                         .with(LLInnerUserQuery::setRealName,money.getRealName())
                         .with(LLInnerUserQuery::setCartNo,money.getCartNo())
                         .with(LLInnerUserQuery::setReturnUrl,innerUserVo.getReturnUrl())
+                        .with(LLInnerUserQuery::setNotifyurl,(url+ LianLianPayEnum.INNER_USER.getNotifyUrl()))
                         .build()
                 )
         );
@@ -103,7 +110,7 @@ public class LianLianController {
     public R<Map<String,String>> withdraw(@RequestBody LLWithdrawQuery llWithdrawQuery) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         BigDecimal val = systemService.getVal(BusinessConstants.SystemTypeConstant.WITHDRAW_CHARGE, BigDecimal.class);
-        return R.ok(LLPayUtils.withdraw(loginBusinessUser.getUserId(),llWithdrawQuery.getPassWord(),llWithdrawQuery.getAmount(),val));
+        return R.ok(LLPayUtils.withdraw(loginBusinessUser.getUserId(),llWithdrawQuery.getPassWord(),llWithdrawQuery.getAmount(),val,(url+LianLianPayEnum.WITHDRAW.getNotifyUrl())));
     }
 
     @PostMapping("/validationSms")
@@ -117,9 +124,19 @@ public class LianLianController {
     @ApiOperation("充值")
     public R<String> userTopup(@RequestBody LLUserTopupQuery llUserTopupQuery) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        CntUserDto cntUser = loginBusinessUser.getCntUser();
         Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId,loginBusinessUser.getUserId()));
         Assert.isTrue(Objects.nonNull(money),"请求参数有误!");
-        return R.ok(LLPayUtils.userTopup(loginBusinessUser.getUserId(),money.getRealName(),loginBusinessUser.getCntUser().getPhone(),loginBusinessUser.getIpaddr(),llUserTopupQuery.getAmount(),llUserTopupQuery.getReturnUrl()));
+        return R.ok(LLPayUtils.userTopup(
+                loginBusinessUser.getUserId(),
+                money.getRealName(),
+                loginBusinessUser.getCntUser().getPhone(),
+                money.getCartNo(),
+                loginBusinessUser.getIpaddr(),
+                DateUtils.getDateToStr(DateUtils.toDate(cntUser.getCreatedTime()),DateUtils.YYYYMMDDHHMMSS),
+                llUserTopupQuery.getAmount(),
+                llUserTopupQuery.getReturnUrl()
+                ,(url+LianLianPayEnum.USER_TOPUP.getNotifyUrl())));
     }
 
     @GetMapping("/queryAcctinfo")

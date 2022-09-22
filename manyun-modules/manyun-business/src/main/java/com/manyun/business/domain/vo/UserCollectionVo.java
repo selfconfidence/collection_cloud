@@ -51,6 +51,12 @@ public class UserCollectionVo  implements Serializable {
     @ApiModelProperty("藏品主图")
     private List<MediaVo> mediaVos;
 
+    @ApiModelProperty("缩略图")
+    private List<MediaVo> thumbnailImgMediaVos;
+
+    @ApiModelProperty("3D图")
+    private List<MediaVo> threeDimensionalMediaVos;
+
     @ApiModelProperty("拥有时间")
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdTime;

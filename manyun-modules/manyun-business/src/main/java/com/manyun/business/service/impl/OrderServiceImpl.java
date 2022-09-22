@@ -32,7 +32,9 @@ import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.LianLianPayEnum;
 import com.manyun.common.core.enums.PayTypeEnum;
 import com.manyun.common.core.enums.ShandePayEnum;
+import com.manyun.common.core.utils.ServletUtils;
 import com.manyun.common.core.utils.StringUtils;
+import com.manyun.common.core.utils.ip.IpUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -137,13 +139,21 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             CntCollection collection = collectionService.getObject().getById(order.getBuiId());
             CntCreationd creation = creationdService.getById(collection.getBindCreation());
             List<MediaVo> mediaVos = mediaService.initMediaVos(order.getBuiId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
+            List<MediaVo> thumbnailImgMediaVos = mediaService.thumbnailImgMediaVos(order.getBuiId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
+            List<MediaVo> threeDimensionalMediaVos = mediaService.threeDimensionalMediaVos(order.getBuiId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
             orderVo.setGoodsImg(mediaVos.get(0).getMediaUrl());
+            orderVo.setThumbnailImg(thumbnailImgMediaVos.size()>0?thumbnailImgMediaVos.get(0).getMediaUrl():"");
+            orderVo.setThreeDimensionalImg(threeDimensionalMediaVos.size()>0?threeDimensionalMediaVos.get(0).getMediaUrl():"");
             orderVo.setBindCreation(creation.getCreationName());
             orderVo.setCreationImg(creation.getHeadImage());
         }
         if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(order.getGoodsType())) {
             List<MediaVo> mediaVos = mediaService.initMediaVos(order.getBuiId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
+            List<MediaVo> thumbnailImgMediaVos = mediaService.thumbnailImgMediaVos(order.getBuiId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
+            List<MediaVo> threeDimensionalMediaVos = mediaService.threeDimensionalMediaVos(order.getBuiId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
             orderVo.setGoodsImg(mediaVos.get(0).getMediaUrl());
+            orderVo.setThumbnailImg(thumbnailImgMediaVos.size()>0?thumbnailImgMediaVos.get(0).getMediaUrl():"");
+            orderVo.setThreeDimensionalImg(threeDimensionalMediaVos.size()>0?threeDimensionalMediaVos.get(0).getMediaUrl():"");
         }
         return orderVo;
     }
@@ -484,7 +494,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                         .serviceCharge(serviceCharge)
                         .lianlianPayEnum(lianLianPayEnum)
                         .goodsName(order.getCollectionName())
-                        .ipaddr(Ipv4Util.LOCAL_IP)
+                        .ipaddr(IpUtils.getIpAddr(ServletUtils.getRequest()))
                         .userId(userId).build());
         // 走这一步如果 是余额支付 那就说明扣款成功了！！！
         order.setMoneyBln(order.getMoneyBln().add(payVo.getMoneyBln()));

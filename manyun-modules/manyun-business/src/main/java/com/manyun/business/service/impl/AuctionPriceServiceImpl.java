@@ -5,6 +5,7 @@ import cn.hutool.core.net.Ipv4Util;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.servlet.ServletUtil;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.design.delay.DelayAbsAspect;
@@ -35,6 +36,8 @@ import com.manyun.common.core.enums.AuctionSendStatus;
 import com.manyun.common.core.enums.AuctionStatus;
 import com.manyun.common.core.enums.LianLianPayEnum;
 import com.manyun.common.core.enums.ShandePayEnum;
+import com.manyun.common.core.utils.ServletUtils;
+import com.manyun.common.core.utils.ip.IpUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
@@ -46,6 +49,7 @@ import java.lang.System;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -65,7 +69,7 @@ import static com.manyun.common.core.enums.WxPayEnum.*;
  * 竞价表 服务实现类
  * </p>
  *
- * @author 
+ * @author
  * @since 2022-06-30
  */
 @Service
@@ -345,14 +349,21 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
             myAuctionPriceVo.setMoneyBln(auctionOrder.getMoneyBln());
         }
         String mediaUrl = "";
+        List<MediaVo> thumbnailImgMediaVos = new ArrayList<>();
+        List<MediaVo> threeDimensionalMediaVos = new ArrayList<>();
         if (auctionSend.getGoodsType() == 1) {
             mediaUrl = mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE).get(0).getMediaUrl();
+            thumbnailImgMediaVos = mediaService.thumbnailImgMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
+            threeDimensionalMediaVos = mediaService.threeDimensionalMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
         } else {
             mediaUrl = mediaService.initMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE).get(0).getMediaUrl();
+            thumbnailImgMediaVos = mediaService.thumbnailImgMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
+            threeDimensionalMediaVos = mediaService.threeDimensionalMediaVos(auctionSend.getGoodsId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
         }
         myAuctionPriceVo.setGoodsName(auctionSend.getGoodsName());
         myAuctionPriceVo.setGoodsImg(mediaUrl);
-
+        myAuctionPriceVo.setThumbnailImg(thumbnailImgMediaVos.size()>0?thumbnailImgMediaVos.get(0).getMediaUrl():"");
+        myAuctionPriceVo.setThreeDimensionalImg(threeDimensionalMediaVos.size()>0?threeDimensionalMediaVos.get(0).getMediaUrl():"");
         return myAuctionPriceVo;
     }
 
@@ -432,7 +443,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                         .wxPayEnum(AUCTION_WECHAT_PAY)
                         .shandePayEnum(shandePayEnum)
                         .lianlianPayEnum(lianLianPayEnum)
-                        .ipaddr(Ipv4Util.LOCAL_IP)
+                        .ipaddr(IpUtils.getIpAddr(ServletUtils.getRequest()))
                         .goodsName(auctionOrder.getGoodsName())
                         .receiveUserId(auctionSend.getUserId())
                         .canTrade(canTrade)
@@ -524,7 +535,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .wxPayEnum(MARGIN_WECHAT_PAY)
                 .shandePayEnum(shandePayEnum)
                 .lianlianPayEnum(lianLianPayEnum)
-                .ipaddr(Ipv4Util.LOCAL_IP)
+                .ipaddr(IpUtils.getIpAddr(ServletUtils.getRequest()))
                 .goodsName(auctionSend.getGoodsName())
                 .userId(payUserId).build());
         auctionMargin1.setMoneyBln(payVo.getMoneyBln());
@@ -644,7 +655,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .canTrade(canTrade)
                 .receiveUserId(auctionSend.getUserId())
                 .serviceCharge(commission)
-                .ipaddr(Ipv4Util.LOCAL_IP)
+                .ipaddr(IpUtils.getIpAddr(ServletUtils.getRequest()))
                 .goodsName(auctionOrder.getGoodsName())
                 .userId(userId).build());
 

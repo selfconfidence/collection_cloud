@@ -162,7 +162,7 @@ public class CntDictServiceImpl implements CntDictService
     @Override
     public R lableDict()
     {
-        return R.ok(lableService.list(Wrappers.<CntLable>lambdaQuery().orderByDesc(CntLable::getCreatedTime)).stream().map(m ->{
+        return R.ok(lableService.list(Wrappers.<CntLable>lambdaQuery().orderByAsc(CntLable::getOrderNum)).stream().map(m ->{
             LableDictVo lableDictVo=new LableDictVo();
             BeanUtil.copyProperties(m,lableDictVo);
             return lableDictVo;

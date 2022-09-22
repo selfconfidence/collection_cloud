@@ -34,6 +34,8 @@ import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.enums.ShandePayEnum;
 import com.manyun.common.core.exception.ServiceException;
+import com.manyun.common.core.utils.ServletUtils;
+import com.manyun.common.core.utils.ip.IpUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -240,7 +242,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
                         .realPayMoney(consignment.getConsignmentPrice())
                         .outHost(hostOut)
                         .goodsName(consignment.getBuiName())
-                        .ipaddr(Ipv4Util.LOCAL_IP)
+                        .ipaddr(IpUtils.getIpAddr(ServletUtils.getRequest()))
                         .shandePayEnum(ShandePayEnum.CONSIGNMENT_SHANDE_PAY)
                         .userId(payUserId).build());
         Order order = orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, hostOut));

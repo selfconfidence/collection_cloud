@@ -565,6 +565,10 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
             museumListVo.setMyGoodsId(userCollection.getId());
             museumListVo.setGoodsId(userCollection.getCollectionId());
             museumListVo.setMediaUrl(mediaService.initMediaVos(userCollection.getCollectionId(), COLLECTION_MODEL_TYPE).get(0).getMediaUrl());
+            List<MediaVo> thumbnailImgMediaVos = mediaService.thumbnailImgMediaVos(userCollection.getCollectionId(), COLLECTION_MODEL_TYPE);
+            List<MediaVo> threeDimensionalMediaVos = mediaService.threeDimensionalMediaVos(userCollection.getCollectionId(), COLLECTION_MODEL_TYPE);
+            museumListVo.setThumbnailImg(thumbnailImgMediaVos.size()>0?thumbnailImgMediaVos.get(0).getMediaUrl():"");
+            museumListVo.setThreeDimensionalImg(threeDimensionalMediaVos.size()>0?threeDimensionalMediaVos.get(0).getMediaUrl():"");
             museumList.add(museumListVo);
         }
         return museumList;

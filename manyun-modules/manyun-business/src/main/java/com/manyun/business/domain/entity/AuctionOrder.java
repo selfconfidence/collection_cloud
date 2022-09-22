@@ -47,6 +47,12 @@ public class AuctionOrder implements Serializable {
     @ApiModelProperty("商品图片")
     private String goodsImg;
 
+    @ApiModelProperty("商品缩略图")
+    private String thumbnailImg;
+
+    @ApiModelProperty("商品3D图")
+    private String threeDimensionalImg;
+
     @ApiModelProperty("送拍id")
     private String sendAuctionId;
 

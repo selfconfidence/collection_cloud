@@ -20,6 +20,12 @@ public class PassonRecordVo {
     @ApiModelProperty("图片链接")
     private String mediaUrl;
 
+    @ApiModelProperty("缩略图链接")
+    private String thumbnailImg;
+
+    @ApiModelProperty("3D图链接")
+    private String threeDimensionalImg;
+
     @ApiModelProperty("商品名称")
     private String goodsName;
 

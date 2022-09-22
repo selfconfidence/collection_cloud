@@ -12,6 +12,7 @@ import com.manyun.common.core.utils.MD5Util;
 import com.manyun.common.core.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -36,6 +37,9 @@ public class ShandePay implements RootPayServer {
 
     @Autowired
     private LianLianPay lianLianPay;
+
+    @Value("${open.url}")
+    private String url;
 
     public static final String defaultReturnUrl = "http://h5.dcalliance.com.cn/";
 
@@ -101,7 +105,7 @@ public class ShandePay implements RootPayServer {
         //商户key1
         String mer_key = "PZWgkPqM09qpDbUngCDdGL5kgg/9jDd3wvZUn87m0CnI6CklVzmtMi2AkXOd7P4xWmEjjzEo5bo="; //活的
         //回调地址
-        String notify_url = shandePayEnum.getNotifyUrl();
+        String notify_url = url + shandePayEnum.getNotifyUrl();
         String return_url = shandePayEnum.getReturnUrl();
         //支付扩展域
         //"userId":"用户在商户下唯一标识 1-10位",
@@ -171,8 +175,5 @@ public class ShandePay implements RootPayServer {
         return url;
     }
 
-    public static void main(String[] args) {
-
-    }
 
 }

@@ -21,6 +21,12 @@ public class SyntheticRecordVo {
     @ApiModelProperty("藏品主图")
     private List<MediaVo> mediaVos;
 
+    @ApiModelProperty("藏品缩略图")
+    private List<MediaVo> thumbnailImgMediaVos;
+
+    @ApiModelProperty("藏品3D图")
+    private List<MediaVo> threeDimensionalMediaVos;
+
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("创建时间")
     private LocalDateTime createdTime;

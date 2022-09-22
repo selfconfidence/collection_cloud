@@ -21,6 +21,10 @@ public class LLGeneralConsumeQuery {
     private String realName;
     //用户手机号
     private String phone;
+    //用户身份证号
+    private String cartNo;
+    //用户注册时间 格式 yyyyMMddHHmmss
+    private String registerTime;
     //ip
     private String ipAddr;
     //ios Android h5 表单提交之后跳转回app的地址

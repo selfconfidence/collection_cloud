@@ -14,8 +14,10 @@ import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.enums.PayTypeEnum;
+import com.manyun.common.core.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -38,6 +40,9 @@ public class LianLianPay implements RootPayServer {
     @Resource
     private RemoteBuiUserService remoteBuiUserService;
 
+    @Value("${open.url}")
+    private String url;
+
     @Override
     public PayVo execPayVo(PayInfoDto payInfoDto) {
 
@@ -52,7 +57,9 @@ public class LianLianPay implements RootPayServer {
                             .with(LLGeneralConsumeQuery::setUserId,payInfoDto.getUserId())
                             .with(LLGeneralConsumeQuery::setRealName,money.getRealName())
                             .with(LLGeneralConsumeQuery::setPhone,cntUserDto.getPhone())
-                            .with(LLGeneralConsumeQuery::setNotifyUrl, payInfoDto.getLianlianPayEnum().getNotifyUrl())
+                            .with(LLGeneralConsumeQuery::setCartNo,money.getCartNo())
+                            .with(LLGeneralConsumeQuery::setRegisterTime, DateUtils.getDateToStr(DateUtils.toDate(cntUserDto.getCreatedTime()),DateUtils.YYYYMMDDHHMMSS))
+                            .with(LLGeneralConsumeQuery::setNotifyUrl, url+payInfoDto.getLianlianPayEnum().getNotifyUrl())
                             .with(LLGeneralConsumeQuery::setIpAddr,payInfoDto.getIpaddr())
                             .with(LLGeneralConsumeQuery::setReturnUrl,payInfoDto.getLianlianPayEnum().getReturnUrl())
                             .with(LLGeneralConsumeQuery::setPayeeUserId, payInfoDto.getReceiveUserId())

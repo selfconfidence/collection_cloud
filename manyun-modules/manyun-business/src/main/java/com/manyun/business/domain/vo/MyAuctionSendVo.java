@@ -34,6 +34,12 @@ public class MyAuctionSendVo {
     @ApiModelProperty("商品图片信息")
     private List<MediaVo> mediaVos;
 
+    @ApiModelProperty("商品缩略图信息")
+    private List<MediaVo> thumbnailImgMediaVos;
+
+    @ApiModelProperty("商品3D图信息")
+    private List<MediaVo> threeDimensionalMediaVos;
+
     @ApiModelProperty("起拍价")
     private BigDecimal startPrice;
 

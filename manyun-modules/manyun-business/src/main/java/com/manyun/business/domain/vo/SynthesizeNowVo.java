@@ -14,4 +14,10 @@ public class SynthesizeNowVo {
     @ApiModelProperty("目标藏品主图")
     private List<MediaVo> mediaVos;
 
+    @ApiModelProperty("目标藏品缩略图")
+    private List<MediaVo> thumbnailImgMediaVos;
+
+    @ApiModelProperty("目标藏品3D图")
+    private List<MediaVo> threeDimensionalMediaVos;
+
 }

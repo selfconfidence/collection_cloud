@@ -213,6 +213,8 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
         //获取本次合成的藏品及图片信息
         CntCollection collection = collectionService.getById(luckCollection.getCollectionId());
         List<MediaVo> mediaVoList = mediaService.initMediaVos(luckCollection.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
+        List<MediaVo> thumbnailImgMediaVos = mediaService.thumbnailImgMediaVos(luckCollection.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
+        List<MediaVo> threeDimensionalMediaVos = mediaService.threeDimensionalMediaVos(luckCollection.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
         Assert.isTrue((Objects.nonNull(collection) || mediaVoList.size()>0),"合成有误,请重试!");
 
         //删除需消耗的合成材料
@@ -276,6 +278,8 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
                     .of(SynthesizeNowVo::new)
                     .with(SynthesizeNowVo::setCollectionName,collection.getCollectionName())
                     .with(SynthesizeNowVo::setMediaVos,mediaVoList)
+                    .with(SynthesizeNowVo::setThumbnailImgMediaVos,thumbnailImgMediaVos)
+                    .with(SynthesizeNowVo::setThreeDimensionalMediaVos,threeDimensionalMediaVos)
                     .build()
             );
     }
@@ -318,8 +322,9 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
     private SyntheticRecordVo syntheticRecordVo(ActionRecord actionRecord) {
         SyntheticRecordVo syntheticRecordVo = Builder.of(SyntheticRecordVo::new).build();
         BeanUtil.copyProperties(actionRecord, syntheticRecordVo);
-        List<MediaVo> mediaVoList = mediaService.initMediaVos(actionRecord.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
-        syntheticRecordVo.setMediaVos(mediaVoList);
+        syntheticRecordVo.setMediaVos(mediaService.initMediaVos(actionRecord.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
+        syntheticRecordVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(actionRecord.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
+        syntheticRecordVo.setThreeDimensionalMediaVos(mediaService.threeDimensionalMediaVos(actionRecord.getCollectionId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
         return syntheticRecordVo;
     }
 
