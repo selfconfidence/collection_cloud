@@ -5,6 +5,7 @@ import cn.hutool.core.net.Ipv4Util;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.servlet.ServletUtil;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.design.delay.DelayAbsAspect;
@@ -35,6 +36,8 @@ import com.manyun.common.core.enums.AuctionSendStatus;
 import com.manyun.common.core.enums.AuctionStatus;
 import com.manyun.common.core.enums.LianLianPayEnum;
 import com.manyun.common.core.enums.ShandePayEnum;
+import com.manyun.common.core.utils.ServletUtils;
+import com.manyun.common.core.utils.ip.IpUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
@@ -440,7 +443,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                         .wxPayEnum(AUCTION_WECHAT_PAY)
                         .shandePayEnum(shandePayEnum)
                         .lianlianPayEnum(lianLianPayEnum)
-                        .ipaddr(Ipv4Util.LOCAL_IP)
+                        .ipaddr(IpUtils.getIpAddr(ServletUtils.getRequest()))
                         .goodsName(auctionOrder.getGoodsName())
                         .receiveUserId(auctionSend.getUserId())
                         .canTrade(canTrade)
@@ -532,7 +535,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .wxPayEnum(MARGIN_WECHAT_PAY)
                 .shandePayEnum(shandePayEnum)
                 .lianlianPayEnum(lianLianPayEnum)
-                .ipaddr(Ipv4Util.LOCAL_IP)
+                .ipaddr(IpUtils.getIpAddr(ServletUtils.getRequest()))
                 .goodsName(auctionSend.getGoodsName())
                 .userId(payUserId).build());
         auctionMargin1.setMoneyBln(payVo.getMoneyBln());
@@ -652,7 +655,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .canTrade(canTrade)
                 .receiveUserId(auctionSend.getUserId())
                 .serviceCharge(commission)
-                .ipaddr(Ipv4Util.LOCAL_IP)
+                .ipaddr(IpUtils.getIpAddr(ServletUtils.getRequest()))
                 .goodsName(auctionOrder.getGoodsName())
                 .userId(userId).build());
 

@@ -32,7 +32,9 @@ import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.LianLianPayEnum;
 import com.manyun.common.core.enums.PayTypeEnum;
 import com.manyun.common.core.enums.ShandePayEnum;
+import com.manyun.common.core.utils.ServletUtils;
 import com.manyun.common.core.utils.StringUtils;
+import com.manyun.common.core.utils.ip.IpUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -492,7 +494,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                         .serviceCharge(serviceCharge)
                         .lianlianPayEnum(lianLianPayEnum)
                         .goodsName(order.getCollectionName())
-                        .ipaddr(Ipv4Util.LOCAL_IP)
+                        .ipaddr(IpUtils.getIpAddr(ServletUtils.getRequest()))
                         .userId(userId).build());
         // 走这一步如果 是余额支付 那就说明扣款成功了！！！
         order.setMoneyBln(order.getMoneyBln().add(payVo.getMoneyBln()));
