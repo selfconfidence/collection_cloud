@@ -62,7 +62,7 @@ public class LianLianController {
     @Autowired
     private ILogsService logsService;
 
-    @Value("{open.url}")
+    @Value("${open.url}")
     private String url;
 
     @GetMapping("/isAccountOpening")
