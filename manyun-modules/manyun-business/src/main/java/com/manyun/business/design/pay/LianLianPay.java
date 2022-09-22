@@ -39,7 +39,7 @@ public class LianLianPay implements RootPayServer {
     @Resource
     private RemoteBuiUserService remoteBuiUserService;
 
-    @Value("{open.url}")
+    @Value("${open.url}")
     private String url;
 
     @Override
