@@ -12,7 +12,7 @@ import lombok.Getter;
 public enum LianLianPayEnum
 {
 
-    COLLECTION_BOX_SHANDE_PAY("/prod-api/business/notify_pay/LlPay/collectionJoinBoxNotify", "盲盒藏品支付",""),
+    COLLECTION_BOX_SHANDE_PAY("/business/notify_pay/LlPay/collectionJoinBoxNotify", "盲盒藏品支付",""),
     CONSIGNMENT_SHANDE_PAY("/business/notify_pay/LlPay/consignmentNotify", "寄售支付",""),
     AUCTION_MARGIN_SHANDE_PAY("/business/notify_pay/LlPay/auctionMarginNotify", "保证金支付", ""),
     AUCTION_SHANDE_PAY("/business/notify_pay/LlPay/auctionNotify", "拍卖支付", ""),
