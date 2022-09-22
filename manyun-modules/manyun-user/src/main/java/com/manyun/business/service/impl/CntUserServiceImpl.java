@@ -156,7 +156,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         if (Objects.nonNull(cntUser.getLoginPass()))
         Assert.isTrue(userChangeLoginForm.getOldPass().equals(cntUser.getLoginPass()),"旧密码输入错误,请核实!");
         if (StringUtils.isNotBlank(cntUser.getPayPass())) {
-            Assert.isTrue(cntUser.getPayPass().equals(userChangeLoginForm.getNewPass()), "登录密码不能与支付密码相同");
+            Assert.isFalse(cntUser.getPayPass().equals(userChangeLoginForm.getNewPass()), "登录密码不能与支付密码相同");
         }
         cntUser.setLoginPass(userChangeLoginForm.getNewPass());
         cntUser.updateD(userId);
@@ -168,7 +168,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     public void changePayPass(String userId, UserChangePayPass userChangePayPass) {
         CntUser cntUser = getById(userId);
         if (StringUtils.isNotBlank(cntUser.getLoginPass())) {
-            Assert.isTrue(cntUser.getLoginPass().equals(userChangePayPass.getNewPayPass()), "支付密码不能与登录密码相同");
+            Assert.isFalse(cntUser.getLoginPass().equals(userChangePayPass.getNewPayPass()), "支付密码不能与登录密码相同");
         }
         cntUser.setPayPass(userChangePayPass.getNewPayPass());
         cntUser.updateD(userId);
