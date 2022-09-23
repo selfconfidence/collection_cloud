@@ -11,11 +11,15 @@ import java.math.BigDecimal;
 @ApiModel(value = "连连提现申请请求参数")
 public class LLWithdrawQuery {
 
-    @ApiModelProperty("支付密码")
+    @ApiModelProperty(value = "随机因子key",required = true)
+    @NotBlank(message = "随机因子key!")
+    private String randomKey;
+
+    @ApiModelProperty(value = "支付密码",required = true)
     @NotBlank(message = "支付密码不能为空!")
     private String passWord;
 
-    @ApiModelProperty("提现金额")
+    @ApiModelProperty(value = "提现金额",required = true)
     @NotBlank(message = "提现金额不能为空!")
     private BigDecimal amount;
 
