@@ -110,7 +110,7 @@ public class LianLianController {
     public R<Map<String,String>> withdraw(@RequestBody LLWithdrawQuery llWithdrawQuery) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         BigDecimal val = systemService.getVal(BusinessConstants.SystemTypeConstant.WITHDRAW_CHARGE, BigDecimal.class);
-        return R.ok(LLPayUtils.withdraw(loginBusinessUser.getUserId(),llWithdrawQuery.getPassWord(),llWithdrawQuery.getAmount(),val,(url+LianLianPayEnum.WITHDRAW.getNotifyUrl())));
+        return R.ok(LLPayUtils.withdraw(loginBusinessUser.getUserId(),llWithdrawQuery.getRandomKey(),llWithdrawQuery.getPassWord(),llWithdrawQuery.getAmount(),val,(url+LianLianPayEnum.WITHDRAW.getNotifyUrl())));
     }
 
     @PostMapping("/validationSms")

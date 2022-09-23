@@ -124,7 +124,7 @@ public class CntUserController extends BaseController {
     //调起认证
    @PostMapping("/getCertifyId")
    @ApiOperation(value = "获取认证ID -app",notes = "app 端")
-   public R<String> getCertifyId(@RequestBodyRsa UserAliyunRealForm userAliyunRealForm){
+   public R<String> getCertifyId(@RequestBody UserAliyunRealForm userAliyunRealForm){
        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
        return R.ok(userService.getCertifyId(notNullLoginBusinessUser.getCntUser(),userAliyunRealForm));
    }

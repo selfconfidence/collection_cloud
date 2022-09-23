@@ -142,12 +142,13 @@ public class LLPayUtils {
 
     /**
      * 提现
+     * @param   randomKey 随机因子key
      * @param   userId 用户Id
      * @param   passWord 支付密码
      * @param   amount 提现金额
      * @param   val 提现手续费 百分比
      */
-    public static Map<String,String> withdraw(String userId, String passWord, BigDecimal amount,BigDecimal val, String notifyUrl) {
+    public static Map<String,String> withdraw(String userId,String randomKey, String passWord, BigDecimal amount,BigDecimal val, String notifyUrl) {
         List<LinkedAcctlist> linkedAcctlists = LLPayUtils.queryLinkedacct(userId);
         Assert.isTrue(linkedAcctlists.size()>0,"请求参数有误!");
         Assert.isTrue(amount.compareTo(BigDecimal.valueOf(1)) > 0, "提现金额需大于1元");
@@ -177,6 +178,7 @@ public class LLPayUtils {
         payerInfo.setPayer_id(userId);
         // 用户：LLianPayTest-In-User-12345 密码：qwerty，本地测试环境测试，没接入密码控件，使用本地加密方法加密密码（仅限测试环境使用）
         payerInfo.setPassword(passWord);
+        payerInfo.setRandom_key(randomKey);
         params.setPayerInfo(payerInfo);
 
         LLianPayClient lLianPayClient = new LLianPayClient();
