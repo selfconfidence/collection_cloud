@@ -61,6 +61,7 @@ public class LLPayNotifyController {
     @ResponseBody
     @ApiOperation(value = "连连支付开户回调",hidden = true)
     public String LlInnerUserNotify(HttpServletRequest req) throws IOException {
+        log.info("进入连连支付开户回调--------");
         String sign = req.getHeader("Signature-Data");
         //获取request的输入流，并设置格式为UTF-8
         BufferedReader streamReader = new BufferedReader(new InputStreamReader(req.getInputStream(), "UTF-8"));
@@ -186,6 +187,7 @@ public class LLPayNotifyController {
     @ResponseBody
     @ApiOperation(value = "连连支付消费回调",hidden = true)
     public String LlGeneralConsumeNotify(HttpServletRequest req) throws IOException {
+        log.info("进入连连支付消费回调-------");
         String sign = req.getHeader("Signature-Data");
         //获取request的输入流，并设置格式为UTF-8
         BufferedReader streamReader = new BufferedReader(new InputStreamReader(req.getInputStream(), "UTF-8"));
@@ -326,6 +328,7 @@ public class LLPayNotifyController {
     @ResponseBody
     @ApiOperation(value = "寄售支付",hidden = true)
     public String consignmentNotify(HttpServletRequest req) throws IOException {
+        log.info("进入寄售支付回调----------");
         String sign = req.getHeader("Signature-Data");
         //获取request的输入流，并设置格式为UTF-8
         BufferedReader streamReader = new BufferedReader(new InputStreamReader(req.getInputStream(), "UTF-8"));

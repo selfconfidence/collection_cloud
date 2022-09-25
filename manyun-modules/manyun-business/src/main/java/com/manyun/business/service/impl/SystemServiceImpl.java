@@ -37,7 +37,7 @@ public class SystemServiceImpl extends ServiceImpl<SystemMapper, System> impleme
     @Override
     @Lock("testRedisson")
     public String testRedisson() throws InterruptedException {
-        Thread.sleep(3000);
+        Thread.sleep(8000);
       return getVal(CONSIGNMENT_INFO, String.class);
     }
 }

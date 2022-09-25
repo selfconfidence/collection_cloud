@@ -16,11 +16,11 @@ public @interface Lock {
     /**
      * 锁超时时间，默认5000ms
      */
-    long expireTime() default 5000L;
+    long expireTime() default 15000L;
 
     /**
      * 锁等待时间，默认50ms
      */
-    long waitTime() default 50L;
+    long waitTime() default 6000L;
 
 }
