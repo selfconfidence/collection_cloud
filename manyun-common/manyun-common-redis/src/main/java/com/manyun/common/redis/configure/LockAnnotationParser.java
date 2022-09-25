@@ -2,6 +2,7 @@ package com.manyun.common.redis.configure;
 
 
 import com.manyun.common.core.annotation.Lock;
+import com.manyun.common.core.exception.user.BizException;
 import com.manyun.common.redis.service.LockManager;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -45,12 +46,18 @@ public class LockAnnotationParser {
         if (isEl(value)) {
             value = getByEl(value, point);
         }
-        LockResult lockResult = lockManager.lock(getRealLockKey(value), lock.expireTime(), lock.waitTime());
         try {
-            return point.proceed();
-        } finally {
-            lockManager.unlock(lockResult.getRLock());
+            LockResult lockResult = lockManager.lock(getRealLockKey(value), lock.expireTime(), lock.waitTime(),()-> new BizException("抢购太激烈了,请稍后重试！"));
+            try {
+                return point.proceed();
+            } finally {
+                lockManager.unlock(lockResult.getRLock());
+            }
+        }catch (Exception e){
+            throw  new RuntimeException("抢购太过激烈,请稍后重试");
         }
+
+
     }
 
     /**

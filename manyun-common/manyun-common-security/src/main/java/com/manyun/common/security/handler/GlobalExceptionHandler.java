@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.manyun.common.core.domain.CodeStatus;
 import com.manyun.common.core.exception.auth.NotLoginException;
+import com.manyun.common.core.exception.user.BizException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.BindException;
@@ -135,6 +136,18 @@ public class GlobalExceptionHandler
         log.error(e.getMessage(), e);
         String message = e.getAllErrors().get(0).getDefaultMessage();
         return AjaxResult.error(message);
+    }
+
+
+    /**
+     * 自定义验证异常
+     */
+    @ExceptionHandler(BizException.class)
+    public AjaxResult handleBizException(BizException e)
+    {
+        log.error(e.getMessage(), e);
+        return  AjaxResult.error(201, e.getMessage());
+
     }
 
     /**
