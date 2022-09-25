@@ -43,7 +43,7 @@ public class LockManager {
      * @param exceptionSupplier 加锁失败时抛该异常，传null时加锁失败不抛异常
      * @return LockResult  加锁结果
      */
-    private LockResult lock(String key, long expireTime, long waitTime, Supplier<BizException> exceptionSupplier){
+    public LockResult lock(String key, long expireTime, long waitTime, Supplier<BizException> exceptionSupplier){
         if (waitTime < MIN_WAIT_TIME) {
             waitTime = MIN_WAIT_TIME;
         }
