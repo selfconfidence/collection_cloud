@@ -83,8 +83,15 @@ public class SystemController {
     }
 
     @PostMapping("/testRedisson")
+    @Lock("testRedisson")
     public R<String> testRedisson() throws InterruptedException {
         return R.ok(systemService.testRedisson());
+    }
+
+    @PostMapping("/testRedisson2")
+    @Lock("testRedisson")
+    public R<String> testRedisson2(){
+        return R.ok();
     }
 
 }
