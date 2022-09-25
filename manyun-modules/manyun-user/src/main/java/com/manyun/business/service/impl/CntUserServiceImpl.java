@@ -416,6 +416,9 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         }catch (Exception e){
             CntUser cntUser = getById(userId);
             cntUser.setCertifyId(e.getMessage());
+            cntUser.setH5RealStatus(3);
+            updateById(cntUser);
+            return;
         }
         optimisticRealUser(userId);
     }
