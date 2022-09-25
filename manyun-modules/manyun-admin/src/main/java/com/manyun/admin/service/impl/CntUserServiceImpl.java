@@ -33,6 +33,7 @@ import com.manyun.admin.mapper.CntUserMapper;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.manyun.common.core.constant.BusinessConstants.SystemTypeConstant.USER_TERM_NUMBERS;
 import static com.manyun.common.core.enums.UserRealStatus.OK_REAL;
 
 /**
@@ -208,6 +209,9 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> imple
      */
     @Override
     public UserChildTermsVo childTerms(String userId) {
+        CntSystem userTermNumbers = systemService.getOne(Wrappers.<CntSystem>lambdaQuery().eq(CntSystem::getSystemType, USER_TERM_NUMBERS));
+        String number= null;
+        Assert.isTrue(Objects.nonNull(userTermNumbers) && StrUtil.isNotBlank(number = (userTermNumbers.getSystemVal())),"此功能暂未开放!");
         UserChildTermsVo childTermsVo = Builder.of(UserChildTermsVo::new).build();
         CntUser parentUser = getById(userId);
         Assert.isTrue(Objects.nonNull(parentUser),"暂无此用户,请核实!");
@@ -217,10 +221,11 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> imple
         int realUsers = 0;
         Set<String> parentUserIds = Sets.newHashSet(parentUser.getId());
         Set<String> userChildIds = Sets.newHashSet();
-        while (flag <= 9 ){
+        Integer tempWid = Integer.valueOf(number);
+        while (flag < tempWid ){
             if (parentUserIds.isEmpty()){
                 // 不可能在有了
-                flag = 10;
+                flag = tempWid;
                 break;
             }
             List<CntUser> cntUsers = list(Wrappers.<CntUser>lambdaQuery().select(CntUser::getId,CntUser::getIsReal).in(CntUser::getParentId, parentUserIds));

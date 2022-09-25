@@ -92,7 +92,7 @@ public class CntUserController extends BaseController
     }
 
     @GetMapping("/childTerms/{userId}")
-    @ApiOperation(value = "查询下级10级别相关Apis",notes = "")
+    @ApiOperation(value = "查询下级N级别相关Apis",notes = "")
     public R<UserChildTermsVo> childTerms(@PathVariable String userId){
         return R.ok(cntUserService.childTerms(userId));
     }

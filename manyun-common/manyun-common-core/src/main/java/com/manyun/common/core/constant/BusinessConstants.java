@@ -205,7 +205,10 @@ public interface BusinessConstants {
          */
         String CONSIGNMENT_INFO = "consignment_info";
 
-
+        /**
+         *查询用户几级团队总人数
+         */
+        String USER_TERM_NUMBERS = "user_term_numbers";
 
     }
 
