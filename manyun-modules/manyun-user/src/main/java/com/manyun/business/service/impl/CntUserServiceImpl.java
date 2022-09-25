@@ -415,7 +415,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
             aliRealConfig.checkCertifyIdH5Status(certifyId);
         }catch (Exception e){
             CntUser cntUser = getById(userId);
-            cntUser.setCertifyId(e.getMessage());
+            cntUser.setCertifyId("验证失败,请重试验证!");
             cntUser.setH5RealStatus(3);
             updateById(cntUser);
             return;

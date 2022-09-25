@@ -18,6 +18,7 @@ import com.aliyuncs.cloudauth.model.v20190307.DescribeFaceVerifyRequest;
 import com.aliyuncs.cloudauth.model.v20190307.DescribeFaceVerifyResponse;
 import com.aliyuncs.cloudauth.model.v20190307.InitFaceVerifyRequest;
 import com.aliyuncs.cloudauth.model.v20190307.InitFaceVerifyResponse;
+import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.profile.DefaultProfile;
 import com.manyun.business.domain.form.UserAliyunRealForm;
 import com.manyun.business.domain.vo.AliRealVo;
@@ -92,8 +93,7 @@ public class AliRealConfig {
      * 增强版实人认证 - app双端在调用
      * @param certifyId
      */
-    @SneakyThrows
-    public void checkCertifyIdH5Status(String certifyId){
+    public void checkCertifyIdH5Status(String certifyId) throws ClientException {
 // 等App客户端提交刷脸认证后，在客户端SDK的回调函数中，由客户端通知服务端运行以下代码查询认证结果。
         log.info("开始h5实名认证查询！");
         DescribeFaceVerifyRequest request2 = new DescribeFaceVerifyRequest();

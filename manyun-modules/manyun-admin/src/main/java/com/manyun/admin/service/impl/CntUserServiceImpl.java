@@ -1,8 +1,13 @@
 package com.manyun.admin.service.impl;
 
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.manyun.admin.domain.*;
 import com.manyun.admin.domain.dto.MyBoxDto;
 import com.manyun.admin.domain.dto.MyCollectionDto;
@@ -27,6 +32,8 @@ import com.manyun.admin.mapper.CntUserMapper;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.manyun.common.core.enums.UserRealStatus.OK_REAL;
 
 /**
  * 用户Service业务层处理
@@ -192,6 +199,62 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper,CntUser> imple
             BeanUtils.copyProperties(m,userPhoneExcel);
             return userPhoneExcel;
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * 统计用户数量
+     * @param userId
+     * @return
+     */
+    @Override
+    public UserChildTermsVo childTerms(String userId) {
+        UserChildTermsVo childTermsVo = Builder.of(UserChildTermsVo::new).build();
+        CntUser parentUser = getById(userId);
+        Assert.isTrue(Objects.nonNull(parentUser),"暂无此用户,请核实!");
+        // 把下9级所有得人数查出来 id,is_real这些数据即可
+        int flag = 0;
+        int terms = 0;
+        int realUsers = 0;
+        Set<String> parentUserIds = Sets.newHashSet(parentUser.getId());
+        Set<String> userChildIds = Sets.newHashSet();
+        while (flag <= 9 ){
+            if (parentUserIds.isEmpty()){
+                // 不可能在有了
+                flag = 10;
+                break;
+            }
+            List<CntUser> cntUsers = list(Wrappers.<CntUser>lambdaQuery().select(CntUser::getId,CntUser::getIsReal).in(CntUser::getParentId, parentUserIds));
+            // 得到总人数
+            terms = terms+=cntUsers.size();
+            realUsers = realUsers += cntUsers.parallelStream().filter(item -> OK_REAL.getCode().equals( item.getIsReal())).count();
+            Set<String> childIds = cntUsers.parallelStream().map(item -> item.getId()).collect(Collectors.toSet());
+            parentUserIds = childIds;
+            userChildIds.addAll(childIds);
+            flag ++;
+        }
+        childTermsVo.setTerms(terms);
+        childTermsVo.setRealUsers(realUsers);
+        childTermsVo.setGoSellUsers(useUserIdsShellAssertNumber(userChildIds));
+        return childTermsVo;
+    }
+
+    private int useUserIdsShellAssertNumber(Set<String> userIds){
+        CntSystem system = systemService.getOne(Wrappers.<CntSystem>lambdaQuery().eq(CntSystem::getSystemType, CntSystemEnum.INVITEPEOPLE_ISBUY_GOODS));
+        if (Objects.isNull(system) && StrUtil.isBlank(system.getSystemVal()))
+            return 0;
+        List<CntConsignment> cntConsignmentList = consignmentService.list(Wrappers.<CntConsignment>lambdaQuery().isNotNull(CntConsignment::getOrderId).select(CntConsignment::getOrderId));
+        List<CntOrder> orderList = orderService.list(
+                Wrappers
+                        .<CntOrder>lambdaQuery()
+                        .eq(CntOrder::getOrderStatus, 1)
+                        .eq(StringUtils.isNotBlank(system.getSystemVal()),CntOrder::getBuiId,system.getSystemVal())
+                        .notIn(
+                                cntConsignmentList.size()>0,
+                                CntOrder::getId,
+                                cntConsignmentList.parallelStream().map(CntConsignment::getOrderId).collect(Collectors.toList())
+                        )
+        ).parallelStream().collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getUserId()))), ArrayList::new));
+    return Long.valueOf(orderList.parallelStream().filter(ff->userIds.contains(ff.getUserId())).count()).intValue();
     }
 
 }

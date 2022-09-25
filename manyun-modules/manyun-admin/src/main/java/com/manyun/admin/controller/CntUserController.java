@@ -7,10 +7,7 @@ import com.manyun.admin.domain.dto.MyOrderDto;
 import com.manyun.admin.domain.dto.UpdateBalanceDto;
 import com.manyun.admin.domain.excel.UserPhoneExcel;
 import com.manyun.admin.domain.query.UserMoneyQuery;
-import com.manyun.admin.domain.vo.CntOrderVo;
-import com.manyun.admin.domain.vo.UserBoxVo;
-import com.manyun.admin.domain.vo.UserCollectionVo;
-import com.manyun.admin.domain.vo.UserMoneyVo;
+import com.manyun.admin.domain.vo.*;
 import com.manyun.comm.api.domain.SysUser;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.poi.ExcelUtil;
@@ -93,5 +90,13 @@ public class CntUserController extends BaseController
     {
         return toResult(cntUserService.updateBalance(balanceDto));
     }
+
+    @GetMapping("/childTerms/{userId}")
+    @ApiOperation(value = "查询下级10级别相关Apis",notes = "")
+    public R<UserChildTermsVo> childTerms(@PathVariable String userId){
+        return R.ok(cntUserService.childTerms(userId));
+    }
+
+
 
 }

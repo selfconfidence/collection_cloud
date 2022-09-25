@@ -69,4 +69,6 @@ public interface ICntUserService extends IService<CntUser>
      * @return
      */
     List<UserPhoneExcel> selectUserList();
+
+    UserChildTermsVo childTerms(String userId);
 }

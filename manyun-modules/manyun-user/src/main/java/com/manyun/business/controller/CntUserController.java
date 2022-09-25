@@ -141,7 +141,7 @@ public class CntUserController extends BaseController {
     //调起认证
     @PostMapping("/getH5CertifyId")
     @ApiOperation(value = "获取认证ID -h5",notes = "h5 端 \n version 1.0.1")
-    public R<AliRealVo> getH5CertifyId(@RequestBodyRsa UserAliyunRealForm userAliyunRealForm){
+    public R<AliRealVo> getH5CertifyId(@RequestBody @Valid UserAliyunRealForm userAliyunRealForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(userService.getH5CertifyId(userAliyunRealForm,notNullLoginBusinessUser.getUserId()));
     }
