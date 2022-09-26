@@ -1,5 +1,10 @@
 package com.manyun.gateway.config;
 
+import com.alibaba.csp.sentinel.adapter.gateway.common.SentinelGatewayConstants;
+import com.alibaba.csp.sentinel.adapter.gateway.common.api.ApiDefinition;
+import com.alibaba.csp.sentinel.adapter.gateway.common.api.ApiPathPredicateItem;
+import com.alibaba.csp.sentinel.adapter.gateway.common.api.ApiPredicateItem;
+import com.alibaba.csp.sentinel.adapter.gateway.common.api.GatewayApiDefinitionManager;
 import com.alibaba.csp.sentinel.adapter.gateway.sc.SentinelGatewayFilter;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Bean;
@@ -9,6 +14,10 @@ import org.springframework.core.annotation.Order;
 import com.manyun.gateway.handler.SentinelFallbackHandler;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.codec.support.DefaultServerCodecConfigurer;
+
+import javax.annotation.PostConstruct;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 网关限流配置
@@ -29,5 +38,17 @@ public class GatewayConfig
     @Order(-1)
     public GlobalFilter sentinelGatewayFilter() {
         return new SentinelGatewayFilter();
+    }
+
+    @PostConstruct
+    private void initCustomizedApis(){
+        Set<ApiDefinition> definitions = new HashSet<>();
+        ApiDefinition businessApis = new ApiDefinition("manyun-business_apis")
+                .setPredicateItems(new HashSet<ApiPredicateItem>() {{
+                    add(new ApiPathPredicateItem().setPattern("/**")
+                            .setMatchStrategy(SentinelGatewayConstants.PARAM_MATCH_STRATEGY_PREFIX));
+                }});
+        definitions.add(businessApis);
+        GatewayApiDefinitionManager.loadApiDefinitions(definitions);
     }
 }
