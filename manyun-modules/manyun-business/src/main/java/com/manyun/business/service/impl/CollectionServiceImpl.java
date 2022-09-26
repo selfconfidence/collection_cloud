@@ -261,7 +261,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         commCheckCollection(cntCollection, userId);
         tarCheckCollection(cntCollection, userId);
         postCheckCollection(cntCollection, userId);
-        //realCheckCollection(userId);
+        realCheckCollection(userId);
     }
 
     private void realCheckCollection(String userId) {
@@ -446,8 +446,8 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         Assert.isTrue(CollectionStatus.UP_ACTION.getCode().equals(cntCollection.getStatusBy()),"您来晚了,售罄了!");
 
         //是否有未支付订单
-//        List<Order> orders = orderService.checkUnpaidOrder(userId);
-//        Assert.isFalse(orders.size() > 0 ,"您有未支付订单，暂不可购买");
+        List<Order> orders = orderService.checkUnpaidOrder(userId);
+        Assert.isFalse(orders.size() > 0 ,"您有未支付订单，暂不可购买");
 
     }
 
