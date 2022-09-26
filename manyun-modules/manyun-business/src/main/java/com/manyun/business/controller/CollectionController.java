@@ -99,7 +99,7 @@ public class CollectionController extends BaseController{
     @PostMapping("/sellOrderCollection")
     @ApiOperation(value = "购买藏品_预先_生成订单",notes = "用来预先 生成一个待支付订单,返回订单编号,用来二次提交支付\n version 1.0.1")
     @Lock("sellOrderCollection")
-    public R<String> sellOrderCollection(@RequestBodyRsa @Valid CollectionOrderSellForm collectionOrderSellForm){
+    public R<String> sellOrderCollection(@RequestBody @Valid CollectionOrderSellForm collectionOrderSellForm){
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(collectionService.sellOrderCollection(loginBusinessUser.getUserId(),collectionOrderSellForm));
     }
