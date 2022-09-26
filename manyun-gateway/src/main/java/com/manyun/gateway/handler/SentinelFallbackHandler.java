@@ -17,7 +17,7 @@ public class SentinelFallbackHandler implements WebExceptionHandler
 {
     private Mono<Void> writeResponse(ServerResponse response, ServerWebExchange exchange)
     {
-        return ServletUtils.webFluxResponseWriter(exchange.getResponse(), "系统执行中，请休息会再试");
+        return ServletUtils.webFluxResponseWriter(exchange.getResponse(), "此热品过于火爆,请您稍后重试!");
     }
 
     @Override

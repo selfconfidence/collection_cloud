@@ -1,5 +1,7 @@
 package com.manyun.gateway.config;
 
+import com.alibaba.csp.sentinel.adapter.gateway.sc.SentinelGatewayFilter;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -21,5 +23,11 @@ public class GatewayConfig
     public SentinelFallbackHandler sentinelGatewayExceptionHandler()
     {
         return new SentinelFallbackHandler();
+    }
+
+    @Bean
+    @Order(-1)
+    public GlobalFilter sentinelGatewayFilter() {
+        return new SentinelGatewayFilter();
     }
 }
