@@ -46,8 +46,7 @@ public class GatewayConfig
         ApiDefinition businessApis = new ApiDefinition("manyun-business_apis")
                 .setPredicateItems(new HashSet<ApiPredicateItem>() {{
                     add(new ApiPathPredicateItem().setPattern("/business/collection/sellOrderCollection"));
-                    add(new ApiPathPredicateItem().setPattern("/business/collection/pageList")
-                                    .setMatchStrategy(SentinelGatewayConstants.PARAM_MATCH_STRATEGY_PREFIX));
+                    add(new ApiPathPredicateItem().setPattern("/business/collection/pageList"));
                 }});
         definitions.add(businessApis);
         GatewayApiDefinitionManager.loadApiDefinitions(definitions);
