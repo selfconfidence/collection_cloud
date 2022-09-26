@@ -54,7 +54,10 @@ public class LockAnnotationParser {
                 lockManager.unlock(lockResult.getRLock());
             }
         }catch (Exception e){
-            throw  new RuntimeException("抢购太过激烈,请稍后重试");
+            if (e instanceof BizException) {
+                throw  new RuntimeException("抢购太过激烈,请稍后重试");
+            }
+            throw e;
         }
 
 
