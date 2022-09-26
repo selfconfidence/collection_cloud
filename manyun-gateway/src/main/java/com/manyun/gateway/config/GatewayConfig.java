@@ -6,6 +6,9 @@ import com.alibaba.csp.sentinel.adapter.gateway.common.api.ApiPathPredicateItem;
 import com.alibaba.csp.sentinel.adapter.gateway.common.api.ApiPredicateItem;
 import com.alibaba.csp.sentinel.adapter.gateway.common.api.GatewayApiDefinitionManager;
 import com.alibaba.csp.sentinel.adapter.gateway.sc.SentinelGatewayFilter;
+import com.manyun.gateway.config.properties.SentinelFlowProperties;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +20,9 @@ import org.springframework.http.codec.support.DefaultServerCodecConfigurer;
 
 import javax.annotation.PostConstruct;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 网关限流配置
@@ -25,8 +30,12 @@ import java.util.Set;
  * @author ruoyi
  */
 @Configuration
+@RefreshScope
 public class GatewayConfig
 {
+
+    @Autowired
+    private SentinelFlowProperties sentinelFlowProperties;
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public SentinelFallbackHandler sentinelGatewayExceptionHandler()
@@ -42,13 +51,14 @@ public class GatewayConfig
 
     @PostConstruct
     private void initCustomizedApis(){
-        Set<ApiDefinition> definitions = new HashSet<>();
-        ApiDefinition businessApis = new ApiDefinition("manyun-business_apis")
-                .setPredicateItems(new HashSet<ApiPredicateItem>() {{
-                    add(new ApiPathPredicateItem().setPattern("/business/collection/sellOrderCollection"));
-                    add(new ApiPathPredicateItem().setPattern("/business/collection/pageList"));
-                }});
-        definitions.add(businessApis);
+        List<SentinelFlowProperties.FlowNode> flowNodeLists = sentinelFlowProperties.getFlowNodeLists();
+        if (flowNodeLists.isEmpty())return;
+        Set<ApiDefinition> definitions = new HashSet<>();//new ApiPathPredicateItem().setPattern("/business/collection/sellOrderCollection")
+        for (SentinelFlowProperties.FlowNode flowNode : flowNodeLists) {
+            ApiDefinition commApis = new ApiDefinition(flowNode.getSourceName())
+                    .setPredicateItems(flowNode.getPathUrl().parallelStream().map(item -> new ApiPathPredicateItem().setPattern(item)).collect(Collectors.toSet()));
+            definitions.add(commApis);
+        }
         GatewayApiDefinitionManager.loadApiDefinitions(definitions);
     }
 }

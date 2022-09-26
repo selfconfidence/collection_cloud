@@ -91,6 +91,7 @@ public class AuthFilter implements GlobalFilter, Ordered
 
         // 内部请求来源参数清除
         removeHeader(mutate, SecurityConstants.FROM_SOURCE);
+        log.info("sadsadas", "123123213");
         return chain.filter(exchange.mutate().request(mutate.build()).build());
     }
 
