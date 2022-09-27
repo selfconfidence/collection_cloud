@@ -250,10 +250,12 @@ public class LLPayNotifyController {
                 log.info(String.format("响应验签通过！"));
                 JSONObject resultObj = JSONObject.parseObject(resultSB.toString());
                 JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
+                JSONObject payerInfo = JSONObject.parseObject(resultObj.getString("payerInfo"));
                 log.info("订单信息:============================="+orderInfo.toString());
-                List<ResponsePayerWithDraw> responsePayerList = JSONObject.parseArray(resultObj.getJSONArray("payerInfo").toJSONString(), ResponsePayerWithDraw.class);
-                log.info("付款方信息:============================="+responsePayerList.toString());
-                String payer_id = responsePayerList.parallelStream().filter(f -> f.getPayer_type().equals("USER")).findFirst().get().getPayer_id();
+                /*List<ResponsePayerWithDraw> responsePayerList = JSONObject.parseArray(resultObj.getJSONArray("payerInfo").toJSONString(), ResponsePayerWithDraw.class);
+                log.info("付款方信息:============================="+responsePayerList.toString());*/
+                //String payer_id = responsePayerList.parallelStream().filter(f -> f.getPayer_type().equals("USER")).findFirst().get().getPayer_id();
+                String payer_id = payerInfo.getString("payer_id");
                 log.info("payer_id:============================="+payer_id);
                 String amount = orderInfo.getString("total_amount");
                 log.info("amount:============================="+amount);
