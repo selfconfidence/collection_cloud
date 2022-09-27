@@ -131,7 +131,7 @@ public class LLPayUtils {
      * @param   amount 提现金额
      * @param   val 提现手续费 百分比
      */
-    public static Map<String,String> withdraw(String userId,String randomKey, String passWord, BigDecimal amount,BigDecimal val, String notifyUrl) {
+    public static Map<String,String> withdraw(String userId,String randomKey, String passWord, BigDecimal amount,BigDecimal val, String notifyUrl, String phone, String registerTime) {
         List<LinkedAcctlist> linkedAcctlists = LLPayUtils.queryLinkedacct(userId);
         Assert.isTrue(linkedAcctlists.size()>0,"请求参数有误!");
         Assert.isTrue(amount.compareTo(BigDecimal.valueOf(1)) > 0, "提现金额需大于1元");
@@ -141,7 +141,15 @@ public class LLPayUtils {
         params.setTimestamp(timestamp);
         params.setOid_partner(LLianPayConstant.OidPartner);
         params.setNotify_url(notifyUrl);
-        params.setRisk_item("");
+        params.setRisk_item(
+                "{" +
+                        "\"frms_ware_category\":\"4007\"," +
+                        "\"goods_name\":\"用户提现\"," +
+                        "\"user_info_mercht_userno\":\"" +userId+ "\"," +
+                        "\"user_info_dt_register\":\"" +registerTime+ "\"," +
+                        "\"user_info_bind_phone\":\"" +phone+ "\"," +
+                        "}"
+        );
         params.setLinked_agrtno(linkedAcctlists.parallelStream().map(LinkedAcctlist::getLinked_agrtno).findFirst().get());
 
         // 设置商户订单信息
