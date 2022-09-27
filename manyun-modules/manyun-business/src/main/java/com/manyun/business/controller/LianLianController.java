@@ -15,9 +15,11 @@ import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.ILogsService;
 import com.manyun.business.service.IMoneyService;
 import com.manyun.business.service.ISystemService;
+import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.constant.BusinessConstants;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.LianLianPayEnum;
@@ -63,6 +65,9 @@ public class LianLianController {
     @Autowired
     private ILogsService logsService;
 
+    @Autowired
+    private RemoteBuiUserService userService;
+
     @Value("${open.url}")
     private String url;
 
@@ -79,9 +84,10 @@ public class LianLianController {
     public R<String> innerUser(@RequestBody InnerUserVo innerUserVo){
         Assert.isTrue(StringUtils.isNotBlank(innerUserVo.getReturnUrl()),"请求参数有误!");
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        if(loginBusinessUser.getCntUser().getIsReal()==1)return R.fail("用户暂未实名,请先实名!");
+        R<CntUserDto> cntUserDtoR = userService.commUni(loginBusinessUser.getUserId(), SecurityConstants.INNER);
+        if(cntUserDtoR.getData().getIsReal()==1)return R.fail("用户暂未实名,请先实名!");
         String userId = loginBusinessUser.getUserId();
-        String phone = loginBusinessUser.getCntUser().getPhone();
+        String phone = cntUserDtoR.getData().getPhone();
         Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId,userId));
         Assert.isFalse("1".equals(money.getLlAccountStatus()),"用户已开户!");
         Assert.isTrue(Objects.nonNull(money),"请求参数有误!");
