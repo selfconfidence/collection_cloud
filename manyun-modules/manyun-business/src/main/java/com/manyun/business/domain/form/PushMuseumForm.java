@@ -12,6 +12,5 @@ import java.util.List;
 public class PushMuseumForm {
 
     @ApiModelProperty("我的藏品id集合")
-    @Size(min = 1,message = "最少选择一个!")
     private List<String> collections;
 }

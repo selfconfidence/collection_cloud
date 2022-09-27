@@ -147,7 +147,7 @@ public class CollectionController extends BaseController{
 
     @PostMapping("/pushMuseum")
     @ApiOperation("选择藏品到展馆")
-    public R pushMuseum(@RequestBody @Valid PushMuseumForm pushMuseumForm) {
+    public R pushMuseum(@RequestBody PushMuseumForm pushMuseumForm) {
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         userCollectionService.pushMuseum(pushMuseumForm, notNullLoginBusinessUser.getUserId());
         return R.ok();
