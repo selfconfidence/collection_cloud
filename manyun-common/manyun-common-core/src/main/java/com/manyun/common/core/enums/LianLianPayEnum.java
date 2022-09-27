@@ -19,6 +19,7 @@ public enum LianLianPayEnum
     AUCTION_FIX_SHANDE_PAY("/business/notify_pay/LlPay/auctionFixNotify", "一口价支付", ""),
     INNER_USER("/business/notify_pay/LlPay/LlInnerUserNotify", "连连支付开户回调", ""),
     BIND_CARD_APPLY("/business/notify_pay/LlPay/LlBindCardApplyNotify", "连连支付新增绑卡申请回调", ""),
+    IND_APPLY("/business/notify_pay/LlPay/LlUnlinkedacctIndApplyNotify", "个人用户解绑银行卡回调", ""),
     USER_TOPUP("/business/notify_pay/LlPay/LlUserTopupNotify", "连连支付充值回调", ""),
     GENERAL_CONSUME("/business/notify_pay/LlPay/LlGeneralConsumeNotify", "连连支付消费回调", ""),
     WITHDRAW("/business/notify_pay/LlPay/LlWithdrawNotify", "连连支付提现回调", "");

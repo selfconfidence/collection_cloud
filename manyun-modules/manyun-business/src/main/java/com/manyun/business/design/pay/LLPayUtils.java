@@ -7,10 +7,7 @@ import com.manyun.business.design.pay.bean.OpenacctApplyBasicInfo;
 import com.manyun.business.design.pay.bean.OpenacctApplyParams;
 import com.manyun.business.design.pay.bean.OpenacctApplyResult;
 import com.manyun.business.design.pay.bean.cashier.*;
-import com.manyun.business.design.pay.bean.individual.IndividualBindCardApplyParams;
-import com.manyun.business.design.pay.bean.individual.IndividualBindCardApplyResult;
-import com.manyun.business.design.pay.bean.individual.IndividualBindCardVerifyParams;
-import com.manyun.business.design.pay.bean.individual.IndividualBindCardVerifyResult;
+import com.manyun.business.design.pay.bean.individual.*;
 import com.manyun.business.design.pay.bean.query.*;
 import com.manyun.business.design.pay.bean.random.GetRandomParams;
 import com.manyun.business.design.pay.bean.random.GetRandomResult;
@@ -44,6 +41,8 @@ public class LLPayUtils {
     private final static String individualBindcardApply = "https://accpapi.lianlianpay.com/v1/acctmgr/individual-bindcard-apply";
     //绑卡验证
     private final static String individualBindcardVerify = "https://accpapi.lianlianpay.com/v1/acctmgr/individual-bindcard-verify";
+    //解绑申请
+    private final static String unlinkedacctIndApply = "https://accpapi.lianlianpay.com/v1/acctmgr/unlinkedacct-ind-apply";
     //提现申请
     private final static String withdrawal = "https://accpapi.lianlianpay.com/v1/txn/withdrawal";
     //交易二次短信验证
@@ -125,22 +124,6 @@ public class LLPayUtils {
 
 
     /**
-     * 绑卡
-     * @param llTiedCardQuery
-     */
-    public static void bindCard(LLTiedCardQuery llTiedCardQuery) {
-        LLianPayClient lLianPayClient = new LLianPayClient();
-        // 绑卡申请
-        IndividualBindCardApplyResult bindCardApplyResult = bindCardApply(lLianPayClient,llTiedCardQuery);
-        // 绑卡验证
-        if (!"0000".equals(bindCardApplyResult.getRet_code())) {
-            Assert.isTrue(Boolean.FALSE,"绑卡申请失败，请检查！");
-        }
-        bindCardVerify(lLianPayClient, bindCardApplyResult);
-    }
-
-
-    /**
      * 提现
      * @param   randomKey 随机因子key
      * @param   userId 用户Id
@@ -148,7 +131,7 @@ public class LLPayUtils {
      * @param   amount 提现金额
      * @param   val 提现手续费 百分比
      */
-    public static Map<String,String> withdraw(String userId,String randomKey, String passWord, BigDecimal amount,BigDecimal val, String notifyUrl) {
+    public static Map<String,String> withdraw(String userId,String randomKey, String passWord, BigDecimal amount,BigDecimal val, String notifyUrl, String phone, String registerTime) {
         List<LinkedAcctlist> linkedAcctlists = LLPayUtils.queryLinkedacct(userId);
         Assert.isTrue(linkedAcctlists.size()>0,"请求参数有误!");
         Assert.isTrue(amount.compareTo(BigDecimal.valueOf(1)) > 0, "提现金额需大于1元");
@@ -158,7 +141,15 @@ public class LLPayUtils {
         params.setTimestamp(timestamp);
         params.setOid_partner(LLianPayConstant.OidPartner);
         params.setNotify_url(notifyUrl);
-        params.setRisk_item("");
+        params.setRisk_item(
+                "{" +
+                        "\"frms_ware_category\":\"4007\"," +
+                        "\"goods_name\":\"用户提现\"," +
+                        "\"user_info_mercht_userno\":\"" +userId+ "\"," +
+                        "\"user_info_dt_register\":\"" +registerTime+ "\"," +
+                        "\"user_info_bind_phone\":\"" +phone+ "\"," +
+                        "}"
+        );
         params.setLinked_agrtno(linkedAcctlists.parallelStream().map(LinkedAcctlist::getLinked_agrtno).findFirst().get());
 
         // 设置商户订单信息
@@ -453,50 +444,75 @@ public class LLPayUtils {
 
     /**
      * 个人用户新增绑卡申请
-     * @param lLianPayClient
-     * @return
      */
-    private static IndividualBindCardApplyResult bindCardApply(LLianPayClient lLianPayClient,LLTiedCardQuery llTiedCardQuery) {
+    public static IndividualBindCardApplyResult bindCardApply(String userId, String linkedAcctno, String linkedPhone, String password, String randomKey, String notifyUrl) {
         IndividualBindCardApplyParams params = new IndividualBindCardApplyParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
         params.setTimestamp(timestamp);
         params.setOid_partner(LLianPayConstant.OidPartner);
-        params.setUser_id(llTiedCardQuery.getUserId());
+        params.setUser_id(userId);
         params.setTxn_seqno(IdUtils.getSnowflakeNextIdStr());
         params.setTxn_time(timestamp);
-        params.setNotify_url(LianLianPayEnum.BIND_CARD_APPLY.getNotifyUrl());
+        params.setNotify_url(notifyUrl);
         // 设置银行卡号
-        params.setLinked_acctno(llTiedCardQuery.getLinkedAcctno());
+        params.setLinked_acctno(linkedAcctno);
         // 设置绑卡手机号
-        params.setLinked_phone(llTiedCardQuery.getLinkedPhone());
+        params.setLinked_phone(linkedPhone);
         // 设置钱包密码，正式环境要接密码控件，调试API可以用连连公钥加密密码
-        params.setPassword(LLianPayAccpSignature.getInstance().localEncrypt(llTiedCardQuery.getPassword()));
+        params.setPassword(password);
+        params.setRandom_key(randomKey);
 
+        LLianPayClient lLianPayClient = new LLianPayClient();
         String resultJsonStr = lLianPayClient.sendRequest(individualBindcardApply, JSON.toJSONString(params));
         IndividualBindCardApplyResult bindCardApplyResult = JSON.parseObject(resultJsonStr, IndividualBindCardApplyResult.class);
+        Assert.isTrue("0000".equalsIgnoreCase(bindCardApplyResult.getRet_code()),bindCardApplyResult.getRet_msg());
         return bindCardApplyResult;
     }
 
 
     /**
      * 个人用户新增绑卡验证
-     * @param lLianPayClient
-     * @param bindCardApplyResult
      */
-    private static void bindCardVerify(LLianPayClient lLianPayClient, IndividualBindCardApplyResult bindCardApplyResult) {
+    public static IndividualBindCardVerifyResult bindCardVerify(String userId, String txnSeqno, String token, String verifyCode) {
         IndividualBindCardVerifyParams params = new IndividualBindCardVerifyParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
         params.setTimestamp(timestamp);
-        params.setOid_partner(bindCardApplyResult.getOid_partner());
-        params.setUser_id(bindCardApplyResult.getUser_id());
-        params.setTxn_seqno(bindCardApplyResult.getTxn_seqno());
-        params.setToken(bindCardApplyResult.getToken());
+        params.setOid_partner(LLianPayConstant.OidPartner);
+        params.setUser_id(userId);
+        params.setTxn_seqno(txnSeqno);
+        params.setToken(token);
         // 测试环境首次绑卡，不下发短信验证码，任意6位数字
-        params.setVerify_code("123456");
+        params.setVerify_code(verifyCode);
 
+        LLianPayClient lLianPayClient = new LLianPayClient();
         String resultJsonStr = lLianPayClient.sendRequest(individualBindcardVerify, JSON.toJSONString(params));
         IndividualBindCardVerifyResult bindCardVerifyResult = JSON.parseObject(resultJsonStr, IndividualBindCardVerifyResult.class);
-        System.out.println(bindCardVerifyResult);
+        Assert.isTrue("0000".equalsIgnoreCase(bindCardVerifyResult.getRet_code()),bindCardVerifyResult.getRet_msg());
+        return bindCardVerifyResult;
+    }
+
+
+    /**
+     * 个人用户解绑银行卡
+     */
+    public static UnlinkedacctIndApplyResult indApply(String userId, String linkedAcctno, String password, String randomKey, String notifyUrl) {
+        UnlinkedacctIndApplyParams params = new UnlinkedacctIndApplyParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(LLianPayConstant.OidPartner);
+        params.setUser_id(userId);
+        params.setTxn_seqno(IdUtils.getSnowflakeNextIdStr());
+        params.setTxn_time(timestamp);
+        params.setNotify_url(notifyUrl);
+        params.setLinked_acctno(linkedAcctno);
+        params.setPassword(password);
+        params.setRandom_key(randomKey);
+
+        LLianPayClient lLianPayClient = new LLianPayClient();
+        String resultJsonStr = lLianPayClient.sendRequest(unlinkedacctIndApply, JSON.toJSONString(params));
+        UnlinkedacctIndApplyResult unlinkedacctIndApplyResult = JSON.parseObject(resultJsonStr, UnlinkedacctIndApplyResult.class);
+        Assert.isTrue("0000".equalsIgnoreCase(unlinkedacctIndApplyResult.getRet_code()),unlinkedacctIndApplyResult.getRet_msg());
+        return unlinkedacctIndApplyResult;
     }
 
 

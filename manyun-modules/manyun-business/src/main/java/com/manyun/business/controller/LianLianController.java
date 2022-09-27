@@ -6,8 +6,9 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.manyun.business.design.pay.LLPayUtils;
-import com.manyun.business.design.pay.bean.query.AcctserialAcctbal;
-import com.manyun.business.design.pay.bean.query.LinkedAcctlist;
+import com.manyun.business.design.pay.bean.individual.IndividualBindCardApplyResult;
+import com.manyun.business.design.pay.bean.individual.IndividualBindCardVerifyResult;
+import com.manyun.business.design.pay.bean.individual.UnlinkedacctIndApplyResult;
 import com.manyun.business.domain.entity.Logs;
 import com.manyun.business.domain.entity.Money;
 import com.manyun.business.domain.query.*;
@@ -15,9 +16,11 @@ import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.ILogsService;
 import com.manyun.business.service.IMoneyService;
 import com.manyun.business.service.ISystemService;
+import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.constant.BusinessConstants;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.LianLianPayEnum;
@@ -31,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -63,6 +67,9 @@ public class LianLianController {
     @Autowired
     private ILogsService logsService;
 
+    @Autowired
+    private RemoteBuiUserService userService;
+
     @Value("${open.url}")
     private String url;
 
@@ -79,9 +86,10 @@ public class LianLianController {
     public R<String> innerUser(@RequestBody InnerUserVo innerUserVo){
         Assert.isTrue(StringUtils.isNotBlank(innerUserVo.getReturnUrl()),"请求参数有误!");
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        if(loginBusinessUser.getCntUser().getIsReal()==1)return R.fail("用户暂未实名,请先实名!");
+        R<CntUserDto> cntUserDtoR = userService.commUni(loginBusinessUser.getUserId(), SecurityConstants.INNER);
+        if(cntUserDtoR.getData().getIsReal()==1)return R.fail("用户暂未实名,请先实名!");
         String userId = loginBusinessUser.getUserId();
-        String phone = loginBusinessUser.getCntUser().getPhone();
+        String phone = cntUserDtoR.getData().getPhone();
         Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId,userId));
         Assert.isFalse("1".equals(money.getLlAccountStatus()),"用户已开户!");
         Assert.isTrue(Objects.nonNull(money),"请求参数有误!");
@@ -110,7 +118,7 @@ public class LianLianController {
     public R<Map<String,String>> withdraw(@RequestBody LLWithdrawQuery llWithdrawQuery) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         BigDecimal val = systemService.getVal(BusinessConstants.SystemTypeConstant.WITHDRAW_CHARGE, BigDecimal.class);
-        return R.ok(LLPayUtils.withdraw(loginBusinessUser.getUserId(),llWithdrawQuery.getRandomKey(),llWithdrawQuery.getPassWord(),llWithdrawQuery.getAmount(),val,(url+LianLianPayEnum.WITHDRAW.getNotifyUrl())));
+        return R.ok(LLPayUtils.withdraw(loginBusinessUser.getUserId(),llWithdrawQuery.getRandomKey(),llWithdrawQuery.getPassWord(),llWithdrawQuery.getAmount(),val,(url+LianLianPayEnum.WITHDRAW.getNotifyUrl()), loginBusinessUser.getCntUser().getPhone(), DateUtils.getDateToStr(DateUtils.toDate(loginBusinessUser.getCntUser().getCreatedTime()),DateUtils.YYYYMMDDHHMMSS)));
     }
 
     @PostMapping("/validationSms")
@@ -148,14 +156,6 @@ public class LianLianController {
         return R.ok(LLPayUtils.queryAcctinfo(loginBusinessUser.getUserId()));
     }
 
-    public static void main(String[] args) {
-        LlBalanceVo llBalanceVo = new LlBalanceVo();
-        String a = "485780.43";
-        String b = "4015.00";
-        BigDecimal aa = new BigDecimal(a);
-        BigDecimal bb = new BigDecimal(b);
-        System.out.println(llBalanceVo.getTotalBalance());
-    }
 
     @PostMapping("/queryAcctserial")
     @ApiOperation("查询资金流水")
@@ -179,6 +179,74 @@ public class LianLianController {
     public R<GetRandomVo> getRandom(@RequestBody getRandomQuery getRandomQuery) {
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(LLPayUtils.getRandom(notNullLoginBusinessUser.getUserId(),getRandomQuery.getFlagChnl(),getRandomQuery.getPkgName(),getRandomQuery.getAppName()));
+    }
+
+
+    @GetMapping("/queryLinkedacct")
+    @ApiOperation("查询绑卡列表")
+    public R<List<LinkedacctVo>> queryLinkedacct() {
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return R.ok(LLPayUtils.queryLinkedacct(notNullLoginBusinessUser.getUserId())
+                .parallelStream().map(m->{
+                   return Builder.of(LinkedacctVo::new)
+                   .with(LinkedacctVo::setLinkedPhone,m.getLinked_phone())
+                   .with(LinkedacctVo::setLinkedBrbankname,m.getLinked_brbankname())
+                   .with(LinkedacctVo::setLinkedAcctno,m.getLinked_acctno())
+                   .build();
+                }).collect(Collectors.toList())
+                );
+    }
+
+
+    @PostMapping("/bindCardApply")
+    @ApiOperation("个人用户新增绑卡申请")
+    public R<BindCardVo> bindCardApply(@Valid @RequestBody BindCardQuery bindCardQuery) {
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        IndividualBindCardApplyResult individualBindCardApplyResult = LLPayUtils.bindCardApply(
+                notNullLoginBusinessUser.getUserId(),
+                bindCardQuery.getLinkedAcctno(),
+                bindCardQuery.getLinkedPhone(),
+                bindCardQuery.getPassword(),
+                bindCardQuery.getRandomKey(),
+                (url + LianLianPayEnum.BIND_CARD_APPLY.getNotifyUrl())
+        );
+        return R.ok(
+                Builder.of(BindCardVo::new)
+                .with(BindCardVo::setTxnSeqno,individualBindCardApplyResult.getTxn_seqno())
+                .with(BindCardVo::setToken,individualBindCardApplyResult.getToken())
+                .build()
+        );
+    }
+
+
+    @PostMapping("/bindCardVerify")
+    @ApiOperation("个人用户新增绑卡验证")
+    public R bindCardVerify(@Valid @RequestBody BindCardVerifyQuery bindCardVerifyQuery) {
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        IndividualBindCardVerifyResult individualBindCardVerifyResult = LLPayUtils.bindCardVerify(
+                notNullLoginBusinessUser.getUserId(),
+                bindCardVerifyQuery.getTxnSeqno(),
+                bindCardVerifyQuery.getToken(),
+                bindCardVerifyQuery.getVerifyCode()
+        );
+        Assert.isTrue(Objects.nonNull(individualBindCardVerifyResult),individualBindCardVerifyResult.getRet_msg());
+        return R.ok();
+    }
+
+
+    @PostMapping("/indApply")
+    @ApiOperation("个人用户解绑银行卡")
+    public R indApply(@Valid @RequestBody IndApplyQuery indApplyQuery) {
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        UnlinkedacctIndApplyResult unlinkedacctIndApplyResult = LLPayUtils.indApply(
+                notNullLoginBusinessUser.getUserId(),
+                indApplyQuery.getLinkedAcctno(),
+                indApplyQuery.getPassword(),
+                indApplyQuery.getRandomKey(),
+                (url + LianLianPayEnum.IND_APPLY.getNotifyUrl())
+        );
+        Assert.isTrue(Objects.nonNull(unlinkedacctIndApplyResult),unlinkedacctIndApplyResult.getRet_msg());
+        return R.ok();
     }
 
 }
