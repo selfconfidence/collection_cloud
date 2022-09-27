@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.nacos.shaded.com.google.gson.JsonObject;
 import com.manyun.business.design.pay.bean.cashier.ResponsePayee;
 import com.manyun.business.design.pay.bean.cashier.ResponsePayer;
+import com.manyun.business.design.pay.bean.cashier.ResponsePayerWithDraw;
 import com.manyun.business.domain.dto.LogInfoDto;
 import com.manyun.business.domain.entity.Logs;
 import com.manyun.business.service.*;
@@ -250,7 +251,7 @@ public class LLPayNotifyController {
                 JSONObject resultObj = JSONObject.parseObject(resultSB.toString());
                 JSONObject orderInfo = JSONObject.parseObject(resultObj.getString("orderInfo"));
                 log.info("订单信息:============================="+orderInfo.toString());
-                List<ResponsePayer> responsePayerList = JSONObject.parseArray(resultObj.getJSONArray("payerInfo").toJSONString(), ResponsePayer.class);
+                List<ResponsePayerWithDraw> responsePayerList = JSONObject.parseArray(resultObj.getJSONArray("payerInfo").toJSONString(), ResponsePayerWithDraw.class);
                 log.info("付款方信息:============================="+responsePayerList.toString());
                 String payer_id = responsePayerList.parallelStream().filter(f -> f.getPayer_type().equals("USER")).findFirst().get().getPayer_id();
                 log.info("payer_id:============================="+payer_id);
