@@ -48,11 +48,11 @@ public class UserTokenController {
     @ApiOperation(value = "用户登录",notes = "用户账号密码登录")
     public R<AccTokenVo> login(@RequestBodyRsa @Valid LoginPhoneForm loginPhoneForm)
     {
+        dingxiangTokenCheck(loginPhoneForm.getToken());
         R<CntUserDto> userR = remoteBuiUserService.login(loginPhoneForm, SecurityConstants.INNER);
         Assert.isTrue(userR.getCode() == CodeStatus.SUCCESS.getCode(),userR.getMsg());
         CntUserDto userRData = userR.getData();
         // 用户登录
-        dingxiangTokenCheck(loginPhoneForm.getToken());
         return R.ok(userTokenService.createToken(userRData));
     }
     @PostMapping("/loginRSA")
@@ -69,10 +69,10 @@ public class UserTokenController {
     @PostMapping("/codeLogin")
     @ApiOperation(value = "用户验证码登录",notes = "验证码登录")
     public R<AccTokenVo> codeLogin(@RequestBodyRsa @Valid LoginPhoneCodeForm loginPhoneCodeForm){
+        dingxiangTokenCheck(loginPhoneCodeForm.getToken());
         R<CntUserDto> cntUserR = remoteBuiUserService.codeLogin(loginPhoneCodeForm,SecurityConstants.INNER);
         Assert.isTrue(cntUserR.getCode() == CodeStatus.SUCCESS.getCode(),cntUserR.getMsg());
         CntUserDto userRData = cntUserR.getData();
-        dingxiangTokenCheck(loginPhoneCodeForm.getToken());
         return R.ok(userTokenService.createToken(userRData));
     }
 
@@ -99,6 +99,7 @@ public class UserTokenController {
         String appId = "54770ccc4f246de629e9886dc949005f";
         String appSecret = "0f5f582c4fe166cb6b79741320ba1276";
         CaptchaClient captchaClient = new CaptchaClient(appId,appSecret);
+        captchaClient.setCaptchaUrl("https://cap-api.dingxiang-inc.com");
 //指定服务器地址，saas可在控制台，应用管理页面最上方获取
         CaptchaResponse response = null;
         try {
