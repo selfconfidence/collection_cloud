@@ -19,4 +19,8 @@ public class LoginPhoneCodeForm implements Serializable {
     @ApiModelProperty("手机号验证码")
     @NotBlank(message = "手机号验证码不可为空")
     private String phoneCode;
+
+/*    @ApiModelProperty("token")
+    @NotBlank(message = "顶象token不可为空")
+    private String token;*/
 }

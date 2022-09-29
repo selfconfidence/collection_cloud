@@ -6,6 +6,7 @@ import com.manyun.comm.api.domain.dto.SmsCommDto;
 import com.manyun.common.core.domain.CodeStatus;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.StringUtils;
+import com.manyun.common.core.utils.XXutils;
 import com.manyun.common.redis.service.RedisService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -42,6 +43,15 @@ public class BaseController {
         //AliUtil.send(phone, BusinessConstants.SmsTemplateNumber.ASSERT_BACK)
         redisService.redisTemplate.opsForValue().set(PHONE_CODE.concat(phone.concat(type)),code,EXP_TIME, TimeUnit.SECONDS);
         return R.ok();
+    }
+
+    @GetMapping("/sendPhoneToken/{phone}/{token}")
+    @ApiOperation("发送登录验证码,有token")
+    public R<String> sendPhoneToken(@PathVariable String phone,@PathVariable String token){
+        XXutils.dingxiangTokenCheck(token);
+        sendPhone(phone,"login_code");
+        return R.ok();
+
     }
 
     @PostMapping("/sendCommPhone")

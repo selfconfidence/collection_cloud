@@ -1,6 +1,8 @@
 package com.manyun.auth.controller;
 
 import cn.hutool.core.lang.Assert;
+import com.dingxianginc.ctu.client.CaptchaClient;
+import com.dingxianginc.ctu.client.model.CaptchaResponse;
 import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.domain.form.JgLoginTokenForm;
@@ -11,6 +13,7 @@ import com.manyun.common.core.annotation.RequestBodyRsa;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.CodeStatus;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.utils.XXutils;
 import com.manyun.common.security.service.UserTokenService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -46,6 +49,7 @@ public class UserTokenController {
     @ApiOperation(value = "用户登录",notes = "用户账号密码登录")
     public R<AccTokenVo> login(@RequestBodyRsa @Valid LoginPhoneForm loginPhoneForm)
     {
+        XXutils.dingxiangTokenCheck(loginPhoneForm.getToken());
         R<CntUserDto> userR = remoteBuiUserService.login(loginPhoneForm, SecurityConstants.INNER);
         Assert.isTrue(userR.getCode() == CodeStatus.SUCCESS.getCode(),userR.getMsg());
         CntUserDto userRData = userR.getData();
@@ -66,6 +70,9 @@ public class UserTokenController {
     @PostMapping("/codeLogin")
     @ApiOperation(value = "用户验证码登录",notes = "验证码登录")
     public R<AccTokenVo> codeLogin(@RequestBodyRsa @Valid LoginPhoneCodeForm loginPhoneCodeForm){
+/*
+        dingxiangTokenCheck(loginPhoneCodeForm.getToken());
+*/
         R<CntUserDto> cntUserR = remoteBuiUserService.codeLogin(loginPhoneCodeForm,SecurityConstants.INNER);
         Assert.isTrue(cntUserR.getCode() == CodeStatus.SUCCESS.getCode(),cntUserR.getMsg());
         CntUserDto userRData = cntUserR.getData();
@@ -83,5 +90,7 @@ public class UserTokenController {
         CntUserDto userRData = cntUserR.getData();
         return R.ok(userTokenService.createToken(userRData));
     }
+
+
 
 }

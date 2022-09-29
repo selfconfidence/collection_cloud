@@ -58,7 +58,9 @@
             <groupId>com.manyun</groupId>
             <artifactId>manyun-common-swagger</artifactId>
         </dependency>
-        
+
+
+
     </dependencies>
 	
     <build>

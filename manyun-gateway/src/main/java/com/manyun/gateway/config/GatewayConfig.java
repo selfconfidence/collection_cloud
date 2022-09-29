@@ -51,14 +51,19 @@ public class GatewayConfig
 
     @PostConstruct
     private void initCustomizedApis(){
-        List<SentinelFlowProperties.FlowNode> flowNodeLists = sentinelFlowProperties.getFlowNodeLists();
-        if (flowNodeLists.isEmpty())return;
-        Set<ApiDefinition> definitions = new HashSet<>();//new ApiPathPredicateItem().setPattern("/business/collection/sellOrderCollection")
-        for (SentinelFlowProperties.FlowNode flowNode : flowNodeLists) {
-            ApiDefinition commApis = new ApiDefinition(flowNode.getSourceName())
-                    .setPredicateItems(flowNode.getPathUrl().parallelStream().map(item -> new ApiPathPredicateItem().setPattern(item)).collect(Collectors.toSet()));
-            definitions.add(commApis);
+        try {
+            List<SentinelFlowProperties.FlowNode> flowNodeLists = sentinelFlowProperties.getFlowNodeLists();
+            if (flowNodeLists.isEmpty())return;
+            Set<ApiDefinition> definitions = new HashSet<>();//new ApiPathPredicateItem().setPattern("/business/collection/sellOrderCollection")
+            for (SentinelFlowProperties.FlowNode flowNode : flowNodeLists) {
+                ApiDefinition commApis = new ApiDefinition(flowNode.getSourceName())
+                        .setPredicateItems(flowNode.getPathUrl().parallelStream().map(item -> new ApiPathPredicateItem().setPattern(item)).collect(Collectors.toSet()));
+                definitions.add(commApis);
+            }
+            GatewayApiDefinitionManager.loadApiDefinitions(definitions);
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        GatewayApiDefinitionManager.loadApiDefinitions(definitions);
+
     }
 }
