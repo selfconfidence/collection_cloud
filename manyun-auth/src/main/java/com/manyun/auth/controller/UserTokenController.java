@@ -96,8 +96,8 @@ public class UserTokenController {
          * token在前端完成验证后可以获取到，随业务请求发送到后台，token有效期为两分钟
          * ip 可选，提交业务参数的客户端ip
          **/
-        String appId = "54770ccc4f246de629e9886dc949005f";
-        String appSecret = "0f5f582c4fe166cb6b79741320ba1276";
+        String appId = "a0ab66c6771a8e8bd9da35c6788cfc63";
+        String appSecret = "78cfa7486febe8a12a094db640c54592";
         CaptchaClient captchaClient = new CaptchaClient(appId,appSecret);
         captchaClient.setCaptchaUrl("https://cap-api.dingxiang-inc.com");
 //指定服务器地址，saas可在控制台，应用管理页面最上方获取
