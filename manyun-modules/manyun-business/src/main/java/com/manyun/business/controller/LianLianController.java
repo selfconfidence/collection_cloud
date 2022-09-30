@@ -267,7 +267,7 @@ public class LianLianController {
     }
 
     @GetMapping("/queryRefund/{refundSeqno}")
-    @ApiOperation("退款结果查询",notes = "txnSeqno==退款订单号")
+    @ApiOperation(value = "退款结果查询",notes = "refundSeqno==退款订单号")
     public R<QueryRefundResult> queryRefund(@PathVariable String refundSeqno) {
         return R.ok(LLPayUtils.queryRefund(refundSeqno));
     }
