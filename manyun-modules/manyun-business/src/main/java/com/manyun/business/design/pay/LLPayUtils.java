@@ -583,6 +583,7 @@ public class LLPayUtils {
 
         LLianPayClient lLianPayClient = new LLianPayClient();
         String resultJsonStr = lLianPayClient.sendRequest(morePayeeRefund, JSON.toJSONString(params));
+        log.info("退款申请-----------" + resultJsonStr);
         MorePayeeRefundResult morePayeeRefundResult = JSON.parseObject(resultJsonStr, MorePayeeRefundResult.class);
         Assert.isTrue("0000".equalsIgnoreCase(morePayeeRefundResult.getRet_code()),morePayeeRefundResult.getRet_msg());
         return morePayeeRefundResult;
