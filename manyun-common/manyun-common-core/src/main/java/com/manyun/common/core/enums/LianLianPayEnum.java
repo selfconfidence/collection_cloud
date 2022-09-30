@@ -22,7 +22,8 @@ public enum LianLianPayEnum
     IND_APPLY("/business/notify_pay/LlPay/LlUnlinkedacctIndApplyNotify", "个人用户解绑银行卡回调", ""),
     USER_TOPUP("/business/notify_pay/LlPay/LlUserTopupNotify", "连连支付充值回调", ""),
     GENERAL_CONSUME("/business/notify_pay/LlPay/LlGeneralConsumeNotify", "连连支付消费回调", ""),
-    WITHDRAW("/business/notify_pay/LlPay/LlWithdrawNotify", "连连支付提现回调", "");
+    WITHDRAW("/business/notify_pay/LlPay/LlWithdrawNotify", "连连支付提现回调", ""),
+    MORE_PAYEE_REFUND("/business/notify_pay/LlPay/LlMorePayeeRefundNotify", "连连支付退款申请回调", "");
     private final String notifyUrl;
     private final String body;
     private  String returnUrl;

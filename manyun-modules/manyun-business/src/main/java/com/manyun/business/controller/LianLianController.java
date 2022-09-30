@@ -6,9 +6,11 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.manyun.business.design.pay.LLPayUtils;
+import com.manyun.business.design.pay.bean.QueryRefundResult;
 import com.manyun.business.design.pay.bean.individual.IndividualBindCardApplyResult;
 import com.manyun.business.design.pay.bean.individual.IndividualBindCardVerifyResult;
 import com.manyun.business.design.pay.bean.individual.UnlinkedacctIndApplyResult;
+import com.manyun.business.design.pay.bean.morePayeeRefund.MorePayeeRefundResult;
 import com.manyun.business.design.pay.bean.queryPayment.QueryPaymentResult;
 import com.manyun.business.domain.entity.Logs;
 import com.manyun.business.domain.entity.Money;
@@ -252,9 +254,22 @@ public class LianLianController {
 
 
     @GetMapping("/queryPayment/{txnSeqno}")
-    @ApiOperation("支付结果查询")
+    @ApiOperation(value = "支付结果查询",notes = "txnSeqno==交易流水号")
     public R<QueryPaymentResult> queryPayment(@PathVariable String txnSeqno) {
         return R.ok(LLPayUtils.queryPayment(txnSeqno));
+    }
+
+
+    @PostMapping("/morePayeeRefund")
+    @ApiOperation("退款申请")
+    public R<MorePayeeRefundResult> morePayeeRefund(@Valid @RequestBody MorePayeeRefundQuery morePayeeRefundQuery) {
+        return R.ok(LLPayUtils.morePayeeRefund(morePayeeRefundQuery,(url + LianLianPayEnum.MORE_PAYEE_REFUND.getNotifyUrl())));
+    }
+
+    @GetMapping("/queryRefund/{refundSeqno}")
+    @ApiOperation("退款结果查询",notes = "txnSeqno==退款订单号")
+    public R<QueryRefundResult> queryRefund(@PathVariable String refundSeqno) {
+        return R.ok(LLPayUtils.queryRefund(refundSeqno));
     }
 
 }
