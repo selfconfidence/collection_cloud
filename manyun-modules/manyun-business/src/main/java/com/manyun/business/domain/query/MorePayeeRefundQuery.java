@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 
@@ -21,7 +22,7 @@ public class MorePayeeRefundQuery {
     private String txn_seqno;
 
     @ApiModelProperty(value = "订单总金额",required = true)
-    @NotBlank(message = "订单总金额不能为空!")
+    @NotNull(message = "订单总金额不能为空!")
     private BigDecimal total_amount;
 
     @ApiModelProperty(value = "付款方式",required = true)
