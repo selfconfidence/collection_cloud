@@ -25,6 +25,7 @@ import com.manyun.common.pays.utils.llpay.LLianPayDateUtils;
 import com.manyun.common.pays.utils.llpay.client.LLianPayClient;
 import com.manyun.common.pays.utils.llpay.config.LLianPayConstant;
 import com.manyun.common.pays.utils.llpay.security.LLianPayAccpSignature;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +36,7 @@ import java.util.*;
  * 连连支付 相关api
  */
 @Component
+@Slf4j
 public class LLPayUtils {
 
     //开户
@@ -535,6 +537,7 @@ public class LLPayUtils {
 
         LLianPayClient lLianPayClient = new LLianPayClient();
         String resultJsonStr = lLianPayClient.sendRequest(queryPayment, JSON.toJSONString(params));
+        log.info("支付结果查询-------------" + resultJsonStr);
         QueryPaymentResult queryPaymentResult = JSON.parseObject(resultJsonStr, QueryPaymentResult.class);
         Assert.isTrue("0000".equalsIgnoreCase(queryPaymentResult.getRet_code()),queryPaymentResult.getRet_msg());
         return queryPaymentResult;
