@@ -9,6 +9,7 @@ import com.manyun.business.design.pay.LLPayUtils;
 import com.manyun.business.design.pay.bean.individual.IndividualBindCardApplyResult;
 import com.manyun.business.design.pay.bean.individual.IndividualBindCardVerifyResult;
 import com.manyun.business.design.pay.bean.individual.UnlinkedacctIndApplyResult;
+import com.manyun.business.design.pay.bean.queryPayment.QueryPaymentResult;
 import com.manyun.business.domain.entity.Logs;
 import com.manyun.business.domain.entity.Money;
 import com.manyun.business.domain.query.*;
@@ -247,6 +248,13 @@ public class LianLianController {
         );
         Assert.isTrue(Objects.nonNull(unlinkedacctIndApplyResult),unlinkedacctIndApplyResult.getRet_msg());
         return R.ok();
+    }
+
+
+    @GetMapping("/queryPayment/{txnSeqno}")
+    @ApiOperation("支付结果查询")
+    public R<QueryPaymentResult> queryPayment(@PathVariable String txnSeqno) {
+        return R.ok(LLPayUtils.queryPayment(txnSeqno));
     }
 
 }

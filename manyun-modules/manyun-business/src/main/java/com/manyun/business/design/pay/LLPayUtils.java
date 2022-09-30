@@ -9,6 +9,8 @@ import com.manyun.business.design.pay.bean.OpenacctApplyResult;
 import com.manyun.business.design.pay.bean.cashier.*;
 import com.manyun.business.design.pay.bean.individual.*;
 import com.manyun.business.design.pay.bean.query.*;
+import com.manyun.business.design.pay.bean.queryPayment.QueryPaymentParams;
+import com.manyun.business.design.pay.bean.queryPayment.QueryPaymentResult;
 import com.manyun.business.design.pay.bean.random.GetRandomParams;
 import com.manyun.business.design.pay.bean.random.GetRandomResult;
 import com.manyun.business.design.pay.bean.txn.*;
@@ -55,6 +57,8 @@ public class LLPayUtils {
     private final static String queryLinkedacct = "https://accpapi.lianlianpay.com/v1/acctmgr/query-linkedacct";
     //查询资金流水列表
     private final static String queryAcctserial = "https://accpapi.lianlianpay.com/v1/acctmgr/query-acctserial";
+    //支付结果查询
+    private final static String queryPayment = "https://accpapi.lianlianpay.com/v1/txn/query-payment";
     //随机因子获取
     private final static String getRandom = "https://accpapi.lianlianpay.com/v1/acctmgr/get-random";
 
@@ -514,6 +518,26 @@ public class LLPayUtils {
         UnlinkedacctIndApplyResult unlinkedacctIndApplyResult = JSON.parseObject(resultJsonStr, UnlinkedacctIndApplyResult.class);
         Assert.isTrue("0000".equalsIgnoreCase(unlinkedacctIndApplyResult.getRet_code()),unlinkedacctIndApplyResult.getRet_msg());
         return unlinkedacctIndApplyResult;
+    }
+
+
+
+    /**
+     * 支付结果查询
+     */
+    public static QueryPaymentResult queryPayment(String txnSeqno) {
+        Assert.isTrue(StringUtils.isNotBlank(txnSeqno),"交易流水号不能为空!");
+        QueryPaymentParams params = new QueryPaymentParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(LLianPayConstant.OidPartner);
+        params.setTxn_seqno(txnSeqno);
+
+        LLianPayClient lLianPayClient = new LLianPayClient();
+        String resultJsonStr = lLianPayClient.sendRequest(queryPayment, JSON.toJSONString(params));
+        QueryPaymentResult queryPaymentResult = JSON.parseObject(resultJsonStr, QueryPaymentResult.class);
+        Assert.isTrue("0000".equalsIgnoreCase(queryPaymentResult.getRet_code()),queryPaymentResult.getRet_msg());
+        return queryPaymentResult;
     }
 
 
