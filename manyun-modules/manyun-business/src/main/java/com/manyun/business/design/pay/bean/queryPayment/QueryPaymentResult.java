@@ -41,7 +41,7 @@ public class QueryPaymentResult {
     private OrderInfo orderInfo;
 
     @ApiModelProperty("付款方信息")
-    private PayerInfo payerInfo;
+    private PayerInfo[] payerInfo;
 
     @ApiModelProperty("收款方信息")
     private PayeeInfo[] payeeInfo;
