@@ -90,7 +90,7 @@ public class CntUserTarServiceImpl extends ServiceImpl<CntUserTarMapper,CntUserT
     public R importPostExcel(List<UserTarExcel> userTarExcelList) {
         log.info("导入表格条数-------------------------" + userTarExcelList.size());
         List<UserTarExcel> userTarExcels = userTarExcelList.parallelStream().filter(f -> (StringUtils.isNotBlank(f.getTarId()) && StringUtils.isNotBlank(f.getUserId()) && f.getIsFull() != null)).collect(Collectors.toList());
-        log.info("过滤后条数---------------" + userTarExcels);
+        log.info("过滤后条数---------------" + userTarExcels.size());
         if (StringUtils.isNull(userTarExcelList) || userTarExcelList.size() == 0 || userTarExcels.size() == 0)
         {
            return R.fail("导入数据为空或导入数据有误!");
