@@ -244,11 +244,11 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
             cntUserTar.updateD(cntUserTar.getUserId());
             CntUserDto cntUserDto = remoteBuiUserService.commUni(cntUserTar.getUserId(), SecurityConstants.INNER).getData();
             if (StrUtil.isNotBlank(cntUserDto.getJgPush())) jgRegLists.add(cntUserDto.getJgPush());
-            remoteSmsService.sendCommPhone(Builder.of(SmsCommDto::new)
+            /*remoteSmsService.sendCommPhone(Builder.of(SmsCommDto::new)
                     .with(SmsCommDto::setPhoneNumber, cntUserDto.getPhone())
                     .with(SmsCommDto::setTemplateCode, TAR_SUCCESS)
                     .with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().build())
-                    .build());
+                    .build());*/
         }
         userTarService.updateBatchById(cntUserTars);
         // 推送用户了表明中奖状态
