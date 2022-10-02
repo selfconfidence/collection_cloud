@@ -140,7 +140,7 @@ public class CntUserTarServiceImpl extends ServiceImpl<CntUserTarMapper,CntUserT
                     if(e.getIsFull()==1)awardUserIds.add(e.getUserId());
                 }
             } else {
-                log.info("optional1不存在 --------- " + optional1.toString());
+                log.info("optional1不存在 --------- " + e.toString());
             }
         });
 
