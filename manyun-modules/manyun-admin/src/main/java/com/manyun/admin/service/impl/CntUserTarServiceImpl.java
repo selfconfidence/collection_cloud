@@ -21,9 +21,11 @@ import com.manyun.common.core.utils.uuid.IdUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.security.utils.SecurityUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.manyun.admin.mapper.CntUserTarMapper;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 用户抽签购买藏品或盲盒中间Service业务层处理
@@ -32,6 +34,7 @@ import com.manyun.admin.mapper.CntUserTarMapper;
  * @date 2022-09-08
  */
 @Service
+@Slf4j
 public class CntUserTarServiceImpl extends ServiceImpl<CntUserTarMapper,CntUserTar> implements ICntUserTarService
 {
     @Autowired
@@ -83,8 +86,11 @@ public class CntUserTarServiceImpl extends ServiceImpl<CntUserTarMapper,CntUserT
      * @return
      */
     @Override
+    @Transactional
     public R importPostExcel(List<UserTarExcel> userTarExcelList) {
+        log.info("导入表格条数-------------------------" + userTarExcelList.size());
         List<UserTarExcel> userTarExcels = userTarExcelList.parallelStream().filter(f -> (StringUtils.isNotBlank(f.getTarId()) && StringUtils.isNotBlank(f.getUserId()) && f.getIsFull() != null)).collect(Collectors.toList());
+        log.info("过滤后条数---------------" + userTarExcels);
         if (StringUtils.isNull(userTarExcelList) || userTarExcelList.size() == 0 || userTarExcels.size() == 0)
         {
            return R.fail("导入数据为空或导入数据有误!");
@@ -135,8 +141,13 @@ public class CntUserTarServiceImpl extends ServiceImpl<CntUserTarMapper,CntUserT
                 }
             }
         });
+
+
         Integer balance = cntTar.getTarType()==1?cntBox.getBalance():cntCollection.getBalance();
         Assert.isTrue(balance>=awardUserIds.size(),"商品库存不足!");
+        log.info("更新记录条数---------------" + updateList.size());
+        log.info("新增记录条数---------------" + insertList.size());
+        log.info("记录总条数-----------------" + awardUserIds.size());
         if(updateList.size()>0){
             updateBatchById(updateList);
         }
