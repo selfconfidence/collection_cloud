@@ -356,10 +356,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             if (Objects.nonNull(moneyBln) && moneyBln.compareTo(NumberUtil.add(0D)) >=1){
                 moneyService.orderBack(commOrder.getUserId(),moneyBln,StrUtil.format("订单已取消,此产生的消费 {},已经退还余额!" , moneyBln));
             }
-            // 刷新对应库存
-            if (reloadAssert)
-                batchUpdateAssertVersion(commOrders);
         }
+        // 刷新对应库存
+        if (reloadAssert)
+            batchUpdateAssertVersion(commOrders);
         updateBatchById(commOrders);
 
     }
