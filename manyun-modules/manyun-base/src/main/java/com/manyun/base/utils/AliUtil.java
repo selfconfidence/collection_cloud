@@ -1,5 +1,6 @@
 package com.manyun.base.utils;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.URLUtil;
 import com.alibaba.fastjson2.JSON;
@@ -14,6 +15,8 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.exceptions.ServerException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.manyun.base.config.AliOssConfig;
 import com.manyun.base.config.AliSmsConfig;
 import com.manyun.common.core.utils.SpringUtils;
@@ -21,10 +24,9 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+
+import static com.manyun.common.core.constant.BusinessConstants.SmsTemplateNumber.TAR_FAIL;
 
 
 @Slf4j
@@ -98,6 +100,52 @@ public class AliUtil {
         }
         return false;
     }
+
+    public static boolean batchSendSms(Set<String> phoneNumbers, String templateCode, Map<String,String> paramMaps){
+        AliSmsConfig bean = SpringUtils.getBean(AliSmsConfig.class);
+                DefaultProfile profile = DefaultProfile.getProfile(bean.getRegionId(),  bean.getAccessKey(), bean.getSecret());
+        IAcsClient client = new DefaultAcsClient(profile);
+
+        CommonRequest request = new CommonRequest();
+        request.setMethod(MethodType.POST);
+        request.setDomain("dysmsapi.aliyuncs.com");
+        request.setVersion("2017-05-25");
+        request.setAction("SendBatchSms");
+        request.putQueryParameter("RegionId", bean.getRegionId());
+        request.putQueryParameter("PhoneNumberJson", JSON.toJSONString(phoneNumbers));
+        request.putQueryParameter("SignNameJson",  JSON.toJSONString(CollUtil.newHashSet(bean.getSing())));
+        request.putQueryParameter("TemplateCode", templateCode);
+        //JSONObject templateParam = new JSONObject();
+/*        if (param.length == 1){
+            templateParam.put("code", param[0]);
+        }*/
+
+        /*else{
+            templateParam.put("vipName", code[0]);
+            templateParam.put("timeNode", code[1]);
+            templateParam.put("subTime", code[2]);
+        }
+*/
+        String toJSONString = JSON.toJSONString(paramMaps);
+        request.putQueryParameter("TemplateParam", toJSONString);
+        try {
+            CommonResponse response = client.getCommonResponse(request);
+            JSONObject responseJSON = JSONObject.parseObject(response.getData(),JSONObject.class);
+            if ("OK".equals(responseJSON.getString("Message"))) {
+                return true;
+            }
+            log.error("【阿里云短信】:发送短信失败，手机号：{},验证码：{},错误信息：{}", phoneNumbers, toJSONString, responseJSON.getString("Message"));
+        } catch (ServerException e) {
+            e.printStackTrace();
+        } catch (ClientException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+/*    public static void main(String[] args) {
+        batchSendSms(Sets.newHashSet("15036596617"), TAR_FAIL, Maps.newHashMap());
+    }*/
 
 
     /**

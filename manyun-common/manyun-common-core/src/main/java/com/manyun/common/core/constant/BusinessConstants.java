@@ -245,6 +245,17 @@ public interface BusinessConstants {
         String COLLECTION_AUTO_NUM = "collection:auto:numbers:";
         String  USER_ACTIVE_NUMBERS = "user:active:numbers";
         String COLLECTION_RANDOM_NUM = "collection:random:numbers:";
+        String COLLECTION_ACTIVE_NUMBERS = "collection:inactive:numbers:";
+        Integer COLLECTION_ACTIVE_EXPIRE = 1; // 一秒内
+        Integer OPEN_INTERFACE_STOP = 6; // 停止时间 如果在一秒内 超过了访问次数 就会封禁 6秒 不可访问当前接口。
+        Integer OPEN_MAX_URL = 3; // 同一接口访问次数
+        String COLLECTION_ACTIVE_NUMBERS_ADD_LUA = "if redis.call('HINCRBY',KEYS[1],ARGV[1],1) >= 1 then\n" +
+                "    redis.call('EXPIRE',KEYS[1],ARGV[2])\n" +
+                "end";
+        String COLLECTION_ACTIVE_NUMBERS_REL_LUA = "if redis.call('HINCRBY',KEYS[1],ARGV[1],-1) <= 0 then\n" +
+                "    redis.call('HDEL',KEYS[1],ARGV[1])\n" +
+                "end";
+
 
     }
 

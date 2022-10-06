@@ -104,6 +104,7 @@ public class OrderController extends BaseController {
     @GetMapping("/timeCancel")
     @ApiOperation(value = "定时调度取消未支付的订单",hidden = true)
     @InnerAuth
+    @Lock("timeCancel")
     public R timeCancel(){
          orderService.timeCancel();
         return R.ok();

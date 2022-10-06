@@ -41,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 
@@ -73,6 +74,9 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
 
     @Autowired
     private IUserPleaseService userPleaseService;
+
+    @Resource
+    private CntUserMapper cntUserMapper;
 
     @Autowired
     private RemoteBuiMoneyService remoteBuiMoneyService;
@@ -221,7 +225,8 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
      */
     @Override
     public CntUser commUni(String commUni) {
-        return getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getUserId, commUni).or().eq(CntUser::getLinkAddr, commUni).or().eq(CntUser::getId,commUni).or().eq(CntUser::getPhone, commUni));
+       return cntUserMapper.commUni(commUni);
+       // return getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getUserId, commUni).or().eq(CntUser::getLinkAddr, commUni).or().eq(CntUser::getId,commUni).or().eq(CntUser::getPhone, commUni));
     }
 
     /**
@@ -405,6 +410,16 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         cntUser.setCertifyId(certifyIdH5.getCertifyId());
         updateById(cntUser);
         return certifyIdH5;
+    }
+
+    @Override
+    public List<CntUserDto> findUserIdLists(List<String> userIds) {
+        List<CntUser> cntUsers = list(Wrappers.<CntUser>lambdaQuery().select(CntUser::getId,CntUser::getPhone,CntUser::getJgPush).in(CntUser::getId, userIds));
+        return cntUsers.parallelStream().map(item -> {
+            CntUserDto cntUserDto = Builder.of(CntUserDto::new).build();
+            BeanUtil.copyProperties(item,cntUserDto);
+            return cntUserDto;
+        } ).collect(Collectors.toList());
     }
 
 

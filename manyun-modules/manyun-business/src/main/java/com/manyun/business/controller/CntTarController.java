@@ -4,6 +4,7 @@ package com.manyun.business.controller;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.domain.entity.CntTar;
 import com.manyun.business.service.ICntTarService;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.controller.BaseController;
 import com.manyun.common.security.annotation.InnerAuth;
@@ -45,6 +46,7 @@ public class CntTarController{
     @GetMapping("/taskEndFlag")
     @ApiOperation(value = "定时调度执行开奖", hidden = true)
     @InnerAuth
+    @Lock(value = "taskEndFlag",expireTime = 600000) // 10分钟过期
     public R taskEndFlag(){
         // 查询出将要开奖的抽签主体
         List<CntTar> cntTarList = cntTarService.list(Wrappers.<CntTar>lambdaQuery().eq(CntTar::getEndFlag, FLAG_PROCESS.getCode()).le(CntTar::getOpenTime, LocalDateTime.now()));

@@ -265,7 +265,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    @Lock("timeCancel")
     public void timeCancel(){
         List<Order> orderList = list(Wrappers.<Order>lambdaQuery().eq(Order::getOrderStatus, WAIT_ORDER.getCode()).lt(Order::getEndTime, LocalDateTime.now()));
         if (orderList.isEmpty()) return;
@@ -277,7 +276,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             // 寄售信息修改
             cntConsignmentServiceObjectFactory.getObject().reLoadConsignments(cntConsignments);
         }
-        for (Order order : orderList) {
+        // 优化进行批处理
+        List<Order> consignmentOrders = orderList.parallelStream().filter(item -> cntConsignmentOrderIds.contains(item.getId())).collect(Collectors.toList());
+        if (!consignmentOrders.isEmpty()){
+            cancelBatchOrder(consignmentOrders, Boolean.FALSE);
+        }
+        List<Order> orders = orderList.parallelStream().filter(item -> !cntConsignmentOrderIds.contains(item.getId())).collect(Collectors.toList());
+       if (!orders.isEmpty()){
+           cancelBatchOrder(orders,Boolean.TRUE);
+       }
+/*        for (Order order : orderList) {
             String orderId = order.getId();
             try {
                 if (cntConsignmentOrderIds.contains(order.getId())){
@@ -291,7 +299,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 log.error("定时订单取消失败订单编号为:{},错误原因为:{}",orderId,e.getMessage());
             }
 
-        }
+        }*/
         // 批量更改订单状态
      /*   List<Order> updateSOrder = orderList.parallelStream().map(item -> {
             item.setOrderStatus(CANCEL_ORDER.getCode());
@@ -338,6 +346,31 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             collectionService.getObject().updateBatchById(cntCollections);
         }
 */
+    }
+
+    private void cancelBatchOrder(List<Order> commOrders, Boolean reloadAssert) {
+        for (Order commOrder : commOrders) {
+            commOrder.setOrderStatus(CANCEL_ORDER.getCode());
+            commOrder.updateD(commOrder.getUserId());
+            BigDecimal moneyBln = commOrder.getMoneyBln();
+            if (Objects.nonNull(moneyBln) && moneyBln.compareTo(NumberUtil.add(0D)) >=1){
+                moneyService.orderBack(commOrder.getUserId(),moneyBln,StrUtil.format("订单已取消,此产生的消费 {},已经退还余额!" , moneyBln));
+            }
+            // 刷新对应库存
+            if (reloadAssert)
+                batchUpdateAssertVersion(commOrders);
+        }
+        updateBatchById(commOrders);
+
+    }
+
+    private void batchUpdateAssertVersion(List<Order> commOrders) {
+        Map<String, List<Order>> buiMaps = commOrders.parallelStream().collect(Collectors.groupingBy(Order::getBuiId));
+        buiMaps.forEach((k,v)->{
+            Integer goodsType = v.get(0).getGoodsType();
+            Integer goodNum = v.parallelStream().map(item -> item.getGoodsNum()).reduce((a, b) -> a + b).orElseGet(() -> Integer.valueOf(0));
+            batchUpdateAssert(k, goodsType,goodNum);
+        });
     }
 
     /**
@@ -657,21 +690,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             // 盲盒
             IBoxService boxServiceReal = boxService.getObject();
             Box box = boxServiceReal.getById(buiId);
-            box.setBalance(box.getBalance() + goodsNum);
-            if (!box.getStatusBy().equals(DOWN_ACTION.getCode()))
-            box.setStatusBy(UP_ACTION.getCode());
-            box.setSelfBalance(box.getSelfBalance() - goodsNum);
-            boxServiceReal.updateById(box);
+            boxServiceReal.update(Wrappers.<Box>lambdaUpdate().eq(Box::getId, buiId).set(!box.getStatusBy().equals(DOWN_ACTION.getCode()),Box::getStatusBy,UP_ACTION.getCode()).set(Box::getBalance, box.getBalance() + goodsNum).set(Box::getSelfBalance, box.getSelfBalance() - goodsNum));
         }
         if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(goodsType)){
             // 藏品
             ICollectionService collectionServiceReal = collectionService.getObject();
             CntCollection cntCollection = collectionServiceReal.getById(buiId);
-            cntCollection.setBalance(cntCollection.getBalance() + goodsNum);
-            if (!cntCollection.getStatusBy().equals(DOWN_ACTION.getCode()))
-            cntCollection.setStatusBy(UP_ACTION.getCode());
-            cntCollection.setSelfBalance(cntCollection.getSelfBalance() - goodsNum);
-            collectionServiceReal.updateById(cntCollection);
+            collectionServiceReal.update(Wrappers.<CntCollection>lambdaUpdate().eq(CntCollection::getId, buiId).set(!cntCollection.getStatusBy().equals(DOWN_ACTION.getCode()),CntCollection::getStatusBy,UP_ACTION.getCode()).set(CntCollection::getBalance, cntCollection.getBalance() + goodsNum).set(CntCollection::getSelfBalance, cntCollection.getSelfBalance() - goodsNum));
         }
     }
 

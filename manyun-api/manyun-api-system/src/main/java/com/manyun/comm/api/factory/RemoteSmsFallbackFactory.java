@@ -2,6 +2,7 @@ package com.manyun.comm.api.factory;
 
 import com.manyun.comm.api.RemoteFileService;
 import com.manyun.comm.api.RemoteSmsService;
+import com.manyun.comm.api.domain.dto.BatchSmsCommDto;
 import com.manyun.comm.api.domain.dto.SmsCommDto;
 import com.manyun.common.core.domain.R;
 import org.slf4j.Logger;
@@ -29,6 +30,11 @@ public class RemoteSmsFallbackFactory implements FallbackFactory<RemoteSmsServic
 
             @Override
             public R sendCommPhone(SmsCommDto smsCommDto) {
+                return R.fail("发送短信失败:" + throwable.getMessage());
+            }
+
+            @Override
+            public R sendBatchCommPhone(BatchSmsCommDto batchSmsCommDto) {
                 return R.fail("发送短信失败:" + throwable.getMessage());
             }
         };

@@ -4,6 +4,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -22,16 +23,20 @@ import com.manyun.business.service.ICntUserTarService;
 import com.manyun.business.service.ICollectionService;
 import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.RemoteSmsService;
+import com.manyun.comm.api.domain.dto.BatchSmsCommDto;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.domain.dto.SmsCommDto;
+import com.manyun.comm.api.domain.dto.UserDto;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
+import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.jg.JpushUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -62,10 +67,10 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
     @Autowired
     private JpushUtil jpushUtil;
 
-    @Autowired
+    @Resource
     private RemoteBuiUserService remoteBuiUserService;
 
-    @Autowired
+    @Resource
     private RemoteSmsService remoteSmsService;
 
 
@@ -161,9 +166,10 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
         CntTar cntTar = getById(tarId);
         // 幂等校验
         if (FLAG_STOP.getCode().equals( cntTar.getEndFlag()))return;
-        execProcessBatchResult(tarId);
         cntTar.setEndFlag(FLAG_STOP.getCode());
         updateById(cntTar);
+        execProcessBatchResult(tarId);
+
 
 
     }
@@ -221,7 +227,7 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
 
 //            List<CntUserTar> successUserTar = whatUserTarLists.parallelStream().filter(item -> CEN_YES_TAR.getCode().equals(nowTimeIndex(cntTar.getTarPro()))).collect(Collectors.toList());
 //            successUserTarLists.addAll(successUserTar);
-//            if (!successUserTarLists.isEmpty())
+            if (!successUserTarLists.isEmpty())
                 openSuccess(successUserTarLists);
 
               Set<String> successIds = successUserTarLists.parallelStream().map(item -> item.getId()).collect(Collectors.toSet());
@@ -237,44 +243,43 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
      * @param cntUserTars
      */
     private void openSuccess(List<CntUserTar> cntUserTars) {
-        ArrayList<String> jgRegLists = Lists.newArrayList();
-        for (CntUserTar cntUserTar : cntUserTars) {
-            cntUserTar.setIsFull(CEN_YES_TAR.getCode());
-            cntUserTar.setOpenTime(LocalDateTime.now());
-            cntUserTar.updateD(cntUserTar.getUserId());
-            CntUserDto cntUserDto = remoteBuiUserService.commUni(cntUserTar.getUserId(), SecurityConstants.INNER).getData();
-            if (StrUtil.isNotBlank(cntUserDto.getJgPush())) jgRegLists.add(cntUserDto.getJgPush());
-            /*remoteSmsService.sendCommPhone(Builder.of(SmsCommDto::new)
-                    .with(SmsCommDto::setPhoneNumber, cntUserDto.getPhone())
-                    .with(SmsCommDto::setTemplateCode, TAR_SUCCESS)
-                    .with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().build())
-                    .build());*/
-        }
-        userTarService.updateBatchById(cntUserTars);
-        // 推送用户了表明中奖状态
-        if (!jgRegLists.isEmpty()) jpushUtil.sendMsg(BusinessConstants.JgPushConstant.PUSH_TITLE,"您抽签结果已经公布,已抽中,快去购买吧!",jgRegLists);
+        userTarService.update(Wrappers.<CntUserTar>lambdaUpdate()
+                .in(CntUserTar::getId, cntUserTars.parallelStream().map(item -> item.getId()).collect(Collectors.toSet()))
+                .set(CntUserTar::getIsFull, CEN_YES_TAR.getCode())
+                .set(CntUserTar::getOpenTime, LocalDateTime.now())
+        );
+        ThreadUtil.execute(()->{
+            R<List<CntUserDto>> userIdLists = remoteBuiUserService.findUserIdLists(Builder.of(UserDto::new).with(UserDto::setUserIds, cntUserTars.parallelStream().map(item -> item.getUserId()).collect(Collectors.toList())).build(), SecurityConstants.INNER);
+            List<CntUserDto> cntUserDtos = userIdLists.getData();
+            // 短信
+            remoteSmsService.sendBatchCommPhone(Builder.of(BatchSmsCommDto::new).with(BatchSmsCommDto::setPhoneNumbers,cntUserDtos.parallelStream().map(item -> item.getPhone()).collect(Collectors.toSet())).with(BatchSmsCommDto::setTemplateCode,TAR_SUCCESS ).with(BatchSmsCommDto::setParamsMap,MapUtil.<String,String>builder().build()).build());
+            // 推送
+            List<String> jgPushIds = cntUserDtos.parallelStream().filter(item -> StrUtil.isNotBlank(item.getJgPush())).map(item -> item.getJgPush()).collect(Collectors.toList());
+            // 推送用户了表明中奖状态
+            if (!jgPushIds.isEmpty()) jpushUtil.sendMsg(BusinessConstants.JgPushConstant.PUSH_TITLE,"您抽签结果已经公布,已抽中,快去购买吧!",jgPushIds);
+        });
     }
     /**
      * 未中奖的
      * @param cntUserTars
      */
     private void openFail(List<CntUserTar> cntUserTars) {
-        ArrayList<String> jgRegLists = Lists.newArrayList();
-        for (CntUserTar cntUserTar : cntUserTars) {
-            cntUserTar.setIsFull(CEN_NO_TAR.getCode());
-            cntUserTar.setOpenTime(LocalDateTime.now());
-            cntUserTar.updateD(cntUserTar.getUserId());
-            CntUserDto cntUserDto = remoteBuiUserService.commUni(cntUserTar.getUserId(), SecurityConstants.INNER).getData();
-            if (StrUtil.isNotBlank(cntUserDto.getJgPush())) jgRegLists.add(cntUserDto.getJgPush());
-            /*remoteSmsService.sendCommPhone(Builder.of(SmsCommDto::new)
-                    .with(SmsCommDto::setPhoneNumber, cntUserDto.getPhone())
-                    .with(SmsCommDto::setTemplateCode, TAR_FAIL)
-                    .with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().build())
-                    .build());*/
-        }
-        userTarService.updateBatchById(cntUserTars);
-        // 推送用户了表明中奖状态
-        if (!jgRegLists.isEmpty())  jpushUtil.sendMsg(BusinessConstants.JgPushConstant.PUSH_TITLE,"您抽签结果已经公布,未抽中,再接再厉!",jgRegLists);
+        userTarService.update(Wrappers.<CntUserTar>lambdaUpdate()
+                .in(CntUserTar::getId, cntUserTars.parallelStream().map(item -> item.getId()).collect(Collectors.toSet()))
+                .set(CntUserTar::getIsFull, CEN_NO_TAR.getCode())
+                .set(CntUserTar::getOpenTime, LocalDateTime.now())
+        );
+        ThreadUtil.execute(()->{
+            R<List<CntUserDto>> userIdLists = remoteBuiUserService.findUserIdLists(Builder.of(UserDto::new).with(UserDto::setUserIds, cntUserTars.parallelStream().map(item -> item.getUserId()).collect(Collectors.toList())).build(), SecurityConstants.INNER);
+            List<CntUserDto> cntUserDtos = userIdLists.getData();
+            // 短信
+            remoteSmsService.sendBatchCommPhone(Builder.of(BatchSmsCommDto::new).with(BatchSmsCommDto::setPhoneNumbers,cntUserDtos.parallelStream().map(item -> item.getPhone()).collect(Collectors.toSet())).with(BatchSmsCommDto::setTemplateCode,TAR_FAIL ).with(BatchSmsCommDto::setParamsMap,MapUtil.<String,String>builder().build()).build());
+            // 推送
+            List<String> jgPushIds =cntUserDtos.parallelStream().filter(item -> StrUtil.isNotBlank(item.getJgPush())).map(item -> item.getJgPush()).collect(Collectors.toList());
+            // 推送用户了表明中奖状态
+            if (!jgPushIds.isEmpty()) jpushUtil.sendMsg(BusinessConstants.JgPushConstant.PUSH_TITLE,"您抽签结果已经公布,已抽中,快去购买吧!",jgPushIds);
+        });
+
     }
 
     /**

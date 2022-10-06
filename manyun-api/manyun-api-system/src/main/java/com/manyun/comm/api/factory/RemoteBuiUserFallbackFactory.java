@@ -2,6 +2,7 @@ package com.manyun.comm.api.factory;
 
 import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
+import com.manyun.comm.api.domain.dto.UserDto;
 import com.manyun.comm.api.domain.form.JgLoginTokenForm;
 import com.manyun.comm.api.model.LoginPhoneCodeForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
@@ -10,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * 业务用户服务降级处理
@@ -44,6 +47,11 @@ public class RemoteBuiUserFallbackFactory implements FallbackFactory<RemoteBuiUs
             @Override
             public R<CntUserDto> jgPhoneLogin(JgLoginTokenForm jgLoginTokenForm, String source) {
                 return R.fail("一键登录失败:" + throwable.getMessage());
+            }
+
+            @Override
+            public R<List<CntUserDto>> findUserIdLists(UserDto userDto, String source) {
+                return R.fail("查询失败:" + throwable.getMessage());
             }
         };
     }

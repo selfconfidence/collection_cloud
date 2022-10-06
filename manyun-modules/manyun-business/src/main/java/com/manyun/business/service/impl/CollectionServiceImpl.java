@@ -35,6 +35,7 @@ import com.manyun.common.core.enums.CollectionStatus;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import com.manyun.common.redis.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -213,6 +214,8 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String sellOrderCollection(String userId, CollectionOrderSellForm collectionOrderSellForm) {
+        // 记录抢购链路
+
         // 总结校验 —— 支付方式
         CntCollection  cntCollection = getById(collectionOrderSellForm.getCollectionId());
         // 实际需要支付的金额

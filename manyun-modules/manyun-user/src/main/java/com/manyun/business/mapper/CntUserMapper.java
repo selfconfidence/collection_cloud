@@ -2,6 +2,7 @@ package com.manyun.business.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.manyun.business.domain.entity.CntUser;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -13,4 +14,5 @@ import com.manyun.business.domain.entity.CntUser;
  */
 public interface CntUserMapper extends BaseMapper<CntUser> {
 
+    CntUser commUni(@Param("commUni") String commUni);
 }

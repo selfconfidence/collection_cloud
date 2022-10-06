@@ -8,6 +8,7 @@ import com.manyun.business.domain.form.*;
 import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.ICntUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
+import com.manyun.comm.api.domain.dto.UserDto;
 import com.manyun.comm.api.domain.form.JgLoginTokenForm;
 import com.manyun.comm.api.domain.vo.AccTokenVo;
 import com.manyun.comm.api.model.LoginBusinessUser;
@@ -241,6 +242,18 @@ public class CntUserController extends BaseController {
         CntUserDto cntUserDto = Builder.of(CntUserDto::new).build();
         BeanUtil.copyProperties(cntUser,cntUserDto);
         return R.ok(cntUserDto);
+    }
+
+    /**
+     * 此接口查询  id, 手机号，jgpush 3字段 有需要再加
+     * @param userDto
+     * @return
+     */
+    @PostMapping("/findUserIdLists")
+    @InnerAuth
+    @ApiOperation(value = "根据用户编号批量查询用户信息",hidden = true)
+    public R<List<CntUserDto>> findUserIdLists(@RequestBody UserDto userDto){
+        return R.ok(userService.findUserIdLists(userDto.getUserIds()));
     }
 
     @PostMapping("/jgPhoneLogin")
