@@ -32,10 +32,10 @@ import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.BoxStatus;
 import com.manyun.common.core.enums.CollectionStatus;
-import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
-import com.manyun.common.redis.service.RedisService;
+import com.manyun.common.redis.domian.dto.BuiCronDto;
+import com.manyun.common.redis.service.BuiCronService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,7 +51,6 @@ import java.util.stream.Collectors;
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.*;
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
 import static com.manyun.common.core.enums.BoxStatus.NULL_ACTION;
-import static com.manyun.common.core.enums.BoxStatus.UP_ACTION;
 import static com.manyun.common.core.enums.CollectionStatus.DOWN_ACTION;
 import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
 import static com.manyun.common.core.enums.PayTypeEnum.MONEY_TAPE;
@@ -109,6 +108,8 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     private final IStepService stepService;
 
     private final RemoteBuiUserService userService;
+
+    private final BuiCronService buiCronService;
 
     @Override
     public TableDataInfo<CollectionVo> pageQueryList(CollectionQuery collectionQuery) {
@@ -172,7 +173,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         BigDecimal realPayMoney = NumberUtil.mul(collectionSellForm.getSellNum(), cntCollection.getRealPrice());
         checkCollection(cntCollection,userId,collectionSellForm.getPayType(),realPayMoney);
         // 锁优化
-        checkBalance(cntCollection,collectionSellForm.getSellNum());
+        checkBalance(cntCollection.getId(),collectionSellForm.getSellNum());
 
         // 根据支付方式创建订单  通用适配方案 余额直接 减扣操作
         //1. 先创建对应的订单
@@ -223,7 +224,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         BigDecimal realPayMoney = NumberUtil.mul(collectionOrderSellForm.getSellNum(), cntCollection.getRealPrice());
         checkPerOrderCollection(cntCollection,userId);
         // 锁优化
-        checkBalance(cntCollection,collectionOrderSellForm.getSellNum());
+        checkCacheBalance(cntCollection,collectionOrderSellForm.getSellNum());
 
         // 根据支付方式创建订单  通用适配方案 余额直接 减扣操作
         //1. 先创建对应的订单
@@ -238,12 +239,19 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         return orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, outHost)).getId();
     }
 
-    private void checkBalance(CntCollection cntCollection,Integer sellNum) {
-        int rows = cntCollectionMapper.updateLock(cntCollection.getId(),sellNum);
+    private void checkCacheBalance(CntCollection cntCollection,Integer sellNum){
+        boolean flag = buiCronService.doBuiDegressionBalanceCache(COLLECTION_MODEL_TYPE, cntCollection.getId(), sellNum);
+        Assert.isTrue(flag,"您来晚了,已售罄了!");
+    }
+    @Override
+    public void checkBalance(String cntCollectionId, Integer sellNum) {
+        int rows = cntCollectionMapper.updateLock(cntCollectionId,sellNum);
         if (!(rows >=1)){
+            update(Wrappers.<CntCollection>lambdaUpdate().eq(CntCollection::getId, cntCollectionId).set(CntCollection::getStatusBy,NULL_ACTION.getCode()));
+/*            CntCollection cntCollection = cntCollectionMapper.selectById(cntCollectionId);
             cntCollection.setStatusBy(NULL_ACTION.getCode());
-            cntCollectionMapper.updateById(cntCollection);
-            Assert.isTrue(Boolean.FALSE,"您来晚了,已售罄了!");
+            cntCollectionMapper.updateById(cntCollection);*/
+          //  Assert.isTrue(Boolean.FALSE,"您来晚了,已售罄了!");
         }
 
     }
@@ -538,23 +546,27 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         return collectionInfoVo;
     }
 
-    private CollectionVo providerCollectionVo(CntCollection CntCollection){
+    private CollectionVo providerCollectionVo(CntCollection cntCollection){
         CollectionVo collectionVo = Builder.of(CollectionVo::new).build();
-        BeanUtil.copyProperties(CntCollection,collectionVo);
-        if (CntCollection.getPublishTime().isAfter(LocalDateTime.now())) {
+        BeanUtil.copyProperties(cntCollection,collectionVo);
+        // 数据隔离
+        BuiCronDto typeBalanceCache = buiCronService.getTypeBalanceCache(COLLECTION_MODEL_TYPE, cntCollection.getId());
+        collectionVo.setBalance(typeBalanceCache.getBalance());
+        collectionVo.setSelfBalance(typeBalanceCache.getSelfBalance());
+        if (cntCollection.getPublishTime().isAfter(LocalDateTime.now())) {
             collectionVo.setPreStatus(1);
         } else {
             collectionVo.setPreStatus(2);
         }
-        if (Integer.valueOf(0).equals(CntCollection.getBalance())) {
+        if (Integer.valueOf(0).equals(cntCollection.getBalance())) {
             collectionVo.setStatusBy(2);
         }
-        collectionVo.setLableVos(initLableVos(CntCollection.getId()));
-        collectionVo.setMediaVos(initMediaVos(CntCollection.getId()));
-        collectionVo.setThumbnailImgMediaVos(thumbnailImgMediaVos(CntCollection.getId()));
-        collectionVo.setThreeDimensionalMediaVos(threeDimensionalMediaVos(CntCollection.getId()));
-        collectionVo.setCnfCreationdVo(initCnfCreationVo(CntCollection.getBindCreation()));
-        collectionVo.setCateVo(initCateVo(CntCollection.getCateId()));
+        collectionVo.setLableVos(initLableVos(cntCollection.getId()));
+        collectionVo.setMediaVos(initMediaVos(cntCollection.getId()));
+        collectionVo.setThumbnailImgMediaVos(thumbnailImgMediaVos(cntCollection.getId()));
+        collectionVo.setThreeDimensionalMediaVos(threeDimensionalMediaVos(cntCollection.getId()));
+        collectionVo.setCnfCreationdVo(initCnfCreationVo(cntCollection.getBindCreation()));
+        collectionVo.setCateVo(initCateVo(cntCollection.getCateId()));
         return collectionVo;
     }
 

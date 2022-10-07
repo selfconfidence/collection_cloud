@@ -38,5 +38,7 @@ public interface IBoxService extends IService<Box> {
 
     BoxListVo getBaseBoxListVo(String boxId);
 
+    void checkBalance(String boxId, Integer sellNum);
+
     String sellOrderBox(BoxOrderSellForm boxOrderSellForm, String userId);
 }

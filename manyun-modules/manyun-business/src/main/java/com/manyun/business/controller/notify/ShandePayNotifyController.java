@@ -6,6 +6,7 @@ import com.manyun.business.config.cashier.sdk.CryptoUtil;
 import com.manyun.business.service.IAuctionOrderService;
 import com.manyun.business.service.IAuctionPriceService;
 import com.manyun.business.service.IOrderService;
+import com.manyun.common.core.annotation.Lock;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -95,6 +96,7 @@ public class ShandePayNotifyController {
      */
     @RequestMapping(value = "/collectionJoinBoxNotify")
     @ApiOperation(value = "盲盒藏品聚合杉德支付回调",hidden = true)
+    @Lock("notifyPaySuccess")
     public JSONObject boxNotify(HttpServletRequest req) {
         log.info("进入盲盒藏品聚合杉德支付回调");
         String data=req.getParameter("data");

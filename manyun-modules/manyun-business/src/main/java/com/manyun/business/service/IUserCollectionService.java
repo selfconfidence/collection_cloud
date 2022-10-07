@@ -22,7 +22,7 @@ public interface IUserCollectionService extends IService<UserCollection> {
 
     String bindOrderCollection(String userId, String buiId, String collectionName, String info, Integer goodsNum);
 
-    void bindCollection(String userId, String buiId, String collectionName, String info, Integer goodsNum);
+    void bindCollection(String userId, String buiId, String collectionName, String info);
 
 
     String autoCollectionNum(String collectionId);

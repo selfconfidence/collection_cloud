@@ -37,6 +37,7 @@ import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.ip.IpUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import com.manyun.common.redis.service.BuiCronService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE;
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE;
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
 import static com.manyun.common.core.enums.BoxStatus.UP_ACTION;
@@ -122,6 +124,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Autowired
     private RemoteBuiUserService remoteBuiUserService;
 
+    @Autowired
+    private BuiCronService buiCronService;
+
     @Override
     public TableDataInfo<OrderVo> pageQueryList(OrderQuery orderQuery, String userId) {
         List<Order> orderList = list(Wrappers.<Order>lambdaQuery()
@@ -148,9 +153,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             orderVo.setCreationImg(creation.getHeadImage());
         }
         if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(order.getGoodsType())) {
-            List<MediaVo> mediaVos = mediaService.initMediaVos(order.getBuiId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
-            List<MediaVo> thumbnailImgMediaVos = mediaService.thumbnailImgMediaVos(order.getBuiId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
-            List<MediaVo> threeDimensionalMediaVos = mediaService.threeDimensionalMediaVos(order.getBuiId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
+            List<MediaVo> mediaVos = mediaService.initMediaVos(order.getBuiId(), BOX_MODEL_TYPE);
+            List<MediaVo> thumbnailImgMediaVos = mediaService.thumbnailImgMediaVos(order.getBuiId(), BOX_MODEL_TYPE);
+            List<MediaVo> threeDimensionalMediaVos = mediaService.threeDimensionalMediaVos(order.getBuiId(), BOX_MODEL_TYPE);
             orderVo.setGoodsImg(mediaVos.get(0).getMediaUrl());
             orderVo.setThumbnailImg(thumbnailImgMediaVos.size()>0?thumbnailImgMediaVos.get(0).getMediaUrl():"");
             orderVo.setThreeDimensionalImg(threeDimensionalMediaVos.size()>0?threeDimensionalMediaVos.get(0).getMediaUrl():"");
@@ -210,7 +215,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @Lock("notifyPaySuccess")
     public void notifyPaySuccess(String outHost) {
         Order order = getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, outHost));
         String info = StrUtil.format("从平台购买,本次消费{},来源为平台发售", order.getOrderAmount().toString());
@@ -234,6 +238,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             if (StrUtil.isNotBlank(box.getTarId()))
                 cntTarService.overSelf(order.getUserId(),box.getId());
 
+
+            // 真实扣减库存操作
+            boxService.getObject().checkBalance(order.getBuiId(),order.getGoodsNum());
             return;
         }
 
@@ -250,6 +257,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             // 是否是抽签购的？
             if (StrUtil.isNotBlank(collection.getTarId()))
                 cntTarService.overSelf(order.getUserId(),collection.getId());
+
+            // 真实扣减库存操作
+          collectionService.getObject().checkBalance(order.getBuiId(),order.getGoodsNum() );
             return;
         }
         throw new IllegalStateException("not fount order good_type = " + goodsType);
@@ -688,15 +698,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(goodsType)){
             // 盲盒
-            IBoxService boxServiceReal = boxService.getObject();
-            Box box = boxServiceReal.getById(buiId);
-            boxServiceReal.update(Wrappers.<Box>lambdaUpdate().eq(Box::getId, buiId).set(!box.getStatusBy().equals(DOWN_ACTION.getCode()),Box::getStatusBy,UP_ACTION.getCode()).set(Box::getBalance, box.getBalance() + goodsNum).set(Box::getSelfBalance, box.getSelfBalance() - goodsNum));
+           // IBoxService boxServiceReal = boxService.getObject();
+           // Box box = boxServiceReal.getById(buiId);
+            //boxServiceReal.update(Wrappers.<Box>lambdaUpdate().eq(Box::getId, buiId).set(!box.getStatusBy().equals(DOWN_ACTION.getCode()),Box::getStatusBy,UP_ACTION.getCode()).set(Box::getBalance, box.getBalance() + goodsNum).set(Box::getSelfBalance, box.getSelfBalance() - goodsNum));
+            buiCronService.doBuiIcrementBalanceCache(BOX_MODEL_TYPE, buiId, goodsNum);
         }
         if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(goodsType)){
             // 藏品
-            ICollectionService collectionServiceReal = collectionService.getObject();
-            CntCollection cntCollection = collectionServiceReal.getById(buiId);
-            collectionServiceReal.update(Wrappers.<CntCollection>lambdaUpdate().eq(CntCollection::getId, buiId).set(!cntCollection.getStatusBy().equals(DOWN_ACTION.getCode()),CntCollection::getStatusBy,UP_ACTION.getCode()).set(CntCollection::getBalance, cntCollection.getBalance() + goodsNum).set(CntCollection::getSelfBalance, cntCollection.getSelfBalance() - goodsNum));
+            //ICollectionService collectionServiceReal = collectionService.getObject();
+           // CntCollection cntCollection = collectionServiceReal.getById(buiId);
+            //collectionServiceReal.update(Wrappers.<CntCollection>lambdaUpdate().eq(CntCollection::getId, buiId).set(!cntCollection.getStatusBy().equals(DOWN_ACTION.getCode()),CntCollection::getStatusBy,UP_ACTION.getCode()).set(CntCollection::getBalance, cntCollection.getBalance() + goodsNum).set(CntCollection::getSelfBalance, cntCollection.getSelfBalance() - goodsNum));
+            buiCronService.doBuiIcrementBalanceCache(COLLECTION_MODEL_TYPE, buiId, goodsNum);
         }
     }
 

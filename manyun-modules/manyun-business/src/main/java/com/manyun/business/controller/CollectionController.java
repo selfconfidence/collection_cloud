@@ -86,14 +86,14 @@ public class CollectionController extends BaseController{
     }
 
 
-    @PostMapping("/sellCollection")
-    @ApiOperation("购买藏品")
-    @Deprecated
-    @Lock("sellCollection")
-    public R<PayVo> sellCollection(@RequestBody @Valid CollectionSellForm collectionSellForm){
-        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        return R.ok(collectionService.sellCollection(loginBusinessUser.getUserId(),collectionSellForm));
-    }
+//    @PostMapping("/sellCollection")
+//    @ApiOperation("购买藏品")
+//    @Deprecated
+//    @Lock("sellCollection")
+//    public R<PayVo> sellCollection(@RequestBody @Valid CollectionSellForm collectionSellForm){
+//        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+//        return R.ok(collectionService.sellCollection(loginBusinessUser.getUserId(),collectionSellForm));
+//    }
 
 
     @PostMapping("/sellOrderCollection")

@@ -31,10 +31,10 @@ import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.BoxStatus;
-import com.manyun.common.core.utils.SpringUtils;
-import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import com.manyun.common.redis.domian.dto.BuiCronDto;
+import com.manyun.common.redis.service.BuiCronService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE;
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE;
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
 import static com.manyun.common.core.enums.BoxOpenType.NO_OPEN;
@@ -108,6 +109,9 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
 
     @Autowired
     private IMsgService msgService;
+
+    @Autowired
+    private BuiCronService buiCronService;
 
 
     @Autowired
@@ -182,7 +186,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         BigDecimal realPayMoney = NumberUtil.mul(boxSellForm.getSellNum(), box.getRealPrice());
         checkSell(box,userId,boxSellForm.getPayType(),realPayMoney);
         // 锁优化
-        checkBalance(box,boxSellForm.getSellNum());
+        checkBalance(box.getId(),boxSellForm.getSellNum());
 
         // 根据支付方式创建订单  通用适配方案 余额直接 减扣操作
         //1. 先创建对应的订单
@@ -225,12 +229,17 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
 
     }
 
-    private void checkBalance(Box box,Integer sellNum) {
-        int rows = boxMapper.updateLock(box.getId(),sellNum);
+    private void checkBalanceCache(Box box,Integer sellNum){
+        boolean flag = buiCronService.doBuiDegressionBalanceCache(BOX_MODEL_TYPE, box.getId(), sellNum);
+        Assert.isTrue(flag,"您来晚了,已售罄了!");
+    }
+
+    @Override
+    public void checkBalance(String boxId, Integer sellNum) {
+        int rows = boxMapper.updateLock(boxId,sellNum);
         if (!(rows >=1)){
-            box.setStatusBy(NULL_ACTION.getCode());
-            boxMapper.updateById(box);
-            Assert.isTrue(Boolean.FALSE,"您来晚了,已售罄了!");
+            update(Wrappers.<Box>lambdaUpdate().eq(Box::getId, boxId).set(Box::getStatusBy, NULL_ACTION.getCode()));
+           // Assert.isTrue(Boolean.FALSE,"您来晚了,已售罄了!");
         }
 
     }
@@ -244,8 +253,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         BigDecimal realPayMoney = NumberUtil.mul(boxOrderSellForm.getSellNum(), box.getRealPrice());
         checkOrderSell(box,userId);
         // 锁优化
-        checkBalance(box,boxOrderSellForm.getSellNum());
-
+        checkBalanceCache(box,boxOrderSellForm.getSellNum());
         //1. 先创建对应的订单
         String outHost =   orderService.createOrder(OrderCreateDto.builder()
                 .orderAmount(realPayMoney)
@@ -284,9 +292,9 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         List<UserBoxVo> userBoxList = userBoxService.pageUserBox(userId,useAssertQuery.getCommName());
         // 数据组合
         List<UserBoxVo> tarData = userBoxList.parallelStream().map(item -> {
-            item.setMediaVos(mediaService.initMediaVos(item.getBoxId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
-            item.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(item.getBoxId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
-            item.setThreeDimensionalMediaVos(mediaService.threeDimensionalMediaVos(item.getBoxId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+            item.setMediaVos(mediaService.initMediaVos(item.getBoxId(), BOX_MODEL_TYPE));
+            item.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(item.getBoxId(), BOX_MODEL_TYPE));
+            item.setThreeDimensionalMediaVos(mediaService.threeDimensionalMediaVos(item.getBoxId(), BOX_MODEL_TYPE));
             return item;
         }).collect(Collectors.toList());
         return TableDataInfoUtil.pageTableDataInfo(tarData,userBoxList);
@@ -316,7 +324,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         Assert.isTrue(boxCollectionService.update(Wrappers.<BoxCollection>lambdaUpdate().eq(BoxCollection::getId,luckCollection.getId()).ge(BoxCollection::getOpenQuantity,Integer.valueOf(1)).set(BoxCollection::getOpenQuantity, luckCollection.getOpenQuantity() - 1 ).set(BoxCollection::getOpenNumber,luckCollection.getOpenNumber() + 1)),"开盲盒有误,请重试!");
         // 3. 得到后开始绑定了
         String info = StrUtil.format("恭喜您,开启盲盒,得到 {} 藏品,请注意查收!", luckCollection.getCollectionName());
-        userCollectionService.bindCollection(userId,luckCollection.getCollectionId(),luckCollection.getCollectionName(),info,Integer.valueOf(1));
+        userCollectionService.bindCollection(userId,luckCollection.getCollectionId(),luckCollection.getCollectionName(),info);
         userBox.setBoxOpen(OK_OPEN.getCode());
         userBoxService.updateById(userBox);
         Box box = boxMapper.selectById(userBox.getBoxId());
@@ -480,15 +488,19 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
     private BoxListVo initBoxListVo(Box box){
         BoxListVo boxListVo = Builder.of(BoxListVo::new).build();
         BeanUtil.copyProperties(box,boxListVo);
+        // 缓存库存数据隔离
+        BuiCronDto typeBalanceCache = buiCronService.getTypeBalanceCache(BOX_MODEL_TYPE, box.getId());
+        boxListVo.setBalance(typeBalanceCache.getBalance());
+        boxListVo.setSelfBalance(typeBalanceCache.getSelfBalance());
         if (box.getPublishTime().isAfter(LocalDateTime.now())) {
             boxListVo.setPreStatus(1);
         } else {
             boxListVo.setPreStatus(2);
         }
         // 需要集成图片服务
-        boxListVo.setMediaVos(mediaService.initMediaVos(box.getId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
-        boxListVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(box.getId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
-        boxListVo.setThreeDimensionalMediaVos(mediaService.threeDimensionalMediaVos(box.getId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+        boxListVo.setMediaVos(mediaService.initMediaVos(box.getId(), BOX_MODEL_TYPE));
+        boxListVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(box.getId(), BOX_MODEL_TYPE));
+        boxListVo.setThreeDimensionalMediaVos(mediaService.threeDimensionalMediaVos(box.getId(), BOX_MODEL_TYPE));
         return boxListVo;
 
     }

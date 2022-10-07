@@ -3,6 +3,7 @@ package com.manyun.common.core.utils;
 import cn.hutool.core.lang.Assert;
 import com.dingxianginc.ctu.client.CaptchaClient;
 import com.dingxianginc.ctu.client.model.CaptchaResponse;
+import com.manyun.common.core.utils.ip.IpUtils;
 
 /*
  *
@@ -25,7 +26,7 @@ public class XXutils {
 //指定服务器地址，saas可在控制台，应用管理页面最上方获取
         CaptchaResponse response = null;
         try {
-            response = captchaClient.verifyToken(token);
+            response = captchaClient.verifyToken(token, IpUtils.getIpAddr(ServletUtils.getRequest()));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

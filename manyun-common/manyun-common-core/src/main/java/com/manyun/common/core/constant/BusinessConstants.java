@@ -256,6 +256,25 @@ public interface BusinessConstants {
                 "    redis.call('HDEL',KEYS[1],ARGV[1])\n" +
                 "end";
 
+        // 业务系列
+        // 创作者
+        String CREATED_BUI_CACHE = "created:bui:cache:";
+
+        // 发行方
+        String PUBLISH_BUI_CACHE = "publish:bui:cache:";
+
+        // 库存系列 hash 数据结构
+
+        // 藏品 大KEY
+        String COLLECTION_POINT_BUI = "collection:point:bui:";
+
+        // 盲盒 大KEY
+        String BOX_POINT_BUI = "box:point:bui:";
+       //已售
+        String SELFBALANCE = "selfBalance";
+        //余量
+        String BALANCE = "balance";
+
 
     }
 

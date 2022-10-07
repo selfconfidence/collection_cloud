@@ -92,14 +92,14 @@ public class BoxController extends BaseController {
         return R.ok(listDto);
     }
 
-    @PostMapping("/sellBox")
+/*    @PostMapping("/sellBox")
     @ApiOperation("购买普通盲盒")
     @Deprecated
     @Lock("sellBox")
     public R<PayVo> sellBox(@Valid @RequestBody BoxSellForm boxSellForm){
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(boxService.sellBox(boxSellForm,loginBusinessUser.getUserId(),loginBusinessUser.getIpaddr()));
-    }
+    }*/
 
     @PostMapping("/sellOrderBox")
     @ApiOperation(value = "购买盲盒_预先_生成订单",notes = "用来预先 生成一个待支付订单,返回订单编号,用来二次提交支付\n version 1.0.1")

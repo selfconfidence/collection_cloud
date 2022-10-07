@@ -47,6 +47,8 @@ import static com.manyun.common.core.constant.BusinessConstants.SmsTemplateNumbe
 import static com.manyun.common.core.enums.TarResultFlag.FLAG_PROCESS;
 import static com.manyun.common.core.enums.TarResultFlag.FLAG_STOP;
 import static com.manyun.common.core.enums.TarStatus.*;
+import static com.manyun.common.core.enums.TarType.BOX_TAR;
+import static com.manyun.common.core.enums.TarType.COLLECTION_TAR;
 import static com.manyun.common.core.enums.UserTaSell.NO_SELL;
 import static com.manyun.common.core.enums.UserTaSell.SELL_OK;
 
@@ -184,13 +186,18 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
             CntUserTar cntUserTar = cntUserTars.stream().findFirst().get();
             // 是藏品还是盲盒? 得到对应库存即可
             Integer count = null;
-            CntCollection cntCollection = SpringUtil.getBean(ICollectionService.class).getById(cntUserTar.getBuiId());
-            Box box = SpringUtil.getBean(IBoxService.class).getById(cntUserTar.getBuiId());
-            if ((count = Objects.isNull(cntCollection) ? null : cntCollection.getBalance()) != null  || (count = Objects.isNull(box) ? null : box.getBalance()) != null);
+            if (BOX_TAR.getCode().equals(cntTar.getTarType())) {
+                Box box = SpringUtil.getBean(IBoxService.class).getById(cntUserTar.getBuiId());
+                count = box.getBalance();
+            }
+            if (COLLECTION_TAR.getCode().equals(cntTar.getTarType())){
+                CntCollection cntCollection = SpringUtil.getBean(ICollectionService.class).getById(cntUserTar.getBuiId());
+                count = cntCollection.getBalance();
+            }
+            Assert.isTrue(Objects.nonNull(count),"此抽签规则类型有误!");
             // 1.1 如果 中奖量 比抽签记录 >= 全部中奖即可
             if (count >= cntUserTars.size()) {
                 //openSuccess(cntUserTars);
-
                 //是否中奖
                 List<CntUserTar> successUserTar = cntUserTars.parallelStream().filter(item -> CEN_YES_TAR.getCode().equals(nowTimeIndex(cntTar.getTarPro())) || CEN_YES_TAR.getCode().equals( item.getIsFull()) ).collect(Collectors.toList());
                 if (!successUserTar.isEmpty())
@@ -273,7 +280,7 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
             R<List<CntUserDto>> userIdLists = remoteBuiUserService.findUserIdLists(Builder.of(UserDto::new).with(UserDto::setUserIds, cntUserTars.parallelStream().map(item -> item.getUserId()).collect(Collectors.toList())).build(), SecurityConstants.INNER);
             List<CntUserDto> cntUserDtos = userIdLists.getData();
             // 短信
-            remoteSmsService.sendBatchCommPhone(Builder.of(BatchSmsCommDto::new).with(BatchSmsCommDto::setPhoneNumbers,cntUserDtos.parallelStream().map(item -> item.getPhone()).collect(Collectors.toSet())).with(BatchSmsCommDto::setTemplateCode,TAR_FAIL ).with(BatchSmsCommDto::setParamsMap,MapUtil.<String,String>builder().build()).build());
+          //  remoteSmsService.sendBatchCommPhone(Builder.of(BatchSmsCommDto::new).with(BatchSmsCommDto::setPhoneNumbers,cntUserDtos.parallelStream().map(item -> item.getPhone()).collect(Collectors.toSet())).with(BatchSmsCommDto::setTemplateCode,TAR_FAIL ).with(BatchSmsCommDto::setParamsMap,MapUtil.<String,String>builder().build()).build());
             // 推送
             List<String> jgPushIds =cntUserDtos.parallelStream().filter(item -> StrUtil.isNotBlank(item.getJgPush())).map(item -> item.getJgPush()).collect(Collectors.toList());
             // 推送用户了表明中奖状态
