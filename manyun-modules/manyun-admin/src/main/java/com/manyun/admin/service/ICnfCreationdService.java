@@ -1,7 +1,5 @@
 package com.manyun.admin.service;
 
-import java.util.List;
-
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CnfCreationd;
 import com.manyun.admin.domain.query.CreationdQuery;

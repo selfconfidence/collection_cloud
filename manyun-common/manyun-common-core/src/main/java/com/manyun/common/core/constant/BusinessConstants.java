@@ -270,6 +270,13 @@ public interface BusinessConstants {
 
         // 盲盒 大KEY
         String BOX_POINT_BUI = "box:point:bui:";
+
+        // 藏品详情 大KEY
+        String COLLECTION_INFO = "collection:info:";
+
+        // 藏品详情 大KEY
+        String BOX_INFO = "box:info:";
+
        //已售
         String SELFBALANCE = "selfBalance";
         //余量

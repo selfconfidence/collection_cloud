@@ -2,13 +2,15 @@ package com.manyun.common.redis.service;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 
 /**
  * spring redis 工具类
- * 
+ *
  * @author ruoyi
  **/
 @SuppressWarnings(value = { "unchecked", "rawtypes" })
@@ -247,6 +249,17 @@ public class RedisService
     }
 
     /**
+     * hash删除指定数据
+     *
+     * @param key Redis键
+     * @param hKey Hash键
+     */
+    public void hashDelete(final String key, final String hKey)
+    {
+        redisTemplate.opsForHash().delete(key, hKey);
+    }
+
+    /**
      * 获取Hash中的数据
      *
      * @param key Redis键
@@ -273,7 +286,7 @@ public class RedisService
 
     /**
      * 获得缓存的基本对象列表
-     * 
+     *
      * @param pattern 字符串前缀
      * @return 对象列表
      */
