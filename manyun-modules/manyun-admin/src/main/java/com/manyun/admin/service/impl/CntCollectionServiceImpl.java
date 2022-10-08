@@ -18,11 +18,13 @@ import com.manyun.admin.domain.dto.CollectionStateDto;
 import com.manyun.admin.domain.dto.MyChainxDto;
 import com.manyun.admin.domain.excel.BachAirdopExcel;
 import com.manyun.admin.domain.query.CollectionQuery;
-import com.manyun.admin.domain.redis.collection.*;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.mapper.*;
 import com.manyun.admin.service.*;
 import com.manyun.comm.api.MyChainxSystemService;
+import com.manyun.comm.api.domain.redis.CreationdRedisVo;
+import com.manyun.comm.api.domain.redis.MediaRedisVo;
+import com.manyun.comm.api.domain.redis.collection.*;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
@@ -219,9 +221,9 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         //图片
         MediaAlterVo mediaAlterVo = collectionAlterCombineDto.getMediaAlterVo();
         List<CntMedia> mediaList = new ArrayList<>();
-        List<MediaVo> mediaVos = new ArrayList<>();
-        List<MediaVo> thumbnailImgMediaVos = new ArrayList<>();
-        List<MediaVo> threeDimensionalMediaVos = new ArrayList<>();
+        List<MediaRedisVo> mediaVos = new ArrayList<>();
+        List<MediaRedisVo> thumbnailImgMediaVos = new ArrayList<>();
+        List<MediaRedisVo> threeDimensionalMediaVos = new ArrayList<>();
         if (Objects.nonNull(mediaAlterVo)) {
             if(StringUtils.isNotBlank(mediaAlterVo.getImg())){
                 CntMedia cntMedia = Builder.of(CntMedia::new)
@@ -233,7 +235,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                         .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
                         .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build();
                 mediaList.add(cntMedia);
-                MediaVo mediaVo = new MediaVo();
+                MediaRedisVo mediaVo = new MediaRedisVo();
                 BeanUtil.copyProperties(cntMedia,mediaVo);
                 mediaVos.add(mediaVo);
             }
@@ -247,7 +249,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                         .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
                         .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build();
                 mediaList.add(cntMedia);
-                MediaVo mediaVo = new MediaVo();
+                MediaRedisVo mediaVo = new MediaRedisVo();
                 BeanUtil.copyProperties(cntMedia,mediaVo);
                 thumbnailImgMediaVos.add(mediaVo);
             }
@@ -261,7 +263,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                         .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
                         .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build();
                 mediaList.add(cntMedia);
-                MediaVo mediaVo = new MediaVo();
+                MediaRedisVo mediaVo = new MediaRedisVo();
                 BeanUtil.copyProperties(cntMedia,mediaVo);
                 threeDimensionalMediaVos.add(mediaVo);
             }
@@ -273,16 +275,16 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
 
         //存储redis 只有藏品状态正常的情况才可以入缓存
         if(cntCollection.getStatusBy()!=null && cntCollection.getStatusBy()==1){
-            CollectionAllVo collectionAllVo = new CollectionAllVo();
+            CollectionAllRedisVo collectionAllVo = new CollectionAllRedisVo();
             //藏品主体信息
-            CollectionVo collectionVo = new CollectionVo();
+            CollectionRedisVo collectionVo = new CollectionRedisVo();
             collectionVo.setId(idStr);
             collectionVo.setCollectionName(cntCollection.getCollectionName());
             collectionVo.setMediaVos(mediaVos);
             collectionVo.setThumbnailImgMediaVos(thumbnailImgMediaVos);
             collectionVo.setThreeDimensionalMediaVos(threeDimensionalMediaVos);
-            collectionVo.setCateVo(initCateVo(cntCollection.getCateId()));
-            collectionVo.setCnfCreationdVo(initCnfCreationVo(cntCollection.getBindCreation()));
+            collectionVo.setCateRedisVo(initCateVo(cntCollection.getCateId()));
+            collectionVo.setCreationdRedisVo(initCnfCreationVo(cntCollection.getBindCreation()));
             collectionVo.setSourcePrice(cntCollection.getSourcePrice());
             collectionVo.setStatusBy(cntCollection.getStatusBy());
             collectionVo.setSelfBalance(cntCollection.getSelfBalance()==null?0:cntCollection.getSelfBalance());
@@ -291,8 +293,8 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
             if(cntCollectionLables.size()>0){
                 List<CntLable> lableList = lableService.list(Wrappers.<CntLable>lambdaQuery().in(CntLable::getId, cntCollectionLables.stream().map(item -> item.getLableId()).collect(Collectors.toList())));
                 if(lableList.size()>0){
-                    collectionVo.setLableVos(lableList.parallelStream().map(item -> {
-                        LableVo lableVo = Builder.of(LableVo::new).build();
+                    collectionVo.setLableRedisVos(lableList.parallelStream().map(item -> {
+                        LableRedisVo lableVo = Builder.of(LableRedisVo::new).build();
                         BeanUtil.copyProperties(item, lableVo);
                         return lableVo;
                     }).collect(Collectors.toList()));
@@ -306,10 +308,10 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                 collectionVo.setPreStatus(2);
             }
             //藏品介绍信息
-            CollectionInfoVo collectionInfoVo = new CollectionInfoVo();
+            CollectionInfoRedisVo collectionInfoVo = new CollectionInfoRedisVo();
             BeanUtil.copyProperties(cntCollectionInfo,collectionInfoVo);
-            collectionAllVo.setCollectionVo(collectionVo);
-            collectionAllVo.setCollectionInfoVo(collectionInfoVo);
+            collectionAllVo.setCollectionRedisVo(collectionVo);
+            collectionAllVo.setCollectionInfoRedisVo(collectionInfoVo);
             redisService.setCacheMapValue(BusinessConstants.RedisDict.COLLECTION_INFO,idStr,collectionAllVo);
         }
         //初始化redis库存
@@ -424,9 +426,9 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         MediaAlterVo mediaAlterVo = collectionAlterCombineDto.getMediaAlterVo();
         List<CntMedia> saveMediaList = new ArrayList<>();
         List<CntMedia> updateMediaList = new ArrayList<>();
-        List<MediaVo> mediaVos1 = new ArrayList<>(); //主图
-        List<MediaVo> mediaVos2 = new ArrayList<>(); //缩略图
-        List<MediaVo> mediaVos3 = new ArrayList<>(); //glb
+        List<MediaRedisVo> mediaVos1 = new ArrayList<>(); //主图
+        List<MediaRedisVo> mediaVos2 = new ArrayList<>(); //缩略图
+        List<MediaRedisVo> mediaVos3 = new ArrayList<>(); //glb
         if (Objects.nonNull(mediaAlterVo)) {
             List<MediaVo> mediaVos = mediaService.initMediaVos(collectionId, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
             List<MediaVo> thumbnailImgMediaVos = mediaService.thumbnailImgMediaVos(collectionId, BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE);
@@ -440,7 +442,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                         .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
                         .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build();
                 saveMediaList.add(cntMedia);
-                MediaVo mediaVo = new MediaVo();
+                MediaRedisVo mediaVo = new MediaRedisVo();
                 BeanUtil.copyProperties(cntMedia,mediaVo);
                 mediaVos1.add(mediaVo);
             }else {
@@ -451,7 +453,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                             .with(CntMedia::setUpdatedTime, DateUtils.getNowDate())
                             .build();
                     updateMediaList.add(cntMedia);
-                    MediaVo mediaVo = new MediaVo();
+                MediaRedisVo mediaVo = new MediaRedisVo();
                     BeanUtil.copyProperties(mediaVos.get(0),mediaVo);
                     mediaVo.setMediaUrl(StringUtils.isBlank(mediaAlterVo.getImg())==true?"":mediaAlterVo.getImg());
                     mediaVos1.add(mediaVo);
@@ -466,7 +468,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                         .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
                         .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build();
                 saveMediaList.add(cntMedia);
-                MediaVo mediaVo = new MediaVo();
+                MediaRedisVo mediaVo = new MediaRedisVo();
                 BeanUtil.copyProperties(cntMedia,mediaVo);
                 mediaVos2.add(mediaVo);
             }else {
@@ -477,7 +479,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                             .with(CntMedia::setUpdatedTime, DateUtils.getNowDate())
                             .build();
                     updateMediaList.add(cntMedia);
-                    MediaVo mediaVo = new MediaVo();
+                MediaRedisVo mediaVo = new MediaRedisVo();
                     BeanUtil.copyProperties(thumbnailImgMediaVos.get(0),mediaVo);
                     mediaVo.setMediaUrl(StringUtils.isBlank(mediaAlterVo.getThumbnailImg())==true?"":mediaAlterVo.getThumbnailImg());
                     mediaVos2.add(mediaVo);
@@ -492,7 +494,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                         .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
                         .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build();
                 saveMediaList.add(cntMedia);
-                MediaVo mediaVo = new MediaVo();
+                MediaRedisVo mediaVo = new MediaRedisVo();
                 BeanUtil.copyProperties(cntMedia,mediaVo);
                 mediaVos3.add(mediaVo);
             }
@@ -503,16 +505,16 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
 
         if(cntCollection.getStatusBy()!=null && cntCollection.getStatusBy()==1){
             //存储redis
-            CollectionAllVo collectionAllVo = new CollectionAllVo();
+            CollectionAllRedisVo collectionAllVo = new CollectionAllRedisVo();
             //藏品主体信息
-            CollectionVo collectionVo = new CollectionVo();
+            CollectionRedisVo collectionVo = new CollectionRedisVo();
             collectionVo.setId(collectionId);
             collectionVo.setCollectionName(cntCollection.getCollectionName());
             collectionVo.setMediaVos(mediaVos1);
             collectionVo.setThumbnailImgMediaVos(mediaVos2);
             collectionVo.setThreeDimensionalMediaVos(mediaVos3);
-            collectionVo.setCateVo(initCateVo(cntCollection.getCateId()));
-            collectionVo.setCnfCreationdVo(initCnfCreationVo(cntCollection.getBindCreation()));
+            collectionVo.setCateRedisVo(initCateVo(cntCollection.getCateId()));
+            collectionVo.setCreationdRedisVo(initCnfCreationVo(cntCollection.getBindCreation()));
             collectionVo.setSourcePrice(cntCollection.getSourcePrice());
             collectionVo.setStatusBy(cntCollection.getStatusBy());
             collectionVo.setSelfBalance(cntCollection.getSelfBalance()==null?0:cntCollection.getSelfBalance());
@@ -521,16 +523,16 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
             if(cntCollectionLables.size()>0){
                 List<CntLable> lableList = lableService.list(Wrappers.<CntLable>lambdaQuery().in(CntLable::getId, cntCollectionLables.stream().map(item -> item.getLableId()).collect(Collectors.toList())));
                 if(lableList.size()>0){
-                    collectionVo.setLableVos(lableList.parallelStream().map(item -> {
-                        LableVo lableVo = Builder.of(LableVo::new).build();
+                    collectionVo.setLableRedisVos(lableList.parallelStream().map(item -> {
+                        LableRedisVo lableVo = Builder.of(LableRedisVo::new).build();
                         BeanUtil.copyProperties(item, lableVo);
                         return lableVo;
                     }).collect(Collectors.toList()));
                 }else {
-                    collectionVo.setLableVos(new ArrayList<LableVo>());
+                    collectionVo.setLableRedisVos(new ArrayList<LableRedisVo>());
                 }
             }else {
-                collectionVo.setLableVos(new ArrayList<LableVo>());
+                collectionVo.setLableRedisVos(new ArrayList<LableRedisVo>());
             }
             collectionVo.setPublishTime(DateUtils.toLocalDateTime(cntCollection.getPublishTime()));
             collectionVo.setCreatedTime(DateUtils.toLocalDateTime(cntCollection.getCreatedTime()));
@@ -540,10 +542,10 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                 collectionVo.setPreStatus(2);
             }
             //藏品介绍信息
-            CollectionInfoVo collectionInfoVo = new CollectionInfoVo();
+            CollectionInfoRedisVo collectionInfoVo = new CollectionInfoRedisVo();
             BeanUtil.copyProperties(cntCollectionInfo,collectionInfoVo);
-            collectionAllVo.setCollectionVo(collectionVo);
-            collectionAllVo.setCollectionInfoVo(collectionInfoVo);
+            collectionAllVo.setCollectionRedisVo(collectionVo);
+            collectionAllVo.setCollectionInfoRedisVo(collectionInfoVo);
             redisService.setCacheMapValue(BusinessConstants.RedisDict.COLLECTION_INFO,collectionId,collectionAllVo);
         }else {
             redisService.hashDelete(BusinessConstants.RedisDict.COLLECTION_INFO,collectionId);
@@ -873,7 +875,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         collection.setUpdatedTime(DateUtils.getNowDate());
         //更新redis
         if(collectionStateDto.getStatusBy()!=null && collectionStateDto.getStatusBy()==1){
-            CollectionAllVo collectionAllVo = Builder.of(CollectionAllVo::new).with(CollectionAllVo::setCollectionVo, providerCollectionVo(collection)).with(CollectionAllVo::setCollectionInfoVo, providerCollectionInfoVo(collectionStateDto.getId())).build();
+            CollectionAllRedisVo collectionAllVo = Builder.of(CollectionAllRedisVo::new).with(CollectionAllRedisVo::setCollectionRedisVo, providerCollectionVo(collection)).with(CollectionAllRedisVo::setCollectionInfoRedisVo, providerCollectionInfoVo(collectionStateDto.getId())).build();
             redisService.setCacheMapValue(BusinessConstants.RedisDict.COLLECTION_INFO,collectionStateDto.getId(),collectionAllVo);
         }else {
             redisService.hashDelete(BusinessConstants.RedisDict.COLLECTION_INFO,collection.getId());
@@ -881,8 +883,8 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         return updateById(collection)==true?1:0;
     }
 
-    private CollectionVo providerCollectionVo(CntCollection collection){
-        CollectionVo collectionVo = Builder.of(CollectionVo::new).build();
+    private CollectionRedisVo providerCollectionVo(CntCollection collection){
+        CollectionRedisVo collectionVo = Builder.of(CollectionRedisVo::new).build();
         BeanUtil.copyProperties(collection,collectionVo);
         // 数据隔离
         BuiCronDto typeBalanceCache = buiCronService.getTypeBalanceCache(COLLECTION_MODEL_TYPE, collection.getId());
@@ -896,12 +898,12 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         if (Integer.valueOf(0).equals(collection.getBalance())) {
             collectionVo.setStatusBy(2);
         }
-        collectionVo.setLableVos(initLableVos(collection.getId()));
+        collectionVo.setLableRedisVos(initLableVos(collection.getId()));
         collectionVo.setMediaVos(initMediaVos(collection.getId()));
         collectionVo.setThumbnailImgMediaVos(thumbnailImgMediaVos(collection.getId()));
         collectionVo.setThreeDimensionalMediaVos(threeDimensionalMediaVos(collection.getId()));
-        collectionVo.setCnfCreationdVo(initCnfCreationVo(collection.getBindCreation()));
-        collectionVo.setCateVo(initCateVo(collection.getCateId()));
+        collectionVo.setCreationdRedisVo(initCnfCreationVo(collection.getBindCreation()));
+        collectionVo.setCateRedisVo(initCateVo(collection.getCateId()));
         return collectionVo;
     }
 
@@ -910,8 +912,8 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
      * @param collectionId
      * @return
      */
-    private CollectionInfoVo providerCollectionInfoVo(String collectionId) {
-        CollectionInfoVo collectionInfoVo = Builder.of(CollectionInfoVo::new).build();
+    private CollectionInfoRedisVo providerCollectionInfoVo(String collectionId) {
+        CollectionInfoRedisVo collectionInfoVo = Builder.of(CollectionInfoRedisVo::new).build();
         CntCollectionInfo collectionInfo = collectionInfoService.getOne(Wrappers.<CntCollectionInfo>lambdaQuery().eq(CntCollectionInfo::getCollectionId, collectionId));
         BeanUtil.copyProperties(collectionInfo,collectionInfoVo);
         return collectionInfoVo;
@@ -922,9 +924,9 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
      * @param bindCreationId
      * @return
      */
-    private CnfCreationdVo initCnfCreationVo(String bindCreationId) {
+    private CreationdRedisVo initCnfCreationVo(String bindCreationId) {
         CnfCreationd cnfCreationd = cntCreationdService.getById(bindCreationId);
-        CnfCreationdVo creationdVo = Builder.of(CnfCreationdVo::new).build();
+        CreationdRedisVo creationdVo = Builder.of(CreationdRedisVo::new).build();
         BeanUtil.copyProperties(cnfCreationd,creationdVo);
         return creationdVo;
     }
@@ -934,8 +936,8 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
      * @param cateId
      * @return
      */
-    private CateVo initCateVo(String cateId) {
-        CateVo cateVo =  Builder.of(CateVo::new).build();
+    private CateRedisVo initCateVo(String cateId) {
+        CateRedisVo cateVo =  Builder.of(CateRedisVo::new).build();
         CntCate cntCate = cateService.getById(cateId);
         BeanUtil.copyProperties(cntCate,cateVo);
         return cateVo;
@@ -946,7 +948,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
      * @param collectionId
      * @return
      */
-    private List<LableVo> initLableVos(String collectionId) {
+    private List<LableRedisVo> initLableVos(String collectionId) {
         List<CntCollectionLable> collectionLables = collectionLableService.list(Wrappers.<CntCollectionLable>lambdaQuery().eq(CntCollectionLable::getCollectionId, collectionId));
         if (collectionLables.isEmpty())return ListUtil.empty();
 
@@ -954,7 +956,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         if (lableList.isEmpty())return ListUtil.empty();
 
         return lableList.parallelStream().map(item -> {
-            LableVo lableVo = Builder.of(LableVo::new).build();
+            LableRedisVo lableVo = Builder.of(LableRedisVo::new).build();
             BeanUtil.copyProperties(item, lableVo);
             return lableVo;
         }).collect(Collectors.toList());
@@ -965,8 +967,12 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
      * @param collectionId
      * @return
      */
-    private List<MediaVo> initMediaVos(String collectionId) {
-        return  mediaService.initMediaVos(collectionId, COLLECTION_MODEL_TYPE);
+    private List<MediaRedisVo> initMediaVos(String collectionId) {
+        return  mediaService.initMediaVos(collectionId, COLLECTION_MODEL_TYPE).parallelStream().map(m->{
+            MediaRedisVo mediaRedisVo = new MediaRedisVo();
+            BeanUtil.copyProperties(m,mediaRedisVo);
+            return mediaRedisVo;
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -974,8 +980,12 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
      * @param collectionId
      * @return
      */
-    private List<MediaVo> thumbnailImgMediaVos(String collectionId) {
-        return  mediaService.thumbnailImgMediaVos(collectionId, COLLECTION_MODEL_TYPE);
+    private List<MediaRedisVo> thumbnailImgMediaVos(String collectionId) {
+        return  mediaService.thumbnailImgMediaVos(collectionId, COLLECTION_MODEL_TYPE).parallelStream().map(m->{
+            MediaRedisVo mediaRedisVo = new MediaRedisVo();
+            BeanUtil.copyProperties(m,mediaRedisVo);
+            return mediaRedisVo;
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -983,8 +993,12 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
      * @param collectionId
      * @return
      */
-    private List<MediaVo> threeDimensionalMediaVos(String collectionId) {
-        return  mediaService.threeDimensionalMediaVos(collectionId, COLLECTION_MODEL_TYPE);
+    private List<MediaRedisVo> threeDimensionalMediaVos(String collectionId) {
+        return  mediaService.threeDimensionalMediaVos(collectionId, COLLECTION_MODEL_TYPE).parallelStream().map(m->{
+            MediaRedisVo mediaRedisVo = new MediaRedisVo();
+            BeanUtil.copyProperties(m,mediaRedisVo);
+            return mediaRedisVo;
+        }).collect(Collectors.toList());
     }
 
     @Override

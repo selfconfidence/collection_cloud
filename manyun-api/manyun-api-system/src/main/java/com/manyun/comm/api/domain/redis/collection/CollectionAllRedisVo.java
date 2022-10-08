@@ -1,4 +1,4 @@
-package com.manyun.admin.domain.redis.collection;
+package com.manyun.comm.api.domain.redis.collection;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -8,12 +8,12 @@ import java.io.Serializable;
 
 @ApiModel("藏品详细信息")
 @Data
-public class CollectionAllVo implements Serializable {
+public class CollectionAllRedisVo implements Serializable {
 
     @ApiModelProperty("藏品主体信息")
-    private CollectionVo collectionVo;
+    private CollectionRedisVo collectionRedisVo;
 
     @ApiModelProperty("藏品介绍信息")
-    private CollectionInfoVo collectionInfoVo;
+    private CollectionInfoRedisVo collectionInfoRedisVo;
 
 }

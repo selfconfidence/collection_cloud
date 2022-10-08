@@ -14,13 +14,14 @@ import com.manyun.admin.domain.CntBox;
 import com.manyun.admin.domain.CntCollection;
 import com.manyun.admin.domain.dto.SaveBoxCollectionDto;
 import com.manyun.admin.domain.query.BoxCollectionQuery;
-import com.manyun.admin.domain.redis.box.BoxCollectionJoinVo;
-import com.manyun.admin.domain.redis.box.BoxListVo;
-import com.manyun.admin.domain.redis.box.BoxVo;
 import com.manyun.admin.domain.vo.CntBoxCollectionVo;
 import com.manyun.admin.service.ICntBoxService;
 import com.manyun.admin.service.ICntCollectionService;
 import com.manyun.admin.service.ICntMediaService;
+import com.manyun.comm.api.domain.redis.MediaRedisVo;
+import com.manyun.comm.api.domain.redis.box.BoxCollectionJoinRedisVo;
+import com.manyun.comm.api.domain.redis.box.BoxListRedisVo;
+import com.manyun.comm.api.domain.redis.box.BoxRedisVo;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.utils.DateUtils;
@@ -97,10 +98,10 @@ public class CntBoxCollectionServiceImpl extends ServiceImpl<CntBoxCollectionMap
     @Transactional(rollbackFor = Exception.class)
     public int insertCntBoxCollection(SaveBoxCollectionDto boxCollectionDto)
     {
-        BoxVo boxVo = Builder.of(BoxVo::new).build();
+        BoxRedisVo boxVo = Builder.of(BoxRedisVo::new).build();
         String boxId = boxCollectionDto.getBoxId();
         CntBox cntBox = boxService.getById(boxId);
-        List<BoxCollectionJoinVo> boxCollectionJoinVos = new ArrayList<>();
+        List<BoxCollectionJoinRedisVo> boxCollectionJoinVos = new ArrayList<>();
         List<CntBoxCollectionVo> cntBoxCollectionVoList = boxCollectionDto.getCntBoxCollectionVos();
         Assert.isTrue(Objects.nonNull(cntBoxCollectionVoList),"新增失败!");
         Assert.isTrue(cntBoxCollectionVoList.size()>0,"请添加藏品!");
@@ -133,7 +134,7 @@ public class CntBoxCollectionServiceImpl extends ServiceImpl<CntBoxCollectionMap
                 cntBoxCollection.setCreatedTime(DateUtils.getNowDate());
                 saveBatchList.add(cntBoxCollection);
 
-                BoxCollectionJoinVo boxCollectionJoinVo = new BoxCollectionJoinVo();
+                BoxCollectionJoinRedisVo boxCollectionJoinVo = new BoxCollectionJoinRedisVo();
                 BeanUtil.copyProperties(cntBoxCollection,boxCollectionJoinVo);
                 boxCollectionJoinVos.add(boxCollectionJoinVo);
             }else {
@@ -147,7 +148,7 @@ public class CntBoxCollectionServiceImpl extends ServiceImpl<CntBoxCollectionMap
                     boxCollection.setUpdatedBy(SecurityUtils.getUsername());
                     boxCollection.setUpdatedTime(DateUtils.getNowDate());
                     updateBatchList.add(boxCollection);
-                    BoxCollectionJoinVo boxCollectionJoinVo = new BoxCollectionJoinVo();
+                    BoxCollectionJoinRedisVo boxCollectionJoinVo = new BoxCollectionJoinRedisVo();
                     BeanUtil.copyProperties(boxCollection,boxCollectionJoinVo);
                     boxCollectionJoinVos.add(boxCollectionJoinVo);
                 }else {
@@ -166,7 +167,7 @@ public class CntBoxCollectionServiceImpl extends ServiceImpl<CntBoxCollectionMap
                     cntBoxCollection.setCreatedBy(SecurityUtils.getUsername());
                     cntBoxCollection.setCreatedTime(DateUtils.getNowDate());
                     saveBatchList.add(cntBoxCollection);
-                    BoxCollectionJoinVo boxCollectionJoinVo = new BoxCollectionJoinVo();
+                    BoxCollectionJoinRedisVo boxCollectionJoinVo = new BoxCollectionJoinRedisVo();
                     BeanUtil.copyProperties(boxCollection,boxCollectionJoinVo);
                     boxCollectionJoinVos.add(boxCollectionJoinVo);
                 }
@@ -181,9 +182,9 @@ public class CntBoxCollectionServiceImpl extends ServiceImpl<CntBoxCollectionMap
 
         //更新redis
         if(cntBox.getStatusBy()!=null && cntBox.getStatusBy()==1){
-            BoxListVo boxListVo = initBoxListVo(cntBox);
-            boxVo.setBoxListVo(boxListVo);
-            boxVo.setBoxCollectionJoinVos(boxCollectionJoinVos);
+            BoxListRedisVo boxListVo = initBoxListVo(cntBox);
+            boxVo.setBoxListRedisVo(boxListVo);
+            boxVo.setBoxCollectionJoinRedisVoList(boxCollectionJoinVos);
             redisService.setCacheMapValue(BusinessConstants.RedisDict.BOX_INFO,boxId,boxVo);
         }else {
             redisService.hashDelete(BusinessConstants.RedisDict.BOX_INFO,boxId);
@@ -197,8 +198,8 @@ public class CntBoxCollectionServiceImpl extends ServiceImpl<CntBoxCollectionMap
      * @param cntBox
      * @return
      */
-    private BoxListVo initBoxListVo(CntBox cntBox){
-        BoxListVo boxListVo = Builder.of(BoxListVo::new).build();
+    private BoxListRedisVo initBoxListVo(CntBox cntBox){
+        BoxListRedisVo boxListVo = Builder.of(BoxListRedisVo::new).build();
         BeanUtil.copyProperties(cntBox,boxListVo);
         // 缓存库存数据隔离
         BuiCronDto typeBalanceCache = buiCronService.getTypeBalanceCache(BOX_MODEL_TYPE, cntBox.getId());
@@ -210,9 +211,21 @@ public class CntBoxCollectionServiceImpl extends ServiceImpl<CntBoxCollectionMap
             boxListVo.setPreStatus(2);
         }
         // 需要集成图片服务
-        boxListVo.setMediaVos(mediaService.initMediaVos(cntBox.getId(), BOX_MODEL_TYPE));
-        boxListVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(cntBox.getId(), BOX_MODEL_TYPE));
-        boxListVo.setThreeDimensionalMediaVos(mediaService.threeDimensionalMediaVos(cntBox.getId(), BOX_MODEL_TYPE));
+        boxListVo.setMediaVos(mediaService.initMediaVos(cntBox.getId(), BOX_MODEL_TYPE).parallelStream().map(m->{
+            MediaRedisVo mediaRedisVo = new MediaRedisVo();
+            BeanUtil.copyProperties(m,mediaRedisVo);
+            return mediaRedisVo;
+        }).collect(Collectors.toList()));
+        boxListVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(cntBox.getId(), BOX_MODEL_TYPE).parallelStream().map(m->{
+            MediaRedisVo mediaRedisVo = new MediaRedisVo();
+            BeanUtil.copyProperties(m,mediaRedisVo);
+            return mediaRedisVo;
+        }).collect(Collectors.toList()));
+        boxListVo.setThreeDimensionalMediaVos(mediaService.threeDimensionalMediaVos(cntBox.getId(), BOX_MODEL_TYPE).parallelStream().map(m->{
+            MediaRedisVo mediaRedisVo = new MediaRedisVo();
+            BeanUtil.copyProperties(m,mediaRedisVo);
+            return mediaRedisVo;
+        }).collect(Collectors.toList()));
         return boxListVo;
     }
 

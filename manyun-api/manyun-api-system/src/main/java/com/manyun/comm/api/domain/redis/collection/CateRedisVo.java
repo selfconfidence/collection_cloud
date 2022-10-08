@@ -1,7 +1,7 @@
-package com.manyun.admin.domain.redis.collection;
+package com.manyun.comm.api.domain.redis.collection;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.manyun.admin.domain.vo.CnfCreationdVo;
+import com.manyun.comm.api.domain.redis.CreationdRedisVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @ApiModel(value = "系列相关返回视图", description = "藏品系列_分类")
 @Data
 @ToString
-public class CateVo implements Serializable {
+public class CateRedisVo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -46,7 +46,7 @@ public class CateVo implements Serializable {
 
 
     @ApiModelProperty("创作者")
-    private CnfCreationdVo cnfCreationdVo;
+    private CreationdRedisVo creationdRedisVo;
 
 
     @ApiModelProperty("创建时间 yyyy-MM-dd HH:mm:ss")

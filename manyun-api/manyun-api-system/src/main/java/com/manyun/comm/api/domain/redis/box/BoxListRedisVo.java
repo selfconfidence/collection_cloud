@@ -1,7 +1,7 @@
-package com.manyun.admin.domain.redis.box;
+package com.manyun.comm.api.domain.redis.box;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.manyun.admin.domain.vo.MediaVo;
+import com.manyun.comm.api.domain.redis.MediaRedisVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -13,7 +13,7 @@ import java.util.List;
 
 @Data
 @ApiModel("盲盒列表返回视图")
-public class BoxListVo implements Serializable {
+public class BoxListRedisVo implements Serializable {
 
     @ApiModelProperty("盲盒编号")
     private String id;
@@ -42,13 +42,13 @@ public class BoxListVo implements Serializable {
 
 
     @ApiModelProperty("盲盒主图")
-    private List<MediaVo> mediaVos;
+    private List<MediaRedisVo> mediaVos;
 
     @ApiModelProperty("盲盒缩略图")
-    private List<MediaVo> thumbnailImgMediaVos;
+    private List<MediaRedisVo> thumbnailImgMediaVos;
 
     @ApiModelProperty("盲盒3D图")
-    private List<MediaVo> threeDimensionalMediaVos;
+    private List<MediaRedisVo> threeDimensionalMediaVos;
 
     @ApiModelProperty("盲盒详情")
     private String boxInfo;

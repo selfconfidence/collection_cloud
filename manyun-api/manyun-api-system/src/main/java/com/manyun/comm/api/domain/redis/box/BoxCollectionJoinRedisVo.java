@@ -1,4 +1,4 @@
-package com.manyun.admin.domain.redis.box;
+package com.manyun.comm.api.domain.redis.box;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -17,7 +17,7 @@ import java.math.BigDecimal;
  */
 @ApiModel(value = "盲盒关联藏品返回视图", description = "盲盒与藏品视图")
 @Data
-public class BoxCollectionJoinVo implements Serializable {
+public class BoxCollectionJoinRedisVo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

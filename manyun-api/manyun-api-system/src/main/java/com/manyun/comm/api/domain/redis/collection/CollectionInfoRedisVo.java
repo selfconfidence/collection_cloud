@@ -1,4 +1,4 @@
-package com.manyun.admin.domain.redis.collection;
+package com.manyun.comm.api.domain.redis.collection;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -18,7 +18,7 @@ import java.io.Serializable;
 @ApiModel(value = "商品详细信息返回视图", description = "藏品详情表")
 @Data
 @ToString
-public class CollectionInfoVo implements Serializable {
+public class CollectionInfoRedisVo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
