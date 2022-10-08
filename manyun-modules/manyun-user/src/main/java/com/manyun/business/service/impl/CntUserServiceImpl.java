@@ -287,7 +287,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     @Override
     public String getCertifyId(CntUserDto cntUser, UserAliyunRealForm userAliyunRealForm) {
         String certifyId = aliRealConfig.getCertifyId(userAliyunRealForm);
-        CntUser user = getById(cntUser.getUserId());
+        CntUser user = getById(cntUser.getId());
         user.setCertifyId(certifyId);
         updateById(user);
         return certifyId;
