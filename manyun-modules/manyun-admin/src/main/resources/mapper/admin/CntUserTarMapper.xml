@@ -9,6 +9,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="tarId"    column="tar_id"    />
         <result property="openTime"    column="open_time"    />
         <result property="userId"    column="user_id"    />
+        <result property="phone"    column="phone"    />
         <result property="goSell"    column="go_sell"    />
         <result property="buiId"    column="bui_id"    />
         <result property="isFull"    column="is_full"    />
@@ -19,7 +20,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectCntUserTarVo">
-        select id, tar_id, open_time, user_id, go_sell, bui_id, is_full, created_by, created_time, updated_by, updated_time from cnt_user_tar
+        select id, tar_id, open_time, user_id, phone, go_sell, bui_id, is_full, created_by, created_time, updated_by, updated_time from cnt_user_tar
     </sql>
 
     <select id="selectCntUserTarList" parameterType="UserTarQuery" resultType="com.manyun.admin.domain.vo.CntUserTarVo">
