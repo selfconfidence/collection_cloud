@@ -7,6 +7,8 @@ import com.manyun.business.domain.form.BoxSellForm;
 import com.manyun.business.domain.query.BoxQuery;
 import com.manyun.business.domain.query.UseAssertQuery;
 import com.manyun.business.domain.vo.*;
+import com.manyun.comm.api.domain.redis.box.BoxListRedisVo;
+import com.manyun.comm.api.domain.redis.box.BoxRedisVo;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 
@@ -41,4 +43,8 @@ public interface IBoxService extends IService<Box> {
     void checkBalance(String boxId, Integer sellNum);
 
     String sellOrderBox(BoxOrderSellForm boxOrderSellForm, String userId);
+
+    TableDataInfo<BoxListRedisVo> homeCacheList();
+
+    BoxRedisVo infoCache(String id, String userId);
 }

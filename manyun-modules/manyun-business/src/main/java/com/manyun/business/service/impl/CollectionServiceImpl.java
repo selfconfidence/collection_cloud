@@ -5,6 +5,8 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
@@ -27,6 +29,10 @@ import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
+import com.manyun.comm.api.domain.redis.collection.CollectionAllRedisVo;
+import com.manyun.comm.api.domain.redis.collection.CollectionRedisVo;
+import com.manyun.comm.api.domain.redis.collection.LableRedisVo;
+import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
@@ -36,12 +42,15 @@ import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.redis.domian.dto.BuiCronDto;
 import com.manyun.common.redis.service.BuiCronService;
+import com.manyun.common.redis.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
+import java.lang.System;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -95,6 +104,8 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
 
     private final RootPay rootPay;
 
+    private final RedisService redisService;
+
 
     private final ICntPostExcelService cntPostExcelService;
     private final ICntPostConfigService postConfigService;
@@ -126,7 +137,50 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     }
 
     @Override
+    public CollectionAllRedisVo infoCache(String id, String userId){
+        CollectionAllRedisVo collectionAllVo = redisService.getCacheMapValue(BusinessConstants.RedisDict.COLLECTION_INFO, id);
+        Assert.isTrue(Objects.nonNull(collectionAllVo),"此藏品未找到,请核实!");
+        // 需找库
+       // CntCollection byId = getById(id);
+        CntCollection cntCollection = getOne(Wrappers.<CntCollection>lambdaQuery().select(CntCollection::getId,CntCollection::getTarId, CntCollection::getPostTime).eq(CntCollection::getId, id));
+        CollectionRedisVo collectionRedisVo = collectionAllVo.getCollectionVo();
+        // 是否能够购买? 预先状态判定
+        collectionAllVo.setTarStatus(NO_TAR.getCode());
+        // 低耦性校验
+        if (StrUtil.isNotBlank(cntCollection.getTarId()) && StringUtils.isNotBlank(userId)){
+            collectionAllVo.setTarStatus(tarService.tarStatus(userId,id));
+            collectionAllVo.setOpenTime(tarService.getById(cntCollection.getTarId()).getOpenTime());
+        }
+
+
+        Integer postTime = null;
+        //提前购?
+        if (Objects.nonNull(cntCollection.getPostTime()) && StringUtils.isNotBlank(userId)){
+            // 两种验证,一种 excel , 一种 关联性 方式
+            //1. excel true 可以提前购, false 不可以
+            //2. 配置模板 true 可以提前购 false 不可以
+            if (cntPostExcelService.isExcelPostCustomer(userId,id) || postConfigService.isConfigPostCustomer(userId,id)){
+                postTime = cntCollection.getPostTime();
+            }
+        }
+        BuiCronDto typeBalanceCache = buiCronService.getTypeBalanceCache(COLLECTION_MODEL_TYPE, id);
+       collectionRedisVo.setBalance(typeBalanceCache.getBalance());
+       collectionRedisVo.setSelfBalance(typeBalanceCache.getSelfBalance());
+        if (collectionRedisVo.getPublishTime().isAfter(LocalDateTime.now())) {
+            collectionRedisVo.setPreStatus(1);
+        } else {
+            collectionRedisVo.setPreStatus(2);
+        }
+        if (Integer.valueOf(0).equals(typeBalanceCache.getBalance())) {
+            collectionRedisVo.setStatusBy(2);
+        }
+        collectionAllVo.setPostTime(postTime);
+         return collectionAllVo;
+    }
+
+    @Override
     public CollectionAllVo info(String id,String userId) {
+        // 不在入库，从redis 中获取。
         CntCollection cntCollection = getById(id);
         CollectionAllVo collectionAllVo = Builder.of(CollectionAllVo::new).with(CollectionAllVo::setCollectionVo, providerCollectionVo(cntCollection)).with(CollectionAllVo::setCollectionInfoVo, providerCollectionInfoVo(id)).build();
         // 是否能够购买? 预先状态判定
@@ -262,6 +316,32 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         List<String> boxNames = userBoxService.list(Wrappers.<UserBox>lambdaQuery().select(UserBox::getBoxTitle).like(UserBox::getBoxTitle, keyword).eq(UserBox::getUserId, userId).eq(UserBox::getIsExist, USE_EXIST.getCode()).orderByDesc(UserBox::getCreatedTime).last(" limit 10 ")).parallelStream().map(item -> item.getBoxTitle()).collect(Collectors.toList());
         return  initKeywordVo(Lists.newArrayList(Sets.newHashSet(collectIonNames)),Lists.newArrayList(Sets.newHashSet(boxNames)));
     }
+
+    @Override
+    public TableDataInfo<CollectionVo> homeCacheList() {
+        // 缓存拿取数据
+        Map<String, CollectionAllRedisVo> entries = redisService.redisTemplate.boundHashOps(BusinessConstants.RedisDict.COLLECTION_INFO).entries();
+        Collection<CollectionAllRedisVo> cacheList = entries.values();
+        List<CollectionRedisVo> collectionVoList = cacheList.parallelStream().map(item ->  {
+            CollectionRedisVo collectionRedisVo = item.getCollectionVo();
+            // 库存需要实时变动
+            BuiCronDto typeBalanceCache = buiCronService.getTypeBalanceCache(COLLECTION_MODEL_TYPE, collectionRedisVo.getId());
+            collectionRedisVo.setBalance(typeBalanceCache.getBalance());
+            collectionRedisVo.setSelfBalance(typeBalanceCache.getSelfBalance());
+            if (collectionRedisVo.getPublishTime().isAfter(LocalDateTime.now())) {
+                collectionRedisVo.setPreStatus(1);
+            } else {
+                collectionRedisVo.setPreStatus(2);
+            }
+            if (Integer.valueOf(0).equals(collectionRedisVo.getBalance())) {
+                collectionRedisVo.setStatusBy(2);
+            }
+            return collectionRedisVo;
+        }).collect(Collectors.toList());
+        // 二次包裹
+        return TableDataInfoUtil.pageCacheData(collectionVoList, collectionVoList.size());
+    }
+
 
     /**
      * 预先生成订单检测方法

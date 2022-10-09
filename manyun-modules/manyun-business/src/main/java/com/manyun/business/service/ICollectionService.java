@@ -6,6 +6,8 @@ import com.manyun.business.domain.form.CollectionSellForm;
 import com.manyun.business.domain.query.CollectionQuery;
 import com.manyun.business.domain.query.UseAssertQuery;
 import com.manyun.business.domain.vo.*;
+import com.manyun.comm.api.domain.redis.collection.CollectionAllRedisVo;
+import com.manyun.comm.api.domain.redis.collection.CollectionRedisVo;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 
@@ -24,7 +26,9 @@ public interface ICollectionService extends IService<CntCollection> {
 
     TableDataInfo<CollectionVo> pageQueryList(CollectionQuery collectionQuery);
 
-    CollectionAllVo info(String id,String userId);
+    CollectionAllRedisVo infoCache(String id, String userId);
+
+    CollectionAllVo info(String id, String userId);
 
     CollectionAllVo info(String id);
 
@@ -52,4 +56,6 @@ public interface ICollectionService extends IService<CntCollection> {
     void checkBalance(String cntCollectionId, Integer sellNum);
 
     List<KeywordVo> thisAssertQueryDict(String userId, String keyword);
+
+    TableDataInfo<CollectionVo> homeCacheList();
 }

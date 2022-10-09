@@ -1,6 +1,7 @@
 package com.manyun.business.controller;
 
 
+import cn.hutool.core.lang.Assert;
 import com.github.pagehelper.PageHelper;
 import com.manyun.business.domain.form.CollectionOrderSellForm;
 import com.manyun.business.domain.form.CollectionSellForm;
@@ -12,6 +13,8 @@ import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.ICollectionService;
 import com.manyun.business.service.ILogsService;
 import com.manyun.business.service.IUserCollectionService;
+import com.manyun.comm.api.domain.redis.collection.CollectionAllRedisVo;
+import com.manyun.comm.api.domain.redis.collection.CollectionRedisVo;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.annotation.RequestBodyRsa;
@@ -70,11 +73,18 @@ public class CollectionController extends BaseController{
         return R.ok(collectionService.pageQueryList(collectionQuery));
     }
 
+    @PostMapping("/homeCacheList")
+    @ApiOperation(value = "查询首页藏品缓存列表",notes = "不分页,默认查询全部上架!\n 调用此接口和之前一样即可,只需要变动下接口即可,但查询条件是无效的,分页也是无效的!")
+    public R<TableDataInfo<CollectionVo>>  homeCacheList(){
+        return R.ok(collectionService.homeCacheList());
+    }
+
+
     @GetMapping("/info/{id}")
     @ApiOperation(value = "查询藏品详情信息",notes = "根据藏品编号查询藏品详情信息 -需登录")
-    public R<CollectionAllVo> info(@PathVariable String id){
+    public R<CollectionAllRedisVo> info(@PathVariable String id){
         String userId = SecurityUtils.getBuiUserId();
-        return R.ok(collectionService.info(id,userId));
+        return R.ok(collectionService.infoCache(id,userId));
     }
 
     @GetMapping("/tarCollection/{id}")

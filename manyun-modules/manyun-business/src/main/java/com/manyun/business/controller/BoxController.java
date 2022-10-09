@@ -10,6 +10,8 @@ import com.manyun.business.service.ILogsService;
 import com.manyun.business.service.IUserBoxService;
 import com.manyun.comm.api.domain.dto.BoxListDto;
 import com.manyun.comm.api.domain.dto.OpenPleaseBoxDto;
+import com.manyun.comm.api.domain.redis.box.BoxListRedisVo;
+import com.manyun.comm.api.domain.redis.box.BoxRedisVo;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.annotation.RequestBodyRsa;
@@ -65,6 +67,13 @@ public class BoxController extends BaseController {
         return R.ok(boxService.pageList(boxQuery));
     }
 
+    @PostMapping("/homeCacheList")
+    @ApiOperation(value = "查询首页盲盒缓存列表",notes = "不分页,默认查询全部上架!\n 调用此接口和之前一样即可,只需要变动下接口即可,但查询条件是无效的,分页也是无效的!")
+    public R<TableDataInfo<BoxListRedisVo>>  homeCacheList(){
+        return R.ok(boxService.homeCacheList());
+    }
+
+
     @GetMapping("/tarBox/{id}")
     @ApiOperation(value = "对需要抽签的盲盒,进行抽签",notes = " id = 盲盒编号  \r data = 提示信息 例如 您已经参与对${buiName}抽签了,抽签结果将在${openTime}公布!")
     @Lock("tarBox")
@@ -76,9 +85,9 @@ public class BoxController extends BaseController {
 
     @GetMapping("/info/{id}")
     @ApiOperation("根据盲盒编号,查询盲盒的详细信息 -需登录")
-    public R<BoxVo> info(@PathVariable String id){
+    public R<BoxRedisVo> info(@PathVariable String id){
         LoginBusinessUser loginBusinessUser = SecurityUtils.getLoginBusinessUser();
-        return R.ok(boxService.info(id, Objects.nonNull(loginBusinessUser) ? loginBusinessUser.getUserId() : null));
+        return R.ok(boxService.infoCache(id, Objects.nonNull(loginBusinessUser) ? loginBusinessUser.getUserId() : null));
     }
 
     @GetMapping("/innerInfo/{id}")

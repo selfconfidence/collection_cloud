@@ -25,6 +25,10 @@ import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
+import com.manyun.comm.api.domain.redis.box.BoxListRedisVo;
+import com.manyun.comm.api.domain.redis.box.BoxRedisVo;
+import com.manyun.comm.api.domain.redis.collection.CollectionAllRedisVo;
+import com.manyun.comm.api.domain.redis.collection.CollectionRedisVo;
 import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
@@ -35,6 +39,7 @@ import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.redis.domian.dto.BuiCronDto;
 import com.manyun.common.redis.service.BuiCronService;
+import com.manyun.common.redis.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,13 +48,12 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE;
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE;
+import static com.manyun.common.core.constant.BusinessConstants.RedisDict.BOX_INFO;
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
 import static com.manyun.common.core.enums.BoxOpenType.NO_OPEN;
 import static com.manyun.common.core.enums.BoxOpenType.OK_OPEN;
@@ -117,6 +121,9 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
     @Autowired
     private  RemoteBuiUserService userService;
 
+    @Autowired
+    private RedisService redisService;
+
 
 
     /**
@@ -139,6 +146,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
      */
     @Override
     public BoxVo info(String id,String userId) {
+        // 不在入库,查询redis 缓存池中
         Box box = getById(id);
         BoxListVo boxListVo = initBoxListVo(box);
         BoxVo boxVo = Builder.of(BoxVo::new).build();
@@ -153,8 +161,6 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
             CntTar cntTar = tarService.getById(box.getTarId());
             boxVo.setOpenTime(cntTar.getOpenTime());
         }
-
-
 
         Integer postTime = null;
         //提前购?
@@ -264,6 +270,76 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
                 .userId(userId)
                 .build());
         return orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, outHost)).getId();
+    }
+
+    @Override
+    public TableDataInfo<BoxListRedisVo> homeCacheList() {
+        Map<String, BoxRedisVo> entries = redisService.redisTemplate.boundHashOps(BOX_INFO).entries();
+        Collection<BoxRedisVo> cacheList = entries.values();
+        List<BoxListRedisVo> collectionRedisVos = cacheList.parallelStream().map(item -> {
+            BoxListRedisVo boxListVo = item.getBoxListVo();
+            BuiCronDto typeBalanceCache = buiCronService.getTypeBalanceCache(BOX_MODEL_TYPE, boxListVo.getId());
+            boxListVo.setBalance(typeBalanceCache.getBalance());
+            boxListVo.setSelfBalance(typeBalanceCache.getSelfBalance());
+            if (boxListVo.getPublishTime().isAfter(LocalDateTime.now())) {
+                boxListVo.setPreStatus(1);
+            } else {
+                boxListVo.setPreStatus(2);
+            }
+            if (boxListVo.getBalance().equals(0)){
+                boxListVo.setStatusBy(2);
+            }
+            return boxListVo;
+        }).collect(Collectors.toList());
+        return TableDataInfoUtil.pageCacheData(collectionRedisVos, collectionRedisVos.size());
+    }
+
+    @Override
+    public BoxRedisVo infoCache(String id, String userId) {
+        // 不在入库,查询redis 缓存池中
+      /*  Box box = getById(id);
+        BoxListVo boxListVo = initBoxListVo(box);
+        BoxVo boxVo = Builder.of(BoxVo::new).build();
+        boxVo.setBoxListVo(boxListVo);
+        // 组合与藏品关联数据
+        boxVo.setBoxCollectionJoinVos(boxCollectionService.findJoinCollections(id));*/
+        BoxRedisVo boxVo = redisService.getCacheMapValue(BOX_INFO, id);
+        Assert.isTrue(Objects.nonNull(boxVo),"盲盒未找到,请核实!");
+        BoxListRedisVo boxListVo = boxVo.getBoxListVo();
+        // 是否能够购买? 预先状态判定
+        boxVo.setTarStatus(NO_TAR.getCode());
+        Box box = getOne(Wrappers.<Box>lambdaQuery().select(Box::getId, Box::getTarId, Box::getPostTime).eq(Box::getId, id));
+        // 低耦性校验
+        if (StrUtil.isNotBlank(box.getTarId()) && StringUtils.isNotBlank(userId)){
+            boxVo.setTarStatus(tarService.tarStatus(userId,id));
+            CntTar cntTar = tarService.getById(box.getTarId());
+            boxVo.setOpenTime(cntTar.getOpenTime());
+        }
+
+        Integer postTime = null;
+        //提前购?
+        if (Objects.nonNull(box.getPostTime())  && StringUtils.isNotBlank(userId)){
+            // 两种验证,一种 excel , 一种 关联性 方式
+            //1. excel true 可以提前购, false 不可以
+            //2. 配置模板 true 可以提前购 false 不可以
+            if (cntPostExcelService.isExcelPostCustomer(userId,id) || postConfigService.isConfigPostCustomer(userId,id)){
+                postTime = box.getPostTime();
+            }
+        }
+
+        BuiCronDto typeBalanceCache = buiCronService.getTypeBalanceCache(BOX_MODEL_TYPE, id);
+        boxListVo.setBalance(typeBalanceCache.getBalance());
+        boxListVo.setSelfBalance(typeBalanceCache.getSelfBalance());
+        if (boxListVo.getPublishTime().isAfter(LocalDateTime.now())) {
+            boxListVo.setPreStatus(1);
+        } else {
+            boxListVo.setPreStatus(2);
+        }
+        if (Integer.valueOf(0).equals(typeBalanceCache.getBalance())) {
+            boxListVo.setStatusBy(2);
+        }
+        boxVo.setPostTime(postTime);
+        return boxVo;
     }
 
     private void checkOrderSell(Box box, String userId) {
@@ -496,6 +572,9 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
             boxListVo.setPreStatus(1);
         } else {
             boxListVo.setPreStatus(2);
+        }
+        if (box.getBalance().equals(0)){
+            box.setStatusBy(2);
         }
         // 需要集成图片服务
         boxListVo.setMediaVos(mediaService.initMediaVos(box.getId(), BOX_MODEL_TYPE));
