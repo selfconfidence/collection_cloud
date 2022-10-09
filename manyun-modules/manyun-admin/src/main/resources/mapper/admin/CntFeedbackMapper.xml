@@ -24,21 +24,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, feedback_user_id, feedback_user_name, feedback_user_phone, link_addr, feedback_type, feedback_content, feedback_img, created_by, created_time, updated_by, updated_time, status from cnt_feedback
     </sql>
 
-    <select id="selectCntFeedbackList" parameterType="CntFeedback" resultMap="CntFeedbackResult">
+    <select id="selectCntFeedbackList" parameterType="FeedbackQuery" resultMap="CntFeedbackResult">
         <include refid="selectCntFeedbackVo"/>
         <where>
-            <if test="feedbackUserId != null  and feedbackUserId != ''"> and feedback_user_id = #{feedbackUserId}</if>
-            <if test="feedbackUserName != null  and feedbackUserName != ''"> and feedback_user_name like concat('%', #{feedbackUserName}, '%')</if>
             <if test="feedbackUserPhone != null  and feedbackUserPhone != ''"> and feedback_user_phone = #{feedbackUserPhone}</if>
-            <if test="linkAddr != null  and linkAddr != ''"> and link_addr = #{linkAddr}</if>
-            <if test="feedbackType != null  and feedbackType != ''"> and feedback_type = #{feedbackType}</if>
-            <if test="feedbackContent != null  and feedbackContent != ''"> and feedback_content = #{feedbackContent}</if>
-            <if test="feedbackImg != null  and feedbackImg != ''"> and feedback_img = #{feedbackImg}</if>
-            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
-            <if test="createdTime != null "> and created_time = #{createdTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''"> and updated_by = #{updatedBy}</if>
-            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
-            <if test="status != null  and status != ''"> and status = #{status}</if>
         </where>
         order by created_time desc
     </select>

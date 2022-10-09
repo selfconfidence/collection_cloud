@@ -12,9 +12,9 @@ import java.util.List;
 public class BoxRedisVo implements Serializable {
 
     @ApiModelProperty("盲盒基础信息")
-    private BoxListRedisVo boxListRedisVo;
+    private BoxListRedisVo boxListVo;
 
     @ApiModelProperty("盲盒关联的藏品描述列表")
-    private List<BoxCollectionJoinRedisVo> boxCollectionJoinRedisVoList;
+    private List<BoxCollectionJoinRedisVo> boxCollectionJoinVos;
 
 }

@@ -11,9 +11,9 @@ import java.io.Serializable;
 public class CollectionAllRedisVo implements Serializable {
 
     @ApiModelProperty("藏品主体信息")
-    private CollectionRedisVo collectionRedisVo;
+    private CollectionRedisVo collectionVo;
 
     @ApiModelProperty("藏品介绍信息")
-    private CollectionInfoRedisVo collectionInfoRedisVo;
+    private CollectionInfoRedisVo collectionInfoVo;
 
 }

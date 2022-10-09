@@ -3,6 +3,7 @@ package com.manyun.admin.service;
 import java.util.List;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntFeedback;
+import com.manyun.admin.domain.query.FeedbackQuery;
 import com.manyun.admin.domain.vo.CntFeedbackVo;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
@@ -19,10 +20,10 @@ public interface ICntFeedbackService extends IService<CntFeedback>
     /**
      * 查询产品举报反馈列表
      *
-     * @param pageQuery
+     * @param feedbackQuery
      * @return 产品举报反馈集合
      */
-    public TableDataInfo<CntFeedbackVo> selectCntFeedbackList(PageQuery pageQuery);
+    public TableDataInfo<CntFeedbackVo> selectCntFeedbackList(FeedbackQuery feedbackQuery);
 
     /**
      * 修改产品举报反馈

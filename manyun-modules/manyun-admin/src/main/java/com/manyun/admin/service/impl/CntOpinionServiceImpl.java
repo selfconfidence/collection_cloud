@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.github.pagehelper.PageHelper;
+import com.manyun.admin.domain.query.OpinionQuery;
 import com.manyun.admin.domain.vo.CntOpinionVo;
 import com.manyun.common.core.utils.DateUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -33,14 +34,14 @@ public class CntOpinionServiceImpl extends ServiceImpl<CntOpinionMapper,CntOpini
     /**
      * 查询产品建议列表
      *
-     * @param pageQuery
+     * @param opinionQuery
      * @return 产品建议
      */
     @Override
-    public TableDataInfo<CntOpinionVo> selectCntOpinionList(PageQuery pageQuery)
+    public TableDataInfo<CntOpinionVo> selectCntOpinionList(OpinionQuery opinionQuery)
     {
-        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
-        List<CntOpinion> cntOpinions = cntOpinionMapper.selectCntOpinionList(new CntOpinion());
+        PageHelper.startPage(opinionQuery.getPageNum(),opinionQuery.getPageSize());
+        List<CntOpinion> cntOpinions = cntOpinionMapper.selectCntOpinionList(opinionQuery);
         return TableDataInfoUtil.pageTableDataInfo(cntOpinions.parallelStream().map(m->{
             CntOpinionVo cntOpinionVo=new CntOpinionVo();
             BeanUtil.copyProperties(m,cntOpinionVo);

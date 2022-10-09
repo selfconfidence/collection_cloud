@@ -48,6 +48,7 @@
         <where>
             <if test="realName != null  and realName != ''"> and m.real_name like concat('%', #{realName}, '%')</if>
             <if test="phone != null  and phone != ''"> and u.phone = #{phone}</if>
+            <if test="isReal != null"> and u.is_real = #{isReal}</if>
         </where>
         order by u.created_time desc
     </select>

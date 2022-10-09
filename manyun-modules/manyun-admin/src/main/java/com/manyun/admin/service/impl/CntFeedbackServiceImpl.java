@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.github.pagehelper.PageHelper;
+import com.manyun.admin.domain.query.FeedbackQuery;
 import com.manyun.admin.domain.vo.CntFeedbackVo;
 import com.manyun.common.core.utils.DateUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -33,14 +34,14 @@ public class CntFeedbackServiceImpl extends ServiceImpl<CntFeedbackMapper,CntFee
     /**
      * 查询产品举报反馈列表
      *
-     * @param pageQuery
+     * @param feedbackQuery
      * @return 产品举报反馈
      */
     @Override
-    public TableDataInfo<CntFeedbackVo> selectCntFeedbackList(PageQuery pageQuery)
+    public TableDataInfo<CntFeedbackVo> selectCntFeedbackList(FeedbackQuery feedbackQuery)
     {
-        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
-        List<CntFeedback> cntFeedbacks = cntFeedbackMapper.selectCntFeedbackList(new CntFeedback());
+        PageHelper.startPage(feedbackQuery.getPageNum(),feedbackQuery.getPageSize());
+        List<CntFeedback> cntFeedbacks = cntFeedbackMapper.selectCntFeedbackList(feedbackQuery);
         return TableDataInfoUtil.pageTableDataInfo(cntFeedbacks.parallelStream().map(m->{
             CntFeedbackVo cntFeedbackVo=new CntFeedbackVo();
             BeanUtil.copyProperties(m,cntFeedbackVo);

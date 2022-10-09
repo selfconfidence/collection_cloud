@@ -183,8 +183,8 @@ public class CntBoxCollectionServiceImpl extends ServiceImpl<CntBoxCollectionMap
         //更新redis
         if(cntBox.getStatusBy()!=null && cntBox.getStatusBy()==1){
             BoxListRedisVo boxListVo = initBoxListVo(cntBox);
-            boxVo.setBoxListRedisVo(boxListVo);
-            boxVo.setBoxCollectionJoinRedisVoList(boxCollectionJoinVos);
+            boxVo.setBoxListVo(boxListVo);
+            boxVo.setBoxCollectionJoinVos(boxCollectionJoinVos);
             redisService.setCacheMapValue(BusinessConstants.RedisDict.BOX_INFO,boxId,boxVo);
         }else {
             redisService.hashDelete(BusinessConstants.RedisDict.BOX_INFO,boxId);

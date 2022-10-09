@@ -36,6 +36,12 @@ public class CntCollectionVo {
     @ApiModelProperty("已售")
     private Integer selfBalance;
 
+    @ApiModelProperty("缓存中的库存")
+    private Integer redisBalance;
+
+    @ApiModelProperty("缓存中的已售")
+    private Integer redisSelfBalance;
+
     @ApiModelProperty("总量")
     private Integer totalBalance;
 

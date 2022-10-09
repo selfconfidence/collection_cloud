@@ -4,6 +4,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntPostExcel;
 import com.manyun.admin.domain.excel.PostExcel;
+import com.manyun.admin.domain.query.PostExcelQuery;
 import com.manyun.admin.domain.vo.CntPostExcelVo;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.PageQuery;
@@ -21,10 +22,10 @@ public interface ICntPostExcelService extends IService<CntPostExcel>
     /**
      * 查询提前购格列表
      *
-     * @param pageQuery
+     * @param postExcelQuery
      * @return 提前购格集合
      */
-    public TableDataInfo<CntPostExcelVo> selectCntPostExcelList(PageQuery pageQuery);
+    public TableDataInfo<CntPostExcelVo> selectCntPostExcelList(PostExcelQuery postExcelQuery);
 
     /**
      * 批量删除提前购格

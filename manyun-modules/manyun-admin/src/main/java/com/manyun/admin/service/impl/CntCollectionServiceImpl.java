@@ -133,6 +133,9 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
             BeanUtil.copyProperties(m, cntCollectionVo);
             cntCollectionVo.setTotalBalance(m.getBalance().intValue() + m.getSelfBalance().intValue());
             cntCollectionVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(m.getId(), BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE));
+            BuiCronDto typeBalanceCache = buiCronService.getTypeBalanceCache(COLLECTION_MODEL_TYPE, m.getId());
+            cntCollectionVo.setRedisBalance(typeBalanceCache.getBalance());
+            cntCollectionVo.setRedisSelfBalance(typeBalanceCache.getSelfBalance());
             return cntCollectionVo;
         }).collect(Collectors.toList()), cntCollectionList);
     }
@@ -283,8 +286,8 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
             collectionVo.setMediaVos(mediaVos);
             collectionVo.setThumbnailImgMediaVos(thumbnailImgMediaVos);
             collectionVo.setThreeDimensionalMediaVos(threeDimensionalMediaVos);
-            collectionVo.setCateRedisVo(initCateVo(cntCollection.getCateId()));
-            collectionVo.setCreationdRedisVo(initCnfCreationVo(cntCollection.getBindCreation()));
+            collectionVo.setCateVo(initCateVo(cntCollection.getCateId()));
+            collectionVo.setCnfCreationdVo(initCnfCreationVo(cntCollection.getBindCreation()));
             collectionVo.setSourcePrice(cntCollection.getSourcePrice());
             collectionVo.setStatusBy(cntCollection.getStatusBy());
             collectionVo.setSelfBalance(cntCollection.getSelfBalance()==null?0:cntCollection.getSelfBalance());
@@ -293,7 +296,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
             if(cntCollectionLables.size()>0){
                 List<CntLable> lableList = lableService.list(Wrappers.<CntLable>lambdaQuery().in(CntLable::getId, cntCollectionLables.stream().map(item -> item.getLableId()).collect(Collectors.toList())));
                 if(lableList.size()>0){
-                    collectionVo.setLableRedisVos(lableList.parallelStream().map(item -> {
+                    collectionVo.setLableVos(lableList.parallelStream().map(item -> {
                         LableRedisVo lableVo = Builder.of(LableRedisVo::new).build();
                         BeanUtil.copyProperties(item, lableVo);
                         return lableVo;
@@ -310,8 +313,8 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
             //藏品介绍信息
             CollectionInfoRedisVo collectionInfoVo = new CollectionInfoRedisVo();
             BeanUtil.copyProperties(cntCollectionInfo,collectionInfoVo);
-            collectionAllVo.setCollectionRedisVo(collectionVo);
-            collectionAllVo.setCollectionInfoRedisVo(collectionInfoVo);
+            collectionAllVo.setCollectionVo(collectionVo);
+            collectionAllVo.setCollectionInfoVo(collectionInfoVo);
             redisService.setCacheMapValue(BusinessConstants.RedisDict.COLLECTION_INFO,idStr,collectionAllVo);
         }
         //初始化redis库存
@@ -513,8 +516,8 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
             collectionVo.setMediaVos(mediaVos1);
             collectionVo.setThumbnailImgMediaVos(mediaVos2);
             collectionVo.setThreeDimensionalMediaVos(mediaVos3);
-            collectionVo.setCateRedisVo(initCateVo(cntCollection.getCateId()));
-            collectionVo.setCreationdRedisVo(initCnfCreationVo(cntCollection.getBindCreation()));
+            collectionVo.setCateVo(initCateVo(cntCollection.getCateId()));
+            collectionVo.setCnfCreationdVo(initCnfCreationVo(cntCollection.getBindCreation()));
             collectionVo.setSourcePrice(cntCollection.getSourcePrice());
             collectionVo.setStatusBy(cntCollection.getStatusBy());
             collectionVo.setSelfBalance(cntCollection.getSelfBalance()==null?0:cntCollection.getSelfBalance());
@@ -523,16 +526,16 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
             if(cntCollectionLables.size()>0){
                 List<CntLable> lableList = lableService.list(Wrappers.<CntLable>lambdaQuery().in(CntLable::getId, cntCollectionLables.stream().map(item -> item.getLableId()).collect(Collectors.toList())));
                 if(lableList.size()>0){
-                    collectionVo.setLableRedisVos(lableList.parallelStream().map(item -> {
+                    collectionVo.setLableVos(lableList.parallelStream().map(item -> {
                         LableRedisVo lableVo = Builder.of(LableRedisVo::new).build();
                         BeanUtil.copyProperties(item, lableVo);
                         return lableVo;
                     }).collect(Collectors.toList()));
                 }else {
-                    collectionVo.setLableRedisVos(new ArrayList<LableRedisVo>());
+                    collectionVo.setLableVos(new ArrayList<LableRedisVo>());
                 }
             }else {
-                collectionVo.setLableRedisVos(new ArrayList<LableRedisVo>());
+                collectionVo.setLableVos(new ArrayList<LableRedisVo>());
             }
             collectionVo.setPublishTime(DateUtils.toLocalDateTime(cntCollection.getPublishTime()));
             collectionVo.setCreatedTime(DateUtils.toLocalDateTime(cntCollection.getCreatedTime()));
@@ -544,8 +547,8 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
             //藏品介绍信息
             CollectionInfoRedisVo collectionInfoVo = new CollectionInfoRedisVo();
             BeanUtil.copyProperties(cntCollectionInfo,collectionInfoVo);
-            collectionAllVo.setCollectionRedisVo(collectionVo);
-            collectionAllVo.setCollectionInfoRedisVo(collectionInfoVo);
+            collectionAllVo.setCollectionVo(collectionVo);
+            collectionAllVo.setCollectionInfoVo(collectionInfoVo);
             redisService.setCacheMapValue(BusinessConstants.RedisDict.COLLECTION_INFO,collectionId,collectionAllVo);
         }else {
             redisService.hashDelete(BusinessConstants.RedisDict.COLLECTION_INFO,collectionId);
@@ -875,7 +878,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         collection.setUpdatedTime(DateUtils.getNowDate());
         //更新redis
         if(collectionStateDto.getStatusBy()!=null && collectionStateDto.getStatusBy()==1){
-            CollectionAllRedisVo collectionAllVo = Builder.of(CollectionAllRedisVo::new).with(CollectionAllRedisVo::setCollectionRedisVo, providerCollectionVo(collection)).with(CollectionAllRedisVo::setCollectionInfoRedisVo, providerCollectionInfoVo(collectionStateDto.getId())).build();
+            CollectionAllRedisVo collectionAllVo = Builder.of(CollectionAllRedisVo::new).with(CollectionAllRedisVo::setCollectionVo, providerCollectionVo(collection)).with(CollectionAllRedisVo::setCollectionInfoVo, providerCollectionInfoVo(collectionStateDto.getId())).build();
             redisService.setCacheMapValue(BusinessConstants.RedisDict.COLLECTION_INFO,collectionStateDto.getId(),collectionAllVo);
         }else {
             redisService.hashDelete(BusinessConstants.RedisDict.COLLECTION_INFO,collection.getId());
@@ -898,12 +901,12 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         if (Integer.valueOf(0).equals(collection.getBalance())) {
             collectionVo.setStatusBy(2);
         }
-        collectionVo.setLableRedisVos(initLableVos(collection.getId()));
+        collectionVo.setLableVos(initLableVos(collection.getId()));
         collectionVo.setMediaVos(initMediaVos(collection.getId()));
         collectionVo.setThumbnailImgMediaVos(thumbnailImgMediaVos(collection.getId()));
         collectionVo.setThreeDimensionalMediaVos(threeDimensionalMediaVos(collection.getId()));
-        collectionVo.setCreationdRedisVo(initCnfCreationVo(collection.getBindCreation()));
-        collectionVo.setCateRedisVo(initCateVo(collection.getCateId()));
+        collectionVo.setCnfCreationdVo(initCnfCreationVo(collection.getBindCreation()));
+        collectionVo.setCateVo(initCateVo(collection.getCateId()));
         return collectionVo;
     }
 

@@ -32,10 +32,10 @@ public class CollectionRedisVo implements Serializable {
     private List<MediaRedisVo> threeDimensionalMediaVos;
 
     @ApiModelProperty("系列")
-    private CateRedisVo cateRedisVo;
+    private CateRedisVo cateVo;
 
     @ApiModelProperty("创作者")
-    private CreationdRedisVo creationdRedisVo;
+    private CreationdRedisVo cnfCreationdVo;
 
     @ApiModelProperty("藏品原价")
     private BigDecimal sourcePrice;
@@ -53,7 +53,7 @@ public class CollectionRedisVo implements Serializable {
     @ApiModelProperty("藏品现价_实际支付的价格")
     private BigDecimal realPrice;
     @ApiModelProperty("藏品标签")
-    private List<LableRedisVo> lableRedisVos;
+    private List<LableRedisVo> lableVos;
 
     @ApiModelProperty("发售时间;到达对应时间点才可以正常交易_平台   yyyy-MM-dd HH:mm:ss")
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")

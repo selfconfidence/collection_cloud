@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.*;
 import com.manyun.admin.domain.excel.PostExcel;
+import com.manyun.admin.domain.query.PostExcelQuery;
 import com.manyun.admin.domain.vo.CntPostExcelVo;
 import com.manyun.admin.service.ICntBoxService;
 import com.manyun.admin.service.ICntCollectionService;
@@ -58,14 +59,14 @@ public class CntPostExcelServiceImpl extends ServiceImpl<CntPostExcelMapper,CntP
     /**
      * 查询提前购格列表
      *
-     * @param pageQuery
+     * @param postExcelQuery
      * @return 提前购格
      */
     @Override
-    public TableDataInfo<CntPostExcelVo> selectCntPostExcelList(PageQuery pageQuery)
+    public TableDataInfo<CntPostExcelVo> selectCntPostExcelList(PostExcelQuery postExcelQuery)
     {
-        PageHelper.startPage(pageQuery.getPageNum(),pageQuery.getPageSize());
-        List<CntPostExcel> cntPostExcels = cntPostExcelMapper.selectCntPostExcelList(new CntPostExcel());
+        PageHelper.startPage(postExcelQuery.getPageNum(),postExcelQuery.getPageSize());
+        List<CntPostExcel> cntPostExcels = cntPostExcelMapper.selectCntPostExcelList(postExcelQuery);
         List<CntUser> userList = userService.list();
         return TableDataInfoUtil.pageTableDataInfo(cntPostExcels.parallelStream().map(m->{
             Optional<CntUser> user = userList.parallelStream().filter(ff -> ff.getId().equals(m.getUserId())).findFirst();

@@ -121,6 +121,9 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
                     BeanUtil.copyProperties(item, cntBoxVo);
                     cntBoxVo.setTotalBalance(item.getBalance().intValue() + item.getSelfBalance().intValue());
                     cntBoxVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(item.getId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+                    BuiCronDto typeBalanceCache = buiCronService.getTypeBalanceCache(BOX_MODEL_TYPE, item.getId());
+                    cntBoxVo.setRedisBalance(typeBalanceCache.getBalance());
+                    cntBoxVo.setRedisSelfBalance(typeBalanceCache.getSelfBalance());
                     return cntBoxVo;
                 }).collect(Collectors.toList()),cntBoxList);
     }
@@ -400,8 +403,8 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
            } else {
                boxListRedisVo.setPreStatus(2);
            }
-           boxRedisVo.setBoxListRedisVo(boxListRedisVo);
-           boxRedisVo.setBoxCollectionJoinRedisVoList(findJoinCollections(boxId));
+           boxRedisVo.setBoxListVo(boxListRedisVo);
+           boxRedisVo.setBoxCollectionJoinVos(findJoinCollections(boxId));
            redisService.setCacheMapValue(BusinessConstants.RedisDict.BOX_INFO,boxId,boxRedisVo);
        }else {
            redisService.hashDelete(BusinessConstants.RedisDict.BOX_INFO,boxId);
@@ -466,9 +469,9 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
             //更新redis
             BoxListRedisVo boxListRedisVo = initBoxListVo(cntBox);
             BoxRedisVo boxRedisVo = Builder.of(BoxRedisVo::new).build();
-            boxRedisVo.setBoxListRedisVo(boxListRedisVo);
+            boxRedisVo.setBoxListVo(boxListRedisVo);
             // 组合与藏品关联数据
-            boxRedisVo.setBoxCollectionJoinRedisVoList(findJoinCollections(cntBox.getId()));
+            boxRedisVo.setBoxCollectionJoinVos(findJoinCollections(cntBox.getId()));
             redisService.setCacheMapValue(BusinessConstants.RedisDict.BOX_INFO,boxStateDto.getId(),boxRedisVo);
         }else {
             redisService.hashDelete(BusinessConstants.RedisDict.BOX_INFO,cntBox.getId());

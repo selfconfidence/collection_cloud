@@ -3,6 +3,7 @@ package com.manyun.admin.controller;
 import java.util.List;
 
 import com.manyun.admin.domain.excel.PostExcel;
+import com.manyun.admin.domain.query.PostExcelQuery;
 import com.manyun.admin.domain.vo.CntPostExcelVo;
 import com.manyun.comm.api.domain.SysUser;
 import com.manyun.common.core.domain.R;
@@ -44,9 +45,9 @@ public class CntPostExcelController extends BaseController
     //@RequiresPermissions("admin:excel:list")
     @GetMapping("/list")
     @ApiOperation("查询提前购格列表")
-    public TableDataInfo<CntPostExcelVo> list(PageQuery pageQuery)
+    public TableDataInfo<CntPostExcelVo> list(PostExcelQuery postExcelQuery)
     {
-        return cntPostExcelService.selectCntPostExcelList(pageQuery);
+        return cntPostExcelService.selectCntPostExcelList(postExcelQuery);
     }
 
     /**

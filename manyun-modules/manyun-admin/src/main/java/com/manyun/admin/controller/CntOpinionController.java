@@ -2,6 +2,7 @@ package com.manyun.admin.controller;
 
 import java.util.List;
 
+import com.manyun.admin.domain.query.OpinionQuery;
 import com.manyun.admin.domain.vo.CntOpinionVo;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.PageQuery;
@@ -41,9 +42,9 @@ public class CntOpinionController extends BaseController
     //@RequiresPermissions("admin:opinion:list")
     @GetMapping("/list")
     @ApiOperation("查询产品建议列表")
-    public TableDataInfo<CntOpinionVo> list(PageQuery pageQuery)
+    public TableDataInfo<CntOpinionVo> list(OpinionQuery opinionQuery)
     {
-        return cntOpinionService.selectCntOpinionList(pageQuery);
+        return cntOpinionService.selectCntOpinionList(opinionQuery);
     }
 
     /**
