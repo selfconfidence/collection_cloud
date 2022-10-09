@@ -49,6 +49,14 @@
             <if test="realName != null  and realName != ''"> and m.real_name like concat('%', #{realName}, '%')</if>
             <if test="phone != null  and phone != ''"> and u.phone = #{phone}</if>
             <if test="isReal != null"> and u.is_real = #{isReal}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                and date_format(u.created_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                and date_format(u.created_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
         </where>
         order by u.created_time desc
     </select>
