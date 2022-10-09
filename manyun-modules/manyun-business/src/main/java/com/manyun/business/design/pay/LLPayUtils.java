@@ -1,10 +1,12 @@
 package com.manyun.business.design.pay;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alipay.api.domain.RefundUnfreezeResult;
 import com.manyun.business.design.pay.bean.*;
 import com.manyun.business.design.pay.bean.cashier.*;
+import com.manyun.business.design.pay.bean.changePayPass.*;
 import com.manyun.business.design.pay.bean.individual.*;
 import com.manyun.business.design.pay.bean.morePayeeRefund.*;
 import com.manyun.business.design.pay.bean.query.*;
@@ -66,6 +68,10 @@ public class LLPayUtils {
     private final static String queryRefund = "https://accpapi.lianlianpay.com/v1/txn/query-refund";
     //随机因子获取
     private final static String getRandom = "https://accpapi.lianlianpay.com/v1/acctmgr/get-random";
+    //找回密码
+    private final static String changePayPass = "https://accpapi.lianlianpay.com/v1/acctmgr/find-password-apply";
+    //找回密码验证
+    private final static String changePayPassVerify = "https://accpapi.lianlianpay.com/v1/acctmgr/find-password-verify";
 
     //使用时,需确认用户实名状况,必须是实名用户
     /**
@@ -640,5 +646,52 @@ public class LLPayUtils {
                 .with(GetRandomVo::setMapArr, getRandomResult.getMap_arr())
                 .build();
     }
+
+
+    /**
+     * 找回支付密码
+     * @param changePayPassForm
+     * @return
+     */
+    public static ChangePayPassResult changeLianLianPayPass(ChangePayPassForm changePayPassForm, String userId) {
+        ChangePayPassParams params = new ChangePayPassParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(LLianPayConstant.OidPartner);
+        if (StrUtil.isNotBlank(changePayPassForm.getLinked_acctno())) {
+            params.setLinked_acctno(changePayPassForm.getLinked_acctno());
+        }
+        params.setLinked_acctno(changePayPassForm.getLinked_acctno());
+        params.setUser_id(userId);
+        LLianPayClient lLianPayClient = new LLianPayClient();
+        String resultJsonStr = lLianPayClient.sendRequest(changePayPass, JSON.toJSONString(params));
+        log.info("找回支付密码申请------" + resultJsonStr);
+
+        ChangePayPassResult changePayPassResult = JSON.parseObject(resultJsonStr, ChangePayPassResult.class);
+        Assert.isTrue("0000".equalsIgnoreCase(changePayPassResult.getRet_code()),changePayPassResult.getRet_msg());
+        return changePayPassResult;
+
+    }
+
+
+    public static ChangePayPassVerifyResult changeLianLianPayPassVerify(ChangePayPassVerifyForm changePayPassVerifyForm, String userId) {
+        ChangePayPassVerifyParams params = new ChangePayPassVerifyParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(LLianPayConstant.OidPartner);
+        params.setRandom_key(changePayPassVerifyForm.getRandom_key());
+        params.setToken(changePayPassVerifyForm.getToken());
+        params.setUser_id(userId);
+        params.setPassword(changePayPassVerifyForm.getPassword());
+        params.setVerify_code(changePayPassVerifyForm.getVerify_code());
+        LLianPayClient lLianPayClient = new LLianPayClient();
+        String resultJsonStr = lLianPayClient.sendRequest(changePayPassVerify, JSON.toJSONString(params));
+        log.info("找回支付密码验证-----" + resultJsonStr);
+        ChangePayPassVerifyResult changePayPassVerifyResult = JSON.parseObject(resultJsonStr, ChangePayPassVerifyResult.class);
+        Assert.isTrue("0000".equalsIgnoreCase(changePayPassVerifyResult.getRet_code()),changePayPassVerifyResult.getRet_msg());
+        return changePayPassVerifyResult;
+    }
+
+
 
 }
