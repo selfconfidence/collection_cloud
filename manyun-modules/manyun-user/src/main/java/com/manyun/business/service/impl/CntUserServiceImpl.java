@@ -40,6 +40,7 @@ import com.manyun.common.core.utils.jg.JgAuthLoginUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
@@ -234,6 +235,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
      * @param userRegForm
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void regUser(UserRegForm userRegForm) {
         CntUser user = getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPhone, userRegForm.getPhone()));
         Assert.isTrue(Objects.isNull(user),"您已注册,请登录！");

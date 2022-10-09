@@ -468,8 +468,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
 
     @Override
-    public OrderInfoVo info(String id) {
+    public OrderInfoVo info(String id,String userId) {
         Order order = getById(id);
+        Assert.isTrue(Objects.nonNull(order),"订单不存在,请核实!");
+        Assert.isTrue(order.getUserId().equals(userId),"此订单不是当前用户订单,请核实!");
         OrderInfoVo orderInfoVo = Builder.of(OrderInfoVo::new).build();
         BeanUtil.copyProperties(order, orderInfoVo );
         OrderCollectionInfoVo collectionInfoVo = Builder.of(OrderCollectionInfoVo::new).build();

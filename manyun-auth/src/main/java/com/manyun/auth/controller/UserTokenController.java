@@ -10,6 +10,7 @@ import com.manyun.comm.api.domain.vo.AccTokenVo;
 import com.manyun.comm.api.model.LoginBusinessUser;
 import com.manyun.comm.api.model.LoginPhoneCodeForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.annotation.RequestBodyRsa;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.CodeStatus;
@@ -83,6 +84,7 @@ public class UserTokenController {
      */
     @PostMapping("/jgAuthPhoneLogin")
     @ApiOperation(value = "激光 一键 登录/注册",notes = "成功返回业务token")
+    @Lock("jgAuthPhoneLogin")
     public R<AccTokenVo> jgPhoneLogin(@RequestBodyRsa JgLoginTokenForm jgLoginTokenForm){
         R<CntUserDto> cntUserR = remoteBuiUserService.jgPhoneLogin(jgLoginTokenForm,SecurityConstants.INNER);
         Assert.isTrue(cntUserR.getCode() == CodeStatus.SUCCESS.getCode(),cntUserR.getMsg());

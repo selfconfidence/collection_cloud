@@ -66,7 +66,8 @@ public class OrderController extends BaseController {
             "moneyBln 是组合支付的时候 用余额抵扣后剩余的金额, payType =0 才有用,如果订单状态是待支付,并且 这个值 不是0.00,那就说明 那么剩余需要支付的金额就是 (订单金额 - moneyBln) 并且二次支付 必须指定是 payType = 0,这种情况固定死即可!  " +
             " \n")
     public R<OrderInfoVo> orderInfo(@PathVariable String id){
-        return R.ok(orderService.info(id));
+        String userId = SecurityUtils.getNotNullLoginBusinessUser().getUserId();
+        return R.ok(orderService.info(id,userId));
     }
 
     /**

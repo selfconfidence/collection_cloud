@@ -180,7 +180,6 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
 
     @Override
     public CollectionAllVo info(String id,String userId) {
-        // 不在入库，从redis 中获取。
         CntCollection cntCollection = getById(id);
         CollectionAllVo collectionAllVo = Builder.of(CollectionAllVo::new).with(CollectionAllVo::setCollectionVo, providerCollectionVo(cntCollection)).with(CollectionAllVo::setCollectionInfoVo, providerCollectionInfoVo(id)).build();
         // 是否能够购买? 预先状态判定
@@ -664,6 +663,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     public UserCollectionForVo userCollectionInfo(String id) {
         UserCollectionForVo userCollectionForVo = Builder.of(UserCollectionForVo::new).build();
         UserCollectionVo userCollectionVo = userCollectionService.userCollectionById(id);
+        Assert.isTrue(Objects.nonNull(userCollectionVo),"未找到相关藏品,请核实!");
         userCollectionVo.setMediaVos(initMediaVos(userCollectionVo.getCollectionId()));
         userCollectionVo.setThumbnailImgMediaVos(thumbnailImgMediaVos(userCollectionVo.getCollectionId()));
         userCollectionVo.setThreeDimensionalMediaVos(threeDimensionalMediaVos(userCollectionVo.getCollectionId()));

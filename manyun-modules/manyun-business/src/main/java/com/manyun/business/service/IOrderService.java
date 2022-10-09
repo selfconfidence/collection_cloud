@@ -50,7 +50,7 @@ public interface IOrderService extends IService<Order> {
 
     void notifyPayConsignmentSuccess(String outHost);
 
-    OrderInfoVo info(String id);
+    OrderInfoVo info(String id,String userId);
 
     PayVo unifiedOrder(OrderPayForm orderPayForm,String userId);
 
