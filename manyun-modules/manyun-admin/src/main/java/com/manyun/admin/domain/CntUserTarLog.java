@@ -9,9 +9,9 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import java.io.Serializable;
 
-@ApiModel("用户抽签购买藏品或盲盒中间对象")
-@TableName("cnt_user_tar")
-public class CntUserTar implements Serializable
+@ApiModel("抽签记录日志对象")
+@TableName("cnt_user_tar_log")
+public class CntUserTarLog implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
@@ -21,24 +21,23 @@ public class CntUserTar implements Serializable
     @ApiModelProperty("抽签编号")
     private String tarId;
 
-    @ApiModelProperty("开奖时间")
-    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date openTime;
-
-    @ApiModelProperty("用户编号")
-    private String userId;
-
     @ApiModelProperty("用户手机号")
-    private String phone;
+    private String userPhone;
 
-    @ApiModelProperty("是否购买，1=未购买,2=已购买")
-    private Integer goSell;
+    @ApiModelProperty("商品编号")
+    private String goodsId;
 
-    @ApiModelProperty("业务编号;(盲盒,藏品的编号)")
-    private String buiId;
+    @ApiModelProperty("投递类型 0:藏品 1:盲盒")
+    private Integer goodsType;
 
     @ApiModelProperty("1=已抽中,2=未抽中,4等待开奖")
     private Integer isFull;
+
+    @ApiModelProperty("状态 0:成功 1:失败")
+    private Integer status;
+
+    @ApiModelProperty("详情")
+    private String info;
 
     @ApiModelProperty("创建人")
     private String createdBy;
@@ -72,49 +71,32 @@ public class CntUserTar implements Serializable
     {
         return tarId;
     }
-    public void setOpenTime(Date openTime)
+    public void setUserPhone(String userPhone)
     {
-        this.openTime = openTime;
+        this.userPhone = userPhone;
     }
 
-    public Date getOpenTime()
+    public String getUserPhone()
     {
-        return openTime;
+        return userPhone;
     }
-    public void setUserId(String userId)
+    public void setGoodsId(String goodsId)
     {
-        this.userId = userId;
+        this.goodsId = goodsId;
     }
 
-    public String getUserId()
+    public String getGoodsId()
     {
-        return userId;
+        return goodsId;
     }
-    public void setGoSell(Integer goSell)
+    public void setGoodsType(Integer goodsType)
     {
-        this.goSell = goSell;
+        this.goodsType = goodsType;
     }
 
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public Integer getGoSell()
+    public Integer getGoodsType()
     {
-        return goSell;
-    }
-    public void setBuiId(String buiId)
-    {
-        this.buiId = buiId;
-    }
-
-    public String getBuiId()
-    {
-        return buiId;
+        return goodsType;
     }
     public void setIsFull(Integer isFull)
     {
@@ -124,6 +106,24 @@ public class CntUserTar implements Serializable
     public Integer getIsFull()
     {
         return isFull;
+    }
+    public void setStatus(Integer status)
+    {
+        this.status = status;
+    }
+
+    public Integer getStatus()
+    {
+        return status;
+    }
+    public void setInfo(String info)
+    {
+        this.info = info;
+    }
+
+    public String getInfo()
+    {
+        return info;
     }
     public void setCreatedBy(String createdBy)
     {
@@ -167,11 +167,12 @@ public class CntUserTar implements Serializable
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("id", getId())
             .append("tarId", getTarId())
-            .append("openTime", getOpenTime())
-            .append("userId", getUserId())
-            .append("goSell", getGoSell())
-            .append("buiId", getBuiId())
+            .append("userPhone", getUserPhone())
+            .append("goodsId", getGoodsId())
+            .append("goodsType", getGoodsType())
             .append("isFull", getIsFull())
+            .append("status", getStatus())
+            .append("info", getInfo())
             .append("createdBy", getCreatedBy())
             .append("createdTime", getCreatedTime())
             .append("updatedBy", getUpdatedBy())
