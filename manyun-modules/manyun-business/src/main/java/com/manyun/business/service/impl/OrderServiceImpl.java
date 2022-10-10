@@ -719,7 +719,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Assert.isTrue(userId.equals(order.getUserId()), "订单被篡改,请联系平台!" );
         Assert.isTrue(WAIT_ORDER.getCode().equals(order.getOrderStatus()),"待支付订单才可支付!");
         Assert.isTrue(order.getEndTime().compareTo(LocalDateTime.now()) >=0,"付款时间已截止,请核实订单状态!");
-        if (MONEY_TAPE.getCode().equals(payType)) Assert.isTrue(payPass.equals(cntUserDto.getPayPass()),"支付密码错误,请核实!");
+        //if (MONEY_TAPE.getCode().equals(payType)) Assert.isTrue(payPass.equals(cntUserDto.getPayPass()),"支付密码错误,请核实!");
 
     }
 
