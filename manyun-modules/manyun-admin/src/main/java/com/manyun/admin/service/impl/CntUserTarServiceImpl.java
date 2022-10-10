@@ -130,14 +130,14 @@ public class CntUserTarServiceImpl extends ServiceImpl<CntUserTarMapper,CntUserT
             });
         }
 
-        List<CntUserTar> userTars = list();
-        List<CntUser> users = userService.list(Wrappers.<CntUser>lambdaQuery().in(CntUser::getPhone, userTarExcels.parallelStream().map(UserTarExcel::getPhone).collect(Collectors.toList())));
-        userTarExcels.parallelStream().forEach(e -> {
-            Optional<CntUser> optionalCntUser = users.parallelStream().filter(ff -> e.getPhone().equals(ff.getPhone())).findFirst();
+        List<CntUserTar> userTars = list(Wrappers.<CntUserTar>lambdaQuery().eq(CntUserTar::getTarId,tarIds.parallelStream().findFirst().get()));
+        List<CntUser> users = userService.list(Wrappers.<CntUser>lambdaQuery().isNotNull(CntUser::getPhone).in(CntUser::getPhone, userTarExcels.parallelStream().map(UserTarExcel::getPhone).collect(Collectors.toList())));
+        userTarExcels.stream().forEach(e -> {
+            Optional<CntUser> optionalCntUser = users.stream().filter(ff -> ff.getPhone().equals(e.getPhone())).findFirst();
             if(Objects.nonNull(optionalCntUser)){
                 if(optionalCntUser.isPresent()){
-                    Optional<CntUserTar> optionalCntUserTar = userTars.parallelStream().filter(ff -> (e.getTarId().equals(ff.getTarId()) && (optionalCntUser.get().getId().equals(ff.getUserId()) || e.getPhone().equals(ff.getPhone()) ))).findFirst();
-                    if(Objects.nonNull(optionalCntUserTar)){
+                    if(userTars.size()>0){
+                        Optional<CntUserTar> optionalCntUserTar = userTars.stream().filter(ff -> ff.getUserId().equals(optionalCntUser.get().getId()) || e.getPhone().equals(ff.getPhone())).findFirst();
                         if(optionalCntUserTar.isPresent()){
                             updateList.add(
                                     Builder.of(CntUserTar::new)
@@ -194,6 +194,34 @@ public class CntUserTarServiceImpl extends ServiceImpl<CntUserTarMapper,CntUserT
                                             .build()
                             );
                         }
+                    } else {
+                        insertList.add(
+                                Builder.of(CntUserTar::new)
+                                        .with(CntUserTar::setId, IdUtils.getSnowflakeNextIdStr())
+                                        .with(CntUserTar::setTarId, e.getTarId())
+                                        .with(CntUserTar::setUserId, optionalCntUser.get().getId())
+                                        .with(CntUserTar::setPhone, e.getPhone())
+                                        .with(CntUserTar::setBuiId,cntTar.getTarType()==1?cntBox.getId():cntCollection.getId())
+                                        .with(CntUserTar::setIsFull,e.getIsFull())
+                                        .with(CntUserTar::setCreatedBy, SecurityUtils.getUsername())
+                                        .with(CntUserTar::setCreatedTime, DateUtils.getNowDate())
+                                        .build()
+                        );
+                        if(e.getIsFull()==1)awardPhones.add(e.getPhone());
+                        cntUserTarLogs.add(
+                                Builder.of(CntUserTarLog::new)
+                                        .with(CntUserTarLog::setId,IdUtils.getSnowflakeNextIdStr())
+                                        .with(CntUserTarLog::setTarId,e.getTarId())
+                                        .with(CntUserTarLog::setUserPhone,e.getPhone())
+                                        .with(CntUserTarLog::setGoodsId,cntTar.getTarType()==1?cntBox.getId():cntCollection.getId())
+                                        .with(CntUserTarLog::setGoodsType,cntTar.getTarType())
+                                        .with(CntUserTarLog::setIsFull,e.getIsFull())
+                                        .with(CntUserTarLog::setStatus,0)
+                                        .with(CntUserTarLog::setInfo,"新增成功!")
+                                        .with(CntUserTarLog::setCreatedBy, SecurityUtils.getUsername())
+                                        .with(CntUserTarLog::setCreatedTime, DateUtils.getNowDate())
+                                        .build()
+                        );
                     }
                 } else {
                     log.info("optional1不存在 --------- " + e.toString());
