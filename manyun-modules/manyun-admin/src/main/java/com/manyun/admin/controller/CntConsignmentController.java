@@ -1,11 +1,9 @@
 package com.manyun.admin.controller;
 
 
-import com.manyun.admin.domain.dto.ConsignmentInfoDto;
-import com.manyun.admin.domain.dto.MyOrderDto;
-import com.manyun.admin.domain.dto.OrderInfoDto;
-import com.manyun.admin.domain.dto.PaymentReviewDto;
+import com.manyun.admin.domain.dto.*;
 import com.manyun.admin.domain.query.ConsignmentQuery;
+import com.manyun.admin.domain.query.ConsignmentStatusQuery;
 import com.manyun.admin.domain.query.OrderListQuery;
 import com.manyun.admin.domain.vo.CntConsignmentVo;
 import com.manyun.admin.domain.vo.CntOrderVo;
@@ -60,6 +58,13 @@ public class CntConsignmentController extends BaseController
     public TableDataInfo<CntConsignmentVo> boxList(ConsignmentQuery consignmentQuery)
     {
         return cntConsignmentService.boxList(consignmentQuery);
+    }
+
+    @PostMapping("/consignmentStatus")
+    @ApiOperation("修改寄售状态")
+    public R consignmentStatus(@Valid @RequestBody ConsignmentStatusQuery consignmentStatusQuery)
+    {
+        return toResult(cntConsignmentService.consignmentStatus(consignmentStatusQuery));
     }
 
     @PostMapping("/getInfo")

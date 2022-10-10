@@ -6,6 +6,7 @@ import com.manyun.admin.domain.dto.ConsignmentInfoDto;
 import com.manyun.admin.domain.dto.OrderInfoDto;
 import com.manyun.admin.domain.dto.PaymentReviewDto;
 import com.manyun.admin.domain.query.ConsignmentQuery;
+import com.manyun.admin.domain.query.ConsignmentStatusQuery;
 import com.manyun.admin.domain.query.OrderListQuery;
 import com.manyun.admin.domain.vo.CntConsignmentVo;
 import com.manyun.admin.domain.vo.CntOrderVo;
@@ -57,4 +58,10 @@ public interface ICntConsignmentService extends IService<CntConsignment>
      */
     CntConsignmentVo selectConsignmentOrderById(ConsignmentInfoDto consignmentInfoDto);
 
+    /**
+     * 修改寄售状态
+     * @param consignmentStatusQuery
+     * @return
+     */
+    int consignmentStatus(ConsignmentStatusQuery consignmentStatusQuery);
 }
