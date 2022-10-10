@@ -56,6 +56,17 @@ public class UserTokenController {
         // 用户登录
         return R.ok(userTokenService.createToken(userRData));
     }
+
+    @PostMapping("/phpLogin")
+    @ApiOperation(value = "用户登录",notes = "用户账号密码登录")
+    public R<AccTokenVo> phpLogin(@RequestBody LoginPhoneForm loginPhoneForm) {
+        R<CntUserDto> userR = remoteBuiUserService.login(loginPhoneForm, SecurityConstants.INNER);
+        Assert.isTrue(userR.getCode() == CodeStatus.SUCCESS.getCode(),userR.getMsg());
+        CntUserDto userRData = userR.getData();
+        // 用户登录
+        return R.ok(userTokenService.createToken(userRData));
+    }
+
     @PostMapping("/loginRSA")
     @ApiOperation(value = "用户登录RSA",notes = "用户账号密码登录RSA",httpMethod = "POST",produces = "application/json;utf-8",consumes = "application/json;utf-8")
     public R<AccTokenVo> loginRSA(@RequestBodyRsa @Valid LoginPhoneForm loginPhoneForm)

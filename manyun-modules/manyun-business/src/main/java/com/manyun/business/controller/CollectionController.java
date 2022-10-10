@@ -114,6 +114,14 @@ public class CollectionController extends BaseController{
         return R.ok(collectionService.sellOrderCollection(loginBusinessUser.getUserId(),collectionOrderSellForm));
     }
 
+    @PostMapping("/phpSellOrderCollection")
+    @ApiOperation(value = "购买藏品_预先_生成订单",notes = "用来预先 生成一个待支付订单,返回订单编号,用来二次提交支付\n version 1.0.1")
+    @Lock("sellOrderCollection")
+    public R<String> phpSellOrderCollection(@RequestBody @Valid CollectionOrderSellForm collectionOrderSellForm){
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return R.ok(collectionService.sellOrderCollection(loginBusinessUser.getUserId(),collectionOrderSellForm));
+    }
+
     @PostMapping("/userCollectionPageList")
     @ApiOperation("用户查询自己的藏品信息")
     public R<TableDataInfo<UserCollectionVo>> userCollectionPageList(@RequestBody UseAssertQuery useAssertQuery){
