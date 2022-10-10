@@ -10,6 +10,7 @@ import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.poi.ExcelUtil;
+import com.manyun.common.security.annotation.RequiresRoles;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;

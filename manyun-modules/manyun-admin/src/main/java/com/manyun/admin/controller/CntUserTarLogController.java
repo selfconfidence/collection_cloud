@@ -30,7 +30,6 @@ public class CntUserTarLogController extends BaseController
     /**
      * 查询抽签记录日志列表
      */
-    @RequiresPermissions("admin:log:list")
     @GetMapping("/list")
     @ApiOperation("查询抽签记录日志列表")
     public TableDataInfo<CntUserTarLog> list(UserTarLogQuery userTarLogQuery)
