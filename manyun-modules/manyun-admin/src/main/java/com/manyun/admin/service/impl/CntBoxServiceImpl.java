@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.*;
+import com.manyun.admin.domain.dto.AirdropBalanceDto;
 import com.manyun.admin.domain.dto.BoxAirdropDto;
 import com.manyun.admin.domain.dto.BoxStateDto;
 import com.manyun.admin.domain.dto.CntBoxAlterCombineDto;
@@ -23,6 +24,7 @@ import com.manyun.comm.api.domain.redis.MediaRedisVo;
 import com.manyun.comm.api.domain.redis.box.BoxCollectionJoinRedisVo;
 import com.manyun.comm.api.domain.redis.box.BoxListRedisVo;
 import com.manyun.comm.api.domain.redis.box.BoxRedisVo;
+import com.manyun.comm.api.domain.redis.collection.CollectionAllRedisVo;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
@@ -41,6 +43,7 @@ import com.manyun.admin.mapper.CntBoxMapper;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE;
+import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE;
 import static com.manyun.common.core.enums.BoxStatus.*;
 
 
@@ -499,6 +502,36 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
     }
 
 
+    /***
+     * 空投库存
+     * @param airdropBalanceDto
+     * @return
+     */
+    @Override
+    public R airdropBalance(AirdropBalanceDto airdropBalanceDto) {
+        CntBox box = getById(airdropBalanceDto.getGoodsId());
+        Assert.isFalse(box.getAirdropBalance()>0 || box.getAirdropSelfBalance()>0,"该盲盒已设置过空投库存!");
+        boolean balanceCache = buiCronService.doBuiDegressionBalanceCache(BOX_MODEL_TYPE, airdropBalanceDto.getGoodsId(), airdropBalanceDto.getAirdropBalance());
+        Assert.isTrue(balanceCache,"当前盲盒库存不足,设置空投库存失败!");
+        box.setAirdropBalance(airdropBalanceDto.getAirdropBalance());
+        Assert.isTrue(updateById(box),"设置空投库存失败!");
+        //更新redis
+        if(box.getStatusBy()!=null && box.getStatusBy()==1){
+            List<CntBoxCollection> boxCollections = boxCollectionService.list(Wrappers.<CntBoxCollection>lambdaQuery().eq(CntBoxCollection::getBoxId, box.getId()));
+            Assert.isTrue(boxCollections.size()>0, "未添加盲盒中的藏品,不可上架该盲盒!");
+
+            //更新redis
+            BoxListRedisVo boxListRedisVo = initBoxListVo(box);
+            BoxRedisVo boxRedisVo = Builder.of(BoxRedisVo::new).build();
+            boxRedisVo.setBoxListVo(boxListRedisVo);
+            // 组合与藏品关联数据
+            boxRedisVo.setBoxCollectionJoinVos(findJoinCollections(box.getId()));
+            redisService.setCacheMapValue(BusinessConstants.RedisDict.BOX_INFO,box.getId(),boxRedisVo);
+        }
+        return R.ok("设置空投库存成功!");
+    }
+
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R airdrop(BoxAirdropDto boxAirdropDto) {
@@ -506,6 +539,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         List<CntUser> cntUsers = userService.list(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPhone, boxAirdropDto.getPhone()));
         List<CntBoxCollection> boxCollectionList = boxCollectionService.list(Wrappers.<CntBoxCollection>lambdaQuery().eq(CntBoxCollection::getBoxId, boxAirdropDto.getBoxId()));
         CntBox box = getById(boxAirdropDto.getBoxId());
+        Assert.isFalse(box.getAirdropBalance()==0 && box.getAirdropSelfBalance()==0,"请先设置空投库存!");
         String boxId = box.getId();
         Integer selfBalance = box.getSelfBalance();
         Integer balance = box.getBalance();
@@ -548,15 +582,10 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
             }
         }
 
-        //扣减库存
-        updateById(
-                Builder
-                        .of(CntBox::new)
-                        .with(CntBox::setId, boxId)
-                        .with(CntBox::setSelfBalance, (selfBalance + 1))
-                        .with(CntBox::setBalance, (balance - 1))
-                        .build()
-        );
+        int rows = cntBoxMapper.updateLock(boxId, 1,1);
+        if(rows==0){
+            return R.fail("库存不足!");
+        }
 
         //增加用户盲盒
         String idStr = IdUtils.getSnowflakeNextIdStr();
@@ -639,6 +668,8 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
                         .eq(CntBox::getId,boxIds.stream().findFirst().get())
                         .gt(CntBox::getBalance, 0)
         );
+
+        Assert.isFalse(cntBox.getAirdropBalance()==0 && cntBox.getAirdropSelfBalance()==0,"请先设置空投库存!");
 
         //获取盲盒藏品
         List<CntBoxCollection> boxCollections = boxCollectionService.list(Wrappers.<CntBoxCollection>lambdaQuery().eq(CntBoxCollection::getBoxId, boxIds.stream().findFirst().get()));
@@ -727,7 +758,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
                 );
             }
         });
-        int rows = cntBoxMapper.updateLock(cntBox.getId(), successList.size());
+        int rows = cntBoxMapper.updateLock(cntBox.getId(), successList.size(),successList.size());
         if(!(rows >=1)){
             boxBachAirdopExcels.parallelStream().forEach(e ->{
                 errorAirdropRecord.add(

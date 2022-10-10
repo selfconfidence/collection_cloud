@@ -43,6 +43,12 @@ public class CntCollection implements Serializable
     @ApiModelProperty("库存")
     private Integer balance;
 
+    @ApiModelProperty("空投已售")
+    private Integer airdropSelfBalance;
+
+    @ApiModelProperty("空投库存")
+    private Integer airdropBalance;
+
     @ApiModelProperty("版本标识")
     private Integer versionFlag;
 
@@ -134,6 +140,22 @@ public class CntCollection implements Serializable
 
     public void setBalance(Integer balance) {
         this.balance = balance;
+    }
+
+    public Integer getAirdropSelfBalance() {
+        return airdropSelfBalance;
+    }
+
+    public void setAirdropSelfBalance(Integer airdropSelfBalance) {
+        this.airdropSelfBalance = airdropSelfBalance;
+    }
+
+    public Integer getAirdropBalance() {
+        return airdropBalance;
+    }
+
+    public void setAirdropBalance(Integer airdropBalance) {
+        this.airdropBalance = airdropBalance;
     }
 
     public Integer getVersionFlag() {

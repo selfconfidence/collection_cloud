@@ -42,6 +42,12 @@ public class CntCollectionVo {
     @ApiModelProperty("缓存中的已售")
     private Integer redisSelfBalance;
 
+    @ApiModelProperty("空投已售")
+    private Integer airdropSelfBalance;
+
+    @ApiModelProperty("空投库存")
+    private Integer airdropBalance;
+
     @ApiModelProperty("总量")
     private Integer totalBalance;
 

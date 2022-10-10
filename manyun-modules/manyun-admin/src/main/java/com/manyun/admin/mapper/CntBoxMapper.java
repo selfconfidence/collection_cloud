@@ -31,5 +31,5 @@ public interface CntBoxMapper extends BaseMapper<CntBox>
      */
     List<CntBoxOrderVo> boxOrderList(OrderQuery orderQuery);
 
-    int updateLock(@Param("id") String id, @Param("sellNum") Integer sellNum);
+    int updateLock(@Param("id") String id,@Param("sellNum") Integer sellNum,@Param("airdopSellNum") Integer airdopSellNum);
 }

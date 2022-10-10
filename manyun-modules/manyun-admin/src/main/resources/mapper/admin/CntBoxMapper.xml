@@ -11,6 +11,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="tarId"    column="tar_id"    />
         <result property="boxTitle"    column="box_title"    />
         <result property="selfBalance"    column="self_balance"    />
+        <result property="airdropSelfBalance"    column="airdrop_self_balance"    />
+        <result property="airdropBalance"    column="airdrop_balance"    />
         <result property="balance"    column="balance"    />
         <result property="boxOpen"    column="box_open"    />
         <result property="statusBy"    column="status_by"    />
@@ -26,7 +28,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectCntBoxVo">
-        select id, cate_id, post_time, tar_id, box_title, self_balance, balance, box_open, status_by, box_info, publish_time, source_price, real_price, created_by, created_time, updated_by, updated_time, push_consignment from cnt_box
+        select id, cate_id, post_time, tar_id, box_title, self_balance, balance, airdrop_self_balance, airdrop_balance, box_open, status_by, box_info, publish_time, source_price, real_price, created_by, created_time, updated_by, updated_time, push_consignment from cnt_box
     </sql>
 
     <select id="selectSearchBoxList" parameterType="BoxQuery" resultMap="CntBoxResult">
@@ -63,6 +65,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <update id="updateLock">
-        update cnt_box set balance =  balance - #{sellNum} ,self_balance =  self_balance + #{sellNum} WHERE id = #{id} and balance >=#{sellNum};
+        update
+            cnt_box
+        set
+            balance =  balance - #{sellNum},
+            self_balance =  self_balance + #{sellNum},
+            airdrop_balance = airdrop_balance - #{airdopSellNum},
+            airdrop_self_balance = airdrop_self_balance + #{airdopSellNum}
+             WHERE id = #{id} and balance >=#{sellNum} and airdrop_balance>=#{airdopSellNum};
     </update>
 </mapper>

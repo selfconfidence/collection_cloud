@@ -45,6 +45,12 @@ public class CntBox implements Serializable
     @ApiModelProperty("库存")
     private Integer balance;
 
+    @ApiModelProperty("空投已售")
+    private Integer airdropSelfBalance;
+
+    @ApiModelProperty("空投库存")
+    private Integer airdropBalance;
+
     @ApiModelProperty("1未开启,2已开启")
     private Integer boxOpen;
 
@@ -127,6 +133,22 @@ public class CntBox implements Serializable
 
     public void setSelfBalance(Integer selfBalance) {
         this.selfBalance = selfBalance;
+    }
+
+    public Integer getAirdropSelfBalance() {
+        return airdropSelfBalance;
+    }
+
+    public void setAirdropSelfBalance(Integer airdropSelfBalance) {
+        this.airdropSelfBalance = airdropSelfBalance;
+    }
+
+    public Integer getAirdropBalance() {
+        return airdropBalance;
+    }
+
+    public void setAirdropBalance(Integer airdropBalance) {
+        this.airdropBalance = airdropBalance;
     }
 
     public Integer getBalance() {

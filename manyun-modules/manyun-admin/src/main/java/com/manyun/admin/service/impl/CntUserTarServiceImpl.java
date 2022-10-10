@@ -134,78 +134,82 @@ public class CntUserTarServiceImpl extends ServiceImpl<CntUserTarMapper,CntUserT
         List<CntUser> users = userService.list(Wrappers.<CntUser>lambdaQuery().in(CntUser::getPhone, userTarExcels.parallelStream().map(UserTarExcel::getPhone).collect(Collectors.toList())));
         userTarExcels.parallelStream().forEach(e -> {
             Optional<CntUser> optionalCntUser = users.parallelStream().filter(ff -> e.getPhone().equals(ff.getPhone())).findFirst();
-            if(optionalCntUser.isPresent()){
-                Optional<CntUserTar> optionalCntUserTar = userTars.parallelStream().filter(ff -> (e.getTarId().equals(ff.getTarId()) && (optionalCntUser.get().getId().equals(ff.getUserId()) || e.getPhone().equals(ff.getPhone()) ))).findFirst();
-                if(optionalCntUserTar.isPresent()){
-                    updateList.add(
-                            Builder.of(CntUserTar::new)
-                                    .with(CntUserTar::setId,optionalCntUserTar.get().getId())
-                                    .with(CntUserTar::setTarId, e.getTarId())
-                                    .with(CntUserTar::setUserId, optionalCntUser.get().getId())
-                                    .with(CntUserTar::setPhone, e.getPhone())
-                                    .with(CntUserTar::setBuiId,cntTar.getTarType()==1?cntBox.getId():cntCollection.getId())
-                                    .with(CntUserTar::setIsFull,e.getIsFull())
-                                    .with(CntUserTar::setUpdatedBy, SecurityUtils.getUsername())
-                                    .with(CntUserTar::setUpdatedTime, DateUtils.getNowDate()).build()
-                    );
-                    if(e.getIsFull()==1)awardPhones.add(e.getPhone());
+            if(Objects.nonNull(optionalCntUser)){
+                if(optionalCntUser.isPresent()){
+                    Optional<CntUserTar> optionalCntUserTar = userTars.parallelStream().filter(ff -> (e.getTarId().equals(ff.getTarId()) && (optionalCntUser.get().getId().equals(ff.getUserId()) || e.getPhone().equals(ff.getPhone()) ))).findFirst();
+                    if(Objects.nonNull(optionalCntUserTar)){
+                        if(optionalCntUserTar.isPresent()){
+                            updateList.add(
+                                    Builder.of(CntUserTar::new)
+                                            .with(CntUserTar::setId,optionalCntUserTar.get().getId())
+                                            .with(CntUserTar::setTarId, e.getTarId())
+                                            .with(CntUserTar::setUserId, optionalCntUser.get().getId())
+                                            .with(CntUserTar::setPhone, e.getPhone())
+                                            .with(CntUserTar::setBuiId,cntTar.getTarType()==1?cntBox.getId():cntCollection.getId())
+                                            .with(CntUserTar::setIsFull,e.getIsFull())
+                                            .with(CntUserTar::setUpdatedBy, SecurityUtils.getUsername())
+                                            .with(CntUserTar::setUpdatedTime, DateUtils.getNowDate()).build()
+                            );
+                            if(e.getIsFull()==1)awardPhones.add(e.getPhone());
+                            cntUserTarLogs.add(
+                                    Builder.of(CntUserTarLog::new)
+                                            .with(CntUserTarLog::setId,IdUtils.getSnowflakeNextIdStr())
+                                            .with(CntUserTarLog::setTarId,e.getTarId())
+                                            .with(CntUserTarLog::setUserPhone,e.getPhone())
+                                            .with(CntUserTarLog::setGoodsId,cntTar.getTarType()==1?cntBox.getId():cntCollection.getId())
+                                            .with(CntUserTarLog::setGoodsType,cntTar.getTarType())
+                                            .with(CntUserTarLog::setIsFull,e.getIsFull())
+                                            .with(CntUserTarLog::setStatus,0)
+                                            .with(CntUserTarLog::setInfo,"修改成功!")
+                                            .with(CntUserTarLog::setCreatedBy, SecurityUtils.getUsername())
+                                            .with(CntUserTarLog::setCreatedTime, DateUtils.getNowDate())
+                                            .build()
+                            );
+                        }else {
+                            insertList.add(
+                                    Builder.of(CntUserTar::new)
+                                            .with(CntUserTar::setId, IdUtils.getSnowflakeNextIdStr())
+                                            .with(CntUserTar::setTarId, e.getTarId())
+                                            .with(CntUserTar::setUserId, optionalCntUser.get().getId())
+                                            .with(CntUserTar::setPhone, e.getPhone())
+                                            .with(CntUserTar::setBuiId,cntTar.getTarType()==1?cntBox.getId():cntCollection.getId())
+                                            .with(CntUserTar::setIsFull,e.getIsFull())
+                                            .with(CntUserTar::setCreatedBy, SecurityUtils.getUsername())
+                                            .with(CntUserTar::setCreatedTime, DateUtils.getNowDate())
+                                            .build()
+                            );
+                            if(e.getIsFull()==1)awardPhones.add(e.getPhone());
+                            cntUserTarLogs.add(
+                                    Builder.of(CntUserTarLog::new)
+                                            .with(CntUserTarLog::setId,IdUtils.getSnowflakeNextIdStr())
+                                            .with(CntUserTarLog::setTarId,e.getTarId())
+                                            .with(CntUserTarLog::setUserPhone,e.getPhone())
+                                            .with(CntUserTarLog::setGoodsId,cntTar.getTarType()==1?cntBox.getId():cntCollection.getId())
+                                            .with(CntUserTarLog::setGoodsType,cntTar.getTarType())
+                                            .with(CntUserTarLog::setIsFull,e.getIsFull())
+                                            .with(CntUserTarLog::setStatus,0)
+                                            .with(CntUserTarLog::setInfo,"新增成功!")
+                                            .with(CntUserTarLog::setCreatedBy, SecurityUtils.getUsername())
+                                            .with(CntUserTarLog::setCreatedTime, DateUtils.getNowDate())
+                                            .build()
+                            );
+                        }
+                    }
+                } else {
+                    log.info("optional1不存在 --------- " + e.toString());
                     cntUserTarLogs.add(
                             Builder.of(CntUserTarLog::new)
                                     .with(CntUserTarLog::setId,IdUtils.getSnowflakeNextIdStr())
                                     .with(CntUserTarLog::setTarId,e.getTarId())
                                     .with(CntUserTarLog::setUserPhone,e.getPhone())
-                                    .with(CntUserTarLog::setGoodsId,cntTar.getTarType()==1?cntBox.getId():cntCollection.getId())
-                                    .with(CntUserTarLog::setGoodsType,cntTar.getTarType())
                                     .with(CntUserTarLog::setIsFull,e.getIsFull())
-                                    .with(CntUserTarLog::setStatus,0)
-                                    .with(CntUserTarLog::setInfo,"修改成功!")
-                                    .with(CntUserTarLog::setCreatedBy, SecurityUtils.getUsername())
-                                    .with(CntUserTarLog::setCreatedTime, DateUtils.getNowDate())
-                                    .build()
-                    );
-                }else {
-                    insertList.add(
-                            Builder.of(CntUserTar::new)
-                                    .with(CntUserTar::setId, IdUtils.getSnowflakeNextIdStr())
-                                    .with(CntUserTar::setTarId, e.getTarId())
-                                    .with(CntUserTar::setUserId, optionalCntUser.get().getId())
-                                    .with(CntUserTar::setPhone, e.getPhone())
-                                    .with(CntUserTar::setBuiId,cntTar.getTarType()==1?cntBox.getId():cntCollection.getId())
-                                    .with(CntUserTar::setIsFull,e.getIsFull())
-                                    .with(CntUserTar::setCreatedBy, SecurityUtils.getUsername())
-                                    .with(CntUserTar::setCreatedTime, DateUtils.getNowDate())
-                                    .build()
-                    );
-                    if(e.getIsFull()==1)awardPhones.add(e.getPhone());
-                    cntUserTarLogs.add(
-                            Builder.of(CntUserTarLog::new)
-                                    .with(CntUserTarLog::setId,IdUtils.getSnowflakeNextIdStr())
-                                    .with(CntUserTarLog::setTarId,e.getTarId())
-                                    .with(CntUserTarLog::setUserPhone,e.getPhone())
-                                    .with(CntUserTarLog::setGoodsId,cntTar.getTarType()==1?cntBox.getId():cntCollection.getId())
-                                    .with(CntUserTarLog::setGoodsType,cntTar.getTarType())
-                                    .with(CntUserTarLog::setIsFull,e.getIsFull())
-                                    .with(CntUserTarLog::setStatus,0)
-                                    .with(CntUserTarLog::setInfo,"新增成功!")
+                                    .with(CntUserTarLog::setStatus,1)
+                                    .with(CntUserTarLog::setInfo,"未查询到改用户!")
                                     .with(CntUserTarLog::setCreatedBy, SecurityUtils.getUsername())
                                     .with(CntUserTarLog::setCreatedTime, DateUtils.getNowDate())
                                     .build()
                     );
                 }
-            } else {
-                log.info("optional1不存在 --------- " + e.toString());
-                cntUserTarLogs.add(
-                        Builder.of(CntUserTarLog::new)
-                                .with(CntUserTarLog::setId,IdUtils.getSnowflakeNextIdStr())
-                                .with(CntUserTarLog::setTarId,e.getTarId())
-                                .with(CntUserTarLog::setUserPhone,e.getPhone())
-                                .with(CntUserTarLog::setIsFull,e.getIsFull())
-                                .with(CntUserTarLog::setStatus,1)
-                                .with(CntUserTarLog::setInfo,"未查询到改用户!")
-                                .with(CntUserTarLog::setCreatedBy, SecurityUtils.getUsername())
-                                .with(CntUserTarLog::setCreatedTime, DateUtils.getNowDate())
-                                .build()
-                );
             }
         });
 

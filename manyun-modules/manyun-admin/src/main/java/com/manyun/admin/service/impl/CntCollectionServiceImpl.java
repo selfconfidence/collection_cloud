@@ -12,10 +12,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.*;
-import com.manyun.admin.domain.dto.AirdropDto;
-import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
-import com.manyun.admin.domain.dto.CollectionStateDto;
-import com.manyun.admin.domain.dto.MyChainxDto;
+import com.manyun.admin.domain.dto.*;
 import com.manyun.admin.domain.excel.BachAirdopExcel;
 import com.manyun.admin.domain.query.CollectionQuery;
 import com.manyun.admin.domain.vo.*;
@@ -556,6 +553,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         return R.ok();
     }
 
+
     public R check(CntCollectionAlterVo collectionAlterVo,CntLableAlterVo lableAlterVo ,MediaAlterVo mediaAlterVo){
         Date publishTime = collectionAlterVo.getPublishTime();
         String tarId = collectionAlterVo.getTarId();
@@ -594,6 +592,27 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
     }
 
     /***
+     * 空投库存
+     * @param airdropBalanceDto
+     * @return
+     */
+    @Override
+    public R airdropBalance(AirdropBalanceDto airdropBalanceDto) {
+        CntCollection collection = getById(airdropBalanceDto.getGoodsId());
+        Assert.isFalse(collection.getAirdropBalance()>0 || collection.getAirdropSelfBalance()>0,"该藏品已设置过空投库存!");
+        boolean balanceCache = buiCronService.doBuiDegressionBalanceCache(COLLECTION_MODEL_TYPE, airdropBalanceDto.getGoodsId(), airdropBalanceDto.getAirdropBalance());
+        Assert.isTrue(balanceCache,"当前藏品库存不足,设置空投库存失败!");
+        collection.setAirdropBalance(airdropBalanceDto.getAirdropBalance());
+        Assert.isTrue(updateById(collection),"设置空投库存失败!");
+        //更新redis
+        if(collection.getStatusBy()!=null && collection.getStatusBy()==1){
+            CollectionAllRedisVo collectionAllVo = Builder.of(CollectionAllRedisVo::new).with(CollectionAllRedisVo::setCollectionVo, providerCollectionVo(collection)).with(CollectionAllRedisVo::setCollectionInfoVo, providerCollectionInfoVo(collection.getId())).build();
+            redisService.setCacheMapValue(BusinessConstants.RedisDict.COLLECTION_INFO,collection.getId(),collectionAllVo);
+        }
+        return R.ok("设置空投库存成功!");
+    }
+
+    /***
      * 空投
      * @param airdropDto 空投请求参数
      * @return
@@ -604,6 +623,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         //验证用户
         List<CntUser> cntUsers = userService.list(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPhone, airdropDto.getPhone()));
         CntCollection collection = getById(airdropDto.getCollectionId());
+        Assert.isFalse(collection.getAirdropBalance()==0 && collection.getAirdropSelfBalance()==0,"请先设置空投库存!");
         String collectionId = collection.getId();
         Integer selfBalance = collection.getSelfBalance();
         Integer balance = collection.getBalance();
@@ -641,15 +661,10 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                 return R.fail("库存不足!");
             }
         }
-        //扣减库存
-        updateById(
-                Builder
-                        .of(CntCollection::new)
-                        .with(CntCollection::setId, collectionId)
-                        .with(CntCollection::setSelfBalance, (selfBalance + 1))
-                        .with(CntCollection::setBalance, (balance - 1))
-                        .build()
-        );
+        int rows = cntCollectionMapper.updateLock(collectionId, 1,1);
+        if(rows==0){
+            return R.fail("库存不足!");
+        }
         //增加用户藏品
         String idStr = IdUtils.getSnowflakeNextIdStr();
         userCollectionService.save(
@@ -772,6 +787,8 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
             }
         }
 
+        Assert.isFalse(cntCollections.getAirdropBalance()==0 && cntCollections.getAirdropSelfBalance()==0,"请先设置空投库存!");
+
         //筛选成功的和失败的
         HashSet<String> errorList = new HashSet<String>();
         List<CntUserCollection> successList = new ArrayList<CntUserCollection>();
@@ -828,7 +845,7 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
                 );
             }
         });
-        int rows = cntCollectionMapper.updateLock(cntCollections.getId(), successList.size());
+        int rows = cntCollectionMapper.updateLock(cntCollections.getId(), successList.size(),successList.size());
         if(!(rows >=1)){
             bachAirdopExcels.parallelStream().forEach(e ->{
                 errorAirdropRecord.add(

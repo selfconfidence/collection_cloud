@@ -37,6 +37,12 @@ public class CntBoxVo {
     @ApiModelProperty("已售")
     private Integer selfBalance;
 
+    @ApiModelProperty("空投已售")
+    private Integer airdropSelfBalance;
+
+    @ApiModelProperty("空投库存")
+    private Integer airdropBalance;
+
     @ApiModelProperty("缓存中的库存")
     private Integer redisBalance;
 

@@ -1,6 +1,7 @@
 package com.manyun.admin.controller;
 
 
+import com.manyun.admin.domain.dto.AirdropBalanceDto;
 import com.manyun.admin.domain.dto.AirdropDto;
 import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
 import com.manyun.admin.domain.dto.CollectionStateDto;
@@ -64,6 +65,13 @@ public class CntCollectionController extends BaseController
     public R edit(@RequestBody CntCollectionAlterCombineDto collectionAlterCombineDto)
     {
         return cntCollectionService.updateCntCollection(collectionAlterCombineDto);
+    }
+
+    @PostMapping("/airdropBalance")
+    @ApiOperation("空投库存")
+    public R airdropBalance(@Valid @RequestBody AirdropBalanceDto airdropBalanceDto)
+    {
+        return cntCollectionService.airdropBalance(airdropBalanceDto);
     }
 
     @PostMapping("/airdrop")
