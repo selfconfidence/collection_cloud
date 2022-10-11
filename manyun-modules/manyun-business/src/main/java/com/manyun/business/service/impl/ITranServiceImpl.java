@@ -99,6 +99,7 @@ public class ITranServiceImpl implements ITranService {
         R<CntUserDto> cntUserDtoR = remoteBuiUserService.commUni(tranAccForm.getCommUni(), SecurityConstants.INNER);
         Assert.isTrue(cntUserDtoR.getCode() == R.SUCCESS && Objects.nonNull(cntUserDtoR.getData()),"转赠方信息有误,请核实!\n{}",cntUserDtoR.getMsg());
         Assert.isTrue(OK_REAL.getCode().equals(cntUserDtoR.getData().getIsReal()),"受赠方暂未实名认证!");
+        Assert.isTrue(userId.equals(cntUserDtoR.getData().getId()),"自己不可转赠自己!");
         // 转方信息是否准确  查询当前用户是否正常拥有这个 藏品 和盲盒
         Integer accFormType = tranAccForm.getType();
 
