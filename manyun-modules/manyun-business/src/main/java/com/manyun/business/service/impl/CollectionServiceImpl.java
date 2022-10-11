@@ -355,7 +355,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         tarCheckCollection(cntCollection, userId);
         postCheckCollection(cntCollection, userId);
         realCheckCollection(userId);
-        conditionOrder(cntCollection,userId);
+        //conditionOrder(cntCollection,userId);
     }
 
     /**
