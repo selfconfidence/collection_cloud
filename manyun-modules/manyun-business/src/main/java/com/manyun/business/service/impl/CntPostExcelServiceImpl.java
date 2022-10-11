@@ -69,7 +69,7 @@ public class CntPostExcelServiceImpl extends ServiceImpl<CntPostExcelMapper, Cnt
             CntPostExcel cntPostExcel = getCntPostExcel(userId, buiId);
             if (Objects.nonNull(cntPostExcel)){
                 CntPostExcelLog postExcelLog = getPostExcelLog(userId, cntPostExcel);
-                if (Objects.nonNull(postExcelLog)){
+                if (Objects.nonNull(postExcelLog) && postExcelLog.getBuyFrequency() < cntPostExcel.getBuyFrequency()){
                     postExcelLog.setBuyFrequency(postExcelLog.getBuyFrequency() +1);
                     iCntPostExcelLogService.updateById(postExcelLog);
                     return;
@@ -115,6 +115,7 @@ public class CntPostExcelServiceImpl extends ServiceImpl<CntPostExcelMapper, Cnt
         if (Objects.isNull(cntPostExcel)) return 0;
         CntPostExcelLog postExcelLog = getPostExcelLog(userId, cntPostExcel);
         if (Objects.isNull(postExcelLog)) return 0;
-        return cntPostExcel.getBuyFrequency() -  postExcelLog.getBuyFrequency();
+
+        return  postExcelLog.getBuyFrequency();
     }
 }

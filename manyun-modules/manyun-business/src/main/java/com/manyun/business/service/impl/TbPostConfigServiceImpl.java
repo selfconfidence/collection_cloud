@@ -210,7 +210,7 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
                 postConfigLogService.save(postConfigLogServiceOne);
                 return;
             }else{
-                if (postConfigLogServiceOne.getBuyFrequency().compareTo(cntPostConfig.getBuyFrequency()) <1){
+                if (postConfigLogServiceOne.getBuyFrequency() <cntPostConfig.getBuyFrequency()){
                     postConfigLogServiceOne.setBuyFrequency(postConfigLogServiceOne.getBuyFrequency() +1);
                     postConfigLogService.updateById(postConfigLogServiceOne);
                     return;
@@ -260,7 +260,7 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
                     // 如果是 null 就直接返回 true
                     if (Objects.isNull(postConfigLogServiceOne))return 0;
                     // 如果不是 NULL
-                    return  cntPostConfig.getBuyFrequency() -  postConfigLogServiceOne.getBuyFrequency();
+                    return  postConfigLogServiceOne.getBuyFrequency();
                 }
             }
         }

@@ -383,7 +383,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
                 }
 
             }
-            Assert.isTrue(limitNumber > sellNumber,"抢的太多了,被限购了哦!");
+            Assert.isTrue(limitNumber > Math.abs(sellNumber),"抢的太多了,被限购了哦!");
 
         }
     }
