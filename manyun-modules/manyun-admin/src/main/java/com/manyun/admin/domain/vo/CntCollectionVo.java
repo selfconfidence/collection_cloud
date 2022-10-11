@@ -48,6 +48,9 @@ public class CntCollectionVo {
     @ApiModelProperty("空投库存")
     private Integer airdropBalance;
 
+    @ApiModelProperty("限定数量")
+    private Integer limitNumber;
+
     @ApiModelProperty("总量")
     private Integer totalBalance;
 

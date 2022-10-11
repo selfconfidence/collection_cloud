@@ -51,6 +51,9 @@ public class CntBox implements Serializable
     @ApiModelProperty("空投库存")
     private Integer airdropBalance;
 
+    @ApiModelProperty("限定数量")
+    private Integer limitNumber;
+
     @ApiModelProperty("1未开启,2已开启")
     private Integer boxOpen;
 
@@ -149,6 +152,14 @@ public class CntBox implements Serializable
 
     public void setAirdropBalance(Integer airdropBalance) {
         this.airdropBalance = airdropBalance;
+    }
+
+    public Integer getLimitNumber() {
+        return limitNumber;
+    }
+
+    public void setLimitNumber(Integer limitNumber) {
+        this.limitNumber = limitNumber;
     }
 
     public Integer getBalance() {
@@ -257,6 +268,9 @@ public class CntBox implements Serializable
             .append("boxTitle", getBoxTitle())
             .append("selfBalance", getSelfBalance())
             .append("balance", getBalance())
+            .append("airdropBalance", getAirdropBalance())
+            .append("airdropSelfBalance", getAirdropSelfBalance())
+            .append("limitNumber", getLimitNumber())
             .append("boxOpen", getBoxOpen())
             .append("statusBy", getStatusBy())
             .append("boxInfo", getBoxInfo())
