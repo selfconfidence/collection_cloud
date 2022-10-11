@@ -29,6 +29,7 @@ import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.enums.DelayLevelEnum;
 import com.manyun.common.core.enums.LianLianPayEnum;
 import com.manyun.common.core.enums.PayTypeEnum;
 import com.manyun.common.core.enums.ShandePayEnum;
@@ -37,6 +38,8 @@ import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.ip.IpUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import com.manyun.common.mq.producers.deliver.DeliverProducer;
+import com.manyun.common.mq.producers.msg.DeliverMsg;
 import com.manyun.common.redis.service.BuiCronService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectFactory;
@@ -45,6 +48,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
@@ -116,6 +120,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Autowired
     private IStepService stepService;
+
+    @Autowired
+    private DeliverProducer deliverProducer;
 
 
     @Autowired
@@ -200,9 +207,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setOrderStatus(WAIT_ORDER.getCode());
         order.setPayTime(LocalDateTime.now());
         order.setMoneyBln(NumberUtil.add(0D));
-        // 截止到什么是否到达付款时间 小时为单位
+        // 截止到什么是否到达付款时间 分钟为单位
        // Integer serviceVal = systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class);
-        order.setEndTime(LocalDateTime.now().plusMinutes(serviceVal));
+        DelayLevelEnum defaultEnum = DelayLevelEnum.getDefaultEnum(serviceVal, DelayLevelEnum.LEVEL_6);
+        order.setEndTime(LocalDateTime.now().plusMinutes(DelayLevelEnum.getSourceConvertTime(defaultEnum, TimeUnit.MINUTES)));
+        deliverProducer.sendCancelOrder(idStr,Builder.of(DeliverMsg::new).with(DeliverMsg::setBuiId,idStr).with(DeliverMsg::setBuiName,StrUtil.format("订单取消了,订单编号为:{}",idStr)).with(DeliverMsg::setResetHost, idStr).build() ,defaultEnum );
         save(order);
         consumer.accept(idStr);
         return orderNo;

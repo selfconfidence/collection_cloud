@@ -33,5 +33,7 @@ spring:
             refresh: true
           - data-id:  application-jiguang-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
             refresh: true
+          - data-id:  application-mq-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+            refresh: true
   main:
     allow-bean-definition-overriding: true

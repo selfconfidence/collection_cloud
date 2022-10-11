@@ -1,4 +1,5 @@
 package com.manyun.business.controller;
+import cn.hutool.core.lang.Assert;
 import com.manyun.business.domain.form.ConsignmentOrderSellForm;
 import com.manyun.business.domain.form.ConsignmentSellForm;
 import com.manyun.business.domain.form.UserConsignmentForm;
@@ -84,6 +85,7 @@ public class CntConsignmentController {
     @ApiOperation(value = "寄售市场进行交易",notes = "对某个 资产 进行购买\n 此接口被废弃，属于一次调用支付 + 创建订单")
     @Deprecated
     public R<PayVo> businessConsignment(@RequestBody @Valid ConsignmentSellForm consignmentSellForm){
+        Assert.isTrue(Boolean.FALSE,"接口已废弃!");
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         String payUserId = notNullLoginBusinessUser.getUserId();
         PayVo payVo =  cntConsignmentService.businessConsignment(payUserId,consignmentSellForm);
