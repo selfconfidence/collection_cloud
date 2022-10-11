@@ -557,6 +557,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     @Lock("notifyPayMarginSuccess")
     public void notifyPayMarginSuccess(String outHost) {
         AuctionMargin auctionMargin = auctionMarginService.getById(outHost);
+        Assert.isTrue(Objects.nonNull(auctionMargin),"找不到对应订单编号!");
         //支付成功，将保证金状态置为已成功
         auctionMargin.setPayMarginStatus(Integer.valueOf(1));
         auctionMarginService.updateById(auctionMargin);
