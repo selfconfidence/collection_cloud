@@ -378,7 +378,8 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
                     int postConfigSellNum = postConfigService.getSellNum(userId, cntCollection.getId());
                      sellNumber =  ((excelSellNum + postConfigSellNum) - sellNumber);
                 }else{
-                    // 中肯写法，不可能没到发售时间!
+                   // 没有到发售时间的话就不管 中肯写法,能走到这里提前购逻辑是过了
+                    return;
                 }
 
             }
