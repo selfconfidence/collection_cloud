@@ -557,6 +557,12 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
     public R check(CntCollectionAlterVo collectionAlterVo,CntLableAlterVo lableAlterVo ,MediaAlterVo mediaAlterVo){
         Date publishTime = collectionAlterVo.getPublishTime();
         String tarId = collectionAlterVo.getTarId();
+        if(null == collectionAlterVo.getLimitNumber() || collectionAlterVo.getLimitNumber()==0){
+            return R.fail("限制数量最小为1!");
+        }
+        if(collectionAlterVo.getLimitNumber()>collectionAlterVo.getBalance()){
+            return R.fail("限制数量不能大于库存数量!");
+        }
         if(StringUtils.isNotBlank(tarId)){
             CntTar tar = cntTarService.getById(tarId);
             if(Objects.nonNull(tar)){

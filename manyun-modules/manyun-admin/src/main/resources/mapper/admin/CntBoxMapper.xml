@@ -14,6 +14,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="airdropSelfBalance"    column="airdrop_self_balance"    />
         <result property="airdropBalance"    column="airdrop_balance"    />
         <result property="balance"    column="balance"    />
+        <result property="limitNumber"    column="limit_number"    />
         <result property="boxOpen"    column="box_open"    />
         <result property="statusBy"    column="status_by"    />
         <result property="boxInfo"    column="box_info"    />
@@ -28,7 +29,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectCntBoxVo">
-        select id, cate_id, post_time, tar_id, box_title, self_balance, balance, airdrop_self_balance, airdrop_balance, box_open, status_by, box_info, publish_time, source_price, real_price, created_by, created_time, updated_by, updated_time, push_consignment from cnt_box
+        select id, cate_id, post_time, tar_id, box_title, self_balance, balance, airdrop_self_balance, airdrop_balance, limit_number, box_open, status_by, box_info, publish_time, source_price, real_price, created_by, created_time, updated_by, updated_time, push_consignment from cnt_box
     </sql>
 
     <select id="selectSearchBoxList" parameterType="BoxQuery" resultMap="CntBoxResult">

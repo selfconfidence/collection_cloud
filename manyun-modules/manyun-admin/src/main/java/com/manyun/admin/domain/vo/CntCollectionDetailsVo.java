@@ -57,6 +57,9 @@ public class CntCollectionDetailsVo
     @ApiModelProperty("流通数量")
     private Integer selfBalance;
 
+    @ApiModelProperty("限定数量")
+    private Integer limitNumber;
+
     @ApiModelProperty("主图")
     private List<MediaVo> mediaVos;
 

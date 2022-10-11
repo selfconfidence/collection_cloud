@@ -34,6 +34,9 @@ public class CntBoxVo {
     @ApiModelProperty("库存")
     private Integer balance;
 
+    @ApiModelProperty("限制数量")
+    private Integer limitNumber;
+
     @ApiModelProperty("已售")
     private Integer selfBalance;
 

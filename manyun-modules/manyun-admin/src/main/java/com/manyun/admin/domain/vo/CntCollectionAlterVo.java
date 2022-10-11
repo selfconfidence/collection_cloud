@@ -44,6 +44,9 @@ public class CntCollectionAlterVo
     @ApiModelProperty("发售数量")
     private Integer balance;
 
+    @ApiModelProperty("限定数量")
+    private Integer limitNumber;
+
     @ApiModelProperty("可提前购的时间")
     private Integer postTime;
 
