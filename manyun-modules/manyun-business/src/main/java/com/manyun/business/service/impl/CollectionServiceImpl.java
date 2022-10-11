@@ -365,12 +365,24 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
      */
     private void conditionOrder(CntCollection cntCollection, String userId) {
         Integer limitNumber = cntCollection.getLimitNumber();
-        if (Objects.nonNull(limitNumber)){
+        // 限购逻辑生效
+        if (Objects.nonNull(limitNumber) && limitNumber >0){
             // 当前资产是否是提前购得资产?
-            if (Objects.nonNull(cntCollection.getPostTime())){
-                // 是提前购得资产
+            // 查询用户所有已经完成的订单!
+            int sellNumber = orderService.overCount(cntCollection.getId(),userId);
+            if (Objects.nonNull(cntCollection.getPostTime()) ){
+                // 是提前购得资产 并且已经到了发布时间
+                if (LocalDateTime.now().compareTo(cntCollection.getPublishTime()) > 0){
+                    // 如果到了发布时间，就将已经参与提前购的次数，直接 - 整个订单的数量即可
+                    int excelSellNum = cntPostExcelService.getSellNum(userId, cntCollection.getId());
+                    int postConfigSellNum = postConfigService.getSellNum(userId, cntCollection.getId());
+                     sellNumber =  ((excelSellNum + postConfigSellNum) - sellNumber);
+                }else{
+                    // 中肯写法，不可能没到发售时间!
+                }
 
             }
+            Assert.isTrue(limitNumber > sellNumber,"抢的太多了,被限购了哦!");
 
         }
     }

@@ -434,7 +434,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
             list = list(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getId, userId));
         }
 
-        List<CntUser> cntUserList = list.parallelStream().map(item -> {
+        List<CntUser> cntUserList = list.parallelStream().filter(item -> StrUtil.isNotBlank(item.getLoginPass())).map(item -> {
             item.setLoginPass(SecurityUtils.encryptPassword(item.getLoginPass()));
             return item;
         }).collect(Collectors.toList());
@@ -447,7 +447,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
             list = list();
         }else{
             list = list(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getId, userId));
-        }        List<CntUser> cntUserList = list.parallelStream().map(item -> {
+        }        List<CntUser> cntUserList = list.parallelStream().filter(item -> StrUtil.isNotBlank(item.getPayPass())).map(item -> {
             item.setPayPass(SecurityUtils.encryptPassword(item.getPayPass()));
             return item;
         }).collect(Collectors.toList());

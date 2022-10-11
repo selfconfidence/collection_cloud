@@ -643,6 +643,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     }
 
     /**
+     * 根据资产编号，查询用户已经完成的订单!
+     * @param assertId
+     * @param userId
+     * @return
+     */
+    @Override
+    public int overCount(String assertId, String userId) {
+       return Long.valueOf(count(Wrappers.<Order>lambdaQuery().eq(Order::getUserId, userId).eq(Order::getBuiId, assertId).eq(Order::getOrderStatus, OVER_ORDER.getCode()))).intValue();
+    }
+
+    /**
      * 寄售订单下单支付
      * @param orderPayForm
      * @param userId

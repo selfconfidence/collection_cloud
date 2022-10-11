@@ -56,5 +56,7 @@ public interface IOrderService extends IService<Order> {
 
     void cancelOrder(String id);
 
+    int overCount(String id, String userId);
+
 //    PayVo consignmentUnifiedOrder(OrderPayForm orderPayForm, String userId);
 }

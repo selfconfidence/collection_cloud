@@ -10,13 +10,10 @@ import com.manyun.business.service.ICntPostExcelLogService;
 import com.manyun.business.service.ICntPostExcelService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.common.core.domain.Builder;
-import com.manyun.common.core.domain.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -103,5 +100,21 @@ public class CntPostExcelServiceImpl extends ServiceImpl<CntPostExcelMapper, Cnt
     private CntPostExcelLog getPostExcelLog(String userId, CntPostExcel excel) {
         CntPostExcelLog cntPostExcelLog = iCntPostExcelLogService.getOne(Wrappers.<CntPostExcelLog>lambdaQuery().eq(CntPostExcelLog::getUserId, userId).eq(CntPostExcelLog::getExcelId, excel.getId()));
          return cntPostExcelLog;
+    }
+
+
+    /**
+     * 获取excel 中，用户实际购买后剩余的次数
+     * @param userId
+     * @param buiId
+     * @return
+     */
+    @Override
+    public int getSellNum(String userId, String buiId){
+        CntPostExcel cntPostExcel = getCntPostExcel(userId, buiId);
+        if (Objects.isNull(cntPostExcel)) return 0;
+        CntPostExcelLog postExcelLog = getPostExcelLog(userId, cntPostExcel);
+        if (Objects.isNull(postExcelLog)) return 0;
+        return postExcelLog.getBuyFrequency();
     }
 }
