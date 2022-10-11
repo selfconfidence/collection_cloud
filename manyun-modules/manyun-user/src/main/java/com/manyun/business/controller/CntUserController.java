@@ -304,6 +304,20 @@ public class CntUserController extends BaseController {
         return R.ok();
     }
 
+    @GetMapping("/loginEncrypt/{userId}")
+    @ApiOperation(value = "登录密码重置密钥",hidden = true)
+    @Lock("loginEncrypt")
+    public R loginEncrypt(@PathVariable String userId){
+        userService.loginEncrypt(userId);
+        return R.ok();
+    }
+    @GetMapping("/payEncrypt/{userId}")
+    @ApiOperation(value = "支付密码重置密钥",hidden = true)
+    @Lock("payEncrypt")
+    public R payEncrypt(@PathVariable String userId){
+        userService.payEncrypt(userId);
+        return R.ok();
+    }
 
 
 

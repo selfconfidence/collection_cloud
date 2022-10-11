@@ -54,6 +54,8 @@ import java.lang.System;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -219,6 +221,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
      */
     @Override
     @Transactional
+    @Deprecated
     public PayVo sellCollection(String userId, CollectionSellForm collectionSellForm) {
         // 总结校验 —— 支付方式
         CntCollection  cntCollection = getById(collectionSellForm.getCollectionId());
@@ -352,6 +355,24 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         tarCheckCollection(cntCollection, userId);
         postCheckCollection(cntCollection, userId);
         realCheckCollection(userId);
+        conditionOrder(cntCollection,userId);
+    }
+
+    /**
+     * 限购判定
+     * @param cntCollection
+     * @param userId
+     */
+    private void conditionOrder(CntCollection cntCollection, String userId) {
+        Integer limitNumber = cntCollection.getLimitNumber();
+        if (Objects.nonNull(limitNumber)){
+            // 当前资产是否是提前购得资产?
+            if (Objects.nonNull(cntCollection.getPostTime())){
+                // 是提前购得资产
+
+            }
+
+        }
     }
 
     private void realCheckCollection(String userId) {

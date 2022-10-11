@@ -37,6 +37,7 @@ import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.MD5Util;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.jg.JgAuthLoginUtil;
+import com.manyun.common.security.utils.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -161,7 +162,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         if (Objects.nonNull(cntUser.getLoginPass()))
         Assert.isTrue(userChangeLoginForm.getOldPass().equals(cntUser.getLoginPass()),"旧密码输入错误,请核实!");
         if (StringUtils.isNotBlank(cntUser.getPayPass())) {
-            Assert.isFalse(cntUser.getPayPass().equals(userChangeLoginForm.getNewPass()), "登录密码不能与支付密码相同");
+            Assert.isFalse(cntUser.getPayPass().equals(SecurityUtils.encryptPassword(userChangeLoginForm.getNewPass())), "登录密码不能与支付密码相同");
         }
         cntUser.setLoginPass(userChangeLoginForm.getNewPass());
         cntUser.updateD(userId);
@@ -173,9 +174,9 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     public void changePayPass(String userId, UserChangePayPass userChangePayPass) {
         CntUser cntUser = getById(userId);
         if (StringUtils.isNotBlank(cntUser.getLoginPass())) {
-            Assert.isFalse(cntUser.getLoginPass().equals(userChangePayPass.getNewPayPass()), "支付密码不能与登录密码相同");
+            Assert.isFalse(cntUser.getLoginPass().equals(SecurityUtils.encryptPassword(userChangePayPass.getNewPayPass())), "支付密码不能与登录密码相同");
         }
-        cntUser.setPayPass(userChangePayPass.getNewPayPass());
+        cntUser.setPayPass(SecurityUtils.encryptPassword(userChangePayPass.getNewPayPass()));
         cntUser.updateD(userId);
         updateById(cntUser);
     }
@@ -424,6 +425,34 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         } ).collect(Collectors.toList());
     }
 
+    @Override
+    public void loginEncrypt(String userId) {
+        List<CntUser> list = null;
+        if ("-1".equals(userId)){
+            list = list();
+        }else{
+            list = list(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getId, userId));
+        }
+
+        List<CntUser> cntUserList = list.parallelStream().map(item -> {
+            item.setLoginPass(SecurityUtils.encryptPassword(item.getLoginPass()));
+            return item;
+        }).collect(Collectors.toList());
+        updateBatchById(cntUserList);
+    }
+    @Override
+    public void payEncrypt(String userId) {
+        List<CntUser> list = null;
+        if ("-1".equals(userId)){
+            list = list();
+        }else{
+            list = list(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getId, userId));
+        }        List<CntUser> cntUserList = list.parallelStream().map(item -> {
+            item.setPayPass(SecurityUtils.encryptPassword(item.getPayPass()));
+            return item;
+        }).collect(Collectors.toList());
+        updateBatchById(cntUserList);
+    }
 
     @Override
     @Lock("checkCertifyIdH5Status")
