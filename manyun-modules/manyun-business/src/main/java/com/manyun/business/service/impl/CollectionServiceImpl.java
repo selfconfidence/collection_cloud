@@ -341,7 +341,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
             return collectionRedisVo;
         }).collect(Collectors.toList());
         // 二次包裹
-        return TableDataInfoUtil.pageCacheData(collectionVoList, collectionVoList.size());
+        return TableDataInfoUtil.pageCacheData(ListUtil.reverse(collectionVoList), collectionVoList.size());
     }
 
 

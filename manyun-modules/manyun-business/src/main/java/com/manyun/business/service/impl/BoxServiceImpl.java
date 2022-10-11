@@ -1,6 +1,7 @@
 package com.manyun.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.NumberUtil;
@@ -291,7 +292,7 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
             }
             return boxListVo;
         }).collect(Collectors.toList());
-        return TableDataInfoUtil.pageCacheData(collectionRedisVos, collectionRedisVos.size());
+        return TableDataInfoUtil.pageCacheData(ListUtil.reverse(collectionRedisVos), collectionRedisVos.size());
     }
 
     @Override
