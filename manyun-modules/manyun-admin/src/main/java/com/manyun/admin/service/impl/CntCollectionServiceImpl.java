@@ -354,7 +354,8 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
         if(200!=check.getCode()){
             return R.fail(check.getCode(),check.getMsg());
         }
-        CntCollection cntCollection = new CntCollection();
+        CntCollection cntCollection = getById(collectionAlterVo.getId());
+        Assert.isTrue(Objects.nonNull(cntCollection), "藏品不存在!");
         BeanUtil.copyProperties(collectionAlterVo, cntCollection);
         cntCollection.setUpdatedBy(SecurityUtils.getUsername());
         cntCollection.setUpdatedTime(DateUtils.getNowDate());
