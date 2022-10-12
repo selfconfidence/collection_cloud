@@ -275,7 +275,8 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         if(200!=check.getCode()){
             return R.fail(check.getCode(),check.getMsg());
         }
-        CntBox cntBox = new CntBox();
+        CntBox cntBox = getById(boxAlterVo.getId());
+        Assert.isTrue(Objects.nonNull(cntBox), "盲盒不存在!");
         BeanUtil.copyProperties(boxAlterVo, cntBox);
         cntBox.setUpdatedBy(SecurityUtils.getUsername());
         cntBox.setUpdatedTime(DateUtils.getNowDate());
