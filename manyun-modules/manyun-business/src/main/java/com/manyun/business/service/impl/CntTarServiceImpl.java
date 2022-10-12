@@ -49,6 +49,7 @@ import static com.manyun.common.core.enums.TarResultFlag.FLAG_STOP;
 import static com.manyun.common.core.enums.TarStatus.*;
 import static com.manyun.common.core.enums.TarType.BOX_TAR;
 import static com.manyun.common.core.enums.TarType.COLLECTION_TAR;
+import static com.manyun.common.core.enums.UserRealStatus.OK_REAL;
 import static com.manyun.common.core.enums.UserTaSell.NO_SELL;
 import static com.manyun.common.core.enums.UserTaSell.SELL_OK;
 
@@ -130,6 +131,9 @@ public class CntTarServiceImpl extends ServiceImpl<CntTarMapper, CntTar> impleme
 
     private String tarComm(String buiName,String buiId,String tarId,String userId){
         Assert.isTrue(CEN_NOT_TAR.getCode().equals(tarStatus(userId,buiId)),"您已经抽过签了!");
+        // 是否实名
+        CntUserDto userDto = remoteBuiUserService.commUni(userId, SecurityConstants.INNER).getData();
+        Assert.isTrue(OK_REAL.getCode().equals(userDto.getIsReal()),"未实名不可参与抽签!");
         // 开始抽签
         CntTar cntTar = getOne(Wrappers.<CntTar>lambdaQuery().eq(CntTar::getId,tarId));
         Assert.isTrue(FLAG_PROCESS.getCode().equals(cntTar.getEndFlag()),"抽签时间已过,敬请期待!");

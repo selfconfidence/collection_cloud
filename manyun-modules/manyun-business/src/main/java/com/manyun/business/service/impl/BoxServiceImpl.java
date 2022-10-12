@@ -291,8 +291,8 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
                 boxListVo.setStatusBy(2);
             }
             return boxListVo;
-        }).collect(Collectors.toList());
-        return TableDataInfoUtil.pageCacheData(ListUtil.reverse(collectionRedisVos), collectionRedisVos.size());
+        }).sorted((item1,item2)->item2.getCreatedTime().compareTo(item1.getCreatedTime())).collect(Collectors.toList());
+        return TableDataInfoUtil.pageCacheData(collectionRedisVos, collectionRedisVos.size());
     }
 
     @Override

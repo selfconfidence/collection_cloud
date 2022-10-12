@@ -339,9 +339,9 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
                 collectionRedisVo.setStatusBy(2);
             }
             return collectionRedisVo;
-        }).collect(Collectors.toList());
+        }).sorted((item1,item2)->item2.getCreatedTime().compareTo(item1.getCreatedTime())).collect(Collectors.toList());
         // 二次包裹
-        return TableDataInfoUtil.pageCacheData(ListUtil.reverse(collectionVoList), collectionVoList.size());
+        return TableDataInfoUtil.pageCacheData(collectionVoList, collectionVoList.size());
     }
 
 
@@ -355,7 +355,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         tarCheckCollection(cntCollection, userId);
         postCheckCollection(cntCollection, userId);
         realCheckCollection(userId);
-        //conditionOrder(cntCollection,userId);
+        conditionOrder(cntCollection,userId);
     }
 
     /**

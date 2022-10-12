@@ -213,8 +213,8 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
                 if (postConfigLogServiceOne.getBuyFrequency() <cntPostConfig.getBuyFrequency()){
                     postConfigLogServiceOne.setBuyFrequency(postConfigLogServiceOne.getBuyFrequency() +1);
                     postConfigLogService.updateById(postConfigLogServiceOne);
-                    return;
                 }
+                return;
 
             }
         }
