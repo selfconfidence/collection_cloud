@@ -243,7 +243,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             updateById(order);
             // 提前购记录次数
             Box box = boxService.getObject().getById(order.getBuiId());
-            if (Objects.nonNull(box.getPostTime()))
+            // 如果已经过了 正常发售时间 就不用记录了!
+            if (Objects.nonNull(box.getPostTime()) && LocalDateTime.now().compareTo(box.getPublishTime()) < 0)
             cntPostExcelService.orderExec(order.getUserId(),order.getBuiId());
             // 是否是抽签购的？
             if (StrUtil.isNotBlank(box.getTarId()))
@@ -262,7 +263,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             updateById(order);
             // 提前购记录次数
             CntCollection collection = collectionService.getObject().getById(order.getBuiId());
-            if (Objects.nonNull(collection.getPostTime()))
+            if (Objects.nonNull(collection.getPostTime()) && LocalDateTime.now().compareTo(collection.getPublishTime()) < 0)
                 cntPostExcelService.orderExec(order.getUserId(),order.getBuiId());
 
             // 是否是抽签购的？
