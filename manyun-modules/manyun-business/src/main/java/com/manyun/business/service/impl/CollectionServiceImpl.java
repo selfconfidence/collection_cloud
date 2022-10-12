@@ -339,7 +339,11 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
                 collectionRedisVo.setStatusBy(2);
             }
             return collectionRedisVo;
-        }).sorted((item1,item2)->item2.getCreatedTime().compareTo(item1.getCreatedTime())).collect(Collectors.toList());
+        }).sorted((item1,item2)->{
+            if (Objects.nonNull(item1) && Objects.nonNull(item2))
+                return item2.getCreatedTime().compareTo(item1.getCreatedTime());
+                return 0;
+        }).collect(Collectors.toList());
         // 二次包裹
         return TableDataInfoUtil.pageCacheData(collectionVoList, collectionVoList.size());
     }
