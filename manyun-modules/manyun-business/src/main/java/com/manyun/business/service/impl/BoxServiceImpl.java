@@ -352,6 +352,33 @@ public class BoxServiceImpl extends ServiceImpl<BoxMapper, Box> implements IBoxS
         tarCheckBox(box,userId);
         postCheckBox(box, userId);
         realCheckCollection(userId);
+        conditionOrder(box,userId);
+
+    }
+
+    private void conditionOrder(Box box, String userId) {
+        Integer limitNumber = box.getLimitNumber();
+        // 限购逻辑生效
+        if (Objects.nonNull(limitNumber) && limitNumber >0){
+            // 当前资产是否是提前购得资产?
+            // 查询用户所有已经完成的订单!
+            int sellNumber = orderService.overCount(box.getId(),userId);
+            if (Objects.nonNull(box.getPostTime()) ){
+                // 是提前购得资产 并且已经到了发布时间
+                if (LocalDateTime.now().compareTo(box.getPublishTime()) > 0){
+                    // 如果到了发布时间，就将已经参与提前购的次数，直接 - 整个订单的数量即可
+                    int excelSellNum = cntPostExcelService.getSellNum(userId, box.getId());
+                    int postConfigSellNum = postConfigService.getSellNum(userId, box.getId());
+                    sellNumber =  ((excelSellNum + postConfigSellNum) - sellNumber);
+                }else{
+                    // 没有到发售时间的话就不管 中肯写法,能走到这里提前购逻辑是过了
+                    return;
+                }
+
+            }
+            Assert.isTrue(limitNumber > Math.abs(sellNumber),"抢的太多了,被限购了哦!");
+
+        }
     }
 
     private void realCheckCollection(String userId) {
