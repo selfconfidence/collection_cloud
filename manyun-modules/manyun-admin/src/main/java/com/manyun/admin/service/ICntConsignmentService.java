@@ -5,14 +5,16 @@ import com.manyun.admin.domain.CntConsignment;
 import com.manyun.admin.domain.dto.ConsignmentInfoDto;
 import com.manyun.admin.domain.dto.OrderInfoDto;
 import com.manyun.admin.domain.dto.PaymentReviewDto;
-import com.manyun.admin.domain.query.ConsignmentQuery;
-import com.manyun.admin.domain.query.ConsignmentStatusQuery;
-import com.manyun.admin.domain.query.OrderListQuery;
+import com.manyun.admin.domain.query.*;
 import com.manyun.admin.domain.vo.CntConsignmentVo;
 import com.manyun.admin.domain.vo.CntOrderVo;
+import com.manyun.admin.domain.vo.CollectionBusinessVo;
+import com.manyun.admin.domain.vo.CollectionSalesStatisticsVo;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
+
+import java.util.List;
 
 /**
  * 寄售市场主_寄售订单Service接口
@@ -64,4 +66,18 @@ public interface ICntConsignmentService extends IService<CntConsignment>
      * @return
      */
     int consignmentStatus(ConsignmentStatusQuery consignmentStatusQuery);
+
+    /**
+     *规定时间藏品交易量及交易金额查询
+     * @param collectionBusinessQuery
+     * @return
+     */
+    List<CollectionBusinessVo> selectByTimeZones(CollectionBusinessQuery collectionBusinessQuery);
+
+    /**
+     * 规定时间指定藏品买卖查询
+     * @param collectionSalesStatisticsQuery
+     * @return
+     */
+    List<CollectionSalesStatisticsVo> selectCollectionSalesStatistics(CollectionSalesStatisticsQuery collectionSalesStatisticsQuery);
 }

@@ -517,7 +517,6 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
     @Override
     public R airdropBalance(AirdropBalanceDto airdropBalanceDto) {
         CntBox box = getById(airdropBalanceDto.getGoodsId());
-        Assert.isFalse(box.getAirdropBalance()>0 || box.getAirdropSelfBalance()>0,"该盲盒已设置过空投库存!");
         boolean balanceCache = buiCronService.doBuiDegressionBalanceCache(BOX_MODEL_TYPE, airdropBalanceDto.getGoodsId(), airdropBalanceDto.getAirdropBalance());
         Assert.isTrue(balanceCache,"当前盲盒库存不足,设置空投库存失败!");
         box.setAirdropBalance(airdropBalanceDto.getAirdropBalance());

@@ -44,4 +44,36 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	order by cub.created_time desc
     </select>
 
+    <select id="selectMeetTheConditionsUserIds" resultType="java.lang.String">
+        SELECT
+            user_id userId
+        FROM
+            `cnt_user_box`
+        WHERE
+            box_id = #{goodId}
+        GROUP BY
+            user_id,
+            box_id
+        HAVING
+            count( id )>=#{count}
+    </select>
+
+    <select id="selectMeetTheConditionsData" resultType="com.manyun.admin.domain.vo.GoodsVo">
+        SELECT
+            box_title goodName,
+            count( id ) count
+        FROM
+            `cnt_user_box`
+        where
+            user_id = #{userId}
+            and  box_id IN
+            <foreach item="boxId" collection="goodIds" open="(" separator="," close=")">
+                #{boxId}
+            </foreach>
+        GROUP BY
+            user_id,
+            box_id,
+            box_title
+    </select>
+
 </mapper>
