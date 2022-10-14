@@ -606,7 +606,6 @@ public class CntCollectionServiceImpl extends ServiceImpl<CntCollectionMapper,Cn
     @Override
     public R airdropBalance(AirdropBalanceDto airdropBalanceDto) {
         CntCollection collection = getById(airdropBalanceDto.getGoodsId());
-        Assert.isFalse(collection.getAirdropBalance()>0 || collection.getAirdropSelfBalance()>0,"该藏品已设置过空投库存!");
         boolean balanceCache = buiCronService.doBuiDegressionBalanceCache(COLLECTION_MODEL_TYPE, airdropBalanceDto.getGoodsId(), airdropBalanceDto.getAirdropBalance());
         Assert.isTrue(balanceCache,"当前藏品库存不足,设置空投库存失败!");
         collection.setAirdropBalance(airdropBalanceDto.getAirdropBalance());

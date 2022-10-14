@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Arrays;
 
 import com.manyun.admin.domain.dto.MyBoxDto;
+import com.manyun.admin.domain.vo.GoodsVo;
 import com.manyun.admin.domain.vo.UserBoxVo;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
@@ -36,5 +37,25 @@ public class CntUserBoxServiceImpl extends ServiceImpl<CntUserBoxMapper,CntUserB
     @Override
     public List<UserBoxVo> myBoxList(String userId) {
         return cntUserBoxMapper.myBoxList(userId);
+    }
+
+    /**
+     * 查询满足条件的用户ids
+     * @param goodId
+     * @param count
+     * @return
+     */
+    @Override
+    public List<String> selectMeetTheConditionsUserIds(String goodId, Integer count) {
+        return cntUserBoxMapper.selectMeetTheConditionsUserIds(goodId,count);
+    }
+
+    /**
+     * 查询满足条件的数据
+     * @return
+     */
+    @Override
+    public List<GoodsVo> selectMeetTheConditionsData(String userId,List<String> goodIds) {
+        return cntUserBoxMapper.selectMeetTheConditionsData(userId,goodIds);
     }
 }
