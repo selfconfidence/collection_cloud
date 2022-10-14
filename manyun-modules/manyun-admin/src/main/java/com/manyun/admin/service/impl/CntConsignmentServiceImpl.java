@@ -143,7 +143,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
     @Override
     public int consignmentStatus(ConsignmentStatusQuery consignmentStatusQuery) {
         CntConsignment consignment = getById(consignmentStatusQuery.getId());
-        consignment.setConsignmentStatus(2);
+        consignment.setConsignmentStatus(consignmentStatusQuery.getStatus()==1?2:1);
         consignment.setUpdatedBy(SecurityUtils.getUsername());
         consignment.setUpdatedTime(DateUtils.getNowDate());
         return updateById(consignment)==true?1:0;
