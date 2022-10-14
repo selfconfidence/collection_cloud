@@ -355,7 +355,6 @@ public class LLPayNotifyController {
     @PostMapping(value = "/collectionJoinBoxNotify")
     @ResponseBody
     @ApiOperation(value = "盲盒藏品支付",hidden = true)
-    @Lock("notifyPaySuccess")
     public String collectionJoinBoxNotify(HttpServletRequest req) throws IOException {
         log.info("进入连连盲盒藏品支付回调");
         String sign = req.getHeader("Signature-Data");

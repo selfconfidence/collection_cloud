@@ -1,5 +1,6 @@
 package com.manyun.business.controller;
 
+import cn.hutool.core.lang.Assert;
 import com.github.pagehelper.PageHelper;
 import com.manyun.business.domain.form.OrderPayForm;
 import com.manyun.business.domain.query.OrderQuery;
@@ -86,7 +87,7 @@ public class OrderController extends BaseController {
     @ApiOperation(value = "(普通订单 & 寄售订单)根据订单编号统一下单支付",notes = "传递订单编号,待支付订单都可以通过此接口二次支付!\t " +
             "如果当前支付类型是 (组合支付)0 余额支付,那么用户余额不够的情况下直接扣除所有的余额,其他的调用银联进行支付!" +
             " \n version 1.0.1")
-    @Lock("unifiedOrder")
+    //@Lock(value = "unifiedOrder",waitTime = 3000L)
     public R<PayVo> unifiedOrder(@RequestBodyRsa @Valid OrderPayForm orderPayForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(orderService.unifiedOrder(orderPayForm,notNullLoginBusinessUser.getUserId()));
@@ -96,8 +97,9 @@ public class OrderController extends BaseController {
     @ApiOperation(value = "(普通订单 & 寄售订单)根据订单编号统一下单支付",notes = "传递订单编号,待支付订单都可以通过此接口二次支付!\t " +
             "如果当前支付类型是 (组合支付)0 余额支付,那么用户余额不够的情况下直接扣除所有的余额,其他的调用银联进行支付!" +
             " \n version 1.0.1")
-    @Lock("unifiedOrder")
+    //@Lock(value = "unifiedOrder",waitTime = 3000L)
     public R<PayVo> phpUnifiedOrder(@RequestBody @Valid OrderPayForm orderPayForm){
+        Assert.isTrue(Boolean.FALSE,"接口已废弃!");
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(orderService.unifiedOrder(orderPayForm,notNullLoginBusinessUser.getUserId()));
     }

@@ -47,7 +47,7 @@ public class UserTokenController {
 
     @PostMapping("/login")
     @ApiOperation(value = "用户登录",notes = "用户账号密码登录")
-    public R<AccTokenVo> login(@RequestBodyRsa @Valid LoginPhoneForm loginPhoneForm)
+    public R<AccTokenVo> login(@RequestBody @Valid LoginPhoneForm loginPhoneForm)
     {
         XXutils.dingxiangTokenCheck(loginPhoneForm.getToken());
         R<CntUserDto> userR = remoteBuiUserService.login(loginPhoneForm, SecurityConstants.INNER);
@@ -60,6 +60,7 @@ public class UserTokenController {
     @PostMapping("/phpLogin")
     @ApiOperation(value = "用户登录",notes = "用户账号密码登录")
     public R<AccTokenVo> phpLogin(@RequestBody LoginPhoneForm loginPhoneForm) {
+        Assert.isTrue(Boolean.FALSE,"接口已废弃!");
         R<CntUserDto> userR = remoteBuiUserService.login(loginPhoneForm, SecurityConstants.INNER);
         Assert.isTrue(userR.getCode() == CodeStatus.SUCCESS.getCode(),userR.getMsg());
         CntUserDto userRData = userR.getData();

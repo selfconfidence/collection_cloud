@@ -113,7 +113,6 @@ public class ShandePayNotifyController {
      */
     @RequestMapping(value = "/collectionJoinBoxNotify")
     @ApiOperation(value = "盲盒藏品聚合杉德支付回调",hidden = true)
-    @Lock("notifyPaySuccess")
     public JSONObject boxNotify(HttpServletRequest req) {
         log.info("进入盲盒藏品聚合杉德支付回调");
         String data=req.getParameter("data");

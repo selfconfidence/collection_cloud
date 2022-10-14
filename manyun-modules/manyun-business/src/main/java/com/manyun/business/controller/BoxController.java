@@ -112,7 +112,7 @@ public class BoxController extends BaseController {
 
     @PostMapping("/sellOrderBox")
     @ApiOperation(value = "购买盲盒_预先_生成订单",notes = "用来预先 生成一个待支付订单,返回订单编号,用来二次提交支付\n version 1.0.1")
-    @Lock("sellOrderBox")
+    @Lock(value = "sellOrderBox",waitTime = 1000L)
     public R<String> sellOrderBox(@Valid @RequestBodyRsa BoxOrderSellForm boxOrderSellForm){
         String userId = SecurityUtils.getBuiUserId();
         return R.ok(boxService.sellOrderBox(boxOrderSellForm,userId));

@@ -292,7 +292,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
                 .goodsNum(collectionOrderSellForm.getSellNum())
                 .userId(userId)
                 .build());
-        return orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, outHost)).getId();
+        return orderService.getOne(Wrappers.<Order>lambdaQuery().select(Order::getId).eq(Order::getOrderNo, outHost)).getId();
     }
 
     private void checkCacheBalance(CntCollection cntCollection,Integer sellNum){
@@ -387,7 +387,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
                 }
 
             }
-            Assert.isTrue(limitNumber > Math.abs(sellNumber),"抢的太多了,被限购了哦!");
+            Assert.isTrue(limitNumber > Math.abs(sellNumber),"购买数量已上限!");
 
         }
     }
