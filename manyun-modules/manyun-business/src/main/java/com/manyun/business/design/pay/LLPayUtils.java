@@ -156,7 +156,7 @@ public class LLPayUtils {
         params.setTimestamp(timestamp);
         params.setOid_partner(LLianPayConstant.OidPartner);
         params.setNotify_url(notifyUrl);
-        params.setPay_time_type("TRANS_NEXT_TIME");
+        params.setPay_time_type("TRANS_THIS_TIME");
         params.setRisk_item(
                 "{" +
                         "\"frms_ware_category\":\"4007\"," +
