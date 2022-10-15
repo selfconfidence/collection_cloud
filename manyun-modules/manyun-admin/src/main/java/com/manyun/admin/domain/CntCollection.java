@@ -2,7 +2,6 @@ package com.manyun.admin.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
@@ -42,6 +41,15 @@ public class CntCollection implements Serializable
 
     @ApiModelProperty("库存")
     private Integer balance;
+
+    @ApiModelProperty("空投已售")
+    private Integer airdropSelfBalance;
+
+    @ApiModelProperty("空投库存")
+    private Integer airdropBalance;
+
+    @ApiModelProperty("限定数量")
+    private Integer limitNumber;
 
     @ApiModelProperty("版本标识")
     private Integer versionFlag;
@@ -134,6 +142,30 @@ public class CntCollection implements Serializable
 
     public void setBalance(Integer balance) {
         this.balance = balance;
+    }
+
+    public Integer getAirdropSelfBalance() {
+        return airdropSelfBalance;
+    }
+
+    public void setAirdropSelfBalance(Integer airdropSelfBalance) {
+        this.airdropSelfBalance = airdropSelfBalance;
+    }
+
+    public Integer getAirdropBalance() {
+        return airdropBalance;
+    }
+
+    public void setAirdropBalance(Integer airdropBalance) {
+        this.airdropBalance = airdropBalance;
+    }
+
+    public Integer getLimitNumber() {
+        return limitNumber;
+    }
+
+    public void setLimitNumber(Integer limitNumber) {
+        this.limitNumber = limitNumber;
     }
 
     public Integer getVersionFlag() {
@@ -234,6 +266,8 @@ public class CntCollection implements Serializable
             .append("realPrice", getRealPrice())
             .append("selfBalance", getSelfBalance())
             .append("balance", getBalance())
+            .append("airdropBalance", getAirdropBalance())
+            .append("airdropSelfBalance", getAirdropSelfBalance())
             .append("versionFlag", getVersionFlag())
             .append("statusBy", getStatusBy())
             .append("publishTime", getPublishTime())
@@ -245,6 +279,7 @@ public class CntCollection implements Serializable
             .append("cateId", getCateId())
             .append("postTime", getPostTime())
             .append("pushConsignment", getPushConsignment())
+            .append("limitNumber",getLimitNumber())
             .toString();
     }
 }

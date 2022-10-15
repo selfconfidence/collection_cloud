@@ -11,18 +11,21 @@ import com.manyun.admin.domain.CntUserCollection;
 import com.manyun.admin.domain.dto.ConsignmentInfoDto;
 import com.manyun.admin.domain.dto.OrderInfoDto;
 import com.manyun.admin.domain.dto.PaymentReviewDto;
-import com.manyun.admin.domain.query.ConsignmentQuery;
-import com.manyun.admin.domain.query.OrderListQuery;
+import com.manyun.admin.domain.query.*;
 import com.manyun.admin.domain.vo.CntConsignmentVo;
 import com.manyun.admin.domain.vo.CntOrderVo;
+import com.manyun.admin.domain.vo.CollectionBusinessVo;
+import com.manyun.admin.domain.vo.CollectionSalesStatisticsVo;
 import com.manyun.admin.service.ICntMediaService;
 import com.manyun.admin.service.ICntOrderService;
 import com.manyun.admin.service.ICntUserCollectionService;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.manyun.admin.mapper.CntConsignmentMapper;
@@ -130,6 +133,40 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
             }
         }
         return cntConsignmentVo;
+    }
+
+    /**
+     * 修改寄售状态
+     * @param consignmentStatusQuery
+     * @return
+     */
+    @Override
+    public int consignmentStatus(ConsignmentStatusQuery consignmentStatusQuery) {
+        CntConsignment consignment = getById(consignmentStatusQuery.getId());
+        consignment.setConsignmentStatus(consignmentStatusQuery.getStatus()==1?2:1);
+        consignment.setUpdatedBy(SecurityUtils.getUsername());
+        consignment.setUpdatedTime(DateUtils.getNowDate());
+        return updateById(consignment)==true?1:0;
+    }
+
+    /**
+     * 规定时间藏品交易量及交易金额查询
+     * @param collectionBusinessQuery
+     * @return
+     */
+    @Override
+    public List<CollectionBusinessVo> selectByTimeZones(CollectionBusinessQuery collectionBusinessQuery) {
+        return cntConsignmentMapper.selectByTimeZones(collectionBusinessQuery);
+    }
+
+    /**
+     * 规定时间指定藏品买卖查询
+     * @param collectionSalesStatisticsQuery
+     * @return
+     */
+    @Override
+    public List<CollectionSalesStatisticsVo> selectCollectionSalesStatistics(CollectionSalesStatisticsQuery collectionSalesStatisticsQuery) {
+        return cntConsignmentMapper.selectCollectionSalesStatistics(collectionSalesStatisticsQuery);
     }
 
 }

@@ -8,6 +8,7 @@ import com.manyun.business.domain.form.*;
 import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.ICntUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
+import com.manyun.comm.api.domain.dto.UserDto;
 import com.manyun.comm.api.domain.form.JgLoginTokenForm;
 import com.manyun.comm.api.domain.vo.AccTokenVo;
 import com.manyun.comm.api.model.LoginBusinessUser;
@@ -68,6 +69,7 @@ public class CntUserController extends BaseController {
 
     @PostMapping("/regUser")
     @ApiOperation("用户注册 - 手机号验证码的方式")
+    @Lock("regUser")
     public R regUser(@RequestBody @Valid UserRegForm userRegForm){
         String phoneCode = (String) redisService.redisTemplate.opsForValue().get(PHONE_CODE.concat(userRegForm.getPhone().concat(PhoneCodeType.REG_CODE.getType())));
         Assert.isTrue(userRegForm.getPhoneCode().equals(phoneCode),"验证码输入错误,请核实!");
@@ -115,6 +117,7 @@ public class CntUserController extends BaseController {
     // 实名认证
     @PostMapping("/realUser")
     @ApiOperation("实名认证 -- 银联")
+    @Lock("realUser")
     public R realUser(@RequestBody @Valid UserRealForm userRealForm){
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         codeCheck(userRealForm.getPhone(),userRealForm.getPhoneCode(), PhoneCodeType.REAL_CODE.getType());
@@ -243,6 +246,18 @@ public class CntUserController extends BaseController {
         return R.ok(cntUserDto);
     }
 
+    /**
+     * 此接口查询  id, 手机号，jgpush 3字段 有需要再加
+     * @param userDto
+     * @return
+     */
+    @PostMapping("/findUserIdLists")
+    @InnerAuth
+    @ApiOperation(value = "根据用户编号批量查询用户信息",hidden = true)
+    public R<List<CntUserDto>> findUserIdLists(@RequestBody UserDto userDto){
+        return R.ok(userService.findUserIdLists(userDto.getUserIds()));
+    }
+
     @PostMapping("/jgPhoneLogin")
     @ApiOperation(value = "激光 一键 登录/注册",notes = "成功返回业务token",hidden = true)
     @InnerAuth
@@ -289,6 +304,20 @@ public class CntUserController extends BaseController {
         return R.ok();
     }
 
+    @GetMapping("/loginEncrypt/{userId}")
+    @ApiOperation(value = "登录密码重置密钥",hidden = true)
+    @Lock("loginEncrypt")
+    public R loginEncrypt(@PathVariable String userId){
+        userService.loginEncrypt(userId);
+        return R.ok();
+    }
+    @GetMapping("/payEncrypt/{userId}")
+    @ApiOperation(value = "支付密码重置密钥",hidden = true)
+    @Lock("payEncrypt")
+    public R payEncrypt(@PathVariable String userId){
+        userService.payEncrypt(userId);
+        return R.ok();
+    }
 
 
 

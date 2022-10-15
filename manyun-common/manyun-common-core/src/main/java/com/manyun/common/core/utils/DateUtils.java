@@ -3,12 +3,15 @@ package com.manyun.common.core.utils;
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.Date;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 /**
@@ -27,6 +30,8 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     public static String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
 
     public static String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+
+    private static final Map<String, TimeUnit> convertMap = MapUtil.<String,TimeUnit>builder().put("s", TimeUnit.SECONDS).put("m", TimeUnit.MINUTES).put("h", TimeUnit.HOURS).put("d", TimeUnit.DAYS).build();
 
     private static String[] parsePatterns = {
             "yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM",
@@ -168,6 +173,19 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     }
 
     /**
+     * 增加 Date ==> LocalDateTime
+     */
+    public static LocalDateTime toLocalDateTime(Date date)
+    {
+        if(date==null){
+            return null;
+        }
+        Instant instant = date.toInstant();
+        LocalDateTime localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
+        return localDateTime;
+    }
+
+    /**
      * 增加 LocalDate ==> Date
      */
     public static Date toDate(LocalDate temporalAccessor)
@@ -239,6 +257,37 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
         } catch (ParseException e) {
             return null;
         }
+    }
+
+
+    public static Long convertTime(String time,TimeUnit returnTimeUnit){
+        Assert.isTrue(time.length() >=2,"time length < 2 ?");
+        TimeUnit timeLast = getTimeLast(time);
+        // 小比较
+        Assert.isTrue(timeLast.compareTo(returnTimeUnit)>=0,"tarTime >= returnTime ?");
+        return Convert.convertTime(Long.parseLong(time.substring(0,time.length() - 1)),timeLast,returnTimeUnit);
+    }
+
+
+    /**
+     * com.manyun.common.core.enums.DelayLevelEnum 针对此枚举
+     * @param time  根据 1s 10h 等等 获取时间单位
+     * @return
+     */
+    public static TimeUnit getTimeLast(String time){
+        String last = time.substring(time.length() - 1);
+          return convert(last);
+    }
+
+    /**
+     * 根据  h s d m 获取时间单位
+     * @param last
+     * @return
+     */
+    private static TimeUnit convert(String last){
+        TimeUnit timeUnit = convertMap.get(last);
+        Assert.isTrue(Objects.nonNull(timeUnit),"last not fount TimeUnit");
+        return timeUnit;
     }
 
 }

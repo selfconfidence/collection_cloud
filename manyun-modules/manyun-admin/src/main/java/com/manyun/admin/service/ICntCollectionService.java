@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.admin.domain.CntCollection;
+import com.manyun.admin.domain.dto.AirdropBalanceDto;
 import com.manyun.admin.domain.dto.AirdropDto;
 import com.manyun.admin.domain.dto.CntCollectionAlterCombineDto;
 import com.manyun.admin.domain.dto.CollectionStateDto;
@@ -55,6 +56,13 @@ public interface ICntCollectionService extends IService<CntCollection>
     public R updateCntCollection(CntCollectionAlterCombineDto collectionAlterCombineDto);
 
     /***
+     * 空投库存
+     * @param airdropBalanceDto 空投库存请求参数
+     * @return
+     */
+    R airdropBalance(AirdropBalanceDto airdropBalanceDto);
+
+    /***
      * 空投
      * @param airdropDto 空投请求参数
      * @return
@@ -77,4 +85,5 @@ public interface ICntCollectionService extends IService<CntCollection>
 
     @Transactional(rollbackFor = Exception.class)
     void taskCheckStatus();
+
 }

@@ -8,6 +8,7 @@ import com.manyun.business.domain.vo.SyntheticActivityVo;
 import com.manyun.business.domain.vo.SyntheticRecordVo;
 import com.manyun.business.service.IActionService;
 import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
@@ -45,8 +46,8 @@ public class ActionController {
     @PostMapping("/syntheticRecordList")
     @ApiOperation("查询合成记录列表")
     public R<TableDataInfo<SyntheticRecordVo>> syntheticRecordList(@RequestBody PageQuery pageQuery) {
-        PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize());
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        PageHelper.startPage(pageQuery.getPageNum(), pageQuery.getPageSize());
         return R.ok(actionService.syntheticRecordList(loginBusinessUser.getUserId()));
     }
 
@@ -59,6 +60,7 @@ public class ActionController {
 
     @PostMapping("/synthesizeNow")
     @ApiOperation("立即合成")
+    @Lock("synthesizeNow")
     public R<SynthesizeNowVo> synthesizeNow(@RequestBody @Valid SynthesizeForm synthesizeForm) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return actionService.synthesizeNow(loginBusinessUser.getUserId(),loginBusinessUser.getUsername(),synthesizeForm.getId());

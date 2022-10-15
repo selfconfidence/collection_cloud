@@ -16,4 +16,6 @@ public interface ICntPostExcelService extends IService<CntPostExcel> {
     Boolean isExcelPostCustomer(String userId, String buiId);
 
     void orderExec(String userId, String buiId);
+
+    int getSellNum(String userId, String buiId);
 }

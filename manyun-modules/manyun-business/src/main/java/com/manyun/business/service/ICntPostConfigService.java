@@ -19,4 +19,6 @@ public interface ICntPostConfigService extends IService<CntPostConfig> {
     boolean isConfigPostBoxCustomer(String userId, String buiId);
 
     void orderExec(String userId, String buiId);
+
+    int getSellNum(String userId, String id);
 }

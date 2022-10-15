@@ -1,5 +1,6 @@
 package com.manyun.comm.api;
 
+import com.manyun.comm.api.domain.dto.BatchSmsCommDto;
 import com.manyun.comm.api.domain.dto.SmsCommDto;
 import com.manyun.comm.api.factory.RemoteFileFallbackFactory;
 import com.manyun.comm.api.factory.RemoteSmsFallbackFactory;
@@ -26,4 +27,8 @@ public interface RemoteSmsService
 
      @PostMapping(value = "/sendCommPhone",consumes = MediaType.APPLICATION_JSON_VALUE)
      R sendCommPhone(@RequestBody SmsCommDto smsCommDto);
+
+     @PostMapping(value = "/sendBatchCommPhone",consumes = MediaType.APPLICATION_JSON_VALUE)
+     R sendBatchCommPhone(@RequestBody BatchSmsCommDto batchSmsCommDto);
+
 }

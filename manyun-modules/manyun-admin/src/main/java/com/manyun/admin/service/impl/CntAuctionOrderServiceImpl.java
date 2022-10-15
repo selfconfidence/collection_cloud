@@ -5,6 +5,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.CntAuctionPrice;
+import com.manyun.admin.domain.CntUser;
 import com.manyun.admin.domain.query.AuctionOrderQuery;
 import com.manyun.admin.domain.query.AuctionPriceQuery;
 import com.manyun.admin.domain.vo.AuctionPriceVo;
@@ -12,6 +13,7 @@ import com.manyun.admin.domain.vo.CntAuctionOrderVo;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.admin.service.ICntAuctionPriceService;
 import com.manyun.admin.service.ICntMediaService;
+import com.manyun.admin.service.ICntUserService;
 import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.common.core.constant.BusinessConstants;
@@ -51,6 +53,9 @@ public class CntAuctionOrderServiceImpl extends ServiceImpl<CntAuctionOrderMappe
     @Autowired
     private ICntMediaService mediaService;
 
+    @Autowired
+    private ICntUserService userService;
+
     /**
      * 查询拍卖订单列表
      *
@@ -82,10 +87,10 @@ public class CntAuctionOrderServiceImpl extends ServiceImpl<CntAuctionOrderMappe
     }
 
     private AuctionPriceVo providerAuctionPriceVo(CntAuctionPrice auctionPrice) {
-        R<CntUserDto> cntUserDtoR = remoteBuiUserService.commUni(auctionPrice.getUserId(), SecurityConstants.INNER);
+        CntUser user = userService.getById(auctionPrice.getUserId());
         AuctionPriceVo auctionPriceVo = Builder.of(AuctionPriceVo::new).build();
         BeanUtil.copyProperties(auctionPrice, auctionPriceVo);
-        auctionPriceVo.setHeadImage(cntUserDtoR.getData().getHeadImage());
+        auctionPriceVo.setHeadImage(user==null?"":user.getHeadImage());
         return auctionPriceVo;
     }
 

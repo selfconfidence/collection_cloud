@@ -45,6 +45,15 @@ public class CntBox implements Serializable
     @ApiModelProperty("库存")
     private Integer balance;
 
+    @ApiModelProperty("空投已售")
+    private Integer airdropSelfBalance;
+
+    @ApiModelProperty("空投库存")
+    private Integer airdropBalance;
+
+    @ApiModelProperty("限定数量")
+    private Integer limitNumber;
+
     @ApiModelProperty("1未开启,2已开启")
     private Integer boxOpen;
 
@@ -127,6 +136,30 @@ public class CntBox implements Serializable
 
     public void setSelfBalance(Integer selfBalance) {
         this.selfBalance = selfBalance;
+    }
+
+    public Integer getAirdropSelfBalance() {
+        return airdropSelfBalance;
+    }
+
+    public void setAirdropSelfBalance(Integer airdropSelfBalance) {
+        this.airdropSelfBalance = airdropSelfBalance;
+    }
+
+    public Integer getAirdropBalance() {
+        return airdropBalance;
+    }
+
+    public void setAirdropBalance(Integer airdropBalance) {
+        this.airdropBalance = airdropBalance;
+    }
+
+    public Integer getLimitNumber() {
+        return limitNumber;
+    }
+
+    public void setLimitNumber(Integer limitNumber) {
+        this.limitNumber = limitNumber;
     }
 
     public Integer getBalance() {
@@ -235,6 +268,9 @@ public class CntBox implements Serializable
             .append("boxTitle", getBoxTitle())
             .append("selfBalance", getSelfBalance())
             .append("balance", getBalance())
+            .append("airdropBalance", getAirdropBalance())
+            .append("airdropSelfBalance", getAirdropSelfBalance())
+            .append("limitNumber", getLimitNumber())
             .append("boxOpen", getBoxOpen())
             .append("statusBy", getStatusBy())
             .append("boxInfo", getBoxInfo())

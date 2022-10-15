@@ -29,6 +29,7 @@ import com.manyun.common.core.enums.AuctionStatus;
 import com.manyun.common.core.enums.OrderStatus;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -326,7 +327,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         CntUserDto data = cntUserDtoR.getData();
         Assert.isTrue(systemWithdrawForm.getWithdrawAmount().compareTo(userMoney.getMoneyBalance()) <= 0, "提现金额不可大于钱包余额");
         Assert.isTrue(OK_REAL.getCode().equals(data.getIsReal()),"暂未实名认证,请实名认证!");
-        Assert.isTrue(systemWithdrawForm.getPayPass().equals(data.getPayPass()),"支付密码错误,请核实!");
+        Assert.isTrue(SecurityUtils.matchesPassword(systemWithdrawForm.getPayPass(),data.getPayPass()),"支付密码错误,请核实!");
         CntSystemWithdraw cntSystemWithdraw = new CntSystemWithdraw();
         cntSystemWithdraw.setId(IdUtil.getSnowflakeNextIdStr());
         cntSystemWithdraw.setBankCard(userMoney.getBankCart());

@@ -2,4 +2,39 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.manyun.business.mapper.CntUserMapper">
 
+
+    <select id="commUni" resultType="com.manyun.business.domain.entity.CntUser">
+        SELECT
+            *
+        FROM
+            cnt_user AS p_u
+        WHERE
+                p_u.id = (
+                SELECT
+                    id
+                FROM
+                    cnt_user
+                WHERE
+                    id = #{commUni} UNION ALL
+                SELECT
+                    id
+                FROM
+                    cnt_user
+                WHERE
+                    phone = #{commUni} UNION ALL
+                SELECT
+                    id
+                FROM
+                    cnt_user
+                WHERE
+                    link_addr = #{commUni} UNION ALL
+                SELECT
+                    id
+                FROM
+                    cnt_user
+                WHERE
+                    user_id = #{commUni}
+            );    </select>
+
+
 </mapper>

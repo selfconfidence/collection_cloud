@@ -245,6 +245,43 @@ public interface BusinessConstants {
         String COLLECTION_AUTO_NUM = "collection:auto:numbers:";
         String  USER_ACTIVE_NUMBERS = "user:active:numbers";
         String COLLECTION_RANDOM_NUM = "collection:random:numbers:";
+        String COLLECTION_ACTIVE_NUMBERS = "collection:inactive:numbers:";
+        Integer COLLECTION_ACTIVE_EXPIRE = 1; // 一秒内
+        Integer OPEN_INTERFACE_STOP = 6; // 停止时间 如果在一秒内 超过了访问次数 就会封禁 6秒 不可访问当前接口。
+        Integer OPEN_MAX_URL = 3; // 同一接口访问次数
+        String COLLECTION_ACTIVE_NUMBERS_ADD_LUA = "if redis.call('HINCRBY',KEYS[1],ARGV[1],1) >= 1 then\n" +
+                "    redis.call('EXPIRE',KEYS[1],ARGV[2])\n" +
+                "end";
+        String COLLECTION_ACTIVE_NUMBERS_REL_LUA = "if redis.call('HINCRBY',KEYS[1],ARGV[1],-1) <= 0 then\n" +
+                "    redis.call('HDEL',KEYS[1],ARGV[1])\n" +
+                "end";
+
+        // 业务系列
+        // 创作者
+        String CREATED_BUI_CACHE = "created:bui:cache:";
+
+        // 发行方
+        String PUBLISH_BUI_CACHE = "publish:bui:cache:";
+
+        // 库存系列 hash 数据结构
+
+        // 藏品 大KEY
+        String COLLECTION_POINT_BUI = "collection:point:bui:";
+
+        // 盲盒 大KEY
+        String BOX_POINT_BUI = "box:point:bui:";
+
+        // 藏品详情 大KEY
+        String COLLECTION_INFO = "collection:info:";
+
+        // 藏品详情 大KEY
+        String BOX_INFO = "box:info:";
+
+       //已售
+        String SELFBALANCE = "selfBalance";
+        //余量
+        String BALANCE = "balance";
+
 
     }
 

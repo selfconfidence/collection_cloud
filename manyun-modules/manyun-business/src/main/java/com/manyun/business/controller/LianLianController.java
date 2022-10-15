@@ -6,9 +6,13 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.manyun.business.design.pay.LLPayUtils;
+import com.manyun.business.design.pay.bean.QueryRefundResult;
+import com.manyun.business.design.pay.bean.changePayPass.*;
 import com.manyun.business.design.pay.bean.individual.IndividualBindCardApplyResult;
 import com.manyun.business.design.pay.bean.individual.IndividualBindCardVerifyResult;
 import com.manyun.business.design.pay.bean.individual.UnlinkedacctIndApplyResult;
+import com.manyun.business.design.pay.bean.morePayeeRefund.MorePayeeRefundResult;
+import com.manyun.business.design.pay.bean.queryPayment.QueryPaymentResult;
 import com.manyun.business.domain.entity.Logs;
 import com.manyun.business.domain.entity.Money;
 import com.manyun.business.domain.query.*;
@@ -247,6 +251,40 @@ public class LianLianController {
         );
         Assert.isTrue(Objects.nonNull(unlinkedacctIndApplyResult),unlinkedacctIndApplyResult.getRet_msg());
         return R.ok();
+    }
+
+
+    @GetMapping("/queryPayment/{txnSeqno}")
+    @ApiOperation(value = "支付结果查询",notes = "txnSeqno==交易流水号")
+    public R<QueryPaymentResult> queryPayment(@PathVariable String txnSeqno) {
+        return R.ok(LLPayUtils.queryPayment(txnSeqno));
+    }
+
+
+    @PostMapping("/morePayeeRefund")
+    @ApiOperation("退款申请")
+    public R<MorePayeeRefundResult> morePayeeRefund(@Valid @RequestBody MorePayeeRefundQuery morePayeeRefundQuery) {
+        return R.ok(LLPayUtils.morePayeeRefund(morePayeeRefundQuery,(url + LianLianPayEnum.MORE_PAYEE_REFUND.getNotifyUrl())));
+    }
+
+    @GetMapping("/queryRefund/{refundSeqno}")
+    @ApiOperation(value = "退款结果查询",notes = "refundSeqno==退款订单号")
+    public R<QueryRefundResult> queryRefund(@PathVariable String refundSeqno) {
+        return R.ok(LLPayUtils.queryRefund(refundSeqno));
+    }
+
+    @PostMapping("/changeLianLianPayPass")
+    @ApiOperation("重置密码申请")
+    public R<ChangePayPassResult> changeLianLianPayPass(@Valid @RequestBody ChangePayPassForm changePayPassForm) {
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return R.ok(LLPayUtils.changeLianLianPayPass(changePayPassForm, notNullLoginBusinessUser.getUserId()));
+    }
+
+    @PostMapping("/changeLianLianPayPassVerify")
+    @ApiOperation("重置密码验证")
+    public R<ChangePayPassVerifyResult> changeLianLianPayPassVerify(@Valid @RequestBody ChangePayPassVerifyForm changePayPassVerifyForm) {
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return R.ok(LLPayUtils.changeLianLianPayPassVerify(changePayPassVerifyForm, notNullLoginBusinessUser.getUserId()));
     }
 
 }

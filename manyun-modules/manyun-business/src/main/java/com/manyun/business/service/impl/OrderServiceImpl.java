@@ -29,6 +29,7 @@ import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.enums.DelayLevelEnum;
 import com.manyun.common.core.enums.LianLianPayEnum;
 import com.manyun.common.core.enums.PayTypeEnum;
 import com.manyun.common.core.enums.ShandePayEnum;
@@ -37,19 +38,26 @@ import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.ip.IpUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import com.manyun.common.mq.producers.deliver.DeliverProducer;
+import com.manyun.common.mq.producers.msg.DeliverMsg;
+import com.manyun.common.redis.service.BuiCronService;
+import com.manyun.common.security.utils.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.System;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE;
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE;
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
 import static com.manyun.common.core.enums.BoxStatus.UP_ACTION;
@@ -115,12 +123,18 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Autowired
     private IStepService stepService;
 
+    @Autowired
+    private DeliverProducer deliverProducer;
+
 
     @Autowired
     private ICntTarService cntTarService;
 
     @Autowired
     private RemoteBuiUserService remoteBuiUserService;
+
+    @Autowired
+    private BuiCronService buiCronService;
 
     @Override
     public TableDataInfo<OrderVo> pageQueryList(OrderQuery orderQuery, String userId) {
@@ -148,9 +162,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             orderVo.setCreationImg(creation.getHeadImage());
         }
         if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(order.getGoodsType())) {
-            List<MediaVo> mediaVos = mediaService.initMediaVos(order.getBuiId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
-            List<MediaVo> thumbnailImgMediaVos = mediaService.thumbnailImgMediaVos(order.getBuiId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
-            List<MediaVo> threeDimensionalMediaVos = mediaService.threeDimensionalMediaVos(order.getBuiId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
+            List<MediaVo> mediaVos = mediaService.initMediaVos(order.getBuiId(), BOX_MODEL_TYPE);
+            List<MediaVo> thumbnailImgMediaVos = mediaService.thumbnailImgMediaVos(order.getBuiId(), BOX_MODEL_TYPE);
+            List<MediaVo> threeDimensionalMediaVos = mediaService.threeDimensionalMediaVos(order.getBuiId(), BOX_MODEL_TYPE);
             orderVo.setGoodsImg(mediaVos.get(0).getMediaUrl());
             orderVo.setThumbnailImg(thumbnailImgMediaVos.size()>0?thumbnailImgMediaVos.get(0).getMediaUrl():"");
             orderVo.setThreeDimensionalImg(threeDimensionalMediaVos.size()>0?threeDimensionalMediaVos.get(0).getMediaUrl():"");
@@ -195,9 +209,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setOrderStatus(WAIT_ORDER.getCode());
         order.setPayTime(LocalDateTime.now());
         order.setMoneyBln(NumberUtil.add(0D));
-        // 截止到什么是否到达付款时间 小时为单位
+        // 截止到什么是否到达付款时间 分钟为单位
        // Integer serviceVal = systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class);
-        order.setEndTime(LocalDateTime.now().plusMinutes(serviceVal));
+        DelayLevelEnum defaultEnum = DelayLevelEnum.getDefaultEnum(serviceVal, DelayLevelEnum.LEVEL_6);
+        order.setEndTime(LocalDateTime.now().plusMinutes(DelayLevelEnum.getSourceConvertTime(defaultEnum, TimeUnit.MINUTES)));
+        deliverProducer.sendCancelOrder(idStr,Builder.of(DeliverMsg::new).with(DeliverMsg::setBuiId,idStr).with(DeliverMsg::setBuiName,StrUtil.format("订单取消了,订单编号为:{}",idStr)).with(DeliverMsg::setResetHost, idStr).build() ,defaultEnum );
         save(order);
         consumer.accept(idStr);
         return orderNo;
@@ -210,7 +226,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @Lock("notifyPaySuccess")
     public void notifyPaySuccess(String outHost) {
         Order order = getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, outHost));
         String info = StrUtil.format("从平台购买,本次消费{},来源为平台发售", order.getOrderAmount().toString());
@@ -228,12 +243,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             updateById(order);
             // 提前购记录次数
             Box box = boxService.getObject().getById(order.getBuiId());
-            if (Objects.nonNull(box.getPostTime()))
+            // 如果已经过了 正常发售时间 就不用记录了!
+            if (Objects.nonNull(box.getPostTime()) && LocalDateTime.now().compareTo(box.getPublishTime()) < 0)
             cntPostExcelService.orderExec(order.getUserId(),order.getBuiId());
             // 是否是抽签购的？
             if (StrUtil.isNotBlank(box.getTarId()))
                 cntTarService.overSelf(order.getUserId(),box.getId());
 
+
+            // 真实扣减库存操作
+            boxService.getObject().checkBalance(order.getBuiId(),order.getGoodsNum());
             return;
         }
 
@@ -244,12 +263,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             updateById(order);
             // 提前购记录次数
             CntCollection collection = collectionService.getObject().getById(order.getBuiId());
-            if (Objects.nonNull(collection.getPostTime()))
+            if (Objects.nonNull(collection.getPostTime()) && LocalDateTime.now().compareTo(collection.getPublishTime()) < 0)
                 cntPostExcelService.orderExec(order.getUserId(),order.getBuiId());
 
             // 是否是抽签购的？
             if (StrUtil.isNotBlank(collection.getTarId()))
                 cntTarService.overSelf(order.getUserId(),collection.getId());
+
+            // 真实扣减库存操作
+          collectionService.getObject().checkBalance(order.getBuiId(),order.getGoodsNum() );
             return;
         }
         throw new IllegalStateException("not fount order good_type = " + goodsType);
@@ -265,7 +287,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    @Lock("timeCancel")
     public void timeCancel(){
         List<Order> orderList = list(Wrappers.<Order>lambdaQuery().eq(Order::getOrderStatus, WAIT_ORDER.getCode()).lt(Order::getEndTime, LocalDateTime.now()));
         if (orderList.isEmpty()) return;
@@ -277,7 +298,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             // 寄售信息修改
             cntConsignmentServiceObjectFactory.getObject().reLoadConsignments(cntConsignments);
         }
-        for (Order order : orderList) {
+        // 优化进行批处理
+        List<Order> consignmentOrders = orderList.parallelStream().filter(item -> cntConsignmentOrderIds.contains(item.getId())).collect(Collectors.toList());
+        if (!consignmentOrders.isEmpty()){
+            cancelBatchOrder(consignmentOrders, Boolean.FALSE);
+        }
+        List<Order> orders = orderList.parallelStream().filter(item -> !cntConsignmentOrderIds.contains(item.getId())).collect(Collectors.toList());
+       if (!orders.isEmpty()){
+           cancelBatchOrder(orders,Boolean.TRUE);
+       }
+/*        for (Order order : orderList) {
             String orderId = order.getId();
             try {
                 if (cntConsignmentOrderIds.contains(order.getId())){
@@ -291,7 +321,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 log.error("定时订单取消失败订单编号为:{},错误原因为:{}",orderId,e.getMessage());
             }
 
-        }
+        }*/
         // 批量更改订单状态
      /*   List<Order> updateSOrder = orderList.parallelStream().map(item -> {
             item.setOrderStatus(CANCEL_ORDER.getCode());
@@ -338,6 +368,31 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             collectionService.getObject().updateBatchById(cntCollections);
         }
 */
+    }
+
+    private void cancelBatchOrder(List<Order> commOrders, Boolean reloadAssert) {
+        for (Order commOrder : commOrders) {
+            commOrder.setOrderStatus(CANCEL_ORDER.getCode());
+            commOrder.updateD(commOrder.getUserId());
+            BigDecimal moneyBln = commOrder.getMoneyBln();
+            if (Objects.nonNull(moneyBln) && moneyBln.compareTo(NumberUtil.add(0D)) >=1){
+                moneyService.orderBack(commOrder.getUserId(),moneyBln,StrUtil.format("订单已取消,此产生的消费 {},已经退还余额!" , moneyBln));
+            }
+        }
+        // 刷新对应库存
+        if (reloadAssert)
+            batchUpdateAssertVersion(commOrders);
+        updateBatchById(commOrders);
+
+    }
+
+    private void batchUpdateAssertVersion(List<Order> commOrders) {
+        Map<String, List<Order>> buiMaps = commOrders.parallelStream().collect(Collectors.groupingBy(Order::getBuiId));
+        buiMaps.forEach((k,v)->{
+            Integer goodsType = v.get(0).getGoodsType();
+            Integer goodNum = v.parallelStream().map(item -> item.getGoodsNum()).reduce((a, b) -> a + b).orElseGet(() -> Integer.valueOf(0));
+            batchUpdateAssert(k, goodsType,goodNum);
+        });
     }
 
     /**
@@ -425,8 +480,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
 
     @Override
-    public OrderInfoVo info(String id) {
+    public OrderInfoVo info(String id,String userId) {
         Order order = getById(id);
+        Assert.isTrue(Objects.nonNull(order),"订单不存在,请核实!");
+        Assert.isTrue(order.getUserId().equals(userId),"此订单不是当前用户订单,请核实!");
         OrderInfoVo orderInfoVo = Builder.of(OrderInfoVo::new).build();
         BeanUtil.copyProperties(order, orderInfoVo );
         OrderCollectionInfoVo collectionInfoVo = Builder.of(OrderCollectionInfoVo::new).build();
@@ -587,6 +644,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     }
 
     /**
+     * 根据资产编号，查询用户已经完成的订单!
+     * @param assertId
+     * @param userId
+     * @return
+     */
+    @Override
+    public int overCount(String assertId, String userId) {
+       return Long.valueOf(count(Wrappers.<Order>lambdaQuery().eq(Order::getUserId, userId).eq(Order::getBuiId, assertId).eq(Order::getOrderStatus, OVER_ORDER.getCode()))).intValue();
+    }
+
+    /**
      * 寄售订单下单支付
      * @param orderPayForm
      * @param userId
@@ -655,23 +723,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(goodsType)){
             // 盲盒
-            IBoxService boxServiceReal = boxService.getObject();
-            Box box = boxServiceReal.getById(buiId);
-            box.setBalance(box.getBalance() + goodsNum);
-            if (!box.getStatusBy().equals(DOWN_ACTION.getCode()))
-            box.setStatusBy(UP_ACTION.getCode());
-            box.setSelfBalance(box.getSelfBalance() - goodsNum);
-            boxServiceReal.updateById(box);
+           // IBoxService boxServiceReal = boxService.getObject();
+           // Box box = boxServiceReal.getById(buiId);
+            //boxServiceReal.update(Wrappers.<Box>lambdaUpdate().eq(Box::getId, buiId).set(!box.getStatusBy().equals(DOWN_ACTION.getCode()),Box::getStatusBy,UP_ACTION.getCode()).set(Box::getBalance, box.getBalance() + goodsNum).set(Box::getSelfBalance, box.getSelfBalance() - goodsNum));
+            buiCronService.doBuiIcrementBalanceCache(BOX_MODEL_TYPE, buiId, goodsNum);
         }
         if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(goodsType)){
             // 藏品
-            ICollectionService collectionServiceReal = collectionService.getObject();
-            CntCollection cntCollection = collectionServiceReal.getById(buiId);
-            cntCollection.setBalance(cntCollection.getBalance() + goodsNum);
-            if (!cntCollection.getStatusBy().equals(DOWN_ACTION.getCode()))
-            cntCollection.setStatusBy(UP_ACTION.getCode());
-            cntCollection.setSelfBalance(cntCollection.getSelfBalance() - goodsNum);
-            collectionServiceReal.updateById(cntCollection);
+            //ICollectionService collectionServiceReal = collectionService.getObject();
+           // CntCollection cntCollection = collectionServiceReal.getById(buiId);
+            //collectionServiceReal.update(Wrappers.<CntCollection>lambdaUpdate().eq(CntCollection::getId, buiId).set(!cntCollection.getStatusBy().equals(DOWN_ACTION.getCode()),CntCollection::getStatusBy,UP_ACTION.getCode()).set(CntCollection::getBalance, cntCollection.getBalance() + goodsNum).set(CntCollection::getSelfBalance, cntCollection.getSelfBalance() - goodsNum));
+            buiCronService.doBuiIcrementBalanceCache(COLLECTION_MODEL_TYPE, buiId, goodsNum);
         }
     }
 
@@ -680,8 +742,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Assert.isTrue(userId.equals(order.getUserId()), "订单被篡改,请联系平台!" );
         Assert.isTrue(WAIT_ORDER.getCode().equals(order.getOrderStatus()),"待支付订单才可支付!");
         Assert.isTrue(order.getEndTime().compareTo(LocalDateTime.now()) >=0,"付款时间已截止,请核实订单状态!");
-        if (MONEY_TAPE.getCode().equals(payType)) Assert.isTrue(payPass.equals(cntUserDto.getPayPass()),"支付密码错误,请核实!");
-
+        if (MONEY_TAPE.getCode().equals(payType)) Assert.isTrue(SecurityUtils.matchesPassword(payPass, cntUserDto.getPayPass()),"支付密码错误,请核实!");
     }
 
 

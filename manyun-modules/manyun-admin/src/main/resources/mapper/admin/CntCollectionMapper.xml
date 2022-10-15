@@ -12,6 +12,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="realPrice"    column="real_price"    />
         <result property="selfBalance"    column="self_balance"    />
         <result property="balance"    column="balance"    />
+        <result property="airdropSelfBalance"    column="airdrop_self_balance"    />
+        <result property="airdropBalance"    column="airdrop_balance"    />
+        <result property="limitNumber"    column="limit_number"    />
         <result property="versionFlag"    column="version_flag"    />
         <result property="statusBy"    column="status_by"    />
         <result property="publishTime"    column="publish_time"    />
@@ -26,7 +29,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectCntCollectionVo">
-        select id, collection_name, tar_id, source_price, real_price, self_balance, balance, version_flag, status_by, publish_time, bind_creation, created_by, created_time, updated_by, updated_time, cate_id, post_time, push_consignment from cnt_collection
+        select id, collection_name, tar_id, source_price, real_price, self_balance, balance, airdrop_self_balance, airdrop_balance, limit_number, version_flag, status_by, publish_time, bind_creation, created_by, created_time, updated_by, updated_time, cate_id, post_time, push_consignment from cnt_collection
     </sql>
 
     <select id="selectSearchCollectionList" parameterType="CollectionQuery" resultMap="CntCollectionResult">
@@ -54,6 +57,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             cp.publish_time publishTime,
             cp.balance balance,
             cp.self_balance selfBalance,
+            cp.limit_number limitNumber,
             cp.status_by,
             cpxq.customer_tail customerTail,
             cpxq.look_info lookInfo,
@@ -73,6 +77,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <update id="updateLock">
-        update cnt_collection set balance =  balance - #{sellNum} ,self_balance =  self_balance + #{sellNum} WHERE id = #{id} and balance >=#{sellNum};
+        update
+            cnt_collection
+        set
+            balance =  balance - #{sellNum},
+            self_balance =  self_balance + #{sellNum},
+            airdrop_balance = airdrop_balance - #{airdopSellNum},
+            airdrop_self_balance = airdrop_self_balance + #{airdopSellNum}
+             WHERE id = #{id} and balance >=#{sellNum} and airdrop_balance>=#{airdopSellNum};
     </update>
 </mapper>

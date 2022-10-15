@@ -1,5 +1,6 @@
 package com.manyun.admin.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -10,15 +11,20 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.*;
+import com.manyun.admin.domain.dto.AirdropBalanceDto;
 import com.manyun.admin.domain.dto.BoxAirdropDto;
 import com.manyun.admin.domain.dto.BoxStateDto;
 import com.manyun.admin.domain.dto.CntBoxAlterCombineDto;
-import com.manyun.admin.domain.excel.BachAirdopExcel;
 import com.manyun.admin.domain.excel.BoxBachAirdopExcel;
 import com.manyun.admin.domain.query.BoxQuery;
 import com.manyun.admin.domain.query.OrderQuery;
 import com.manyun.admin.domain.vo.*;
 import com.manyun.admin.service.*;
+import com.manyun.comm.api.domain.redis.MediaRedisVo;
+import com.manyun.comm.api.domain.redis.box.BoxCollectionJoinRedisVo;
+import com.manyun.comm.api.domain.redis.box.BoxListRedisVo;
+import com.manyun.comm.api.domain.redis.box.BoxRedisVo;
+import com.manyun.comm.api.domain.redis.collection.CollectionAllRedisVo;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
@@ -27,15 +33,19 @@ import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.uuid.IdUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import com.manyun.common.redis.domian.dto.BuiCronDto;
+import com.manyun.common.redis.service.BuiCronService;
+import com.manyun.common.redis.service.RedisService;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.manyun.admin.mapper.CntBoxMapper;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE;
+import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE;
 import static com.manyun.common.core.enums.BoxStatus.*;
-import static com.manyun.common.core.enums.CollectionLink.NOT_LINK;
-import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
+
 
 /**
  * 盲盒;盲盒主体Service业务层处理
@@ -69,6 +79,15 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
 
     @Autowired
     private ICntUserBoxService userBoxService;
+
+    @Autowired
+    private RedisService redisService;
+
+    @Autowired
+    private ICntBoxScoreService boxScoreService;
+
+    @Autowired
+    private BuiCronService buiCronService;
 
     /**
      * 查询盲盒;盲盒主体详情
@@ -105,6 +124,9 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
                     BeanUtil.copyProperties(item, cntBoxVo);
                     cntBoxVo.setTotalBalance(item.getBalance().intValue() + item.getSelfBalance().intValue());
                     cntBoxVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(item.getId(), BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE));
+                    BuiCronDto typeBalanceCache = buiCronService.getTypeBalanceCache(BOX_MODEL_TYPE, item.getId());
+                    cntBoxVo.setRedisBalance(typeBalanceCache.getBalance());
+                    cntBoxVo.setRedisSelfBalance(typeBalanceCache.getSelfBalance());
                     return cntBoxVo;
                 }).collect(Collectors.toList()),cntBoxList);
     }
@@ -153,7 +175,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         }
         //标签
         CntLableAlterVo cntLableAlterVo = boxAlterCombineDto.getCntLableAlterVo();
-        if (Objects.nonNull(cntLableAlterVo)) {
+        if (cntLableAlterVo!=null && cntLableAlterVo.getLableIds()!=null) {
             String[] lableIds = cntLableAlterVo.getLableIds();
             if (lableIds.length>0) {
                 List<CntCollectionLable> cntCollectionLables = Arrays.asList(lableIds).stream().map(m -> {
@@ -170,41 +192,59 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         //图片
         MediaAlterVo mediaAlterVo = boxAlterCombineDto.getMediaAlterVo();
         List<CntMedia> mediaList = new ArrayList<>();
+        List<MediaVo> mediaVos = new ArrayList<>();
+        List<MediaVo> thumbnailImgMediaVos = new ArrayList<>();
+        List<MediaVo> threeDimensionalMediaVos = new ArrayList<>();
         if (Objects.nonNull(mediaAlterVo)) {
-            if(StringUtils.isNotBlank(mediaAlterVo.getImg()))mediaList.add(
-                    Builder.of(CntMedia::new)
-                            .with(CntMedia::setId, IdUtils.getSnowflake().nextIdStr())
-                            .with(CntMedia::setBuiId, idStr)
-                            .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
-                            .with(CntMedia::setMediaUrl, mediaAlterVo.getImg())
-                            .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
-                            .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
-                            .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
-            );
-            if(StringUtils.isNotBlank(mediaAlterVo.getThumbnailImg()))mediaList.add(
-                    Builder.of(CntMedia::new)
-                            .with(CntMedia::setId, IdUtils.getSnowflake().nextIdStr())
-                            .with(CntMedia::setBuiId, idStr)
-                            .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
-                            .with(CntMedia::setMediaUrl, mediaAlterVo.getThumbnailImg())
-                            .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.THUMBNAIL_IMG)
-                            .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
-                            .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
-            );
-            if(StringUtils.isNotBlank(mediaAlterVo.getThreeDimensional()))mediaList.add(
-                    Builder.of(CntMedia::new)
-                            .with(CntMedia::setId, IdUtils.getSnowflake().nextIdStr())
-                            .with(CntMedia::setBuiId, idStr)
-                            .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
-                            .with(CntMedia::setMediaUrl, mediaAlterVo.getThreeDimensional())
-                            .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.GLB)
-                            .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
-                            .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
-            );
+            if(StringUtils.isNotBlank(mediaAlterVo.getImg())){
+                CntMedia cntMedia = Builder.of(CntMedia::new)
+                        .with(CntMedia::setId, IdUtils.getSnowflake().nextIdStr())
+                        .with(CntMedia::setBuiId, idStr)
+                        .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
+                        .with(CntMedia::setMediaUrl, mediaAlterVo.getImg())
+                        .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
+                        .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
+                        .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build();
+                mediaList.add(cntMedia);
+                MediaVo mediaVo = new MediaVo();
+                BeanUtil.copyProperties(cntMedia,mediaVo);
+                mediaVos.add(mediaVo);
+            }
+            if(StringUtils.isNotBlank(mediaAlterVo.getThumbnailImg())){
+                CntMedia cntMedia = Builder.of(CntMedia::new)
+                        .with(CntMedia::setId, IdUtils.getSnowflake().nextIdStr())
+                        .with(CntMedia::setBuiId, idStr)
+                        .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
+                        .with(CntMedia::setMediaUrl, mediaAlterVo.getThumbnailImg())
+                        .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.THUMBNAIL_IMG)
+                        .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
+                        .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build();
+                mediaList.add(cntMedia);
+                MediaVo mediaVo = new MediaVo();
+                BeanUtil.copyProperties(cntMedia,mediaVo);
+                thumbnailImgMediaVos.add(mediaVo);
+            }
+            if(StringUtils.isNotBlank(mediaAlterVo.getThreeDimensional())){
+                CntMedia cntMedia = Builder.of(CntMedia::new)
+                        .with(CntMedia::setId, IdUtils.getSnowflake().nextIdStr())
+                        .with(CntMedia::setBuiId, idStr)
+                        .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
+                        .with(CntMedia::setMediaUrl, mediaAlterVo.getThreeDimensional())
+                        .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.GLB)
+                        .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
+                        .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build();
+                mediaList.add(cntMedia);
+                MediaVo mediaVo = new MediaVo();
+                BeanUtil.copyProperties(cntMedia,mediaVo);
+                threeDimensionalMediaVos.add(mediaVo);
+            }
             if(mediaList.size()>0)mediaService.saveBatch(mediaList);
         }
+        //初始化redis库存
+        buiCronService.initBuiBalanceCache(BOX_MODEL_TYPE,idStr,cntBox.getBalance()==null?0:cntBox.getBalance(),cntBox.getSelfBalance()==null?0:cntBox.getSelfBalance());
         return R.ok();
     }
+
 
     /**
      * 修改盲盒;盲盒主体
@@ -235,7 +275,8 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         if(200!=check.getCode()){
             return R.fail(check.getCode(),check.getMsg());
         }
-        CntBox cntBox = new CntBox();
+        CntBox cntBox = getById(boxAlterVo.getId());
+        Assert.isTrue(Objects.nonNull(cntBox), "盲盒不存在!");
         BeanUtil.copyProperties(boxAlterVo, cntBox);
         cntBox.setUpdatedBy(SecurityUtils.getUsername());
         cntBox.setUpdatedTime(DateUtils.getNowDate());
@@ -265,78 +306,125 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         MediaAlterVo mediaAlterVo = boxAlterCombineDto.getMediaAlterVo();
         List<CntMedia> saveMediaList = new ArrayList<>();
         List<CntMedia> updateMediaList = new ArrayList<>();
+        List<MediaRedisVo> mediaVos1 = new ArrayList<>(); //主图
+        List<MediaRedisVo> mediaVos2 = new ArrayList<>(); //缩略图
+        List<MediaRedisVo> mediaVos3 = new ArrayList<>(); //glb
         if (Objects.nonNull(mediaAlterVo)) {
             List<MediaVo> mediaVos = mediaService.initMediaVos(boxId, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
             List<MediaVo> thumbnailImgMediaVos = mediaService.thumbnailImgMediaVos(boxId, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE);
 
             if (mediaVos.size() == 0) {
-                saveMediaList.add(
-                        Builder.of(CntMedia::new)
-                                .with(CntMedia::setId, IdUtils.getSnowflakeNextIdStr())
-                                .with(CntMedia::setBuiId, boxId)
-                                .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
-                                .with(CntMedia::setMediaUrl, mediaAlterVo.getImg())
-                                .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE.toString())
-                                .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
-                                .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
-                );
+                CntMedia cntMedia = Builder.of(CntMedia::new)
+                        .with(CntMedia::setId, IdUtils.getSnowflakeNextIdStr())
+                        .with(CntMedia::setBuiId, boxId)
+                        .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
+                        .with(CntMedia::setMediaUrl, mediaAlterVo.getImg())
+                        .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE.toString())
+                        .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
+                        .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build();
+                saveMediaList.add(cntMedia);
+                MediaRedisVo mediaRedisVo = new MediaRedisVo();
+                BeanUtil.copyProperties(cntMedia,mediaRedisVo);
+                mediaVos1.add(mediaRedisVo);
             } else {
-                if(StringUtils.isNotBlank(mediaAlterVo.getImg())){
-                    updateMediaList.add(
-                            Builder.of(CntMedia::new)
-                                    .with(CntMedia::setId, mediaVos.get(0).getId())
-                                    .with(CntMedia::setMediaUrl, mediaAlterVo.getImg())
-                                    .with(CntMedia::setUpdatedBy, SecurityUtils.getUsername())
-                                    .with(CntMedia::setUpdatedTime, DateUtils.getNowDate())
-                                    .build()
-                    );
-                }
+                CntMedia cntMedia = Builder.of(CntMedia::new)
+                        .with(CntMedia::setId, mediaVos.get(0).getId())
+                        .with(CntMedia::setMediaUrl, StringUtils.isBlank(mediaAlterVo.getImg()) == true ? "" : mediaAlterVo.getImg())
+                        .with(CntMedia::setUpdatedBy, SecurityUtils.getUsername())
+                        .with(CntMedia::setUpdatedTime, DateUtils.getNowDate())
+                        .build();
+                updateMediaList.add(cntMedia);
+                MediaRedisVo mediaRedisVo = new MediaRedisVo();
+                BeanUtil.copyProperties(mediaVos.get(0),mediaRedisVo);
+                mediaRedisVo.setMediaUrl(StringUtils.isBlank(mediaAlterVo.getImg()) == true ? "" : mediaAlterVo.getImg());
+                mediaVos1.add(mediaRedisVo);
             }
             if(thumbnailImgMediaVos.size()==0){
-                saveMediaList.add(
-                        Builder.of(CntMedia::new)
-                                .with(CntMedia::setId, IdUtils.getSnowflake().nextIdStr())
-                                .with(CntMedia::setBuiId, boxId)
-                                .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
-                                .with(CntMedia::setMediaUrl, mediaAlterVo.getThumbnailImg())
-                                .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.THUMBNAIL_IMG)
-                                .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
-                                .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
-                );
+                CntMedia cntMedia = Builder.of(CntMedia::new)
+                        .with(CntMedia::setId, IdUtils.getSnowflake().nextIdStr())
+                        .with(CntMedia::setBuiId, boxId)
+                        .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
+                        .with(CntMedia::setMediaUrl, mediaAlterVo.getThumbnailImg())
+                        .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.THUMBNAIL_IMG)
+                        .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
+                        .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build();
+                saveMediaList.add(cntMedia);
+                MediaRedisVo mediaRedisVo = new MediaRedisVo();
+                BeanUtil.copyProperties(cntMedia,mediaRedisVo);
+                mediaVos2.add(mediaRedisVo);
             }else {
-                if(StringUtils.isNotBlank(mediaAlterVo.getThumbnailImg())){
-                    updateMediaList.add(
-                            Builder.of(CntMedia::new)
-                                    .with(CntMedia::setId, thumbnailImgMediaVos.get(0).getId())
-                                    .with(CntMedia::setMediaUrl, mediaAlterVo.getThumbnailImg())
-                                    .with(CntMedia::setUpdatedBy, SecurityUtils.getUsername())
-                                    .with(CntMedia::setUpdatedTime, DateUtils.getNowDate())
-                                    .build()
-                    );
-                }
+                CntMedia cntMedia = Builder.of(CntMedia::new)
+                        .with(CntMedia::setId, thumbnailImgMediaVos.get(0).getId())
+                        .with(CntMedia::setMediaUrl, StringUtils.isBlank(mediaAlterVo.getThumbnailImg())==true?"":mediaAlterVo.getThumbnailImg())
+                        .with(CntMedia::setUpdatedBy, SecurityUtils.getUsername())
+                        .with(CntMedia::setUpdatedTime, DateUtils.getNowDate())
+                        .build();
+                updateMediaList.add(cntMedia);
+                MediaRedisVo mediaRedisVo = new MediaRedisVo();
+                BeanUtil.copyProperties(thumbnailImgMediaVos.get(0),mediaRedisVo);
+                mediaRedisVo.setMediaUrl(StringUtils.isBlank(mediaAlterVo.getThumbnailImg())==true?"":mediaAlterVo.getThumbnailImg());
+                mediaVos2.add(mediaRedisVo);
             }
             if(StringUtils.isNotBlank(mediaAlterVo.getThreeDimensional())){
-                saveMediaList.add(
-                        Builder.of(CntMedia::new)
-                                .with(CntMedia::setId, IdUtils.getSnowflake().nextIdStr())
-                                .with(CntMedia::setBuiId, boxId)
-                                .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
-                                .with(CntMedia::setMediaUrl, mediaAlterVo.getThreeDimensional())
-                                .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.GLB)
-                                .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
-                                .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build()
-                );
+                CntMedia cntMedia = Builder.of(CntMedia::new)
+                        .with(CntMedia::setId, IdUtils.getSnowflake().nextIdStr())
+                        .with(CntMedia::setBuiId, boxId)
+                        .with(CntMedia::setModelType, BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE)
+                        .with(CntMedia::setMediaUrl, mediaAlterVo.getThreeDimensional())
+                        .with(CntMedia::setMediaType, BusinessConstants.ModelTypeConstant.GLB)
+                        .with(CntMedia::setCreatedBy, SecurityUtils.getUsername())
+                        .with(CntMedia::setCreatedTime, DateUtils.getNowDate()).build();
+                saveMediaList.add(cntMedia);
+                MediaRedisVo mediaRedisVo = new MediaRedisVo();
+                BeanUtil.copyProperties(cntMedia,mediaRedisVo);
+                mediaVos3.add(mediaRedisVo);
             }
             mediaService.remove(Wrappers.<CntMedia>lambdaQuery().eq(CntMedia::getBuiId,boxId).eq(CntMedia::getModelType,BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE).eq(CntMedia::getMediaType,BusinessConstants.ModelTypeConstant.GLB));
             if(saveMediaList.size()>0)mediaService.saveBatch(saveMediaList);
             if(updateMediaList.size()>0)mediaService.updateBatchById(updateMediaList);
         }
+
+       if(cntBox.getStatusBy()!=null && cntBox.getStatusBy()==1){
+           //存储redis
+           BoxRedisVo boxRedisVo = new BoxRedisVo();
+           //盲盒基础信息
+           BoxListRedisVo boxListRedisVo = new BoxListRedisVo();
+           boxListRedisVo.setId(boxId);
+           boxListRedisVo.setBoxTitle(cntBox.getBoxTitle());
+           boxListRedisVo.setSelfBalance(cntBox.getSelfBalance()==null?0:cntBox.getSelfBalance());
+           boxListRedisVo.setBalance(cntBox.getBalance()==null?0:cntBox.getBalance());
+           boxListRedisVo.setStatusBy(cntBox.getStatusBy());
+           boxListRedisVo.setRealPrice(cntBox.getRealPrice());
+           boxListRedisVo.setSourcePrice(cntBox.getSourcePrice());
+           boxListRedisVo.setMediaVos(mediaVos1);
+           boxListRedisVo.setThumbnailImgMediaVos(mediaVos2);
+           boxListRedisVo.setThreeDimensionalMediaVos(mediaVos3);
+           boxListRedisVo.setBoxInfo(cntBox.getBoxInfo());
+           boxListRedisVo.setPublishTime(DateUtils.toLocalDateTime(cntBox.getPublishTime()));
+           boxListRedisVo.setCreatedTime(DateUtils.toLocalDateTime(cntBox.getCreatedTime()));
+           if (DateUtils.toLocalDateTime(cntBox.getPublishTime()).isAfter(LocalDateTime.now())) {
+               boxListRedisVo.setPreStatus(1);
+           } else {
+               boxListRedisVo.setPreStatus(2);
+           }
+           boxRedisVo.setBoxListVo(boxListRedisVo);
+           boxRedisVo.setBoxCollectionJoinVos(findJoinCollections(boxId));
+           redisService.setCacheMapValue(BusinessConstants.RedisDict.BOX_INFO,boxId,boxRedisVo);
+       }else {
+           redisService.hashDelete(BusinessConstants.RedisDict.BOX_INFO,boxId);
+       }
         return R.ok();
     }
 
     public R check(CntBoxAlterVo boxAlterVo, CntLableAlterVo lableAlterVo, MediaAlterVo mediaAlterVo){
         Date publishTime = boxAlterVo.getPublishTime();
         String tarId = boxAlterVo.getTarId();
+        if(null == boxAlterVo.getLimitNumber() || boxAlterVo.getLimitNumber()==0){
+            return R.fail("限制数量最小为1!");
+        }
+        if(boxAlterVo.getLimitNumber()>boxAlterVo.getBalance()){
+            return R.fail("限制数量不能大于库存数量!");
+        }
         if(StringUtils.isNotBlank(tarId)){
             CntTar tar = cntTarService.getById(tarId);
             if(Objects.nonNull(tar)){
@@ -359,7 +447,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
             }
         }
         //验证标签是否超过三个
-        if(Objects.nonNull(lableAlterVo)){
+        if(lableAlterVo!=null && lableAlterVo.getLableIds()!=null){
             if(lableAlterVo.getLableIds().length>3){
                 return R.fail("藏品标签最多可选中三个!");
             }
@@ -379,15 +467,25 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
      */
     @Override
     public int updateState(BoxStateDto boxStateDto) {
-        CntBox cntBox=new CntBox();
-        //验证盲盒如果没有添加藏品不能上架
-        if(boxStateDto.getStatusBy()==1){
-            List<CntBoxCollection> boxCollections = boxCollectionService.list(Wrappers.<CntBoxCollection>lambdaQuery().eq(CntBoxCollection::getBoxId, boxStateDto.getId()));
-            Assert.isTrue(boxCollections.size()>0, "未添加盲盒中的藏品,不可上架该盲盒!");
-        }
-        BeanUtil.copyProperties(boxStateDto,cntBox);
+        CntBox cntBox = getById(boxStateDto.getId());
+        cntBox.setStatusBy(boxStateDto.getStatusBy());
         cntBox.setUpdatedBy(SecurityUtils.getUsername());
         cntBox.setUpdatedTime(DateUtils.getNowDate());
+        //验证盲盒如果没有添加藏品不能上架
+        if(boxStateDto.getStatusBy()!=null && boxStateDto.getStatusBy()==1){
+            List<CntBoxCollection> boxCollections = boxCollectionService.list(Wrappers.<CntBoxCollection>lambdaQuery().eq(CntBoxCollection::getBoxId, boxStateDto.getId()));
+            Assert.isTrue(boxCollections.size()>0, "未添加盲盒中的藏品,不可上架该盲盒!");
+
+            //更新redis
+            BoxListRedisVo boxListRedisVo = initBoxListVo(cntBox);
+            BoxRedisVo boxRedisVo = Builder.of(BoxRedisVo::new).build();
+            boxRedisVo.setBoxListVo(boxListRedisVo);
+            // 组合与藏品关联数据
+            boxRedisVo.setBoxCollectionJoinVos(findJoinCollections(cntBox.getId()));
+            redisService.setCacheMapValue(BusinessConstants.RedisDict.BOX_INFO,boxStateDto.getId(),boxRedisVo);
+        }else {
+            redisService.hashDelete(BusinessConstants.RedisDict.BOX_INFO,cntBox.getId());
+        }
         return updateById(cntBox)==true?1:0;
     }
 
@@ -411,6 +509,35 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
     }
 
 
+    /***
+     * 空投库存
+     * @param airdropBalanceDto
+     * @return
+     */
+    @Override
+    public R airdropBalance(AirdropBalanceDto airdropBalanceDto) {
+        CntBox box = getById(airdropBalanceDto.getGoodsId());
+        boolean balanceCache = buiCronService.doBuiDegressionBalanceCache(BOX_MODEL_TYPE, airdropBalanceDto.getGoodsId(), airdropBalanceDto.getAirdropBalance());
+        Assert.isTrue(balanceCache,"当前盲盒库存不足,设置空投库存失败!");
+        box.setAirdropBalance(airdropBalanceDto.getAirdropBalance());
+        Assert.isTrue(updateById(box),"设置空投库存失败!");
+        //更新redis
+        if(box.getStatusBy()!=null && box.getStatusBy()==1){
+            List<CntBoxCollection> boxCollections = boxCollectionService.list(Wrappers.<CntBoxCollection>lambdaQuery().eq(CntBoxCollection::getBoxId, box.getId()));
+            Assert.isTrue(boxCollections.size()>0, "未添加盲盒中的藏品,不可上架该盲盒!");
+
+            //更新redis
+            BoxListRedisVo boxListRedisVo = initBoxListVo(box);
+            BoxRedisVo boxRedisVo = Builder.of(BoxRedisVo::new).build();
+            boxRedisVo.setBoxListVo(boxListRedisVo);
+            // 组合与藏品关联数据
+            boxRedisVo.setBoxCollectionJoinVos(findJoinCollections(box.getId()));
+            redisService.setCacheMapValue(BusinessConstants.RedisDict.BOX_INFO,box.getId(),boxRedisVo);
+        }
+        return R.ok("设置空投库存成功!");
+    }
+
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R airdrop(BoxAirdropDto boxAirdropDto) {
@@ -418,6 +545,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         List<CntUser> cntUsers = userService.list(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPhone, boxAirdropDto.getPhone()));
         List<CntBoxCollection> boxCollectionList = boxCollectionService.list(Wrappers.<CntBoxCollection>lambdaQuery().eq(CntBoxCollection::getBoxId, boxAirdropDto.getBoxId()));
         CntBox box = getById(boxAirdropDto.getBoxId());
+        Assert.isFalse(box.getAirdropBalance()==0 && box.getAirdropSelfBalance()==0,"请先设置空投库存!");
         String boxId = box.getId();
         Integer selfBalance = box.getSelfBalance();
         Integer balance = box.getBalance();
@@ -460,15 +588,10 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
             }
         }
 
-        //扣减库存
-        updateById(
-                Builder
-                        .of(CntBox::new)
-                        .with(CntBox::setId, boxId)
-                        .with(CntBox::setSelfBalance, (selfBalance + 1))
-                        .with(CntBox::setBalance, (balance - 1))
-                        .build()
-        );
+        int rows = cntBoxMapper.updateLock(boxId, 1,1);
+        if(rows==0){
+            return R.fail("库存不足!");
+        }
 
         //增加用户盲盒
         String idStr = IdUtils.getSnowflakeNextIdStr();
@@ -551,6 +674,8 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
                         .eq(CntBox::getId,boxIds.stream().findFirst().get())
                         .gt(CntBox::getBalance, 0)
         );
+
+        Assert.isFalse(cntBox.getAirdropBalance()==0 && cntBox.getAirdropSelfBalance()==0,"请先设置空投库存!");
 
         //获取盲盒藏品
         List<CntBoxCollection> boxCollections = boxCollectionService.list(Wrappers.<CntBoxCollection>lambdaQuery().eq(CntBoxCollection::getBoxId, boxIds.stream().findFirst().get()));
@@ -639,7 +764,7 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
                 );
             }
         });
-        int rows = cntBoxMapper.updateLock(cntBox.getId(), successList.size());
+        int rows = cntBoxMapper.updateLock(cntBox.getId(), successList.size(),successList.size());
         if(!(rows >=1)){
             boxBachAirdopExcels.parallelStream().forEach(e ->{
                 errorAirdropRecord.add(
@@ -667,5 +792,62 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
         airdropRecordService.saveBatch(airdropRecordList);
         return R.ok();
     }
+
+
+    /**
+     * 转义数据
+     * @param cntBox
+     * @return
+     */
+    private BoxListRedisVo initBoxListVo(CntBox cntBox){
+        BoxListRedisVo boxListVo = Builder.of(BoxListRedisVo::new).build();
+        BeanUtil.copyProperties(cntBox,boxListVo);
+        // 缓存库存数据隔离
+        BuiCronDto typeBalanceCache = buiCronService.getTypeBalanceCache(BOX_MODEL_TYPE, cntBox.getId());
+        boxListVo.setBalance(typeBalanceCache.getBalance());
+        boxListVo.setSelfBalance(typeBalanceCache.getSelfBalance());
+        if (DateUtils.toLocalDateTime(cntBox.getPublishTime()).isAfter(LocalDateTime.now())) {
+            boxListVo.setPreStatus(1);
+        } else {
+            boxListVo.setPreStatus(2);
+        }
+        // 需要集成图片服务
+        boxListVo.setMediaVos(mediaService.initMediaVos(cntBox.getId(), BOX_MODEL_TYPE).parallelStream().map(m->{
+            MediaRedisVo mediaRedisVo = new MediaRedisVo();
+            BeanUtil.copyProperties(m,mediaRedisVo);
+            return mediaRedisVo;
+        }).collect(Collectors.toList()));
+        boxListVo.setThumbnailImgMediaVos(mediaService.thumbnailImgMediaVos(cntBox.getId(), BOX_MODEL_TYPE).parallelStream().map(m->{
+            MediaRedisVo mediaRedisVo = new MediaRedisVo();
+            BeanUtil.copyProperties(m,mediaRedisVo);
+            return mediaRedisVo;
+        }).collect(Collectors.toList()));
+        boxListVo.setThreeDimensionalMediaVos(mediaService.threeDimensionalMediaVos(cntBox.getId(), BOX_MODEL_TYPE).parallelStream().map(m->{
+            MediaRedisVo mediaRedisVo = new MediaRedisVo();
+            BeanUtil.copyProperties(m,mediaRedisVo);
+            return mediaRedisVo;
+        }).collect(Collectors.toList()));
+        return boxListVo;
+    }
+
+
+
+    /**
+     * 根据盲盒编号查询盲盒藏品
+     * @param boxId
+     * @return
+     */
+    private List<BoxCollectionJoinRedisVo> findJoinCollections(String boxId) {
+        List<CntBoxCollection> boxCollections = boxCollectionService.list(Wrappers.<CntBoxCollection>lambdaQuery().eq(CntBoxCollection::getBoxId, boxId).orderByDesc(CntBoxCollection::getTranSvg));
+        return boxCollections.parallelStream().map(this::initBoxCollectionJoinVo).collect(Collectors.toList());
+    }
+
+    private BoxCollectionJoinRedisVo initBoxCollectionJoinVo(CntBoxCollection boxCollection){
+        BoxCollectionJoinRedisVo collectionJoinVo = Builder.of(BoxCollectionJoinRedisVo::new).build();
+        BeanUtil.copyProperties(boxCollection,collectionJoinVo);
+        collectionJoinVo.setFlagScore(boxScoreService.getById(boxCollection.getFlagScore()).getScoreName());
+        return collectionJoinVo;
+    }
+
 
 }

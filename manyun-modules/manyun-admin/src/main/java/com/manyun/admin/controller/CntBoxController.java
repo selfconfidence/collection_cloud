@@ -1,5 +1,6 @@
 package com.manyun.admin.controller;
 
+import com.manyun.admin.domain.dto.AirdropBalanceDto;
 import com.manyun.admin.domain.dto.BoxAirdropDto;
 import com.manyun.admin.domain.dto.BoxStateDto;
 import com.manyun.admin.domain.dto.CntBoxAlterCombineDto;
@@ -80,6 +81,13 @@ public class CntBoxController extends BaseController
     public TableDataInfo<CntBoxOrderVo> boxOrderList(OrderQuery orderQuery)
     {
         return cntBoxService.boxOrderList(orderQuery);
+    }
+
+    @PostMapping("/airdropBalance")
+    @ApiOperation("空投库存")
+    public R airdropBalance(@Valid @RequestBody AirdropBalanceDto airdropBalanceDto)
+    {
+        return cntBoxService.airdropBalance(airdropBalanceDto);
     }
 
     @PostMapping("/airdrop")

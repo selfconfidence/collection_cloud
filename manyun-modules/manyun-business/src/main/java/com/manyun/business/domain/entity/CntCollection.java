@@ -70,6 +70,9 @@ public class CntCollection implements Serializable {
     @ApiModelProperty("是否推送寄售市场(0=可以，1=不可以)")
     private Integer pushConsignment;
 
+    @ApiModelProperty("限定数量")
+    private Integer limitNumber;
+
     @ApiModelProperty("创建人")
     private String createdBy;
 

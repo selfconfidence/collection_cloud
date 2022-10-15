@@ -133,13 +133,22 @@ public class UserTokenService
     /**
      * 删除用户缓存信息
      */
-    public void delLoginUser(String token)
+    public void delLoginUser(LoginBusinessUser loginBusinessUser)
     {
-        if (StringUtils.isNotEmpty(token))
+        String token = loginBusinessUser.getToken();
+        String loginTokenLogs = getLoginTokenLogs(loginBusinessUser.getUserId());
+        // 判定之前是否有过登录痕迹?
+        if (redisService.hasKey(loginTokenLogs)) {
+            // 有的话,清理之前的
+         //  String userKey = redisService.getCacheObject(loginTokenLogs);
+            redisService.deleteObject(loginTokenLogs);
+            redisService.deleteObject(getTokenKey(token));
+        }
+/*        if (StringUtils.isNotEmpty(token))
         {
             String userkey = JwtUtils.getUserKey(token);
             redisService.deleteObject(getTokenKey(userkey));
-        }
+        }*/
     }
 
     /**

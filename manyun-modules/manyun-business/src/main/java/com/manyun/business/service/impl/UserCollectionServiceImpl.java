@@ -2,6 +2,7 @@ package com.manyun.business.service.impl;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
@@ -128,29 +129,31 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         // 增加日志
         logsService.saveLogs(LogInfoDto.builder().jsonTxt(info).buiId(userId).modelType(COLLECTION_MODEL_TYPE).isType(PULL_SOURCE).formInfo(goodsNum.toString()).build());
         // 开始上链 // 组装所有上链所需要数据结构 并且不能报错
-        for (UserCollection userCollection : userCollections) {
-            BigDecimal realPrice = collectionServiceObjectFactory.getObject().getById(userCollection.getCollectionId()).getRealPrice();
-            myChainService.accountCollectionUp(CallCommitDto.builder()
-                    .userCollectionId(userCollection.getId())
-                    .artId(userCollection.getLinkAddr())
-                    .artName(userCollection.getCollectionName())
-                    .artSize("80")
-                    .location(userCollection.getLinkAddr())
-                    .price(realPrice.toString())
-                    .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM")))
-                    .sellway(userCollection.getSourceInfo())
-                    .owner(userCollection.getUserId())
-                    .build(), (hash)->{
-                userCollection.setIsLink(OK_LINK.getCode());
-                userCollection.setRealCompany(REAL_COMPANY);
-                // 编号特殊生成 借助 redis 原子性操作
-                userCollection.setCollectionNumber(StrUtil.format("CNT_{}",autoCollectionNum(userCollection.getCollectionId())));
-                //userCollection.setLinkAddr(hash);
-                userCollection.setCollectionHash(hash);
-                userCollection.updateD(userCollection.getUserId());
-                updateById(userCollection);
-            });
-        }
+        ThreadUtil.execute(()->{
+            for (UserCollection userCollection : userCollections) {
+                BigDecimal realPrice = collectionServiceObjectFactory.getObject().getById(userCollection.getCollectionId()).getRealPrice();
+                myChainService.accountCollectionUp(CallCommitDto.builder()
+                        .userCollectionId(userCollection.getId())
+                        .artId(userCollection.getLinkAddr())
+                        .artName(userCollection.getCollectionName())
+                        .artSize("80")
+                        .location(userCollection.getLinkAddr())
+                        .price(realPrice.toString())
+                        .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM")))
+                        .sellway(userCollection.getSourceInfo())
+                        .owner(userCollection.getUserId())
+                        .build(), (hash)->{
+                    userCollection.setIsLink(OK_LINK.getCode());
+                    userCollection.setRealCompany(REAL_COMPANY);
+                    // 编号特殊生成 借助 redis 原子性操作
+                    userCollection.setCollectionNumber(StrUtil.format("CNT_{}",autoCollectionNum(userCollection.getCollectionId())));
+                    //userCollection.setLinkAddr(hash);
+                    userCollection.setCollectionHash(hash);
+                    userCollection.updateD(userCollection.getUserId());
+                    updateById(userCollection);
+                });
+            }
+        });
         return userCollections.get(0).getId();
     }
 
@@ -161,12 +164,9 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
      * @param userId
      * @param buiId
      * @param info
-     * @param goodsNum
      */
     @Override
-    public void bindCollection(String userId, String buiId, String collectionName,String info, Integer goodsNum) {
-        ArrayList<UserCollection> userCollections = Lists.newArrayList();
-        for (Integer i = 0; i < goodsNum; i++) {
+    public void bindCollection(String userId, String buiId, String collectionName,String info) {
             UserCollection userCollection = Builder.of(UserCollection::new).build();
             userCollection.setId(IdUtil.getSnowflake().nextIdStr());
             userCollection.setCollectionId(buiId);
@@ -178,35 +178,34 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
             // 初始化 未上链过程
             userCollection.setIsLink(NOT_LINK.getCode());
             userCollection.createD(userId);
-            userCollections.add(userCollection);
-        }
-        saveBatch(userCollections);
+        save(userCollection);
         // 增加日志
-        logsService.saveLogs(LogInfoDto.builder().jsonTxt(info).buiId(userId).modelType(COLLECTION_MODEL_TYPE).isType(PULL_SOURCE).formInfo(goodsNum.toString()).build());
+        logsService.saveLogs(LogInfoDto.builder().jsonTxt(info).buiId(userId).modelType(COLLECTION_MODEL_TYPE).isType(PULL_SOURCE).formInfo(Integer.valueOf(1).toString()).build());
         // 开始上链 // 组装所有上链所需要数据结构 并且不能报错
-        for (UserCollection userCollection : userCollections) {
-            BigDecimal realPrice = collectionServiceObjectFactory.getObject().getById(userCollection.getCollectionId()).getRealPrice();
-            myChainService.accountCollectionUp(CallCommitDto.builder()
-                    .userCollectionId(userCollection.getId())
-                    .artId(userCollection.getLinkAddr())
-                            .artName(userCollection.getCollectionName())
-                            .artSize("80")
-                            .location(userCollection.getLinkAddr())
-                            .price(realPrice.toString())
-                            .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM")))
-                            .sellway(userCollection.getSourceInfo())
-                            .owner(userCollection.getUserId())
-                    .build(), (hash)->{
-                userCollection.setIsLink(OK_LINK.getCode());
-                userCollection.setRealCompany(REAL_COMPANY);
-                // 编号特殊生成 借助 redis 原子性操作
-                userCollection.setCollectionNumber(StrUtil.format("CNT_{}",autoCollectionNum(userCollection.getCollectionId())));
-                //userCollection.setLinkAddr(hash);
-                userCollection.setCollectionHash(hash);
-                userCollection.updateD(userCollection.getUserId());
-                updateById(userCollection);
-            });
-        }
+       ThreadUtil.execute(()->{
+           BigDecimal realPrice = collectionServiceObjectFactory.getObject().getById(userCollection.getCollectionId()).getRealPrice();
+           myChainService.accountCollectionUp(CallCommitDto.builder()
+                   .userCollectionId(userCollection.getId())
+                   .artId(userCollection.getLinkAddr())
+                   .artName(userCollection.getCollectionName())
+                   .artSize("80")
+                   .location(userCollection.getLinkAddr())
+                   .price(realPrice.toString())
+                   .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM")))
+                   .sellway(userCollection.getSourceInfo())
+                   .owner(userCollection.getUserId())
+                   .build(), (hash)->{
+               userCollection.setIsLink(OK_LINK.getCode());
+               userCollection.setRealCompany(REAL_COMPANY);
+               // 编号特殊生成 借助 redis 原子性操作
+               userCollection.setCollectionNumber(StrUtil.format("CNT_{}",autoCollectionNum(userCollection.getCollectionId())));
+               //userCollection.setLinkAddr(hash);
+               userCollection.setCollectionHash(hash);
+               userCollection.updateD(userCollection.getUserId());
+               updateById(userCollection);
+           });
+       });
+
     }
 
     @Override

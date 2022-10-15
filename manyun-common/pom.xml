@@ -17,6 +17,7 @@
         <module>manyun-common-datascope</module>
 		<module>manyun-common-datasource</module>
         <module>manyun-common-pays</module>
+        <module>manyun-common-mq</module>
 
     </modules>
 

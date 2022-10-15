@@ -13,6 +13,7 @@ import com.manyun.business.domain.entity.Logs;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.domain.entity.Money;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.pays.utils.llpay.security.LLianPayAccpSignature;
 import io.swagger.annotations.Api;
@@ -161,6 +162,42 @@ public class LLPayNotifyController {
                 JSONObject resultObj = JSONObject.parseObject(resultSB.toString());
                 if("SUCCESS".equals(resultObj.getString("result"))){
                     log.info(String.format("解绑银行卡成功！"));
+                }
+            }
+        }else {
+            log.error("返回响应验证签名异常，请核实！");
+            return null;
+        }
+        return "Success";
+    }
+
+
+
+    @PostMapping(value = "/LlMorePayeeRefundNotify")
+    @ResponseBody
+    @ApiOperation(value = "连连支付退款申请回调",hidden = true)
+    public String LlMorePayeeRefundNotify(HttpServletRequest req) throws IOException {
+        String sign = req.getHeader("Signature-Data");
+        //获取request的输入流，并设置格式为UTF-8
+        BufferedReader streamReader = new BufferedReader(new InputStreamReader(req.getInputStream(), "UTF-8"));
+        //将输入流数据放入StringBuilder
+        StringBuilder resultSB = new StringBuilder();
+        String inputStr = null;
+        while ((inputStr = streamReader.readLine()) != null) {
+            resultSB.append(inputStr);
+        }
+        log.info(String.format("响应结果：%s", resultSB));
+        if (!"".equalsIgnoreCase(sign)) {
+            log.info(String.format("响应签名：%s", sign));
+            boolean checksign = LLianPayAccpSignature.getInstance().checkSign(resultSB.toString(), sign);
+            if (!checksign) {
+                log.error("返回响应验证签名异常，请核实！");
+                return null;
+            } else {
+                log.info(String.format("响应验签通过！"));
+                JSONObject resultObj = JSONObject.parseObject(resultSB.toString());
+                if("TRADE_SUCCESS".equals(resultObj.getString("txn_status"))){
+                    log.info(String.format("===============退款成功!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"));
                 }
             }
         }else {

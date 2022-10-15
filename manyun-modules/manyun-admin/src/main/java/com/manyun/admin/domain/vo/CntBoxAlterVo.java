@@ -32,6 +32,9 @@ public class CntBoxAlterVo {
     @ApiModelProperty("库存")
     private Integer balance;
 
+    @ApiModelProperty("限定数量")
+    private Integer limitNumber;
+
     @ApiModelProperty("盲盒状态;0=下架,1=正常")
     private Integer statusBy;
 

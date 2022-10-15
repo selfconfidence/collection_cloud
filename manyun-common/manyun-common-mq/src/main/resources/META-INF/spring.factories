@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.manyun.common.mq.config.MqConfig,\
+  com.manyun.common.mq.producers.deliver.DeliverProducer

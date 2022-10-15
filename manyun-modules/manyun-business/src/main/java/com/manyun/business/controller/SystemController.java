@@ -1,16 +1,20 @@
 package com.manyun.business.controller;
 
 
+import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.IdUtil;
 import com.manyun.business.service.ISystemService;
 import com.manyun.common.core.annotation.Lock;
+import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.enums.DelayLevelEnum;
+import com.manyun.common.mq.producers.deliver.DeliverProducer;
+import com.manyun.common.mq.producers.msg.DeliverMsg;
 import com.manyun.common.security.annotation.InnerAuth;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.stereotype.Controller;
 
 import static com.manyun.common.core.constant.BusinessConstants.SystemTypeConstant.*;
 
@@ -31,9 +35,14 @@ public class SystemController {
     private ISystemService systemService;
 
 
+
+/*    @Autowired
+    private RocketMQTemplate rocketMQTemplate;*/
+
+
     @GetMapping("/sellInfo")
     @ApiOperation("购买须知")
-    public R<String>  sellInfo(){
+    public R<String>  sellInfo() {
         return R.ok(systemService.getVal(SELL_INFO,String.class));
     }
 

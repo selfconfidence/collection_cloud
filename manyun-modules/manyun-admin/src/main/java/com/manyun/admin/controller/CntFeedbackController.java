@@ -1,6 +1,7 @@
 package com.manyun.admin.controller;
 
 
+import com.manyun.admin.domain.query.FeedbackQuery;
 import com.manyun.admin.domain.vo.CntFeedbackVo;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.PageQuery;
@@ -41,9 +42,9 @@ public class CntFeedbackController extends BaseController
     //@RequiresPermissions("admin:feedback:list")
     @GetMapping("/list")
     @ApiOperation("查询产品举报反馈列表")
-    public TableDataInfo<CntFeedbackVo> list(PageQuery pageQuery)
+    public TableDataInfo<CntFeedbackVo> list(FeedbackQuery feedbackQuery)
     {
-        return cntFeedbackService.selectCntFeedbackList(pageQuery);
+        return cntFeedbackService.selectCntFeedbackList(feedbackQuery);
     }
 
     /**

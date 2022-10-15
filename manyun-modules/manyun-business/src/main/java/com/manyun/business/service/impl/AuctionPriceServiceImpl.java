@@ -411,7 +411,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     public PayVo payAuction(String payUserId, AuctionPayForm auctionPayForm) {
         CntUserDto cntUserDto = remoteBuiUserService.commUni(payUserId, SecurityConstants.INNER).getData();
         if (Integer.valueOf(0).equals(auctionPayForm.getPayType())) {
-            Assert.isTrue(auctionPayForm.getPayPass().equals(cntUserDto.getPayPass()),"支付密码错误,请核实!");
+            Assert.isTrue(SecurityUtils.matchesPassword(auctionPayForm.getPayPass(),cntUserDto.getPayPass()),"支付密码错误,请核实!");
         }
         AuctionSend auctionSend = auctionSendService.getById(auctionPayForm.getAuctionSendId());
         boolean canTrade = moneyService.checkLlpayStatus(payUserId) && moneyService.checkLlpayStatus(auctionSend.getUserId());
@@ -502,7 +502,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
         CntUserDto cntUserDto = remoteBuiUserService.commUni(payUserId, SecurityConstants.INNER).getData();
         if (Integer.valueOf(0).equals(auctionPayMarginForm.getPayType())) {
-            Assert.isTrue(auctionPayMarginForm.getPayPass().equals(cntUserDto.getPayPass()),"支付密码错误,请核实!");
+            Assert.isTrue(SecurityUtils.matchesPassword(auctionPayMarginForm.getPayPass(),cntUserDto.getPayPass()),"支付密码错误,请核实!");
         }
         AuctionSend auctionSend = auctionSendService.getById(auctionPayMarginForm.getAuctionSendId());
         Assert.isFalse(payUserId.equals(auctionSend.getUserId()), "不可对自己送拍的支付保证金");
@@ -557,6 +557,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     @Lock("notifyPayMarginSuccess")
     public void notifyPayMarginSuccess(String outHost) {
         AuctionMargin auctionMargin = auctionMarginService.getById(outHost);
+        Assert.isTrue(Objects.nonNull(auctionMargin),"找不到对应订单编号!");
         //支付成功，将保证金状态置为已成功
         auctionMargin.setPayMarginStatus(Integer.valueOf(1));
         auctionMarginService.updateById(auctionMargin);
@@ -574,7 +575,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         realCheck(userId);
         CntUserDto cntUserDto = remoteBuiUserService.commUni(userId, SecurityConstants.INNER).getData();
         if (Integer.valueOf(0).equals(auctionPayFixedForm.getPayType())) {
-            Assert.isTrue(auctionPayFixedForm.getPayPass().equals(cntUserDto.getPayPass()),"支付密码错误,请核实!");
+
+            Assert.isTrue(SecurityUtils.matchesPassword(auctionPayFixedForm.getPayPass(),cntUserDto.getPayPass()),"支付密码错误,请核实!");
         }
         LoginBusinessUser businessUser = SecurityUtils.getNotNullLoginBusinessUser();
 

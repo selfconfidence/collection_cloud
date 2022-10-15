@@ -5,6 +5,8 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
@@ -27,30 +29,39 @@ import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
+import com.manyun.comm.api.domain.redis.collection.CollectionAllRedisVo;
+import com.manyun.comm.api.domain.redis.collection.CollectionRedisVo;
+import com.manyun.comm.api.domain.redis.collection.LableRedisVo;
+import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.BoxStatus;
 import com.manyun.common.core.enums.CollectionStatus;
-import com.manyun.common.core.web.page.PageQuery;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import com.manyun.common.redis.domian.dto.BuiCronDto;
+import com.manyun.common.redis.service.BuiCronService;
+import com.manyun.common.redis.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
+import java.lang.System;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.*;
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
 import static com.manyun.common.core.enums.BoxStatus.NULL_ACTION;
-import static com.manyun.common.core.enums.BoxStatus.UP_ACTION;
 import static com.manyun.common.core.enums.CollectionStatus.DOWN_ACTION;
 import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
 import static com.manyun.common.core.enums.PayTypeEnum.MONEY_TAPE;
@@ -95,6 +106,8 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
 
     private final RootPay rootPay;
 
+    private final RedisService redisService;
+
 
     private final ICntPostExcelService cntPostExcelService;
     private final ICntPostConfigService postConfigService;
@@ -109,6 +122,8 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
 
     private final RemoteBuiUserService userService;
 
+    private final BuiCronService buiCronService;
+
     @Override
     public TableDataInfo<CollectionVo> pageQueryList(CollectionQuery collectionQuery) {
         // 查询条件部分
@@ -121,6 +136,48 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         );
         // 聚合数据
         return TableDataInfoUtil.pageTableDataInfo(cntCollections.parallelStream().map(this::providerCollectionVo).collect(Collectors.toList()),cntCollections);
+    }
+
+    @Override
+    public CollectionAllRedisVo infoCache(String id, String userId){
+        CollectionAllRedisVo collectionAllVo = redisService.getCacheMapValue(BusinessConstants.RedisDict.COLLECTION_INFO, id);
+        Assert.isTrue(Objects.nonNull(collectionAllVo),"此藏品未找到,请核实!");
+        // 需找库
+       // CntCollection byId = getById(id);
+        CntCollection cntCollection = getOne(Wrappers.<CntCollection>lambdaQuery().select(CntCollection::getId,CntCollection::getTarId, CntCollection::getPostTime).eq(CntCollection::getId, id));
+        CollectionRedisVo collectionRedisVo = collectionAllVo.getCollectionVo();
+        // 是否能够购买? 预先状态判定
+        collectionAllVo.setTarStatus(NO_TAR.getCode());
+        // 低耦性校验
+        if (StrUtil.isNotBlank(cntCollection.getTarId()) && StringUtils.isNotBlank(userId)){
+            collectionAllVo.setTarStatus(tarService.tarStatus(userId,id));
+            collectionAllVo.setOpenTime(tarService.getById(cntCollection.getTarId()).getOpenTime());
+        }
+
+
+        Integer postTime = null;
+        //提前购?
+        if (Objects.nonNull(cntCollection.getPostTime()) && StringUtils.isNotBlank(userId)){
+            // 两种验证,一种 excel , 一种 关联性 方式
+            //1. excel true 可以提前购, false 不可以
+            //2. 配置模板 true 可以提前购 false 不可以
+            if (cntPostExcelService.isExcelPostCustomer(userId,id) || postConfigService.isConfigPostCustomer(userId,id)){
+                postTime = cntCollection.getPostTime();
+            }
+        }
+        BuiCronDto typeBalanceCache = buiCronService.getTypeBalanceCache(COLLECTION_MODEL_TYPE, id);
+       collectionRedisVo.setBalance(typeBalanceCache.getBalance());
+       collectionRedisVo.setSelfBalance(typeBalanceCache.getSelfBalance());
+        if (collectionRedisVo.getPublishTime().isAfter(LocalDateTime.now())) {
+            collectionRedisVo.setPreStatus(1);
+        } else {
+            collectionRedisVo.setPreStatus(2);
+        }
+        if (Integer.valueOf(0).equals(typeBalanceCache.getBalance())) {
+            collectionRedisVo.setStatusBy(2);
+        }
+        collectionAllVo.setPostTime(postTime);
+         return collectionAllVo;
     }
 
     @Override
@@ -164,6 +221,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
      */
     @Override
     @Transactional
+    @Deprecated
     public PayVo sellCollection(String userId, CollectionSellForm collectionSellForm) {
         // 总结校验 —— 支付方式
         CntCollection  cntCollection = getById(collectionSellForm.getCollectionId());
@@ -171,7 +229,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         BigDecimal realPayMoney = NumberUtil.mul(collectionSellForm.getSellNum(), cntCollection.getRealPrice());
         checkCollection(cntCollection,userId,collectionSellForm.getPayType(),realPayMoney);
         // 锁优化
-        checkBalance(cntCollection,collectionSellForm.getSellNum());
+        checkBalance(cntCollection.getId(),collectionSellForm.getSellNum());
 
         // 根据支付方式创建订单  通用适配方案 余额直接 减扣操作
         //1. 先创建对应的订单
@@ -213,6 +271,8 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String sellOrderCollection(String userId, CollectionOrderSellForm collectionOrderSellForm) {
+        // 记录抢购链路
+
         // 总结校验 —— 支付方式
         CntCollection  cntCollection = getById(collectionOrderSellForm.getCollectionId());
         // 实际需要支付的金额
@@ -220,7 +280,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         BigDecimal realPayMoney = NumberUtil.mul(collectionOrderSellForm.getSellNum(), cntCollection.getRealPrice());
         checkPerOrderCollection(cntCollection,userId);
         // 锁优化
-        checkBalance(cntCollection,collectionOrderSellForm.getSellNum());
+        checkCacheBalance(cntCollection,collectionOrderSellForm.getSellNum());
 
         // 根据支付方式创建订单  通用适配方案 余额直接 减扣操作
         //1. 先创建对应的订单
@@ -232,15 +292,22 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
                 .goodsNum(collectionOrderSellForm.getSellNum())
                 .userId(userId)
                 .build());
-        return orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, outHost)).getId();
+        return orderService.getOne(Wrappers.<Order>lambdaQuery().select(Order::getId).eq(Order::getOrderNo, outHost)).getId();
     }
 
-    private void checkBalance(CntCollection cntCollection,Integer sellNum) {
-        int rows = cntCollectionMapper.updateLock(cntCollection.getId(),sellNum);
+    private void checkCacheBalance(CntCollection cntCollection,Integer sellNum){
+        boolean flag = buiCronService.doBuiDegressionBalanceCache(COLLECTION_MODEL_TYPE, cntCollection.getId(), sellNum);
+        Assert.isTrue(flag,"您来晚了,已售罄了!");
+    }
+    @Override
+    public void checkBalance(String cntCollectionId, Integer sellNum) {
+        int rows = cntCollectionMapper.updateLock(cntCollectionId,sellNum);
         if (!(rows >=1)){
+            update(Wrappers.<CntCollection>lambdaUpdate().eq(CntCollection::getId, cntCollectionId).set(CntCollection::getStatusBy,NULL_ACTION.getCode()));
+/*            CntCollection cntCollection = cntCollectionMapper.selectById(cntCollectionId);
             cntCollection.setStatusBy(NULL_ACTION.getCode());
-            cntCollectionMapper.updateById(cntCollection);
-            Assert.isTrue(Boolean.FALSE,"您来晚了,已售罄了!");
+            cntCollectionMapper.updateById(cntCollection);*/
+          //  Assert.isTrue(Boolean.FALSE,"您来晚了,已售罄了!");
         }
 
     }
@@ -252,6 +319,36 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         return  initKeywordVo(Lists.newArrayList(Sets.newHashSet(collectIonNames)),Lists.newArrayList(Sets.newHashSet(boxNames)));
     }
 
+    @Override
+    public TableDataInfo<CollectionVo> homeCacheList() {
+        // 缓存拿取数据
+        Map<String, CollectionAllRedisVo> entries = redisService.redisTemplate.boundHashOps(BusinessConstants.RedisDict.COLLECTION_INFO).entries();
+        Collection<CollectionAllRedisVo> cacheList = entries.values();
+        List<CollectionRedisVo> collectionVoList = cacheList.parallelStream().map(item ->  {
+            CollectionRedisVo collectionRedisVo = item.getCollectionVo();
+            // 库存需要实时变动
+            BuiCronDto typeBalanceCache = buiCronService.getTypeBalanceCache(COLLECTION_MODEL_TYPE, collectionRedisVo.getId());
+            collectionRedisVo.setBalance(typeBalanceCache.getBalance());
+            collectionRedisVo.setSelfBalance(typeBalanceCache.getSelfBalance());
+            if (collectionRedisVo.getPublishTime().isAfter(LocalDateTime.now())) {
+                collectionRedisVo.setPreStatus(1);
+            } else {
+                collectionRedisVo.setPreStatus(2);
+            }
+            if (Integer.valueOf(0).equals(collectionRedisVo.getBalance())) {
+                collectionRedisVo.setStatusBy(2);
+            }
+            return collectionRedisVo;
+        }).sorted((item1,item2)->{
+            if (Objects.nonNull(item1) && Objects.nonNull(item2))
+                return item2.getCreatedTime().compareTo(item1.getCreatedTime());
+                return 0;
+        }).collect(Collectors.toList());
+        // 二次包裹
+        return TableDataInfoUtil.pageCacheData(collectionVoList, collectionVoList.size());
+    }
+
+
     /**
      * 预先生成订单检测方法
      * @param cntCollection
@@ -262,6 +359,37 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         tarCheckCollection(cntCollection, userId);
         postCheckCollection(cntCollection, userId);
         realCheckCollection(userId);
+        conditionOrder(cntCollection,userId);
+    }
+
+    /**
+     * 限购判定
+     * @param cntCollection
+     * @param userId
+     */
+    private void conditionOrder(CntCollection cntCollection, String userId) {
+        Integer limitNumber = cntCollection.getLimitNumber();
+        // 限购逻辑生效
+        if (Objects.nonNull(limitNumber) && limitNumber >0){
+            // 当前资产是否是提前购得资产?
+            // 查询用户所有已经完成的订单!
+            int sellNumber = orderService.overCount(cntCollection.getId(),userId);
+            if (Objects.nonNull(cntCollection.getPostTime()) ){
+                // 是提前购得资产 并且已经到了发布时间
+                if (LocalDateTime.now().compareTo(cntCollection.getPublishTime()) > 0){
+                    // 如果到了发布时间，就将已经参与提前购的次数，直接 - 整个订单的数量即可
+                    int excelSellNum = cntPostExcelService.getSellNum(userId, cntCollection.getId());
+                    int postConfigSellNum = postConfigService.getSellNum(userId, cntCollection.getId());
+                     sellNumber =  ((excelSellNum + postConfigSellNum) - sellNumber);
+                }else{
+                   // 没有到发售时间的话就不管 中肯写法,能走到这里提前购逻辑是过了
+                    return;
+                }
+
+            }
+            Assert.isTrue(limitNumber > Math.abs(sellNumber),"购买数量已上限!");
+
+        }
     }
 
     private void realCheckCollection(String userId) {
@@ -535,23 +663,27 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
         return collectionInfoVo;
     }
 
-    private CollectionVo providerCollectionVo(CntCollection CntCollection){
+    private CollectionVo providerCollectionVo(CntCollection cntCollection){
         CollectionVo collectionVo = Builder.of(CollectionVo::new).build();
-        BeanUtil.copyProperties(CntCollection,collectionVo);
-        if (CntCollection.getPublishTime().isAfter(LocalDateTime.now())) {
+        BeanUtil.copyProperties(cntCollection,collectionVo);
+        // 数据隔离
+        BuiCronDto typeBalanceCache = buiCronService.getTypeBalanceCache(COLLECTION_MODEL_TYPE, cntCollection.getId());
+        collectionVo.setBalance(typeBalanceCache.getBalance());
+        collectionVo.setSelfBalance(typeBalanceCache.getSelfBalance());
+        if (cntCollection.getPublishTime().isAfter(LocalDateTime.now())) {
             collectionVo.setPreStatus(1);
         } else {
             collectionVo.setPreStatus(2);
         }
-        if (Integer.valueOf(0).equals(CntCollection.getBalance())) {
+        if (Integer.valueOf(0).equals(cntCollection.getBalance())) {
             collectionVo.setStatusBy(2);
         }
-        collectionVo.setLableVos(initLableVos(CntCollection.getId()));
-        collectionVo.setMediaVos(initMediaVos(CntCollection.getId()));
-        collectionVo.setThumbnailImgMediaVos(thumbnailImgMediaVos(CntCollection.getId()));
-        collectionVo.setThreeDimensionalMediaVos(threeDimensionalMediaVos(CntCollection.getId()));
-        collectionVo.setCnfCreationdVo(initCnfCreationVo(CntCollection.getBindCreation()));
-        collectionVo.setCateVo(initCateVo(CntCollection.getCateId()));
+        collectionVo.setLableVos(initLableVos(cntCollection.getId()));
+        collectionVo.setMediaVos(initMediaVos(cntCollection.getId()));
+        collectionVo.setThumbnailImgMediaVos(thumbnailImgMediaVos(cntCollection.getId()));
+        collectionVo.setThreeDimensionalMediaVos(threeDimensionalMediaVos(cntCollection.getId()));
+        collectionVo.setCnfCreationdVo(initCnfCreationVo(cntCollection.getBindCreation()));
+        collectionVo.setCateVo(initCateVo(cntCollection.getCateId()));
         return collectionVo;
     }
 
@@ -569,6 +701,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     public UserCollectionForVo userCollectionInfo(String id) {
         UserCollectionForVo userCollectionForVo = Builder.of(UserCollectionForVo::new).build();
         UserCollectionVo userCollectionVo = userCollectionService.userCollectionById(id);
+        Assert.isTrue(Objects.nonNull(userCollectionVo),"未找到相关藏品,请核实!");
         userCollectionVo.setMediaVos(initMediaVos(userCollectionVo.getCollectionId()));
         userCollectionVo.setThumbnailImgMediaVos(thumbnailImgMediaVos(userCollectionVo.getCollectionId()));
         userCollectionVo.setThreeDimensionalMediaVos(threeDimensionalMediaVos(userCollectionVo.getCollectionId()));

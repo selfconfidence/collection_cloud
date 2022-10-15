@@ -37,10 +37,13 @@ import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.MD5Util;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.jg.JgAuthLoginUtil;
+import com.manyun.common.security.utils.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 
@@ -73,6 +76,9 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
 
     @Autowired
     private IUserPleaseService userPleaseService;
+
+    @Resource
+    private CntUserMapper cntUserMapper;
 
     @Autowired
     private RemoteBuiMoneyService remoteBuiMoneyService;
@@ -156,7 +162,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         if (Objects.nonNull(cntUser.getLoginPass()))
         Assert.isTrue(userChangeLoginForm.getOldPass().equals(cntUser.getLoginPass()),"旧密码输入错误,请核实!");
         if (StringUtils.isNotBlank(cntUser.getPayPass())) {
-            Assert.isFalse(cntUser.getPayPass().equals(userChangeLoginForm.getNewPass()), "登录密码不能与支付密码相同");
+            Assert.isFalse(cntUser.getPayPass().equals(SecurityUtils.encryptPassword(userChangeLoginForm.getNewPass())), "登录密码不能与支付密码相同");
         }
         cntUser.setLoginPass(userChangeLoginForm.getNewPass());
         cntUser.updateD(userId);
@@ -168,9 +174,9 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     public void changePayPass(String userId, UserChangePayPass userChangePayPass) {
         CntUser cntUser = getById(userId);
         if (StringUtils.isNotBlank(cntUser.getLoginPass())) {
-            Assert.isFalse(cntUser.getLoginPass().equals(userChangePayPass.getNewPayPass()), "支付密码不能与登录密码相同");
+            Assert.isFalse(cntUser.getLoginPass().equals(SecurityUtils.encryptPassword(userChangePayPass.getNewPayPass())), "支付密码不能与登录密码相同");
         }
-        cntUser.setPayPass(userChangePayPass.getNewPayPass());
+        cntUser.setPayPass(SecurityUtils.encryptPassword(userChangePayPass.getNewPayPass()));
         cntUser.updateD(userId);
         updateById(cntUser);
     }
@@ -221,7 +227,8 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
      */
     @Override
     public CntUser commUni(String commUni) {
-        return getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getUserId, commUni).or().eq(CntUser::getLinkAddr, commUni).or().eq(CntUser::getId,commUni).or().eq(CntUser::getPhone, commUni));
+       return cntUserMapper.commUni(commUni);
+       // return getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getUserId, commUni).or().eq(CntUser::getLinkAddr, commUni).or().eq(CntUser::getId,commUni).or().eq(CntUser::getPhone, commUni));
     }
 
     /**
@@ -229,6 +236,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
      * @param userRegForm
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void regUser(UserRegForm userRegForm) {
         CntUser user = getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPhone, userRegForm.getPhone()));
         Assert.isTrue(Objects.isNull(user),"您已注册,请登录！");
@@ -282,7 +290,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     @Override
     public String getCertifyId(CntUserDto cntUser, UserAliyunRealForm userAliyunRealForm) {
         String certifyId = aliRealConfig.getCertifyId(userAliyunRealForm);
-        CntUser user = getById(cntUser.getUserId());
+        CntUser user = getById(cntUser.getId());
         user.setCertifyId(certifyId);
         updateById(user);
         return certifyId;
@@ -407,6 +415,44 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
         return certifyIdH5;
     }
 
+    @Override
+    public List<CntUserDto> findUserIdLists(List<String> userIds) {
+        List<CntUser> cntUsers = list(Wrappers.<CntUser>lambdaQuery().select(CntUser::getId,CntUser::getPhone,CntUser::getJgPush).in(CntUser::getId, userIds));
+        return cntUsers.parallelStream().map(item -> {
+            CntUserDto cntUserDto = Builder.of(CntUserDto::new).build();
+            BeanUtil.copyProperties(item,cntUserDto);
+            return cntUserDto;
+        } ).collect(Collectors.toList());
+    }
+
+    @Override
+    public void loginEncrypt(String userId) {
+        List<CntUser> list = null;
+        if ("-1".equals(userId)){
+            list = list();
+        }else{
+            list = list(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getId, userId));
+        }
+
+        List<CntUser> cntUserList = list.parallelStream().filter(item -> StrUtil.isNotBlank(item.getLoginPass())).map(item -> {
+            item.setLoginPass(SecurityUtils.encryptPassword(item.getLoginPass()));
+            return item;
+        }).collect(Collectors.toList());
+        updateBatchById(cntUserList);
+    }
+    @Override
+    public void payEncrypt(String userId) {
+        List<CntUser> list = null;
+        if ("-1".equals(userId)){
+            list = list();
+        }else{
+            list = list(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getId, userId));
+        }        List<CntUser> cntUserList = list.parallelStream().filter(item -> StrUtil.isNotBlank(item.getPayPass())).map(item -> {
+            item.setPayPass(SecurityUtils.encryptPassword(item.getPayPass()));
+            return item;
+        }).collect(Collectors.toList());
+        updateBatchById(cntUserList);
+    }
 
     @Override
     @Lock("checkCertifyIdH5Status")
@@ -499,7 +545,7 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
     public void checkPaySecure(String paySecure, String userId) {
         CntUser cntUser = getById(userId);
         Assert.isTrue(StrUtil.isNotBlank(cntUser.getPayPass()),"未设置支付密码,请核实!");
-        Assert.isTrue(paySecure.equals(cntUser.getPayPass()),"支付密码校验失败!");
+        Assert.isTrue(SecurityUtils.matchesPassword(paySecure,cntUser.getPayPass()),"支付密码校验失败!");
 
     }
 

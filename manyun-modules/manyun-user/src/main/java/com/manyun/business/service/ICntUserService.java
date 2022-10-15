@@ -63,4 +63,10 @@ public interface ICntUserService extends IService<CntUser> {
 
     AliRealVo getH5CertifyId(UserAliyunRealForm userAliyunRealForm,String userId);
 
+    List<CntUserDto> findUserIdLists(List<String> userIds);
+
+    void loginEncrypt(String userId);
+
+
+    void payEncrypt(String userId);
 }

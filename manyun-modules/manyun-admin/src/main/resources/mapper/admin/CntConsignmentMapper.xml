@@ -152,4 +152,55 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         and js.id=#{id}
     </select>
 
+    <select id="selectByTimeZones" resultType="com.manyun.admin.domain.vo.CollectionBusinessVo">
+        SELECT
+            pay_user_id userId,
+            count(id) orderNumber,
+            sum(consignment_price) price
+        FROM cnt_consignment
+        where
+                 consignment_status = 3
+                and date_format(created_time,'%Y-%m-%d %H:%i:%s') &gt;= date_format(#{params.beginTime},'%Y-%m-%d %H:%i:%s')
+                and date_format(created_time,'%Y-%m-%d %H:%i:%s') &lt;= date_format(#{params.endTime},'%Y-%m-%d %H:%i:%s')
+            GROUP BY pay_user_id
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
+    </select>
+
+    <select id="selectCollectionSalesStatistics"
+            resultType="com.manyun.admin.domain.vo.CollectionSalesStatisticsVo">
+        <if test=" status == 1 ">
+            SELECT
+                send_user_id userId,
+                count( id ) count
+            FROM
+                `cnt_consignment`
+            WHERE
+                consignment_status = 3
+                and bui_id = #{collectionId}
+                and date_format(created_time,'%Y-%m-%d %H:%i:%s') &gt;= date_format(#{params.beginTime},'%Y-%m-%d %H:%i:%s')
+                and date_format(created_time,'%Y-%m-%d %H:%i:%s') &lt;= date_format(#{params.endTime},'%Y-%m-%d %H:%i:%s')
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
+            GROUP BY
+                send_user_id
+        </if>
+        <if test=" status == 2 ">
+            SELECT
+                pay_user_id userId,
+                count( id ) count
+            FROM
+                `cnt_consignment`
+            WHERE
+                consignment_status = 3
+                and bui_id = #{collectionId}
+                and date_format(created_time,'%Y-%m-%d %H:%i:%s') &gt;= date_format(#{params.beginTime},'%Y-%m-%d %H:%i:%s')
+                and date_format(created_time,'%Y-%m-%d %H:%i:%s') &lt;= date_format(#{params.endTime},'%Y-%m-%d %H:%i:%s')
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
+            GROUP BY
+                pay_user_id
+        </if>
+    </select>
+
 </mapper>

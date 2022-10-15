@@ -1,14 +1,17 @@
 package com.manyun.business.design.pay;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
-import com.manyun.business.design.pay.bean.OpenacctApplyAccountInfo;
-import com.manyun.business.design.pay.bean.OpenacctApplyBasicInfo;
-import com.manyun.business.design.pay.bean.OpenacctApplyParams;
-import com.manyun.business.design.pay.bean.OpenacctApplyResult;
+import com.alipay.api.domain.RefundUnfreezeResult;
+import com.manyun.business.design.pay.bean.*;
 import com.manyun.business.design.pay.bean.cashier.*;
+import com.manyun.business.design.pay.bean.changePayPass.*;
 import com.manyun.business.design.pay.bean.individual.*;
+import com.manyun.business.design.pay.bean.morePayeeRefund.*;
 import com.manyun.business.design.pay.bean.query.*;
+import com.manyun.business.design.pay.bean.queryPayment.QueryPaymentParams;
+import com.manyun.business.design.pay.bean.queryPayment.QueryPaymentResult;
 import com.manyun.business.design.pay.bean.random.GetRandomParams;
 import com.manyun.business.design.pay.bean.random.GetRandomResult;
 import com.manyun.business.design.pay.bean.txn.*;
@@ -23,6 +26,7 @@ import com.manyun.common.pays.utils.llpay.LLianPayDateUtils;
 import com.manyun.common.pays.utils.llpay.client.LLianPayClient;
 import com.manyun.common.pays.utils.llpay.config.LLianPayConstant;
 import com.manyun.common.pays.utils.llpay.security.LLianPayAccpSignature;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +37,7 @@ import java.util.*;
  * 连连支付 相关api
  */
 @Component
+@Slf4j
 public class LLPayUtils {
 
     //开户
@@ -55,8 +60,18 @@ public class LLPayUtils {
     private final static String queryLinkedacct = "https://accpapi.lianlianpay.com/v1/acctmgr/query-linkedacct";
     //查询资金流水列表
     private final static String queryAcctserial = "https://accpapi.lianlianpay.com/v1/acctmgr/query-acctserial";
+    //支付结果查询
+    private final static String queryPayment = "https://accpapi.lianlianpay.com/v1/txn/query-payment";
+    //退款申请
+    private final static String morePayeeRefund = "https://accpapi.lianlianpay.com/v1/txn/more-payee-refund";
+    //退款结果查询
+    private final static String queryRefund = "https://accpapi.lianlianpay.com/v1/txn/query-refund";
     //随机因子获取
     private final static String getRandom = "https://accpapi.lianlianpay.com/v1/acctmgr/get-random";
+    //找回密码
+    private final static String changePayPass = "https://accpapi.lianlianpay.com/v1/acctmgr/find-password-apply";
+    //找回密码验证
+    private final static String changePayPassVerify = "https://accpapi.lianlianpay.com/v1/acctmgr/find-password-verify";
 
     //使用时,需确认用户实名状况,必须是实名用户
     /**
@@ -141,7 +156,7 @@ public class LLPayUtils {
         params.setTimestamp(timestamp);
         params.setOid_partner(LLianPayConstant.OidPartner);
         params.setNotify_url(notifyUrl);
-        params.setPay_time_type("TRANS_NEXT_TIME");
+        params.setPay_time_type("TRANS_THIS_TIME");
         params.setRisk_item(
                 "{" +
                         "\"frms_ware_category\":\"4007\"," +
@@ -517,6 +532,88 @@ public class LLPayUtils {
     }
 
 
+
+    /**
+     * 支付结果查询
+     */
+    public static QueryPaymentResult queryPayment(String txnSeqno) {
+        Assert.isTrue(StringUtils.isNotBlank(txnSeqno),"交易流水号不能为空!");
+        QueryPaymentParams params = new QueryPaymentParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(LLianPayConstant.OidPartner);
+        params.setTxn_seqno(txnSeqno);
+
+        LLianPayClient lLianPayClient = new LLianPayClient();
+        String resultJsonStr = lLianPayClient.sendRequest(queryPayment, JSON.toJSONString(params));
+        log.info("支付结果查询-------------" + resultJsonStr);
+        QueryPaymentResult queryPaymentResult = JSON.parseObject(resultJsonStr, QueryPaymentResult.class);
+        Assert.isTrue("0000".equalsIgnoreCase(queryPaymentResult.getRet_code()),queryPaymentResult.getRet_msg());
+        return queryPaymentResult;
+    }
+
+
+    /**
+     * 退款申请
+     */
+    public static MorePayeeRefundResult morePayeeRefund(MorePayeeRefundQuery morePayeeRefundQuery,String notifyUrl) {
+        MorePayeeRefundParams params = new MorePayeeRefundParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(LLianPayConstant.OidPartner);
+        params.setUser_id(morePayeeRefundQuery.getUserId());
+        params.setNotify_url(notifyUrl);
+        //原商户订单信息
+        OriginalOrderInfo originalOrderInfo = new OriginalOrderInfo();
+        originalOrderInfo.setTxn_seqno(morePayeeRefundQuery.getTxn_seqno());
+        originalOrderInfo.setTotal_amount(morePayeeRefundQuery.getTotal_amount());
+        params.setOriginalOrderInfo(originalOrderInfo);
+        //退款订单信息
+        RefundOrderInfo refundOrderInfo = new RefundOrderInfo();
+        refundOrderInfo.setRefund_seqno(IdUtils.getSnowflakeNextIdStr());
+        refundOrderInfo.setRefund_time(timestamp);
+        refundOrderInfo.setRefund_amount(morePayeeRefundQuery.getTotal_amount());
+        params.setRefundOrderInfo(refundOrderInfo);
+        //原收款方退款信息
+        PyeeRefundInfos pyeeRefundInfos = new PyeeRefundInfos();
+        pyeeRefundInfos.setPayee_id(LLianPayConstant.OidPartner);
+        pyeeRefundInfos.setPayee_type("MERCHANT");
+        pyeeRefundInfos.setPayee_accttype("MCHOWN");
+        pyeeRefundInfos.setPayee_refund_amount(morePayeeRefundQuery.getTotal_amount());
+        params.setPyeeRefundInfos(pyeeRefundInfos);
+        //原付款方式退款规则信息
+        RefundMethods refundMethods = new RefundMethods();
+        refundMethods.setMethod(morePayeeRefundQuery.getMethod());
+        refundMethods.setAmount(morePayeeRefundQuery.getTotal_amount());
+        params.setRefundMethods(refundMethods);
+
+        LLianPayClient lLianPayClient = new LLianPayClient();
+        String resultJsonStr = lLianPayClient.sendRequest(morePayeeRefund, JSON.toJSONString(params));
+        log.info("退款申请-----------" + resultJsonStr);
+        MorePayeeRefundResult morePayeeRefundResult = JSON.parseObject(resultJsonStr, MorePayeeRefundResult.class);
+        Assert.isTrue("0000".equalsIgnoreCase(morePayeeRefundResult.getRet_code()),morePayeeRefundResult.getRet_msg());
+        return morePayeeRefundResult;
+    }
+
+    /**
+     * 退款结果查询
+     */
+    public static QueryRefundResult queryRefund(String refundSeqno) {
+        Assert.isTrue(StringUtils.isNotBlank(refundSeqno),"退款订单号不能为空!");
+        QueryRefundParams params = new QueryRefundParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(LLianPayConstant.OidPartner);
+        params.setRefund_seqno(refundSeqno);
+
+        LLianPayClient lLianPayClient = new LLianPayClient();
+        String resultJsonStr = lLianPayClient.sendRequest(queryRefund, JSON.toJSONString(params));
+        QueryRefundResult queryRefundResult = JSON.parseObject(resultJsonStr, QueryRefundResult.class);
+        Assert.isTrue("0000".equalsIgnoreCase(queryRefundResult.getRet_code()),queryRefundResult.getRet_msg());
+        return queryRefundResult;
+    }
+
+
     /**
      * 随机因子获取
      * @param
@@ -549,5 +646,52 @@ public class LLPayUtils {
                 .with(GetRandomVo::setMapArr, getRandomResult.getMap_arr())
                 .build();
     }
+
+
+    /**
+     * 找回支付密码
+     * @param changePayPassForm
+     * @return
+     */
+    public static ChangePayPassResult changeLianLianPayPass(ChangePayPassForm changePayPassForm, String userId) {
+        ChangePayPassParams params = new ChangePayPassParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(LLianPayConstant.OidPartner);
+        if (StrUtil.isNotBlank(changePayPassForm.getLinked_acctno())) {
+            params.setLinked_acctno(changePayPassForm.getLinked_acctno());
+        }
+        params.setLinked_acctno(changePayPassForm.getLinked_acctno());
+        params.setUser_id(userId);
+        LLianPayClient lLianPayClient = new LLianPayClient();
+        String resultJsonStr = lLianPayClient.sendRequest(changePayPass, JSON.toJSONString(params));
+        log.info("找回支付密码申请------" + resultJsonStr);
+
+        ChangePayPassResult changePayPassResult = JSON.parseObject(resultJsonStr, ChangePayPassResult.class);
+        Assert.isTrue("0000".equalsIgnoreCase(changePayPassResult.getRet_code()),changePayPassResult.getRet_msg());
+        return changePayPassResult;
+
+    }
+
+
+    public static ChangePayPassVerifyResult changeLianLianPayPassVerify(ChangePayPassVerifyForm changePayPassVerifyForm, String userId) {
+        ChangePayPassVerifyParams params = new ChangePayPassVerifyParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(LLianPayConstant.OidPartner);
+        params.setRandom_key(changePayPassVerifyForm.getRandom_key());
+        params.setToken(changePayPassVerifyForm.getToken());
+        params.setUser_id(userId);
+        params.setPassword(changePayPassVerifyForm.getPassword());
+        params.setVerify_code(changePayPassVerifyForm.getVerify_code());
+        LLianPayClient lLianPayClient = new LLianPayClient();
+        String resultJsonStr = lLianPayClient.sendRequest(changePayPassVerify, JSON.toJSONString(params));
+        log.info("找回支付密码验证-----" + resultJsonStr);
+        ChangePayPassVerifyResult changePayPassVerifyResult = JSON.parseObject(resultJsonStr, ChangePayPassVerifyResult.class);
+        Assert.isTrue("0000".equalsIgnoreCase(changePayPassVerifyResult.getRet_code()),changePayPassVerifyResult.getRet_msg());
+        return changePayPassVerifyResult;
+    }
+
+
 
 }

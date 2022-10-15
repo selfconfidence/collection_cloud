@@ -1,11 +1,16 @@
 package com.manyun.business.controller.notify;
 
+import cn.hutool.core.lang.Assert;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.config.cashier.sdk.CertUtil;
 import com.manyun.business.config.cashier.sdk.CryptoUtil;
-import com.manyun.business.service.IAuctionOrderService;
-import com.manyun.business.service.IAuctionPriceService;
-import com.manyun.business.service.IOrderService;
+import com.manyun.business.domain.dto.LogInfoDto;
+import com.manyun.business.domain.entity.AuctionMargin;
+import com.manyun.business.domain.entity.AuctionOrder;
+import com.manyun.business.domain.entity.Order;
+import com.manyun.business.service.*;
+import com.manyun.common.core.annotation.Lock;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +22,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.math.BigDecimal;
+import java.util.Objects;
+
+import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.POLL_SOURCE;
+import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.LL_MONEY_MODEL_TYPE;
+import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.MONEY_TYPE;
 
 /**
  * 杉德支付    验证
@@ -36,6 +48,12 @@ public class ShandePayNotifyController {
 
     @Autowired
     private IAuctionOrderService auctionOrderService;
+
+    @Autowired
+    private ILogsService logsService;
+
+    @Autowired
+    private IAuctionMarginService auctionMarginService;
 
 
     /**
@@ -117,12 +135,24 @@ public class ShandePayNotifyController {
                 JSONObject bodyData = JSONObject.parseObject(dataJson.getString("body"));
                 String orderStatus = bodyData.getString("orderStatus");
                 String tradeNo = bodyData.getString("tradeNo");
+                String orderAmount = bodyData.getString("buyerPayAmount");
+                BigDecimal i = BigDecimal.valueOf(Integer.valueOf(orderAmount)).divide(BigDecimal.valueOf(100));
                 if (dataJson != null) {
                     log.info("后台通知业务数据为：" + JSONObject.toJSONString(dataJson, true));
                     log.info("orderStatus：" + orderStatus);
                     log.info("tradeNo：" + tradeNo);
+                    log.info("orderAmount", i);
                     if ("1".equals(orderStatus)){
                         orderService.notifyPaySuccess(tradeNo);
+                        Order order = orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, tradeNo));
+                        Assert.isTrue(Objects.nonNull(order),"找不到对应订单编号!");
+                        logsService.saveLogs(
+                                LogInfoDto
+                                        .builder()
+                                        .buiId(order.getUserId())
+                                        .jsonTxt("消费")
+                                        .formInfo(i.toString())
+                                        .isType(POLL_SOURCE).modelType(MONEY_TYPE).build());
                     }
                 } else {
                     log.info("通知数据异常！！！");
@@ -212,12 +242,23 @@ public class ShandePayNotifyController {
                 JSONObject bodyData = JSONObject.parseObject(dataJson.getString("body"));
                 String orderStatus = bodyData.getString("orderStatus");
                 String tradeNo = bodyData.getString("tradeNo");
+                String orderAmount = bodyData.getString("buyerPayAmount");
+                BigDecimal i = BigDecimal.valueOf(Integer.valueOf(orderAmount)).divide(BigDecimal.valueOf(100));
                 if (dataJson != null) {
                     log.info("后台通知业务数据为：" + JSONObject.toJSONString(dataJson, true));
                     log.info("orderStatus：" + orderStatus);
                     log.info("tradeNo：" + tradeNo);
                     if ("1".equals(orderStatus)){
                         orderService.notifyPayConsignmentSuccess(tradeNo);
+                        Order order = orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, tradeNo));
+                        Assert.isTrue(Objects.nonNull(order),"找不到对应订单编号!");
+                        logsService.saveLogs(
+                                LogInfoDto
+                                        .builder()
+                                        .buiId(order.getUserId())
+                                        .jsonTxt("消费")
+                                        .formInfo(i.toString())
+                                        .isType(POLL_SOURCE).modelType(MONEY_TYPE).build());
                     }
                 } else {
                     log.info("通知数据异常！！！");
@@ -259,12 +300,23 @@ public class ShandePayNotifyController {
                 JSONObject bodyData = JSONObject.parseObject(dataJson.getString("body"));
                 String orderStatus = bodyData.getString("orderStatus");
                 String tradeNo = bodyData.getString("tradeNo");
+                String orderAmount = bodyData.getString("buyerPayAmount");
+                BigDecimal i = BigDecimal.valueOf(Integer.valueOf(orderAmount)).divide(BigDecimal.valueOf(100));
                 if (dataJson != null) {
                     log.info("后台通知业务数据为：" + JSONObject.toJSONString(dataJson, true));
                     log.info("orderStatus：" + orderStatus);
                     log.info("tradeNo：" + tradeNo);
                     if ("1".equals(orderStatus)){
                         auctionPriceService.notifyPayMarginSuccess(tradeNo);
+                        AuctionMargin auctionMargin = auctionMarginService.getById(tradeNo);
+                        Assert.isTrue(Objects.nonNull(auctionMargin),"找不到对应订单编号!");
+                        logsService.saveLogs(
+                                LogInfoDto
+                                        .builder()
+                                        .buiId(auctionMargin.getUserId())
+                                        .jsonTxt("保证金")
+                                        .formInfo(i.toString())
+                                        .isType(POLL_SOURCE).modelType(MONEY_TYPE).build());
                     }
                 } else {
                     log.info("通知数据异常！！！");
@@ -305,12 +357,23 @@ public class ShandePayNotifyController {
                 JSONObject bodyData = JSONObject.parseObject(dataJson.getString("body"));
                 String orderStatus = bodyData.getString("orderStatus");
                 String tradeNo = bodyData.getString("tradeNo");
+                String orderAmount = bodyData.getString("buyerPayAmount");
+                BigDecimal i = BigDecimal.valueOf(Integer.valueOf(orderAmount)).divide(BigDecimal.valueOf(100));
                 if (dataJson != null) {
                     log.info("后台通知业务数据为：" + JSONObject.toJSONString(dataJson, true));
                     log.info("orderStatus：" + orderStatus);
                     log.info("tradeNo：" + tradeNo);
                     if ("1".equals(orderStatus)){
                         auctionOrderService.notifyPaySuccess(tradeNo);
+                        AuctionOrder auctionOrder = auctionOrderService.getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getOrderNo, tradeNo));
+                        Assert.isTrue(Objects.nonNull(auctionOrder),"找不到对应订单编号!");
+                        logsService.saveLogs(
+                                LogInfoDto
+                                        .builder()
+                                        .buiId(auctionOrder.getToUserId())
+                                        .jsonTxt("消费")
+                                        .formInfo(i.toString())
+                                        .isType(POLL_SOURCE).modelType(MONEY_TYPE).build());
                     }
                 } else {
                     log.info("通知数据异常！！！");
@@ -352,12 +415,23 @@ public class ShandePayNotifyController {
                 JSONObject bodyData = JSONObject.parseObject(dataJson.getString("body"));
                 String orderStatus = bodyData.getString("orderStatus");
                 String tradeNo = bodyData.getString("tradeNo");
+                String orderAmount = bodyData.getString("buyerPayAmount");
+                BigDecimal i = BigDecimal.valueOf(Integer.valueOf(orderAmount)).divide(BigDecimal.valueOf(100));
                 if (dataJson != null) {
                     log.info("后台通知业务数据为：" + JSONObject.toJSONString(dataJson, true));
                     log.info("orderStatus：" + orderStatus);
                     log.info("tradeNo：" + tradeNo);
                     if ("1".equals(orderStatus)){
                         auctionOrderService.notifyPaySuccess(tradeNo);
+                        AuctionOrder auctionOrder = auctionOrderService.getOne(Wrappers.<AuctionOrder>lambdaQuery().eq(AuctionOrder::getOrderNo, tradeNo));
+                        Assert.isTrue(Objects.nonNull(auctionOrder),"找不到对应订单编号!");
+                        logsService.saveLogs(
+                                LogInfoDto
+                                        .builder()
+                                        .buiId(auctionOrder.getToUserId())
+                                        .jsonTxt("消费")
+                                        .formInfo(i.toString())
+                                        .isType(POLL_SOURCE).modelType(MONEY_TYPE).build());
                     }
                 } else {
                     log.info("通知数据异常！！！");

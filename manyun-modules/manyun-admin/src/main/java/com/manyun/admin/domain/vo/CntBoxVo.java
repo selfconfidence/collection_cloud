@@ -34,8 +34,23 @@ public class CntBoxVo {
     @ApiModelProperty("库存")
     private Integer balance;
 
+    @ApiModelProperty("限制数量")
+    private Integer limitNumber;
+
     @ApiModelProperty("已售")
     private Integer selfBalance;
+
+    @ApiModelProperty("空投已售")
+    private Integer airdropSelfBalance;
+
+    @ApiModelProperty("空投库存")
+    private Integer airdropBalance;
+
+    @ApiModelProperty("缓存中的库存")
+    private Integer redisBalance;
+
+    @ApiModelProperty("缓存中的已售")
+    private Integer redisSelfBalance;
 
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("发售时间")

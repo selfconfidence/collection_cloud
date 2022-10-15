@@ -210,15 +210,61 @@ public class TbPostConfigServiceImpl extends ServiceImpl<TbPostConfigMapper, Cnt
                 postConfigLogService.save(postConfigLogServiceOne);
                 return;
             }else{
-                if (postConfigLogServiceOne.getBuyFrequency().compareTo(cntPostConfig.getBuyFrequency()) <1){
+                if (postConfigLogServiceOne.getBuyFrequency() <cntPostConfig.getBuyFrequency()){
                     postConfigLogServiceOne.setBuyFrequency(postConfigLogServiceOne.getBuyFrequency() +1);
                     postConfigLogService.updateById(postConfigLogServiceOne);
-                    return;
                 }
+                return;
 
             }
         }
 
+    }
+
+    @Override
+    public int getSellNum(String userId, String id) {
+        // 1. 查询 sell 表中是否有当前 资产的记录，如果有的话，就按照集合的方式，整理下 config_id 然后，根据 新增字段排序按需验证即可
+        List<CntPostSell> cntPostSells = getCntPostSells(id);
+        if (cntPostSells.isEmpty()) return 0;
+        Set<String> configIds = cntPostSells.parallelStream().map(item -> item.getConfigId()).collect(Collectors.toSet());
+        if (configIds.isEmpty()) return 0;
+        List<CntPostConfig> cntPostConfigs = list(Wrappers.<CntPostConfig>lambdaQuery().select(CntPostConfig::getId,CntPostConfig::getBuyFrequency).in(CntPostConfig::getId, configIds).orderByDesc(CntPostConfig::getCreatedTime));
+        // 拿到当前 配置列表后，开始遍历 已经是有顺序得了
+        for (CntPostConfig cntPostConfig : cntPostConfigs) {
+            // 条件查出来之后，全部满足即可
+            List<CntPostExist> cntPostExists = postExistService.list(Wrappers.<CntPostExist>lambdaQuery().eq(CntPostExist::getConfigId, cntPostConfig.getId()));
+            if (cntPostExists.size() == 0){
+                return 0;
+            }
+            // userCollections 让它重复即可
+            List<UserCollection> userCollections = userCollectionService.list(
+                    Wrappers.<UserCollection>lambdaQuery().select(UserCollection::getId,UserCollection::getCollectionId)
+                            .eq(UserCollection::getIsExist,USE_EXIST.getCode())
+                            .eq(UserCollection::getUserId, userId)
+                            .in(UserCollection::getCollectionId,cntPostExists.parallelStream().map(item -> item.getCollectionId()).collect(Collectors.toSet()) ));
+            // 组合过滤条件
+            Map<String, Integer> requiredQuantity = cntPostExists.parallelStream().collect(Collectors.toMap(CntPostExist::getCollectionId, CntPostExist::getRequiredQuantity));
+            // 组合操作条件
+            if (userCollections.size() >= cntPostExists.size()){
+                // 当前用户对应的持有量是否满足！ 必须全部满足即可！
+                Map<String, List<UserCollection>> userUseCollection = userCollections.parallelStream().collect(Collectors.groupingBy(UserCollection::getCollectionId));
+                AtomicBoolean full = new AtomicBoolean(true);
+                requiredQuantity.forEach((k,v)->{
+                    // 有一个条件不成立 就变更状态
+                    if (!(userUseCollection.get(k).size() >= v))
+                        full.set(false);
+                });
+                if (full.get()){
+                    // 如果满足，需要二次查询 自己的次数是否满足了.
+                    CntPostConfigLog postConfigLogServiceOne = postConfigLogService.getOne(Wrappers.<CntPostConfigLog>lambdaQuery().eq(CntPostConfigLog::getUserId, userId).eq(CntPostConfigLog::getConfigId, cntPostConfig.getId()));
+                    // 如果是 null 就直接返回 true
+                    if (Objects.isNull(postConfigLogServiceOne))return 0;
+                    // 如果不是 NULL
+                    return  postConfigLogServiceOne.getBuyFrequency();
+                }
+            }
+        }
+        return 0;
     }
 
 }

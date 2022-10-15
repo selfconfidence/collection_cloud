@@ -10,8 +10,8 @@ public class UserTarExcel implements Serializable {
     @Excel(name = "抽签编号",width = 40)
     private String tarId;
 
-    @Excel(name = "用户id",width = 40)
-    private String userId;
+    @Excel(name = "手机号",width = 40)
+    private String phone;
 
     @Excel(name = "中奖状态",readConverterExp = "1=已抽中,2=未抽中,4=等待开奖",combo = "已抽中,未抽中,等待开奖",width = 30)
     private Integer isFull;
@@ -24,12 +24,12 @@ public class UserTarExcel implements Serializable {
         this.tarId = tarId;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public Integer getIsFull() {

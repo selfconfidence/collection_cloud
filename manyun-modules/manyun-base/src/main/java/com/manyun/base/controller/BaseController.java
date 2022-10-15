@@ -2,6 +2,7 @@ package com.manyun.base.controller;
 
 import cn.hutool.core.util.RandomUtil;
 import com.manyun.base.utils.AliUtil;
+import com.manyun.comm.api.domain.dto.BatchSmsCommDto;
 import com.manyun.comm.api.domain.dto.SmsCommDto;
 import com.manyun.common.core.domain.CodeStatus;
 import com.manyun.common.core.domain.R;
@@ -58,6 +59,13 @@ public class BaseController {
     @ApiOperation("内部提供短信通知")
     public R sendCommPhone(@RequestBody SmsCommDto smsCommDto){
         AliUtil.send(smsCommDto.getPhoneNumber(), smsCommDto.getTemplateCode(), smsCommDto.getParamsMap());
+        return R.ok();
+    }
+
+    @PostMapping("/sendBatchCommPhone")
+    @ApiOperation("内部批量提供短信通知")
+    public R sendBatchCommPhone(@RequestBody BatchSmsCommDto batchSmsCommDto){
+        AliUtil.batchSendSms(batchSmsCommDto.getPhoneNumbers(), batchSmsCommDto.getTemplateCode(), batchSmsCommDto.getParamsMap());
         return R.ok();
     }
 }

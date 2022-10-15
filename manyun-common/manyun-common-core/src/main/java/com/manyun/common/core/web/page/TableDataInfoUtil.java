@@ -25,4 +25,14 @@ public class TableDataInfoUtil {
         rspData.setTotal(new PageInfo(sourceList).getTotal());
         return rspData;
     }
+
+
+    public static TableDataInfo pageCacheData(List<?> targetList,Number total){
+        TableDataInfo rspData = new TableDataInfo();
+        rspData.setCode(HttpStatus.SUCCESS);
+        rspData.setRows(targetList);
+        rspData.setMsg("查询成功");
+        rspData.setTotal(total.longValue());
+        return rspData;
+    }
 }

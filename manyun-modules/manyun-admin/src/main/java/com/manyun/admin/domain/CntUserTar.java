@@ -28,6 +28,9 @@ public class CntUserTar implements Serializable
     @ApiModelProperty("用户编号")
     private String userId;
 
+    @ApiModelProperty("用户手机号")
+    private String phone;
+
     @ApiModelProperty("是否购买，1=未购买,2=已购买")
     private Integer goSell;
 
@@ -90,6 +93,14 @@ public class CntUserTar implements Serializable
     public void setGoSell(Integer goSell)
     {
         this.goSell = goSell;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public Integer getGoSell()
