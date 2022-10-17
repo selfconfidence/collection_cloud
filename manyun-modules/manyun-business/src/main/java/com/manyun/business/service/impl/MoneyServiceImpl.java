@@ -29,6 +29,7 @@ import com.manyun.common.core.enums.AuctionStatus;
 import com.manyun.common.core.enums.OrderStatus;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import com.manyun.common.redis.service.RedisService;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -45,6 +46,7 @@ import java.util.stream.Collectors;
 import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.POLL_SOURCE;
 import static com.manyun.common.core.constant.BusinessConstants.LogsTypeConstant.PULL_SOURCE;
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.MONEY_TYPE;
+import static com.manyun.common.core.constant.BusinessConstants.RedisDict.ORDER_ORDINARY_STATUS;
 import static com.manyun.common.core.enums.UserRealStatus.OK_REAL;
 
 /**
@@ -81,6 +83,9 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
 
     @Autowired
     private RemoteBuiUserService remoteBuiUserService;
+
+    @Autowired
+    private RedisService redisService;
 
 
     /**
@@ -253,7 +258,10 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
 
         switch (checkOrderPayQuery.getType()) {
             case 1 :
-                Order order = orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, checkOrderPayQuery.getOrderNo()));
+                Order order = redisService.getCacheObject(ORDER_ORDINARY_STATUS.concat(checkOrderPayQuery.getOrderNo()));
+                if (Objects.isNull(order)){
+                    order = orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, checkOrderPayQuery.getOrderNo()));
+                }
                 if (Objects.isNull(order)) order = orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getId, checkOrderPayQuery.getOrderNo()));
                 if (order == null) {
                     break;

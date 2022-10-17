@@ -210,6 +210,10 @@ public interface BusinessConstants {
          */
         String USER_TERM_NUMBERS = "user_term_numbers";
 
+        /**
+         *查询用户几级团队总人数
+         */
+        String IS_REAL = "is_real";
     }
 
 
@@ -281,6 +285,9 @@ public interface BusinessConstants {
         String SELFBALANCE = "selfBalance";
         //余量
         String BALANCE = "balance";
+
+        // 普通订单支付状态返回值
+        String ORDER_ORDINARY_STATUS = "order:ordinary:status:";
 
 
     }

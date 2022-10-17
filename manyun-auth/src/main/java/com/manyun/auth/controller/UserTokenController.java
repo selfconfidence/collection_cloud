@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Assert;
 import com.dingxianginc.ctu.client.CaptchaClient;
 import com.dingxianginc.ctu.client.model.CaptchaResponse;
 import com.manyun.comm.api.RemoteBuiUserService;
+import com.manyun.comm.api.RemoteSystemService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.domain.form.JgLoginTokenForm;
 import com.manyun.comm.api.domain.vo.AccTokenVo;
@@ -45,6 +46,8 @@ public class UserTokenController {
     @Autowired
     private RemoteBuiUserService remoteBuiUserService;
 
+
+
     @PostMapping("/login")
     @ApiOperation(value = "用户登录",notes = "用户账号密码登录")
     public R<AccTokenVo> login(@RequestBody @Valid LoginPhoneForm loginPhoneForm)
@@ -60,7 +63,7 @@ public class UserTokenController {
     @PostMapping("/phpLogin")
     @ApiOperation(value = "用户登录",notes = "用户账号密码登录")
     public R<AccTokenVo> phpLogin(@RequestBody LoginPhoneForm loginPhoneForm) {
-        Assert.isTrue(Boolean.FALSE,"接口已废弃!");
+       Assert.isTrue(Boolean.FALSE,"接口已废弃!");
         R<CntUserDto> userR = remoteBuiUserService.login(loginPhoneForm, SecurityConstants.INNER);
         Assert.isTrue(userR.getCode() == CodeStatus.SUCCESS.getCode(),userR.getMsg());
         CntUserDto userRData = userR.getData();

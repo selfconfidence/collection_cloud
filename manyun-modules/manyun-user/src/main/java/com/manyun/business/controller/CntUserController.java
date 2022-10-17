@@ -7,6 +7,7 @@ import com.manyun.business.domain.entity.CntUser;
 import com.manyun.business.domain.form.*;
 import com.manyun.business.domain.vo.*;
 import com.manyun.business.service.ICntUserService;
+import com.manyun.comm.api.RemoteSystemService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.domain.dto.UserDto;
 import com.manyun.comm.api.domain.form.JgLoginTokenForm;
@@ -16,6 +17,8 @@ import com.manyun.comm.api.model.LoginPhoneCodeForm;
 import com.manyun.comm.api.model.LoginPhoneForm;
 import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.annotation.RequestBodyRsa;
+import com.manyun.common.core.constant.BusinessConstants;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.PhoneCodeType;
@@ -34,6 +37,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.manyun.common.core.constant.BusinessConstants.RedisDict.PHONE_CODE;
+import static com.manyun.common.core.constant.BusinessConstants.SystemTypeConstant.IS_REAL;
 
 /**
  * <p>
@@ -54,7 +58,8 @@ public class CntUserController extends BaseController {
     @Autowired
     private RedisService redisService;
 
-
+    @Autowired
+    protected RemoteSystemService remoteSystemService;
 
     @PostMapping("/login")
     @ApiOperation(value = "用户登录",notes = "用户账号密码登录",hidden = true)
@@ -119,6 +124,8 @@ public class CntUserController extends BaseController {
     @ApiOperation("实名认证 -- 银联")
     @Lock("realUser")
     public R realUser(@RequestBody @Valid UserRealForm userRealForm){
+        String data = remoteSystemService.findType(IS_REAL, SecurityConstants.INNER).getData();
+        Assert.isTrue("ON".equals(data),"未开启实名认证!");
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         codeCheck(userRealForm.getPhone(),userRealForm.getPhoneCode(), PhoneCodeType.REAL_CODE.getType());
         return userService.userRealName(userRealForm, notNullLoginBusinessUser.getUserId());

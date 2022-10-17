@@ -41,6 +41,7 @@ import com.manyun.common.core.web.page.TableDataInfoUtil;
 import com.manyun.common.mq.producers.deliver.DeliverProducer;
 import com.manyun.common.mq.producers.msg.DeliverMsg;
 import com.manyun.common.redis.service.BuiCronService;
+import com.manyun.common.redis.service.RedisService;
 import com.manyun.common.security.utils.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectFactory;
@@ -59,6 +60,7 @@ import java.time.LocalDateTime;
 
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.BOX_MODEL_TYPE;
 import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE;
+import static com.manyun.common.core.constant.BusinessConstants.RedisDict.ORDER_ORDINARY_STATUS;
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
 import static com.manyun.common.core.enums.BoxStatus.UP_ACTION;
 import static com.manyun.common.core.enums.CollectionLink.NOT_LINK;
@@ -135,6 +137,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Autowired
     private BuiCronService buiCronService;
+
+    @Autowired
+    private RedisService redisService;
 
     @Override
     public TableDataInfo<OrderVo> pageQueryList(OrderQuery orderQuery, String userId) {
@@ -214,6 +219,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         DelayLevelEnum defaultEnum = DelayLevelEnum.getDefaultEnum(serviceVal, DelayLevelEnum.LEVEL_6);
         order.setEndTime(LocalDateTime.now().plusMinutes(DelayLevelEnum.getSourceConvertTime(defaultEnum, TimeUnit.MINUTES)));
         deliverProducer.sendCancelOrder(idStr,Builder.of(DeliverMsg::new).with(DeliverMsg::setBuiId,idStr).with(DeliverMsg::setBuiName,StrUtil.format("订单取消了,订单编号为:{}",idStr)).with(DeliverMsg::setResetHost, idStr).build() ,defaultEnum );
+        redisService.setCacheObject(ORDER_ORDINARY_STATUS.concat(orderNo) ,order,DelayLevelEnum.getSourceConvertTime(defaultEnum, TimeUnit.MINUTES),TimeUnit.MINUTES);
         save(order);
         consumer.accept(idStr);
         return orderNo;
@@ -233,6 +239,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Assert.isTrue(WAIT_ORDER.getCode().equals(order.getOrderStatus()),"订单状态有误,请核实!");
         // 更改订单状态, 绑定对应的 （藏品/盲盒）
         order.setOrderStatus(OVER_ORDER.getCode());
+
+        // redis 缓存订单状态优化
+        Integer serviceVal = systemService.getVal(BusinessConstants.SystemTypeConstant.ORDER_END_TIME, Integer.class);
+        DelayLevelEnum defaultEnum = DelayLevelEnum.getDefaultEnum(serviceVal, DelayLevelEnum.LEVEL_6);
+        redisService.setCacheObject(ORDER_ORDINARY_STATUS.concat(outHost) ,order,DelayLevelEnum.getSourceConvertTime(defaultEnum, TimeUnit.MINUTES),TimeUnit.MINUTES);
+
         order.updateD(order.getUserId());
         // 开始绑定 根据购买的藏品/盲盒进行绑定
         Integer goodsType = order.getGoodsType();
