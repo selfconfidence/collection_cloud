@@ -1,9 +1,11 @@
 package com.manyun.common.core.utils;
 
 import cn.hutool.core.lang.Assert;
+import com.alibaba.fastjson.JSON;
 import com.dingxianginc.ctu.client.CaptchaClient;
 import com.dingxianginc.ctu.client.model.CaptchaResponse;
 import com.manyun.common.core.utils.ip.IpUtils;
+import lombok.extern.slf4j.Slf4j;
 
 /*
  *
@@ -11,6 +13,7 @@ import com.manyun.common.core.utils.ip.IpUtils;
  * @author yanwei
  * @create 2022-09-29
  */
+@Slf4j
 public class XXutils {
     public static void dingxiangTokenCheck(String token){
         /**构造入参为appId和appSecret
@@ -36,6 +39,11 @@ public class XXutils {
 //确保验证状态是SERVER_SUCCESS，SDK中有容错机制，在网络出现异常的情况会返回通过
 //System.out.println(response.getIp());
 //验证码服务采集到的客户端ip
+        log.info("当前验证toke 为:{},验证结果为：{}",token, JSON.toJSON(response));
         Assert.isTrue(response.getResult(),"验证失败,请重试！");
+    }
+
+    public static void main(String[] args) {
+        dingxiangTokenCheck("123");
     }
 }
