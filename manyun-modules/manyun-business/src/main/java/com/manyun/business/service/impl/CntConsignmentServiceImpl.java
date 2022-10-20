@@ -429,6 +429,9 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         // 此寄售是否 状态是否正确！！！
         Assert.isTrue(PUSH_CONSIGN.getCode().equals(consignment.getConsignmentStatus()),"当前寄售资产已被锁单,请稍后重试!");
         Assert.isFalse(payUserId.equals(consignment.getSendUserId()),"自己不可购买自己寄售的产品!");
+        // 是否满三次？
+        long count = count(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getPayUserId, payUserId).last(" AND DATE_FORMAT( created_time, '%Y%m%d' ) = DATE_FORMAT( CURDATE( ) , '%Y%m%d' ) "));
+        Assert.isTrue(count < 3,"每天限制锁单三次！");
 
     }
 

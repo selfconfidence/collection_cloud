@@ -25,7 +25,7 @@ public class XXutils {
         String appId = "a0ab66c6771a8e8bd9da35c6788cfc63";
         String appSecret = "78cfa7486febe8a12a094db640c54592";
         CaptchaClient captchaClient = new CaptchaClient(appId,appSecret);
-        captchaClient.setCaptchaUrl("https://cap-api.dingxiang-inc.com");
+        captchaClient.setCaptchaUrl("https://cap-api.dingxiang-inc.com/api/tokenVerify");
 //指定服务器地址，saas可在控制台，应用管理页面最上方获取
         CaptchaResponse response = null;
         try {
@@ -43,7 +43,4 @@ public class XXutils {
         Assert.isTrue(response.getResult(),"验证失败,请重试！");
     }
 
-    public static void main(String[] args) {
-        dingxiangTokenCheck("123");
-    }
 }
