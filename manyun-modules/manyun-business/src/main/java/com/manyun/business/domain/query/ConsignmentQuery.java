@@ -26,8 +26,8 @@ public class ConsignmentQuery extends PageQuery {
     @ApiModelProperty("系列编号")
     private String cateId;
 
-    @NotBlank(message = "验证Token不可为空。")
-    private String token;
+   // @NotBlank(message = "验证Token不可为空。")
+    //private String token;
 
 
 
