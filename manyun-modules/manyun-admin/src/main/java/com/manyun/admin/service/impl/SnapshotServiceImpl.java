@@ -75,22 +75,16 @@ public class SnapshotServiceImpl implements ISnapshotService {
             }
             if(userIdsCollection.size()==0)return TableDataInfoUtil.pageTableDataInfo(new ArrayList<StatisticalGoodsVo>(), new ArrayList<StatisticalGoodsVo>());
             //组装需要返回的数据
-            List<CntUser> users = userService.list(Wrappers.<CntUser>lambdaQuery().in(userIdsCollection.size()>0,CntUser::getId,userIdsCollection));
             PageHelper.startPage(statisticalGoodsQuery.getPageNum(),statisticalGoodsQuery.getPageSize());
-            List<StatisticalGoodsVo> list = userIdsCollection.stream().map(m -> {
+            List<CntUser> users = userService.list(Wrappers.<CntUser>lambdaQuery().in(userIdsCollection.size()>0,CntUser::getId,userIdsCollection));
+            return TableDataInfoUtil.pageTableDataInfo(users.stream().map(m -> {
                 StatisticalGoodsVo statisticalGoodsVo = new StatisticalGoodsVo();
-                statisticalGoodsVo.setUserId(m);
-                if (users.size() > 0) {
-                    Optional<CntUser> optionalUser = users.parallelStream().filter(ff -> ff.getId().equals(m)).findFirst();
-                    if (optionalUser.isPresent()) {
-                        statisticalGoodsVo.setPhone(optionalUser.get().getPhone());
-                        statisticalGoodsVo.setLinkAddr(optionalUser.get().getLinkAddr());
-                    }
-                }
-                statisticalGoodsVo.setCollections(userCollectionService.selectMeetTheConditionsData(m,collections.parallelStream().map(GoodsQuery::getGoodId).collect(Collectors.toList())));
+                statisticalGoodsVo.setUserId(m.getId());
+                statisticalGoodsVo.setPhone(m.getPhone());
+                statisticalGoodsVo.setLinkAddr(m.getLinkAddr());
+                statisticalGoodsVo.setCollections(userCollectionService.selectMeetTheConditionsData(m.getId(),collections.parallelStream().map(GoodsQuery::getGoodId).collect(Collectors.toList())));
                 return statisticalGoodsVo;
-            }).collect(Collectors.toList());
-            return TableDataInfoUtil.pageTableDataInfo(list, list);
+            }).collect(Collectors.toList()),users);
         }else if(boxs.size()>0 && collections.size()==0){
             for (int i = 0; i < boxs.size(); i++) {
                 //查询第一次符合条件的用户信息
@@ -104,22 +98,16 @@ public class SnapshotServiceImpl implements ISnapshotService {
             if(userIdsBox.size()==0)return TableDataInfoUtil.pageTableDataInfo(new ArrayList<StatisticalGoodsVo>(), new ArrayList<StatisticalGoodsVo>());
             //组装需要返回的数据
             //查询用户信息
-            List<CntUser> users = userService.list(Wrappers.<CntUser>lambdaQuery().in(userIdsBox.size()>0,CntUser::getId,userIdsBox));
             PageHelper.startPage(statisticalGoodsQuery.getPageNum(),statisticalGoodsQuery.getPageSize());
-            List<StatisticalGoodsVo> list = userIdsBox.stream().map(m -> {
+            List<CntUser> users = userService.list(Wrappers.<CntUser>lambdaQuery().in(userIdsBox.size()>0,CntUser::getId,userIdsBox));
+            return TableDataInfoUtil.pageTableDataInfo(users.stream().map(m -> {
                 StatisticalGoodsVo statisticalGoodsVo = new StatisticalGoodsVo();
-                statisticalGoodsVo.setUserId(m);
-                if (users.size() > 0) {
-                    Optional<CntUser> optionalUser = users.parallelStream().filter(ff -> ff.getId().equals(m)).findFirst();
-                    if (optionalUser.isPresent()) {
-                        statisticalGoodsVo.setPhone(optionalUser.get().getPhone());
-                        statisticalGoodsVo.setLinkAddr(optionalUser.get().getLinkAddr());
-                    }
-                }
-                statisticalGoodsVo.setBoxs(userBoxService.selectMeetTheConditionsData(m,boxs.parallelStream().map(GoodsQuery::getGoodId).collect(Collectors.toList())));
+                statisticalGoodsVo.setUserId(m.getId());
+                statisticalGoodsVo.setPhone(m.getPhone());
+                statisticalGoodsVo.setLinkAddr(m.getLinkAddr());
+                statisticalGoodsVo.setBoxs(userBoxService.selectMeetTheConditionsData(m.getId(),boxs.parallelStream().map(GoodsQuery::getGoodId).collect(Collectors.toList())));
                 return statisticalGoodsVo;
-            }).collect(Collectors.toList());
-            return TableDataInfoUtil.pageTableDataInfo(list, list);
+            }).collect(Collectors.toList()),users);
         }else if(collections.size()>0 && boxs.size()>0){
             for (int i = 0; i < collections.size(); i++) {
                 //查询第一次符合条件的用户信息
@@ -144,23 +132,17 @@ public class SnapshotServiceImpl implements ISnapshotService {
             List<String> intersection = userIdsCollection.stream().filter(userIdsBox::contains).collect(Collectors.toList());
             //组装需要返回的数据
             //查询用户信息
-            List<CntUser> users = userService.list(Wrappers.<CntUser>lambdaQuery().in(intersection.size()>0,CntUser::getId,intersection));
             PageHelper.startPage(statisticalGoodsQuery.getPageNum(),statisticalGoodsQuery.getPageSize());
-            List<StatisticalGoodsVo> list = intersection.stream().map(m -> {
+            List<CntUser> users = userService.list(Wrappers.<CntUser>lambdaQuery().in(intersection.size()>0,CntUser::getId,intersection));
+            return TableDataInfoUtil.pageTableDataInfo(users.stream().map(m -> {
                 StatisticalGoodsVo statisticalGoodsVo = new StatisticalGoodsVo();
-                statisticalGoodsVo.setUserId(m);
-                if (users.size() > 0) {
-                    Optional<CntUser> optionalUser = users.parallelStream().filter(ff -> ff.getId().equals(m)).findFirst();
-                    if (optionalUser.isPresent()) {
-                        statisticalGoodsVo.setPhone(optionalUser.get().getPhone());
-                        statisticalGoodsVo.setLinkAddr(optionalUser.get().getLinkAddr());
-                    }
-                }
-                statisticalGoodsVo.setCollections(userCollectionService.selectMeetTheConditionsData(m,collections.parallelStream().map(GoodsQuery::getGoodId).collect(Collectors.toList())));
-                statisticalGoodsVo.setBoxs(userBoxService.selectMeetTheConditionsData(m,boxs.parallelStream().map(GoodsQuery::getGoodId).collect(Collectors.toList())));
+                statisticalGoodsVo.setUserId(m.getId());
+                statisticalGoodsVo.setPhone(m.getPhone());
+                statisticalGoodsVo.setLinkAddr(m.getLinkAddr());
+                statisticalGoodsVo.setCollections(userCollectionService.selectMeetTheConditionsData(m.getId(),collections.parallelStream().map(GoodsQuery::getGoodId).collect(Collectors.toList())));
+                statisticalGoodsVo.setBoxs(userBoxService.selectMeetTheConditionsData(m.getId(),boxs.parallelStream().map(GoodsQuery::getGoodId).collect(Collectors.toList())));
                 return statisticalGoodsVo;
-            }).collect(Collectors.toList());
-            return TableDataInfoUtil.pageTableDataInfo(list, list);
+            }).collect(Collectors.toList()), users);
         }else {
             Assert.isTrue(Boolean.FALSE,"数据查询错误!");
         }
