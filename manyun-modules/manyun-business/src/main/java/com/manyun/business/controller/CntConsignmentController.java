@@ -13,6 +13,7 @@ import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.annotation.RequestBodyRsa;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.R;
+import com.manyun.common.core.utils.XXutils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.security.annotation.InnerAuth;
 import com.manyun.common.security.utils.SecurityUtils;
@@ -71,6 +72,7 @@ public class CntConsignmentController {
     @PostMapping("/pageConsignmentCollectionList")
     @ApiOperation(value = "分页查询寄售市场藏品的信息",notes = "详情还是调用藏品详情即可\n,用藏品编号查详情\n购买的时候,按照寄售购买的流程进行！！！")
     public R<TableDataInfo<ConsignmentCollectionListVo>> pageConsignmentList(@RequestBody @Valid ConsignmentQuery consignmentQuery){
+        XXutils.dingxiangTokenCheck(consignmentQuery.getToken());
         return R.ok(cntConsignmentService.pageConsignmentList(consignmentQuery));
     }
 
@@ -78,6 +80,7 @@ public class CntConsignmentController {
     @PostMapping("/pageConsignmentBoxList")
     @ApiOperation(value = "分页查询寄售市场盲盒的信息",notes = "详情还是调用盲盒详情即可\n,用盲盒编号查详情\n购买的时候,按照寄售购买的流程进行！！！")
     public R<TableDataInfo<ConsignmentBoxListVo>> pageConsignmentBoxList(@RequestBody @Valid ConsignmentQuery consignmentQuery){
+        XXutils.dingxiangTokenCheck(consignmentQuery.getToken());
         return R.ok(cntConsignmentService.pageConsignmentBoxList(consignmentQuery));
     }
 
@@ -97,6 +100,7 @@ public class CntConsignmentController {
     @ApiOperation(value = "购买寄售_预先_生成订单",notes = "用来预先 生成一个待支付订单,返回订单编号,用来二次提交支付\n version 1.0.1")
     @Lock("consignmentCreateOrder")
     public R<String>  consignmentCreateOrder(@RequestBodyRsa @Valid ConsignmentOrderSellForm consignmentOrderSellForm){
+        XXutils.dingxiangTokenCheck(consignmentOrderSellForm.getToken());
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         String payUserId = notNullLoginBusinessUser.getUserId();
         return R.ok(cntConsignmentService.consignmentCreateOrder( payUserId,consignmentOrderSellForm));

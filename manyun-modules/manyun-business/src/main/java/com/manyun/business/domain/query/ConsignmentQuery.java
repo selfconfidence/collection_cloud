@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+
 @Data
 @ApiModel("分页查询寄售市场资产相关查询视图")
 public class ConsignmentQuery extends PageQuery {
@@ -24,7 +26,8 @@ public class ConsignmentQuery extends PageQuery {
     @ApiModelProperty("系列编号")
     private String cateId;
 
-
+    @NotBlank(message = "验证Token不可为空。")
+    private String token;
 
 
 

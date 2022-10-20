@@ -18,6 +18,10 @@ public class ConsignmentOrderSellForm implements Serializable {
     private String buiId;
 
 
+    @NotBlank(message = "验证Token不可为空。")
+    private String token;
+
+
 
 
 }
