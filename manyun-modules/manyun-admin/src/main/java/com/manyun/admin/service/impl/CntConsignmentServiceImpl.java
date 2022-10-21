@@ -1,9 +1,13 @@
 package com.manyun.admin.service.impl;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.CntConsignment;
@@ -16,9 +20,7 @@ import com.manyun.admin.domain.vo.CntConsignmentVo;
 import com.manyun.admin.domain.vo.CntOrderVo;
 import com.manyun.admin.domain.vo.CollectionBusinessVo;
 import com.manyun.admin.domain.vo.CollectionSalesStatisticsVo;
-import com.manyun.admin.service.ICntMediaService;
-import com.manyun.admin.service.ICntOrderService;
-import com.manyun.admin.service.ICntUserCollectionService;
+import com.manyun.admin.service.*;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.DateUtils;
@@ -29,7 +31,9 @@ import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.manyun.admin.mapper.CntConsignmentMapper;
-import com.manyun.admin.service.ICntConsignmentService;
+import org.springframework.transaction.annotation.Transactional;
+
+import static com.manyun.common.core.enums.ConsignmentStatus.PUSH_CONSIGN;
 
 /**
  * 寄售市场主_寄售订单Service业务层处理
@@ -45,6 +49,9 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
 
     @Autowired
     private ICntUserCollectionService userCollectionService;
+
+    @Autowired
+    private ICntUserBoxService userBoxService;
 
     @Autowired
     private ICntOrderService orderService;
@@ -167,6 +174,36 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
     @Override
     public List<CollectionSalesStatisticsVo> selectCollectionSalesStatistics(CollectionSalesStatisticsQuery collectionSalesStatisticsQuery) {
         return cntConsignmentMapper.selectCollectionSalesStatistics(collectionSalesStatisticsQuery);
+    }
+
+    /**
+     * 根据寄售id寄售方取消寄售市场中的资产
+     * @param consignmentOrderQuery
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelConsignmentById(CancelConsignmentOrderQuery consignmentOrderQuery) {
+        CntConsignment consignment = getOne(
+                Wrappers
+                        .<CntConsignment>lambdaQuery()
+                        .eq(CntConsignment::getId, consignmentOrderQuery.getId())
+                        .eq(CntConsignment::getSendUserId, consignmentOrderQuery.getUserId())
+                        .eq(CntConsignment::getConsignmentStatus, PUSH_CONSIGN.getCode()));
+        // 判定条件是否符合
+        Assert.isTrue(Objects.nonNull(consignment),"取消寄售资产有误,请核实当前寄售状态!");
+        // 1. 回滚到 用户资产中间表
+        Integer isType = consignment.getIsType();
+        //验证是 藏品信息 还是 盲盒信息
+        if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(isType))
+            //藏品
+            userCollectionService.showUserCollection(consignment.getSendUserId(),consignment.getBuiId(), StrUtil.format("寄售的藏品,已被退回!"));
+        if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(isType))
+            // 盲盒
+            userBoxService.showUserBox(consignment.getBuiId(),consignment.getSendUserId(),StrUtil.format("寄售的盲盒,已被退回!"));
+
+        // 2. 删除当前寄售订单
+        removeById(consignment.getId());
     }
 
 }

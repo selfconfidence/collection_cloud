@@ -16,6 +16,12 @@ public class CntConsignmentVo
     @ApiModelProperty("寄售单号")
     private String id;
 
+    @ApiModelProperty("卖方用户id")
+    private String sendUserId;
+
+    @ApiModelProperty("买方用户id")
+    private String payUserId;
+
     @ApiModelProperty("0藏品，1盲盒")
     private Integer isType;
 

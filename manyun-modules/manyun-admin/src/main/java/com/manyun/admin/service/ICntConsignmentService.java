@@ -80,4 +80,10 @@ public interface ICntConsignmentService extends IService<CntConsignment>
      * @return
      */
     List<CollectionSalesStatisticsVo> selectCollectionSalesStatistics(CollectionSalesStatisticsQuery collectionSalesStatisticsQuery);
+
+    /**
+     * 根据寄售id寄售方取消寄售市场中的资产
+     * @param consignmentOrderQuery
+     */
+    void cancelConsignmentById(CancelConsignmentOrderQuery consignmentOrderQuery);
 }

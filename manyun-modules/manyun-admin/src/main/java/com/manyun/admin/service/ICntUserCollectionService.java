@@ -53,4 +53,6 @@ public interface ICntUserCollectionService extends IService<CntUserCollection>
      */
     List<GoodsVo> selectMeetTheConditionsData(String userId,List<String> goodIds);
 
+
+    String showUserCollection(String userId, String buiId, String info);
 }

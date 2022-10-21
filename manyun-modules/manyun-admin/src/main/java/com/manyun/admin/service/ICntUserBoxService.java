@@ -37,4 +37,7 @@ public interface ICntUserBoxService extends IService<CntUserBox>
      * @return
      */
     List<GoodsVo> selectMeetTheConditionsData(String userId,List<String> goodIds);
+
+    String showUserBox(String buiId, String userId, String info);
+
 }

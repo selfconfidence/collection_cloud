@@ -159,6 +159,12 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
                 return R.fail("发售时间不能小于当前时间!");
             }
         }
+        if(null == cntBoxAlterVo.getLimitNumber() || cntBoxAlterVo.getLimitNumber()==0){
+            return R.fail("限制数量最小为1!");
+        }
+        if(cntBoxAlterVo.getLimitNumber()>cntBoxAlterVo.getBalance()){
+            return R.fail("限制数量不能大于库存数量!");
+        }
         //校验
         R check = check(cntBoxAlterVo,boxAlterCombineDto.getCntLableAlterVo(),boxAlterCombineDto.getMediaAlterVo());
         if(200!=check.getCode()){
@@ -419,12 +425,6 @@ public class CntBoxServiceImpl extends ServiceImpl<CntBoxMapper,CntBox> implemen
     public R check(CntBoxAlterVo boxAlterVo, CntLableAlterVo lableAlterVo, MediaAlterVo mediaAlterVo){
         Date publishTime = boxAlterVo.getPublishTime();
         String tarId = boxAlterVo.getTarId();
-        if(null == boxAlterVo.getLimitNumber() || boxAlterVo.getLimitNumber()==0){
-            return R.fail("限制数量最小为1!");
-        }
-        if(boxAlterVo.getLimitNumber()>boxAlterVo.getBalance()){
-            return R.fail("限制数量不能大于库存数量!");
-        }
         if(StringUtils.isNotBlank(tarId)){
             CntTar tar = cntTarService.getById(tarId);
             if(Objects.nonNull(tar)){
