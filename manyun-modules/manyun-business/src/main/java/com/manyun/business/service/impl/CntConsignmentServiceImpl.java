@@ -430,8 +430,8 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         Assert.isTrue(PUSH_CONSIGN.getCode().equals(consignment.getConsignmentStatus()),"当前寄售资产已被锁单,请稍后重试!");
         Assert.isFalse(payUserId.equals(consignment.getSendUserId()),"自己不可购买自己寄售的产品!");
         // 是否满三次？
-        long count = count(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getPayUserId, payUserId).last(" AND DATE_FORMAT( created_time, '%Y%m%d' ) = DATE_FORMAT( CURDATE( ) , '%Y%m%d' ) "));
-        Assert.isTrue(count < 3,"每天限制锁单三次！");
+        //long count = count(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getPayUserId, payUserId).last(" AND DATE_FORMAT( created_time, '%Y%m%d' ) = DATE_FORMAT( CURDATE( ) , '%Y%m%d' ) "));
+       // Assert.isTrue(count < 3,"每天限制锁单三次！");
 
     }
 
@@ -577,6 +577,9 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
     }
 
     private void checkAll(String userId, UserConsignmentForm userConsignmentForm) {
+        // 是否开通连连钱包
+        Money serviceOne = moneyService.getOne(Wrappers.<Money>lambdaQuery().select(Money::getLlAccountStatus).eq(Money::getUserId, userId));
+        Assert.isTrue("1".equals(serviceOne.getLlAccountStatus()),"开通连连支付才可寄售！");
         Integer type = userConsignmentForm.getType();
         // 藏品
         if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(type))
@@ -585,6 +588,8 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         // 盲盒
         if (BusinessConstants.ModelTypeConstant.BOX_TAYPE.equals(type))
             Assert.isTrue(userBoxService.existUserBox(userId,userConsignmentForm.getBuiId()),"选择的盲盒有误,请核实盲盒详细信息!");
+
+
     }
 
 
