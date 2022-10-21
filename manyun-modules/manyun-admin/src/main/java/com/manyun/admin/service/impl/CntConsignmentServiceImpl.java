@@ -1,5 +1,6 @@
 package com.manyun.admin.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Service;
 import com.manyun.admin.mapper.CntConsignmentMapper;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.manyun.common.core.enums.ConsignmentStatus.LOCK_CONSIGN;
 import static com.manyun.common.core.enums.ConsignmentStatus.PUSH_CONSIGN;
 
 /**
@@ -184,12 +186,15 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void cancelConsignmentById(CancelConsignmentOrderQuery consignmentOrderQuery) {
+        List<Integer> list = new ArrayList<>();
+        list.add(PUSH_CONSIGN.getCode());
+        list.add(LOCK_CONSIGN.getCode());
         CntConsignment consignment = getOne(
                 Wrappers
                         .<CntConsignment>lambdaQuery()
                         .eq(CntConsignment::getId, consignmentOrderQuery.getId())
                         .eq(CntConsignment::getSendUserId, consignmentOrderQuery.getUserId())
-                        .eq(CntConsignment::getConsignmentStatus, PUSH_CONSIGN.getCode()));
+                        .in(CntConsignment::getConsignmentStatus, list));
         // 判定条件是否符合
         Assert.isTrue(Objects.nonNull(consignment),"取消寄售资产有误,请核实当前寄售状态!");
         // 1. 回滚到 用户资产中间表
