@@ -71,7 +71,7 @@ public class CntConsignmentController {
 
     @PostMapping("/pageConsignmentCollectionList")
     @ApiOperation(value = "分页查询寄售市场藏品的信息",notes = "详情还是调用藏品详情即可\n,用藏品编号查详情\n购买的时候,按照寄售购买的流程进行！！！")
-    public R<TableDataInfo<ConsignmentCollectionListVo>> pageConsignmentList(@RequestBody @Valid ConsignmentQuery consignmentQuery){
+    public R<TableDataInfo<ConsignmentCollectionListVo>> pageConsignmentList(@RequestBodyRsa @Valid ConsignmentQuery consignmentQuery){
         //XXutils.dingxiangTokenCheck(consignmentQuery.getToken());
         return R.ok(cntConsignmentService.pageConsignmentList(consignmentQuery));
     }
@@ -79,7 +79,7 @@ public class CntConsignmentController {
 
     @PostMapping("/pageConsignmentBoxList")
     @ApiOperation(value = "分页查询寄售市场盲盒的信息",notes = "详情还是调用盲盒详情即可\n,用盲盒编号查详情\n购买的时候,按照寄售购买的流程进行！！！")
-    public R<TableDataInfo<ConsignmentBoxListVo>> pageConsignmentBoxList(@RequestBody @Valid ConsignmentQuery consignmentQuery){
+    public R<TableDataInfo<ConsignmentBoxListVo>> pageConsignmentBoxList(@RequestBodyRsa @Valid ConsignmentQuery consignmentQuery){
         //XXutils.dingxiangTokenCheck(consignmentQuery.getToken());
         return R.ok(cntConsignmentService.pageConsignmentBoxList(consignmentQuery));
     }

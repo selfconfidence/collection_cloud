@@ -11,6 +11,7 @@ import cn.hutool.json.JSONUtil;
 import com.manyun.comm.api.model.LoginPhoneForm;
 import com.manyun.common.core.annotation.RequestBodyRsa;
 import com.manyun.common.core.domain.CodeStatus;
+import com.manyun.common.core.domain.RequestTimeRate;
 import com.manyun.common.core.exception.ServiceException;
 import com.manyun.common.security.config.GlobalRsaConfig;
 import com.manyun.common.security.domain.dto.CommDto;
@@ -86,10 +87,19 @@ public class RsaRequestBodyProcessor implements HandlerMethodArgumentResolver, E
        // 解析过程
         if (!mavContainer.isRequestHandled()) {
             mavContainer.setRequestHandled(true);
-            return jsr303Check( isOpen(parameter) ?  doDyd(parameter, webRequest) : doDefaultDyd(parameter,webRequest),parameter,mavContainer,webRequest,binderFactory);
+            Object oblData = null;
+            oblData = jsr303Check(isOpen(parameter) ? doDyd(parameter, webRequest) : doDefaultDyd(parameter, webRequest), parameter, mavContainer, webRequest, binderFactory);
+            if (oblData instanceof RequestTimeRate){
+                RequestTimeRate requestTimeRate = (RequestTimeRate) oblData;
+                Assert.isTrue(requestTimeRate.getRequestTime() == 0,"请求时间有误！");
+                long between = DateTime.of(requestTimeRate.getRequestTime()).between(new Date(), DateUnit.SECOND);
+                Assert.isTrue(between <= 2,"有效期已过,请重新获取时间戳!有效时间为{}秒.",2);
+            }
+            return oblData;
         }
         return null;
     }
+
 
     private Object doDefaultDyd(MethodParameter parameter, NativeWebRequest webRequest) throws IOException {
         return JSONUtil.toBean(IOUtils.toString(webRequest.getNativeRequest(HttpServletRequest.class).getInputStream(), StandardCharsets.UTF_8), parameter.getParameter().getType());
@@ -97,11 +107,11 @@ public class RsaRequestBodyProcessor implements HandlerMethodArgumentResolver, E
 
     private Object doDyd(MethodParameter parameter,  NativeWebRequest webRequest) throws IOException {
         postCheck(parameter);
-        String data =  checkRsaDyd(webRequest);
-        String decryptStr = null;
-        try {
-             decryptStr = SecureUtil.rsa(globalRsaConfig.getPrivateKey(),globalRsaConfig.getPublicKey() ).decryptStr(data, KeyType.PrivateKey, StandardCharsets.UTF_8);
-            return  JSONUtil.toBean(decryptStr, parameter.getParameter().getType());
+            String data =  checkRsaDyd(webRequest);
+            String decryptStr = null;
+            try {
+                decryptStr = SecureUtil.rsa(globalRsaConfig.getPrivateKey(),globalRsaConfig.getPublicKey() ).decryptStr(data, KeyType.PrivateKey, StandardCharsets.UTF_8);
+                return  JSONUtil.toBean(decryptStr, parameter.getParameter().getType());
         }catch (Exception e){
             throw  new ServiceException(globalRsaConfig.getErrorMsg(), CodeStatus.ILLEGAL_PARAMETER.getCode());
         }
