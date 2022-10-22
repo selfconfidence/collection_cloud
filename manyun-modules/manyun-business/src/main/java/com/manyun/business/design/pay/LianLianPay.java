@@ -2,6 +2,7 @@ package com.manyun.business.design.pay;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.domain.dto.PayInfoDto;
 import com.manyun.business.domain.dto.UserMoneyDto;
@@ -48,11 +49,10 @@ public class LianLianPay implements RootPayServer {
     @Value("${open.url}")
     private String url;
 
-    @Resource
-    private IOrderService orderService;
 
     @Override
     public PayVo execPayVo(PayInfoDto payInfoDto) {
+        IOrderService orderService = SpringUtil.getBean(IOrderService.class);
 
         if (PayTypeEnum.LIANLIAN_TYPE.getCode().equals(payInfoDto.getPayType())){
             Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId,payInfoDto.getUserId()));
