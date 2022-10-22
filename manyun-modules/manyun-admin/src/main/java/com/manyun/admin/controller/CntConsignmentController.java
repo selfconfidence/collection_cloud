@@ -2,15 +2,19 @@ package com.manyun.admin.controller;
 
 
 import com.manyun.admin.domain.dto.*;
+import com.manyun.admin.domain.query.CancelConsignmentOrderQuery;
 import com.manyun.admin.domain.query.ConsignmentQuery;
 import com.manyun.admin.domain.query.ConsignmentStatusQuery;
 import com.manyun.admin.domain.query.OrderListQuery;
 import com.manyun.admin.domain.vo.CntConsignmentVo;
 import com.manyun.admin.domain.vo.CntOrderVo;
 import com.manyun.comm.api.RemoteConsignmentService;
+import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.web.page.PageQuery;
+import com.manyun.common.security.utils.SecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +83,13 @@ public class CntConsignmentController extends BaseController
     public R paymentReview(@Valid @RequestBody PaymentReviewDto paymentReviewDto)
     {
         return remoteConsignmentService.consignmentSuccess(paymentReviewDto.getId(), SecurityConstants.INNER);
+    }
+
+    @PostMapping("/cancelConsignmentById")
+    @ApiOperation(value = "根据寄售id寄售方取消寄售市场中的资产")
+    public R cancelConsignmentById(@Valid @RequestBody CancelConsignmentOrderQuery consignmentOrderQuery){
+        cntConsignmentService.cancelConsignmentById(consignmentOrderQuery);
+        return R.ok();
     }
 
 }

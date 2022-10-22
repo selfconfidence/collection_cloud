@@ -1,5 +1,7 @@
 package com.manyun.admin.service.impl;
 
+import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.admin.domain.query.CollectionTotalNumberQuery;
 import com.manyun.admin.domain.query.UserCollectionNumberQuery;
@@ -11,6 +13,11 @@ import com.manyun.admin.domain.CntUserCollection;
 import com.manyun.admin.service.ICntUserCollectionService;
 
 import java.util.List;
+import java.util.Objects;
+
+import static com.manyun.common.core.enums.CollectionLink.OK_LINK;
+import static com.manyun.common.core.enums.CommAssetStatus.NOT_EXIST;
+import static com.manyun.common.core.enums.CommAssetStatus.USE_EXIST;
 
 /**
  * 用户购买藏品中间Service业务层处理
@@ -78,6 +85,23 @@ public class CntUserCollectionServiceImpl extends ServiceImpl<CntUserCollectionM
     @Override
     public List<GoodsVo> selectMeetTheConditionsData(String userId,List<String> goodIds) {
         return cntUserCollectionMapper.selectMeetTheConditionsData(userId,goodIds);
+    }
+
+    @Override
+    public String showUserCollection(String userId, String buiId, String info) {
+        CntUserCollection userCollection = getOne(
+                Wrappers
+                        .<CntUserCollection>lambdaQuery()
+                        .eq(CntUserCollection::getIsExist, NOT_EXIST.getCode())
+                        .eq(CntUserCollection::getId, buiId)
+                        .eq(CntUserCollection::getUserId, userId)
+                        .eq(CntUserCollection::getIsLink, OK_LINK.getCode()));
+        Assert.isTrue(Objects.nonNull(userCollection),"藏品有误,请检查藏品状态!");
+        userCollection.setIsExist(USE_EXIST.getCode());
+        userCollection.setUpdatedBy(userId);
+        userCollection.setSourceInfo(info);
+        updateById(userCollection);
+        return userCollection.getCollectionId();
     }
 
 }
