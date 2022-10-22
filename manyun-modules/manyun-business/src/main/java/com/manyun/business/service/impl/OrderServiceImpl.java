@@ -10,6 +10,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.manyun.business.design.pay.LLPayUtils;
 import com.manyun.business.design.pay.RootPay;
 import com.manyun.business.design.pay.ShandePay;
 import com.manyun.business.domain.dto.*;
@@ -732,6 +733,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (reloadAssert)
         batchUpdateAssert(order.getBuiId(),order.getGoodsType(),order.getGoodsNum());
 
+        // no close exe
+        try {
+            if (order.getPayType().equals(5)){
+                // 连连，进行关闭
+                LLPayUtils.closePayment(order.getTxnSeqno());
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void batchUpdateAssert(String buiId, Integer goodsType, Integer goodsNum) {
