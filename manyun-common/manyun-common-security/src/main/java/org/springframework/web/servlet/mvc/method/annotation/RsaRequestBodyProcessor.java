@@ -91,7 +91,7 @@ public class RsaRequestBodyProcessor implements HandlerMethodArgumentResolver, E
             oblData = jsr303Check(isOpen(parameter) ? doDyd(parameter, webRequest) : doDefaultDyd(parameter, webRequest), parameter, mavContainer, webRequest, binderFactory);
             if (oblData instanceof RequestTimeRate){
                 RequestTimeRate requestTimeRate = (RequestTimeRate) oblData;
-                Assert.isTrue(requestTimeRate.getRequestTime() == 0,"请求时间有误！");
+                Assert.isTrue(requestTimeRate.getRequestTime() != 0,"请求时间有误！");
                 long between = DateTime.of(requestTimeRate.getRequestTime()).between(new Date(), DateUnit.SECOND);
                 Assert.isTrue(between <= 2,"有效期已过,请重新获取时间戳!有效时间为{}秒.",2);
             }
