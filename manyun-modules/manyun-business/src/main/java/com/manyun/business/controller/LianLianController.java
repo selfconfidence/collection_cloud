@@ -8,6 +8,7 @@ import com.github.pagehelper.PageHelper;
 import com.manyun.business.design.pay.LLPayUtils;
 import com.manyun.business.design.pay.bean.QueryRefundResult;
 import com.manyun.business.design.pay.bean.changePayPass.*;
+import com.manyun.business.design.pay.bean.closePayment.ClosePaymentResult;
 import com.manyun.business.design.pay.bean.individual.IndividualBindCardApplyResult;
 import com.manyun.business.design.pay.bean.individual.IndividualBindCardVerifyResult;
 import com.manyun.business.design.pay.bean.individual.UnlinkedacctIndApplyResult;
@@ -285,6 +286,12 @@ public class LianLianController {
     public R<ChangePayPassVerifyResult> changeLianLianPayPassVerify(@Valid @RequestBody ChangePayPassVerifyForm changePayPassVerifyForm) {
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return R.ok(LLPayUtils.changeLianLianPayPassVerify(changePayPassVerifyForm, notNullLoginBusinessUser.getUserId()));
+    }
+
+    @GetMapping("/closePayment/{txnSeqno}")
+    @ApiOperation(value = "支付单关单",notes = "txnSeqno==商户系统唯一交易流水号")
+    public R<ClosePaymentResult> closePayment(@PathVariable String txnSeqno) {
+        return R.ok(LLPayUtils.closePayment(txnSeqno));
     }
 
 }

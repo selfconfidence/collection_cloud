@@ -7,6 +7,8 @@ import com.alipay.api.domain.RefundUnfreezeResult;
 import com.manyun.business.design.pay.bean.*;
 import com.manyun.business.design.pay.bean.cashier.*;
 import com.manyun.business.design.pay.bean.changePayPass.*;
+import com.manyun.business.design.pay.bean.closePayment.ClosePaymentParams;
+import com.manyun.business.design.pay.bean.closePayment.ClosePaymentResult;
 import com.manyun.business.design.pay.bean.individual.*;
 import com.manyun.business.design.pay.bean.morePayeeRefund.*;
 import com.manyun.business.design.pay.bean.query.*;
@@ -72,7 +74,8 @@ public class LLPayUtils {
     private final static String changePayPass = "https://accpapi.lianlianpay.com/v1/acctmgr/find-password-apply";
     //找回密码验证
     private final static String changePayPassVerify = "https://accpapi.lianlianpay.com/v1/acctmgr/find-password-verify";
-
+    //支付单关单
+    private final static String closePayment = 	"https://accpapi.lianlianpay.com/v1/txn/close-payment";
     //使用时,需确认用户实名状况,必须是实名用户
     /**
      * 开户
@@ -360,7 +363,7 @@ public class LLPayUtils {
         );
         // 设置商户订单信息
         CashierPayCreateOrderInfo orderInfo = new CashierPayCreateOrderInfo();
-        orderInfo.setTxn_seqno((llGeneralConsumeQuery.getOrderId()+"-"+LLianPayDateUtils.getTimestamp()));
+        orderInfo.setTxn_seqno(llGeneralConsumeQuery.getOrderId());
         orderInfo.setTxn_time(timestamp);
         orderInfo.setTotal_amount(llGeneralConsumeQuery.getAmount());
         orderInfo.setGoods_name(llGeneralConsumeQuery.getGoodsName());
@@ -690,6 +693,25 @@ public class LLPayUtils {
         ChangePayPassVerifyResult changePayPassVerifyResult = JSON.parseObject(resultJsonStr, ChangePayPassVerifyResult.class);
         Assert.isTrue("0000".equalsIgnoreCase(changePayPassVerifyResult.getRet_code()),changePayPassVerifyResult.getRet_msg());
         return changePayPassVerifyResult;
+    }
+
+
+    /**
+     * 支付单关单
+     * @param txn_seqno 商户系统唯一交易流水号
+     */
+    public static ClosePaymentResult closePayment(String txn_seqno) {
+        Assert.isTrue(StringUtils.isNotBlank(txn_seqno),"请求参数有误!");
+        ClosePaymentParams params = new ClosePaymentParams();
+        params.setTimestamp(LLianPayDateUtils.getTimestamp());
+        params.setOid_partner(LLianPayConstant.OidPartner);
+        params.setTxn_seqno(txn_seqno);
+
+        LLianPayClient lLianPayClient = new LLianPayClient();
+        String resultJsonStr = lLianPayClient.sendRequest(closePayment, JSON.toJSONString(params));
+        ClosePaymentResult closePaymentResult = JSON.parseObject(resultJsonStr, ClosePaymentResult.class);
+        Assert.isTrue("0000".equalsIgnoreCase(closePaymentResult.getRet_code()),closePaymentResult.getRet_msg());
+        return closePaymentResult;
     }
 
 

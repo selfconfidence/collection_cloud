@@ -88,6 +88,8 @@ public class Order implements Serializable {
     @ApiModelProperty("寄售限单数量")
     private Integer innerNumber;
 
+    @ApiModelProperty("交易流水号(连连)")
+    private String txnSeqno;
 
     public void createD(String createId){
         this.createdBy = createId;
