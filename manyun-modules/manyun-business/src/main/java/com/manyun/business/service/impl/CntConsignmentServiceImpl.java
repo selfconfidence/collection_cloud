@@ -506,15 +506,15 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         ConsignmentCollectionListVo collectionListVo = Builder.of(ConsignmentCollectionListVo::new).build();
         collectionListVo.setCollectionVo(collectionService.getSoleBaseCollectionVo(cntConsignment.getRealBuiId()));
         // 脱敏
-        CntUserDto cntUserDto = remoteBuiUserService.commUni(cntConsignment.getSendUserId(), SecurityConstants.INNER).getData();
-        CntUserDto newCntUserDto = new CntUserDto();
-        newCntUserDto.setId(cntUserDto.getId());
-        newCntUserDto.setHeadImage(cntUserDto.getHeadImage());
-        newCntUserDto.setNickName(cntUserDto.getNickName());
-        newCntUserDto.setPhone(cntUserDto.getPhone());
-        newCntUserDto.setLinkAddr(cntUserDto.getLinkAddr());
-
-        collectionListVo.setCntUserDto(newCntUserDto);
+//        CntUserDto cntUserDto = remoteBuiUserService.commUni(cntConsignment.getSendUserId(), SecurityConstants.INNER).getData();
+//        CntUserDto newCntUserDto = new CntUserDto();
+//        newCntUserDto.setId(cntUserDto.getId());
+//        newCntUserDto.setHeadImage(cntUserDto.getHeadImage());
+//        newCntUserDto.setNickName(cntUserDto.getNickName());
+//        newCntUserDto.setPhone(cntUserDto.getPhone());
+//        newCntUserDto.setLinkAddr(cntUserDto.getLinkAddr());
+//
+//        collectionListVo.setCntUserDto(newCntUserDto);
         collectionListVo.setId(cntConsignment.getId());
         collectionListVo.setConsignmentStatus(cntConsignment.getConsignmentStatus());
        // collectionListVo.setCreatedTime(cntConsignment.getCreatedTime());
