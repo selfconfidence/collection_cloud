@@ -44,6 +44,8 @@ public interface ICollectionService extends IService<CntCollection> {
 
     CollectionVo getBaseCollectionVo(@NotNull String collectionId);
 
+    CollectionVo getSoleBaseCollectionVo(@NotNull String collectionId);
+
     UserCollectionForVo userCollectionInfo(String id);
 
     CollectionOrderAllVo orderInfo(String id);

@@ -720,6 +720,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Assert.isTrue(WAIT_ORDER.getCode().equals(order.getOrderStatus()),"待支付订单才可取消!");
         order.setOrderStatus(CANCEL_ORDER.getCode());
         order.updateD(order.getUserId());
+        if (!reloadAssert) {
+            order.setInnerNumber(1);
+        }
         updateById(order);
         BigDecimal moneyBln = order.getMoneyBln();
         if (Objects.nonNull(moneyBln) && moneyBln.compareTo(NumberUtil.add(0D)) >=1){

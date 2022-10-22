@@ -5,8 +5,6 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
@@ -31,7 +29,6 @@ import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.domain.redis.collection.CollectionAllRedisVo;
 import com.manyun.comm.api.domain.redis.collection.CollectionRedisVo;
-import com.manyun.comm.api.domain.redis.collection.LableRedisVo;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
@@ -45,17 +42,13 @@ import com.manyun.common.redis.service.BuiCronService;
 import com.manyun.common.redis.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
-import java.lang.System;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -695,6 +688,38 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     @Override
     public CollectionVo getBaseCollectionVo(@NotNull String collectionId){
         return providerCollectionVo(getById(collectionId));
+    }
+
+
+    /**
+     * 封装基础藏品信息
+     * @param collectionId
+     * @return
+     */
+    @Override
+    public CollectionVo getSoleBaseCollectionVo(@NotNull String collectionId){
+        CntCollection cntCollection = getById(collectionId);
+        CollectionVo collectionVo = Builder.of(CollectionVo::new).build();
+        BeanUtil.copyProperties(cntCollection,collectionVo);
+        // 数据隔离
+//        BuiCronDto typeBalanceCache = buiCronService.getTypeBalanceCache(COLLECTION_MODEL_TYPE, cntCollection.getId());
+//        collectionVo.setBalance(typeBalanceCache.getBalance());
+//        collectionVo.setSelfBalance(typeBalanceCache.getSelfBalance());
+//        if (cntCollection.getPublishTime().isAfter(LocalDateTime.now())) {
+//            collectionVo.setPreStatus(1);
+//        } else {
+//            collectionVo.setPreStatus(2);
+//        }
+//        if (Integer.valueOf(0).equals(cntCollection.getBalance())) {
+//            collectionVo.setStatusBy(2);
+//        }
+      //  collectionVo.setLableVos(initLableVos(cntCollection.getId()));
+        collectionVo.setMediaVos(initMediaVos(cntCollection.getId()));
+//        collectionVo.setThumbnailImgMediaVos(thumbnailImgMediaVos(cntCollection.getId()));
+//        collectionVo.setThreeDimensionalMediaVos(threeDimensionalMediaVos(cntCollection.getId()));
+        collectionVo.setCnfCreationdVo(initCnfCreationVo(cntCollection.getBindCreation()));
+        collectionVo.setCateVo(initCateVo(cntCollection.getCateId()));
+        return collectionVo;
     }
 
     @Override

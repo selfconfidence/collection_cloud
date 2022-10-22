@@ -85,6 +85,10 @@ public class Order implements Serializable {
     @ApiModelProperty("藏品名称")
     private String collectionName;
 
+    @ApiModelProperty("寄售限单数量")
+    private Integer innerNumber;
+
+
     public void createD(String createId){
         this.createdBy = createId;
         this.createdTime = LocalDateTime.now();
