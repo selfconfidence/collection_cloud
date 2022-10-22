@@ -718,7 +718,7 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
 //        collectionVo.setThumbnailImgMediaVos(thumbnailImgMediaVos(cntCollection.getId()));
 //        collectionVo.setThreeDimensionalMediaVos(threeDimensionalMediaVos(cntCollection.getId()));
         collectionVo.setCnfCreationdVo(initCnfCreationVo(cntCollection.getBindCreation()));
-        collectionVo.setCateVo(initCateVo(cntCollection.getCateId()));
+       // collectionVo.setCateVo(initCateVo(cntCollection.getCateId()));
         return collectionVo;
     }
 
