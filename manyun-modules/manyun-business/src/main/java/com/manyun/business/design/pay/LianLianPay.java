@@ -52,11 +52,18 @@ public class LianLianPay implements RootPayServer {
 
     @Override
     public PayVo execPayVo(PayInfoDto payInfoDto) {
+        IOrderService orderService = SpringUtil.getBean(IOrderService.class);
 
         if (PayTypeEnum.LIANLIAN_TYPE.getCode().equals(payInfoDto.getPayType())){
             Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId,payInfoDto.getUserId()));
             CntUserDto cntUserDto = remoteBuiUserService.commUni(payInfoDto.getUserId(), SecurityConstants.INNER).getData();
             String orderId = (payInfoDto.getOutHost() + "-" + LLianPayDateUtils.getTimestamp());
+            Order orderInfo = orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, payInfoDto.getOutHost()));
+            Assert.isTrue(Objects.nonNull(orderInfo),"未查询到该订单信息!");
+            if(!orderId.equals(orderInfo.getTxnSeqno())){
+                orderInfo.setTxnSeqno(orderId);
+                orderService.updateById(orderInfo);
+            }
             String body = LLPayUtils.generalConsume(
                     Builder.of(LLGeneralConsumeQuery::new)
                             .with(LLGeneralConsumeQuery::setOrderId, orderId)
