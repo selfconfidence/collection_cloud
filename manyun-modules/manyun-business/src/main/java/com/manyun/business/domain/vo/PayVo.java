@@ -22,4 +22,6 @@ public class PayVo implements Serializable {
 
     @ApiModelProperty(value = "0=余额支付，1=微信,2=支付宝,3=银联")
     private Integer payType;
+
+    private transient String txnSeqno;
 }

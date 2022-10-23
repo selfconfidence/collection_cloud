@@ -569,6 +569,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 走这一步如果 是余额支付 那就说明扣款成功了！！！
         order.setMoneyBln(order.getMoneyBln().add(payVo.getMoneyBln()));
         order.setPayType(orderPayForm.getPayType());
+        order.setTxnSeqno(payVo.getTxnSeqno());
         updateById(order);
         if ( StrUtil.isBlank(payVo.getBody())){
             // 调用完成订单 是寄售还是普通呢?
