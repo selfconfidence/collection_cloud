@@ -22,7 +22,9 @@ import com.manyun.admin.domain.vo.CntOrderVo;
 import com.manyun.admin.domain.vo.CollectionBusinessVo;
 import com.manyun.admin.domain.vo.CollectionSalesStatisticsVo;
 import com.manyun.admin.service.*;
+import com.manyun.comm.api.RemoteOrderService;
 import com.manyun.common.core.constant.BusinessConstants;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.DateUtils;
 import com.manyun.common.core.web.page.PageQuery;
@@ -33,6 +35,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.manyun.admin.mapper.CntConsignmentMapper;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
 
 import static com.manyun.common.core.enums.ConsignmentStatus.LOCK_CONSIGN;
 import static com.manyun.common.core.enums.ConsignmentStatus.PUSH_CONSIGN;
@@ -60,6 +64,9 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
 
     @Autowired
     private ICntMediaService mediaService;
+
+    @Resource
+    private RemoteOrderService remoteOrderService;
 
     /**
      * 订单管理列表
@@ -209,6 +216,12 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
 
         // 2. 删除当前寄售订单
         removeById(consignment.getId());
+        // 3. 取消订单状态
+        if (consignment.getConsignmentStatus().equals(LOCK_CONSIGN.getCode())){
+            remoteOrderService.cancelOpenOrder(consignment.getOrderId(), SecurityConstants.INNER);
+        }
+
+
     }
 
 }

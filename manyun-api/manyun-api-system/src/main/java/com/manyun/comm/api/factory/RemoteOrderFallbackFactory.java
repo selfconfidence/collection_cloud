@@ -31,6 +31,11 @@ public class RemoteOrderFallbackFactory implements FallbackFactory<RemoteOrderSe
             public R timeCancel(String source) {
                 return R.fail("获取用户失败:" + throwable.getMessage());
             }
+
+            @Override
+            public R cancelOpenOrder(String orderId, String source) {
+                return R.fail("获取用户失败:" + throwable.getMessage());
+            }
         };
     }
 }

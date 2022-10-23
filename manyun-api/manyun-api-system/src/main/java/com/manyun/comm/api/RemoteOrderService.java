@@ -1,6 +1,7 @@
 package com.manyun.comm.api;
 
 import com.manyun.comm.api.domain.SysUser;
+import com.manyun.comm.api.factory.RemoteOrderFallbackFactory;
 import com.manyun.comm.api.factory.RemoteUserFallbackFactory;
 import com.manyun.comm.api.model.LoginUser;
 import com.manyun.common.core.constant.SecurityConstants;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
  * 
  * @author ruoyi
  */
-@FeignClient(contextId = "remoteOrderService", value = ServiceNameConstants.BUSINESS_SERVICE, fallbackFactory = RemoteUserFallbackFactory.class)
+@FeignClient(contextId = "remoteOrderService", value = ServiceNameConstants.BUSINESS_SERVICE, fallbackFactory = RemoteOrderFallbackFactory.class)
 public interface RemoteOrderService
 {
     /**
@@ -25,4 +26,9 @@ public interface RemoteOrderService
     @GetMapping("/order/timeCancel")
      R timeCancel( @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 
+    /**
+     * 取消订单
+     */
+    @GetMapping("/order/cancelOpenOrder/{orderId}")
+    R cancelOpenOrder(@PathVariable("orderId") String orderId,@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 }
