@@ -51,6 +51,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             `cnt_user_box`
         WHERE
             box_id = #{goodId}
+            is_exist = 1
         GROUP BY
             user_id,
             box_id
@@ -70,6 +71,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <foreach item="boxId" collection="goodIds" open="(" separator="," close=")">
                 #{boxId}
             </foreach>
+            and is_exist = 1
         GROUP BY
             user_id,
             box_id,

@@ -86,6 +86,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             </foreach>
             and date_format(created_time,'%Y-%m-%d %H:%i:%s') &gt;= date_format(#{params.beginTime},'%Y-%m-%d %H:%i:%s')
             and date_format(created_time,'%Y-%m-%d %H:%i:%s') &lt;= date_format(#{params.endTime},'%Y-%m-%d %H:%i:%s')
+            and is_exist = 1
         <!-- 数据范围过滤 -->
         ${params.dataScope}
         GROUP BY
@@ -106,6 +107,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <where>
             <if test="userId != null  and userId != ''"> and uc.user_id = #{userId}</if>
             <if test="phone != null  and phone != ''"> and u.phone = #{phone}</if>
+             and uc.is_exist = 1
         </where>
         GROUP BY
             uc.user_id
@@ -118,6 +120,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             `cnt_user_collection`
         WHERE
             collection_id = #{goodId}
+            and is_exist = 1
         GROUP BY
             user_id,
             collection_id
@@ -137,6 +140,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <foreach item="collectionId" collection="goodIds" open="(" separator="," close=")">
                 #{collectionId}
             </foreach>
+            and is_exist = 1
         GROUP BY
             user_id,
             collection_id,

@@ -279,7 +279,12 @@ public class SnapshotServiceImpl implements ISnapshotService {
     @Override
     public TableDataInfo<CollectionNumberVo> collectionNumberQuery(CollectionNumberQuery collectionNumberQuery) {
         PageHelper.startPage(collectionNumberQuery.getPageNum(),collectionNumberQuery.getPageSize());
-        List<CntUserCollection> userCollectionList = userCollectionService.list(Wrappers.<CntUserCollection>lambdaQuery().eq(CntUserCollection::getCollectionId,collectionNumberQuery.getCollectionId()));
+        List<CntUserCollection> userCollectionList = userCollectionService.list(
+                Wrappers
+                        .<CntUserCollection>lambdaQuery()
+                        .eq(CntUserCollection::getCollectionId,collectionNumberQuery.getCollectionId())
+                        .eq(CntUserCollection::getIsExist,1)
+        );
         List<String> userIds = userCollectionList.stream().map(CntUserCollection::getUserId)
                 .collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(f -> f))), ArrayList::new));
         List<CntUser> users = userService.list(Wrappers.<CntUser>lambdaQuery().in(userIds.size()>0,CntUser::getId,userIds));
@@ -306,7 +311,12 @@ public class SnapshotServiceImpl implements ISnapshotService {
      */
     @Override
     public List<CollectionNumberVo> collectionNumberExcel(CollectionNumberQuery collectionNumberQuery) {
-        List<CntUserCollection> userCollectionList = userCollectionService.list(Wrappers.<CntUserCollection>lambdaQuery().eq(CntUserCollection::getCollectionId,collectionNumberQuery.getCollectionId()));
+        List<CntUserCollection> userCollectionList = userCollectionService.list(
+                Wrappers
+                        .<CntUserCollection>lambdaQuery()
+                        .eq(CntUserCollection::getCollectionId,collectionNumberQuery.getCollectionId())
+                        .eq(CntUserCollection::getIsExist,1)
+        );
         List<String> userIds = userCollectionList.stream().map(CntUserCollection::getUserId)
                 .collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(f -> f))), ArrayList::new));
         List<CntUser> users = userService.list(Wrappers.<CntUser>lambdaQuery().in(userIds.size()>0,CntUser::getId,userIds));
