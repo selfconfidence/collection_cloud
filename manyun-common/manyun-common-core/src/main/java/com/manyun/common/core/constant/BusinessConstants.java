@@ -201,6 +201,11 @@ public interface BusinessConstants {
         String WITHDRAW_CHARGE = "withdraw_charge";
 
         /**
+         * 平台提现手续费
+         */
+        String SYSTEM_WITHDRAW_CHARGE = "system_withdraw_charge";
+
+        /**
          * 寄售须知
          */
         String CONSIGNMENT_INFO = "consignment_info";

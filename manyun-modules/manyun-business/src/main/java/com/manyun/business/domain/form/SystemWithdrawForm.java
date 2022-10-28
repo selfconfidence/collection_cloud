@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -17,6 +18,10 @@ public class SystemWithdrawForm implements Serializable {
     @NotNull
     @Min(value = 1L,message = "提现最低一元起!")
     private BigDecimal withdrawAmount;
+
+    @ApiModelProperty("支付宝账号")
+    @NotBlank
+    private String aliAccount;
 
     @ApiModelProperty("支付密码")
     @NotNull

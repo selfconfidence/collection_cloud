@@ -29,6 +29,9 @@ public class CntSystemWithdraw implements Serializable {
     @ApiModelProperty("提现金额")
     private BigDecimal withdrawAmount;
 
+    @ApiModelProperty("实际到账金额")
+    private BigDecimal realWithdrawAmount;
+
     @ApiModelProperty("剩余余额")
     private BigDecimal moneyBalance;
 
@@ -40,6 +43,12 @@ public class CntSystemWithdraw implements Serializable {
 
     @ApiModelProperty("银行卡")
     private String bankCard;
+
+    @ApiModelProperty("支付宝账户")
+    private String aliAccount;
+
+    @ApiModelProperty("提现详情")
+    private String withdrawMsg;
 
     @ApiModelProperty("是否已打款（0未打款，1已打款）")
     private Integer withdrawStatus;

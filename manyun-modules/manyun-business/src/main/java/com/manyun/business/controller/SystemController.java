@@ -16,6 +16,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+
 import static com.manyun.common.core.constant.BusinessConstants.SystemTypeConstant.*;
 
 /**
@@ -77,6 +79,12 @@ public class SystemController {
     @ApiOperation("连连余额提现规则")
     public R<String> withdrawInfo() {
         return R.ok(systemService.getVal(WITHDRAW_INFO, String.class));
+    }
+
+    @GetMapping("/systemWithdrawCharge")
+    @ApiOperation("平台余额提现手续费比例")
+    public R<BigDecimal> systemWithdrawCharge() {
+        return R.ok(systemService.getVal(SYSTEM_WITHDRAW_CHARGE, BigDecimal.class));
     }
 
     @GetMapping("/systemWithdrawInfo")

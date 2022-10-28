@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.comm.api.RemoteBuiUserService;
 import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.domain.form.UserRealMoneyForm;
+import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
@@ -37,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -86,6 +88,9 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
 
     @Autowired
     private RedisService redisService;
+
+    @Autowired
+    private ISystemService systemService;
 
 
     /**
@@ -333,16 +338,21 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         Money userMoney = getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, userId));
         R<CntUserDto> cntUserDtoR = remoteBuiUserService.commUni(userId, SecurityConstants.INNER);
         CntUserDto data = cntUserDtoR.getData();
+        BigDecimal val = systemService.getVal(BusinessConstants.SystemTypeConstant.SYSTEM_WITHDRAW_CHARGE, BigDecimal.class);
         Assert.isTrue(systemWithdrawForm.getWithdrawAmount().compareTo(userMoney.getMoneyBalance()) <= 0, "提现金额不可大于钱包余额");
+        Assert.isTrue(systemWithdrawForm.getWithdrawAmount().compareTo(BigDecimal.valueOf(1)) > 0, "最小提现金额1元");
         Assert.isTrue(OK_REAL.getCode().equals(data.getIsReal()),"暂未实名认证,请实名认证!");
         Assert.isTrue(SecurityUtils.matchesPassword(systemWithdrawForm.getPayPass(),data.getPayPass()),"支付密码错误,请核实!");
         CntSystemWithdraw cntSystemWithdraw = new CntSystemWithdraw();
+        BigDecimal fee = systemWithdrawForm.getWithdrawAmount().multiply(val).compareTo(BigDecimal.valueOf(1)) > 0 ? systemWithdrawForm.getWithdrawAmount().multiply(val) : BigDecimal.valueOf(1);
         cntSystemWithdraw.setId(IdUtil.getSnowflakeNextIdStr());
         cntSystemWithdraw.setBankCard(userMoney.getBankCart());
         cntSystemWithdraw.setMoneyBalance(userMoney.getMoneyBalance().subtract(systemWithdrawForm.getWithdrawAmount()));
         cntSystemWithdraw.setWithdrawAmount(systemWithdrawForm.getWithdrawAmount());
         cntSystemWithdraw.setPhone(data.getPhone());
         cntSystemWithdraw.setUserName(userMoney.getRealName());
+        cntSystemWithdraw.setRealWithdrawAmount(systemWithdrawForm.getWithdrawAmount().subtract(fee).setScale(2, RoundingMode.DOWN));
+        cntSystemWithdraw.setAliAccount(systemWithdrawForm.getAliAccount());
         cntSystemWithdraw.createD(userId);
         withdrawService.save(cntSystemWithdraw);
         //先将余额扣掉
