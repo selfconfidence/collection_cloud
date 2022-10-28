@@ -32,7 +32,6 @@ import java.math.BigDecimal;
 @Slf4j
 @Getter
 public class AliComm extends CommPayAbs {
-    @Autowired
     private AliPayConfig aliPayApiConfig ;
 
     public AliComm(AliPayConfig aliPayApiConfig) {
