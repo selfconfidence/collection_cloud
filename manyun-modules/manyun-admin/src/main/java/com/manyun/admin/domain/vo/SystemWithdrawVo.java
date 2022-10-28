@@ -18,6 +18,10 @@ public class SystemWithdrawVo
     @ApiModelProperty("主键")
     private String id;
 
+    @Excel(name = "提现单号",width = 30)
+    @ApiModelProperty("提现单号")
+    private String orderNo;
+
     @Excel(name = "姓名")
     @ApiModelProperty("姓名")
     private String userName;
@@ -30,9 +34,21 @@ public class SystemWithdrawVo
     @ApiModelProperty("银行卡")
     private String bankCard;
 
+    @Excel(name = "支付宝账户")
+    @ApiModelProperty("支付宝账户")
+    private String aliAccount;
+
+    @Excel(name = "提现详情",width = 50)
+    @ApiModelProperty("提现详情")
+    private String withdrawMsg;
+
     @Excel(name = "提现金额")
     @ApiModelProperty("提现金额")
     private BigDecimal withdrawAmount;
+
+    @Excel(name = "实际到账金额")
+    @ApiModelProperty("实际到账金额")
+    private BigDecimal realWithdrawAmount;
 
     @Excel(name = "剩余余额")
     @ApiModelProperty("剩余余额")

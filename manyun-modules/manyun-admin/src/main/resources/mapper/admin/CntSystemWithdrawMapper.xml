@@ -16,10 +16,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createdTime"    column="created_time"    />
         <result property="updatedBy"    column="updated_by"    />
         <result property="updatedTime"    column="updated_time"    />
+        <result property="realWithdrawAmount"    column="real_withdraw_amount"    />
+        <result property="aliAccount"    column="ali_account"    />
+        <result property="withdrawMsg"    column="withdraw_msg"    />
+        <result property="orderNo"    column="order_no"    />
     </resultMap>
 
     <sql id="selectCntSystemWithdrawVo">
-        select id, withdraw_amount, money_balance, user_name, phone, bank_card, withdraw_status, created_by, created_time, updated_by, updated_time from cnt_system_withdraw
+        select id, withdraw_amount, money_balance, user_name, phone, bank_card, withdraw_status, created_by, created_time, updated_by, updated_time, real_withdraw_amount, ali_account, withdraw_msg, order_no from cnt_system_withdraw
     </sql>
 
     <select id="selectCntSystemWithdrawList" parameterType="CntSystemWithdraw" resultMap="CntSystemWithdrawResult">
