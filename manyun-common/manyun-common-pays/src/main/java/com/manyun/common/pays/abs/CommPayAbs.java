@@ -1,5 +1,6 @@
 package com.manyun.common.pays.abs;
 import cn.hutool.core.lang.Assert;
+import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.CertAlipayRequest;
 import com.alipay.api.DefaultAlipayClient;
@@ -54,9 +55,9 @@ public abstract class CommPayAbs {
 
     }
 
-    @SneakyThrows
     public AlipayClient initAliCertConfig() {
         //String privateKey = aliPrivateKey;
+        log.info("初始化支付宝配置----");
         CertAlipayRequest alipayConfig = new CertAlipayRequest();
         alipayConfig.setPrivateKey(aliPrivateKey);
         alipayConfig.setServerUrl("https://openapi.alipay.com/gateway.do");
@@ -68,7 +69,13 @@ public abstract class CommPayAbs {
         alipayConfig.setCertPath("cert/appCertPublicKey_2021003159664036.crt");
         alipayConfig.setAlipayPublicCertPath("cert/alipayCertPublicKey_RSA2.crt");
         alipayConfig.setRootCertPath("cert/alipayRootCert.crt");
-        AlipayClient alipayClient = new DefaultAlipayClient(alipayConfig);
+        AlipayClient alipayClient = null;
+        try {
+            alipayClient = new DefaultAlipayClient(alipayConfig);
+        } catch (AlipayApiException e) {
+            e.printStackTrace();
+        }
+        log.info(alipayClient.toString());
         return alipayClient;
     }
 
