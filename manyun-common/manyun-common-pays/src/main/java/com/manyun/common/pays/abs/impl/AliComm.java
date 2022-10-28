@@ -10,6 +10,7 @@ import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.AlipayFundTransUniTransferModel;
 import com.alipay.api.domain.AlipayTradeAppPayModel;
 import com.alipay.api.domain.Participant;
+import com.alipay.api.request.AlipayFundTransUniTransferRequest;
 import com.alipay.api.response.AlipayFundTransUniTransferResponse;
 import com.ijpay.alipay.AliPayApi;
 import com.manyun.common.core.domain.Builder;
@@ -22,7 +23,6 @@ import com.manyun.common.pays.model.PayWxModel;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 
@@ -48,8 +48,10 @@ public class AliComm extends CommPayAbs {
      */
     public String aliTransfer(String aliAccount, BigDecimal amount, String realName, String orderNo) throws AlipayApiException {
         log.info("支付宝配置----"+aliPayApiConfig.toString());
-        initAliConfig();
+        //initAliConfig();
         //AlipayFundTransToaccountTransferModel model = new AlipayFundTransToaccountTransferModel();
+        AlipayClient alipayClient = initAliCertConfig();
+        AlipayFundTransUniTransferRequest request = new AlipayFundTransUniTransferRequest();
         AlipayFundTransUniTransferModel model = new AlipayFundTransUniTransferModel();
         model.setOutBizNo(orderNo);
         log.info("支付宝商家对个人转账: 收款人:{},收款金额:{}",aliAccount,amount);
@@ -58,7 +60,9 @@ public class AliComm extends CommPayAbs {
         model.setTransAmount(amount.setScale(2,BigDecimal.ROUND_DOWN).toString());
         model.setOrderTitle("商家打款");
         model.setBizScene("DIRECT_TRANSFER");
-        String body = AliPayApi.uniTransferToResponse(model, null).getBody();
+        request.setBizModel(model);
+        String body = alipayClient.certificateExecute(request).getBody();
+        //String body = AliPayApi.uniTransferToResponse(model, null).getBody();
         //String body = AliPayApi.transferToResponse(model).getBody();
         //Assert.isTrue(JSON.parseObject(body).getJSONObject("alipay_fund_trans_uni_transfer_response").getString("code").equals("10000"),body);
         log.info(body);
