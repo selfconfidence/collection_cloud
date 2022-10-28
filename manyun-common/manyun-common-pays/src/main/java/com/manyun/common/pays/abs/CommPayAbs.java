@@ -7,6 +7,8 @@ import com.ijpay.wxpay.WxPayApiConfigKit;
 import com.manyun.common.pays.model.PayAliModel;
 import com.manyun.common.pays.model.PayWxModel;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Objects;
 
 /**
@@ -17,6 +19,7 @@ import java.util.Objects;
  * @author yanwei
  * @since 2020-12-17
  */
+@Slf4j
 public abstract class CommPayAbs {
 
 
@@ -27,6 +30,7 @@ public abstract class CommPayAbs {
     public void initAliConfig(){
         // 需要进行获取对应支付参数
         PayAliModel payModel = getAliModel();
+        log.info("进入阿里云配置------"+ payModel.toString());
         Assert.isTrue(Objects.nonNull(payModel),"暂不支持支付宝支付!");
         AliPayApiConfig aliPayApiConfig = AliPayApiConfig.builder()
                 .setAppId(payModel.getAliAppId())
