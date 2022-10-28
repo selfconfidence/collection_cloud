@@ -66,9 +66,9 @@ public abstract class CommPayAbs {
         alipayConfig.setSignType("RSA2");
         alipayConfig.setEncryptor("");
         alipayConfig.setFormat("json");
-        alipayConfig.setCertPath("/cert/appCertPublicKey_2021003159664036.crt");
-        alipayConfig.setAlipayPublicCertPath("/cert/alipayCertPublicKey_RSA2.crt");
-        alipayConfig.setRootCertPath("/cert/alipayRootCert.crt");
+        alipayConfig.setCertPath("/home/workspace/pay_certs/ali_key/appCertPublicKey_2021003159664036.crt");
+        alipayConfig.setAlipayPublicCertPath("/home/workspace/pay_certs/ali_key/alipayCertPublicKey_RSA2.crt");
+        alipayConfig.setRootCertPath("/home/workspace/pay_certs/ali_key/alipayRootCert.crt");
         AlipayClient alipayClient = null;
         try {
             alipayClient = new DefaultAlipayClient(alipayConfig);
