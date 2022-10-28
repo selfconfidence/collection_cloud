@@ -1,6 +1,12 @@
 package com.manyun.admin.service.impl;
 
 
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+import com.alipay.api.AlipayApiException;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.CntMoney;
@@ -13,11 +19,13 @@ import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.utils.bean.BeanUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import com.manyun.common.pays.abs.impl.AliComm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.manyun.admin.mapper.CntSystemWithdrawMapper;
 import com.manyun.admin.domain.CntSystemWithdraw;
 import com.manyun.admin.service.ICntSystemWithdrawService;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +41,9 @@ public class CntSystemWithdrawServiceImpl extends ServiceImpl<CntSystemWithdrawM
 {
     @Autowired
     private CntSystemWithdrawMapper cntSystemWithdrawMapper;
+
+    @Autowired
+    private AliComm aliComm;
 
 
     /**
@@ -59,9 +70,38 @@ public class CntSystemWithdrawServiceImpl extends ServiceImpl<CntSystemWithdrawM
      * @return
      */
     @Override
-    public int updateWithdrawStatus(UpdateWithDrawDto withDrawDto) {
-        CntSystemWithdraw systemWithdraw = Builder.of(CntSystemWithdraw::new).with(CntSystemWithdraw::setWithdrawStatus, 1).build();
-        return update(systemWithdraw, Wrappers.<CntSystemWithdraw>lambdaUpdate().eq(CntSystemWithdraw::getId,withDrawDto.getId())) == true?1:0;
+    @Transactional
+    public void updateWithdrawStatus(UpdateWithDrawDto withDrawDto) {
+        CntSystemWithdraw withdraw = getById(withDrawDto.getId());
+
+        String orderNo = IdUtil.objectId();
+
+        String orderInfo = "";
+        withdraw.setOrderNo(orderNo);
+        try {
+            orderInfo = aliComm.aliTransfer(withdraw.getAliAccount(), withdraw.getRealWithdrawAmount(), withdraw.getUserName(), orderNo);
+            if (StrUtil.isNotBlank(orderInfo)) {
+                JSONObject jsonObject = JSON.parseObject(orderInfo).getJSONObject("alipay_fund_trans_uni_transfer_response");
+                String code = jsonObject.getString("code");
+                String msg = jsonObject.getString("msg");
+                Assert.isTrue(JSON.parseObject(orderInfo).getJSONObject("alipay_fund_trans_uni_transfer_response").getString("code").equals("10000"),msg);
+                if ("10000".equals(code)) {
+                    withdraw.setWithdrawStatus(1);
+
+                } else {
+                    withdraw.setWithdrawStatus(0);
+                }
+                withdraw.setWithdrawMsg(msg);
+            }
+        } catch (AlipayApiException e) {
+            e.printStackTrace();
+        }
+
+        updateById(withdraw);
+
+
+        //CntSystemWithdraw systemWithdraw = Builder.of(CntSystemWithdraw::new).with(CntSystemWithdraw::setWithdrawStatus, 1).build();
+        //return update(systemWithdraw, Wrappers.<CntSystemWithdraw>lambdaUpdate().eq(CntSystemWithdraw::getId,withDrawDto.getId())) == true?1:0;
     }
 
     /**

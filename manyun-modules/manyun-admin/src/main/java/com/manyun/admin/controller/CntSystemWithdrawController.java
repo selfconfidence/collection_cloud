@@ -52,7 +52,9 @@ public class CntSystemWithdrawController extends BaseController
     @ApiOperation("修改打款状态")
     public R updateWithdrawStatus(@RequestBody UpdateWithDrawDto withDrawDto)
     {
-        return toResult(cntSystemWithdrawService.updateWithdrawStatus(withDrawDto));
+        //return toResult(cntSystemWithdrawService.updateWithdrawStatus(withDrawDto));
+        cntSystemWithdrawService.updateWithdrawStatus(withDrawDto);
+        return R.ok();
     }
 
     @PostMapping("/export")

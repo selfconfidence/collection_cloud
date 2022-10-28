@@ -22,6 +22,9 @@ public class CntSystemWithdraw implements Serializable
     @ApiModelProperty("提现金额")
     private BigDecimal withdrawAmount;
 
+    @ApiModelProperty("实际到账金额")
+    private BigDecimal realWithdrawAmount;
+
     @ApiModelProperty("剩余余额")
     private BigDecimal moneyBalance;
 
@@ -33,6 +36,15 @@ public class CntSystemWithdraw implements Serializable
 
     @ApiModelProperty("银行卡")
     private String bankCard;
+
+    @ApiModelProperty("支付宝账户")
+    private String aliAccount;
+
+    @ApiModelProperty("提现详情")
+    private String withdrawMsg;
+
+    @ApiModelProperty("提现单号")
+    private String orderNo;
 
     @ApiModelProperty("是否已打款（0未打款，1已打款）")
     private Integer withdrawStatus;
@@ -151,20 +163,57 @@ public class CntSystemWithdraw implements Serializable
         return updatedTime;
     }
 
+    public BigDecimal getRealWithdrawAmount() {
+        return realWithdrawAmount;
+    }
+
+    public void setRealWithdrawAmount(BigDecimal realWithdrawAmount) {
+        this.realWithdrawAmount = realWithdrawAmount;
+    }
+
+    public String getAliAccount() {
+        return aliAccount;
+    }
+
+    public void setAliAccount(String aliAccount) {
+        this.aliAccount = aliAccount;
+    }
+
+    public String getWithdrawMsg() {
+        return withdrawMsg;
+    }
+
+    public void setWithdrawMsg(String withdrawMsg) {
+        this.withdrawMsg = withdrawMsg;
+    }
+
+    public String getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
+    }
+
     @Override
     public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("withdrawAmount", getWithdrawAmount())
-            .append("moneyBalance", getMoneyBalance())
-            .append("userName", getUserName())
-            .append("phone", getPhone())
-            .append("bankCard", getBankCard())
-            .append("withdrawStatus", getWithdrawStatus())
-            .append("createdBy", getCreatedBy())
-            .append("createdTime", getCreatedTime())
-            .append("updatedBy", getUpdatedBy())
-            .append("updatedTime", getUpdatedTime())
-            .toString();
+        return "CntSystemWithdraw{" +
+                "id='" + id + '\'' +
+                ", withdrawAmount=" + withdrawAmount +
+                ", realWithdrawAmount=" + realWithdrawAmount +
+                ", moneyBalance=" + moneyBalance +
+                ", userName='" + userName + '\'' +
+                ", phone='" + phone + '\'' +
+                ", bankCard='" + bankCard + '\'' +
+                ", aliAccount='" + aliAccount + '\'' +
+                ", withdrawMsg='" + withdrawMsg + '\'' +
+                ", orderNo='" + orderNo + '\'' +
+                ", withdrawStatus=" + withdrawStatus +
+                ", createdBy='" + createdBy + '\'' +
+                ", createdTime=" + createdTime +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", updatedTime=" + updatedTime +
+                '}';
     }
+
 }

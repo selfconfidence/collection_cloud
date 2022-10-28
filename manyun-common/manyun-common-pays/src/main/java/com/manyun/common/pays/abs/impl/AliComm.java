@@ -10,6 +10,7 @@ import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.AlipayFundTransUniTransferModel;
 import com.alipay.api.domain.AlipayTradeAppPayModel;
 import com.alipay.api.domain.Participant;
+import com.alipay.api.response.AlipayFundTransUniTransferResponse;
 import com.ijpay.alipay.AliPayApi;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.enums.AliPayEnum;
@@ -43,22 +44,23 @@ public class AliComm extends CommPayAbs {
      * @param realName   支付宝真实姓名
      * @throws AlipayApiException
      */
-    public void aliTransfer(String aliAccount, BigDecimal amount, String realName) throws AlipayApiException {
+    public String aliTransfer(String aliAccount, BigDecimal amount, String realName, String orderNo) throws AlipayApiException {
         initAliConfig();
         //AlipayFundTransToaccountTransferModel model = new AlipayFundTransToaccountTransferModel();
         AlipayFundTransUniTransferModel model = new AlipayFundTransUniTransferModel();
-        model.setOutBizNo(UUID.fastUUID().toString(Boolean.TRUE));
+        model.setOutBizNo(orderNo);
         log.info("支付宝商家对个人转账: 收款人:{},收款金额:{}",aliAccount,amount);
         model.setProductCode("TRANS_ACCOUNT_NO_PWD");
         model.setPayeeInfo(Builder.of(Participant::new).with(Participant::setIdentity,aliAccount).with(Participant::setIdentityType,"ALIPAY_LOGON_ID").with(Participant::setName,realName).build());
         model.setTransAmount(amount.setScale(2,BigDecimal.ROUND_DOWN).toString());
-        model.setOrderTitle("xxxx");
+        model.setOrderTitle("商家打款");
         model.setBizScene("DIRECT_TRANSFER");
         String body = AliPayApi.uniTransferToResponse(model, null).getBody();
         //String body = AliPayApi.transferToResponse(model).getBody();
-        Assert.isTrue(JSON.parseObject(body).getJSONObject("alipay_fund_trans_uni_transfer_response").getString("code").equals("10000"),body);
+        //Assert.isTrue(JSON.parseObject(body).getJSONObject("alipay_fund_trans_uni_transfer_response").getString("code").equals("10000"),body);
         log.info(body);
         log.info("支付宝商家对个人转账: 收款人:{},收款金额:{}",aliAccount,amount);
+        return body;
     }
 
 

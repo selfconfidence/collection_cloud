@@ -50,6 +50,9 @@ public class CntSystemWithdraw implements Serializable {
     @ApiModelProperty("提现详情")
     private String withdrawMsg;
 
+    @ApiModelProperty("提现单号")
+    private String orderNo;
+
     @ApiModelProperty("是否已打款（0未打款，1已打款）")
     private Integer withdrawStatus;
 
