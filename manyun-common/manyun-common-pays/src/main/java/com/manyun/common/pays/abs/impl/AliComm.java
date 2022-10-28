@@ -22,6 +22,8 @@ import com.manyun.common.pays.model.PayWxModel;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.math.BigDecimal;
 
 /**
@@ -30,7 +32,8 @@ import java.math.BigDecimal;
 @Slf4j
 @Getter
 public class AliComm extends CommPayAbs {
-   private AliPayConfig aliPayApiConfig ;
+    @Autowired
+    private AliPayConfig aliPayApiConfig ;
 
     public AliComm(AliPayConfig aliPayApiConfig) {
         this.aliPayApiConfig = aliPayApiConfig;
