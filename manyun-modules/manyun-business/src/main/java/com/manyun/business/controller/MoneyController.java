@@ -1,5 +1,7 @@
 package com.manyun.business.controller;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.domain.entity.Money;
 import com.manyun.business.domain.form.AccountInfoForm;
@@ -149,6 +151,15 @@ public class MoneyController extends BaseController {
     public R systemWithdraw(@RequestBody @Valid SystemWithdrawForm systemWithdrawForm) {
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return moneyService.systemWithdraw(systemWithdrawForm, notNullLoginBusinessUser.getUserId());
+    }
+
+    @PostMapping("/getUserRealName")
+    @ApiOperation("获取用户姓名")
+    public R<String> getUserRealName() {
+        LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        Money userMoney = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, notNullLoginBusinessUser.getUserId()));
+        Assert.isTrue(StrUtil.isNotBlank(userMoney.getRealName()), "用户暂未实名");
+        return R.ok(userMoney.getRealName());
     }
 
 
