@@ -47,6 +47,7 @@ public class AliComm extends CommPayAbs {
      * @throws AlipayApiException
      */
     public String aliTransfer(String aliAccount, BigDecimal amount, String realName, String orderNo) throws AlipayApiException {
+        log.info("支付宝配置----"+aliPayApiConfig.toString());
         initAliConfig();
         //AlipayFundTransToaccountTransferModel model = new AlipayFundTransToaccountTransferModel();
         AlipayFundTransUniTransferModel model = new AlipayFundTransUniTransferModel();
