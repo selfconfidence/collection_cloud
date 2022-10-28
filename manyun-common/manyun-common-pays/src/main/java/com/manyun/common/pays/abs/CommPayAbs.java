@@ -73,6 +73,7 @@ public abstract class CommPayAbs {
         try {
             alipayClient = new DefaultAlipayClient(alipayConfig);
         } catch (AlipayApiException e) {
+            log.info(e.getMessage());
             e.printStackTrace();
         }
         log.info(alipayClient.toString());
