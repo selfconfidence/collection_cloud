@@ -32,6 +32,13 @@ public interface ICntSystemWithdrawService extends IService<CntSystemWithdraw>
      */
     void updateWithdrawStatus(UpdateWithDrawDto withDrawDto);
 
+
+    /**
+     * 取消打款
+     * @param withDrawDto
+     */
+    void cancelWithDraw(UpdateWithDrawDto withDrawDto);
+
     /**
      * 查询系统余额提现列表
      */

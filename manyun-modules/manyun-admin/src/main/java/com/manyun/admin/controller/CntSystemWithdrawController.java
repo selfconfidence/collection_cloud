@@ -51,6 +51,15 @@ public class CntSystemWithdrawController extends BaseController
         return R.ok();
     }
 
+    @PostMapping("/cancelWithDraw")
+    @ApiOperation("取消打款")
+    public R cancelWithDraw(@RequestBody UpdateWithDrawDto withDrawDto)
+    {
+        //return toResult(cntSystemWithdrawService.updateWithdrawStatus(withDrawDto));
+        cntSystemWithdrawService.cancelWithDraw(withDrawDto);
+        return R.ok();
+    }
+
     @PostMapping("/export")
     @ApiOperation("导出提现记录数据")
     public void export(HttpServletResponse response)

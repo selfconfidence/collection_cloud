@@ -10,11 +10,14 @@ import com.alipay.api.AlipayApiException;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.manyun.admin.domain.CntMoney;
+import com.manyun.admin.domain.CntUser;
 import com.manyun.admin.domain.dto.UpdateWithDrawDto;
 import com.manyun.admin.domain.query.SystemWithdrawQuery;
 import com.manyun.admin.domain.vo.CntPostSellVo;
 import com.manyun.admin.domain.vo.SystemWithdrawVo;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.admin.service.ICntMoneyService;
+import com.manyun.admin.service.ICntUserService;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.utils.bean.BeanUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
@@ -28,6 +31,7 @@ import com.manyun.admin.service.ICntSystemWithdrawService;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -44,6 +48,12 @@ public class CntSystemWithdrawServiceImpl extends ServiceImpl<CntSystemWithdrawM
 
     @Autowired
     private AliComm aliComm;
+
+    @Autowired
+    private ICntMoneyService moneyService;
+
+    @Autowired
+    private ICntUserService userService;
 
 
     /**
@@ -102,6 +112,27 @@ public class CntSystemWithdrawServiceImpl extends ServiceImpl<CntSystemWithdrawM
 
         //CntSystemWithdraw systemWithdraw = Builder.of(CntSystemWithdraw::new).with(CntSystemWithdraw::setWithdrawStatus, 1).build();
         //return update(systemWithdraw, Wrappers.<CntSystemWithdraw>lambdaUpdate().eq(CntSystemWithdraw::getId,withDrawDto.getId())) == true?1:0;
+    }
+
+    @Override
+    @Transactional
+    public void cancelWithDraw(UpdateWithDrawDto withDrawDto) {
+        CntSystemWithdraw withdraw = getById(withDrawDto.getId());
+        Assert.isTrue(Objects.nonNull(withdraw), "未找到该打款订单，请核实");
+        Assert.isTrue(Integer.valueOf(0).equals(withdraw.getWithdrawStatus()), "打款状态有误，请核实");
+        withdraw.setWithdrawStatus(2);
+        CntMoney cntMoney = null;
+        //兼容旧数据
+        if (StrUtil.isNotBlank(withdraw.getUserId())) {
+            cntMoney = moneyService.getOne(Wrappers.<CntMoney>lambdaQuery().eq(CntMoney::getUserId, withdraw.getUserId()));
+        } else {
+            CntUser cntUser = userService.getOne(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getPhone, withdraw.getPhone()));
+            cntMoney = moneyService.getOne(Wrappers.<CntMoney>lambdaQuery().eq(CntMoney::getUserId, cntUser.getId()));
+        }
+        cntMoney.setMoneyBalance(cntMoney.getMoneyBalance().add(withdraw.getWithdrawAmount()));
+        moneyService.updateById(cntMoney);
+        updateById(withdraw);
+
     }
 
     /**

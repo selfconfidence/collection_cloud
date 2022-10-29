@@ -26,6 +26,9 @@ public class CntSystemWithdraw implements Serializable {
     @ApiModelProperty("主键")
     private String id;
 
+    @ApiModelProperty("用户id")
+    private String userId;
+
     @ApiModelProperty("提现金额")
     private BigDecimal withdrawAmount;
 

@@ -19,6 +19,9 @@ public class CntSystemWithdraw implements Serializable
     @ApiModelProperty("主键")
     private String id;
 
+    @ApiModelProperty("用户id")
+    private String userId;
+
     @ApiModelProperty("提现金额")
     private BigDecimal withdrawAmount;
 
@@ -46,7 +49,7 @@ public class CntSystemWithdraw implements Serializable
     @ApiModelProperty("提现单号")
     private String orderNo;
 
-    @ApiModelProperty("是否已打款（0未打款，1已打款）")
+    @ApiModelProperty("是否已打款（0未打款，1已打款, 2取消打款）")
     private Integer withdrawStatus;
 
     @ApiModelProperty("创建人")
@@ -62,6 +65,14 @@ public class CntSystemWithdraw implements Serializable
     @ApiModelProperty("更新时间")
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedTime;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public void setId(String id)
     {
@@ -199,6 +210,7 @@ public class CntSystemWithdraw implements Serializable
     public String toString() {
         return "CntSystemWithdraw{" +
                 "id='" + id + '\'' +
+                ", userId='" + userId + '\'' +
                 ", withdrawAmount=" + withdrawAmount +
                 ", realWithdrawAmount=" + realWithdrawAmount +
                 ", moneyBalance=" + moneyBalance +

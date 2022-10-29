@@ -346,6 +346,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         CntSystemWithdraw cntSystemWithdraw = new CntSystemWithdraw();
         BigDecimal fee = systemWithdrawForm.getWithdrawAmount().multiply(val).compareTo(BigDecimal.valueOf(1)) > 0 ? systemWithdrawForm.getWithdrawAmount().multiply(val) : BigDecimal.valueOf(1);
         cntSystemWithdraw.setId(IdUtil.getSnowflakeNextIdStr());
+        cntSystemWithdraw.setUserId(data.getUserId());
         cntSystemWithdraw.setBankCard(userMoney.getBankCart());
         cntSystemWithdraw.setMoneyBalance(userMoney.getMoneyBalance().subtract(systemWithdrawForm.getWithdrawAmount()));
         cntSystemWithdraw.setWithdrawAmount(systemWithdrawForm.getWithdrawAmount());
