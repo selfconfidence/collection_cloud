@@ -148,7 +148,7 @@ public class MoneyController extends BaseController {
 
     @PostMapping("/systemWithdraw")
     @ApiOperation("系统余额提现")
-    public R systemWithdraw(@RequestBody @Valid SystemWithdrawForm systemWithdrawForm) {
+    public R systemWithdraw(@RequestBodyRsa @Valid SystemWithdrawForm systemWithdrawForm) {
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return moneyService.systemWithdraw(systemWithdrawForm, notNullLoginBusinessUser.getUserId());
     }
