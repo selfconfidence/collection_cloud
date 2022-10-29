@@ -166,7 +166,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
             if (Objects.nonNull(consignmentQuery.getPriceOrder()) && Integer.valueOf(1).equals(consignmentQuery.getPriceOrder()))
                 lambdaQueryWrapper.orderByAsc(CntConsignment::getConsignmentPrice);
             if (Objects.isNull(consignmentQuery.getPriceOrder()))
-                lambdaQueryWrapper.orderByDesc(CntConsignment::getConsignmentPrice);
+                lambdaQueryWrapper.orderByAsc(CntConsignment::getConsignmentPrice);
         }
 
 
