@@ -15,6 +15,7 @@ import com.manyun.business.service.IMoneyService;
 import com.manyun.comm.api.domain.dto.AccountInfoDto;
 import com.manyun.comm.api.domain.form.UserRealMoneyForm;
 import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.annotation.Lock;
 import com.manyun.common.core.annotation.RequestBodyRsa;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
@@ -148,6 +149,7 @@ public class MoneyController extends BaseController {
 
     @PostMapping("/systemWithdraw")
     @ApiOperation("系统余额提现")
+    @Lock("systemWithdraw")
     public R systemWithdraw(@RequestBodyRsa @Valid SystemWithdrawForm systemWithdrawForm) {
         LoginBusinessUser notNullLoginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         return moneyService.systemWithdraw(systemWithdrawForm, notNullLoginBusinessUser.getUserId());
