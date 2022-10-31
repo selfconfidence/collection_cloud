@@ -6,14 +6,13 @@ import cn.hutool.core.net.Ipv4Util;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Lists;
 import com.manyun.business.design.pay.RootPay;
-import com.manyun.business.domain.dto.MsgCommDto;
-import com.manyun.business.domain.dto.MsgThisDto;
-import com.manyun.business.domain.dto.OrderCreateDto;
-import com.manyun.business.domain.dto.PayInfoDto;
+import com.manyun.business.domain.dto.*;
 import com.manyun.business.domain.entity.*;
 import com.manyun.business.domain.form.ConsignmentOrderSellForm;
 import com.manyun.business.domain.form.ConsignmentSellForm;
@@ -51,6 +50,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.manyun.common.core.constant.BusinessConstants.ModelTypeConstant.COLLECTION_MODEL_TYPE;
 import static com.manyun.common.core.constant.BusinessConstants.SystemTypeConstant.CONSIGNMENT_DE_TIME;
 import static com.manyun.common.core.enums.AliPayEnum.BOX_ALI_PAY;
 import static com.manyun.common.core.enums.AliPayEnum.CONSIGNMENT_ALI_PAY;
@@ -108,6 +108,9 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
     @Autowired
     private IMoneyService moneyService;
 
+    @Autowired
+    private IMediaService mediaService;
+
 
     /**
      * 资产挂卖寄售市场
@@ -146,6 +149,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
      * @return
      */
     private LambdaQueryWrapper<CntConsignment> getCntConsignmentLambdaQueryWrapper(ConsignmentQuery consignmentQuery,Integer isType) {
+        log.info(JSON.toJSONString(consignmentQuery));
         LambdaQueryWrapper<CntConsignment> lambdaQueryWrapper = Wrappers.<CntConsignment>lambdaQuery();
         // 硬性条件查询
         lambdaQueryWrapper.eq(CntConsignment::getIsType,isType);
@@ -398,6 +402,24 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
         // 发送通知
         CntUserDto cntUserDto = remoteBuiUserService.commUni(cntConsignment.getSendUserId(), SecurityConstants.INNER).getData();
         remoteSmsService.sendCommPhone(Builder.<SmsCommDto>of(SmsCommDto::new).with(SmsCommDto::setTemplateCode, BusinessConstants.SmsTemplateNumber.ASSERT_SUCCESS).with(SmsCommDto::setParamsMap, MapUtil.<String,String>builder().put("money", realMoney.toString()).put("buiName",cntConsignment.getBuiName() ).build()).with(SmsCommDto::setPhoneNumber,cntUserDto.getPhone()).build());
+    }
+
+    @Override
+    public List<ConsignmentOpenListVo> openConsignmentList() {
+        List<ConsignmentOpenListVo> listVoList = Lists.newArrayList();
+       List<ConsignmentOpenDto> consignmentOpenDtos =  baseMapper.openConsignmentList();
+        for (ConsignmentOpenDto consignmentOpenDto : consignmentOpenDtos) {
+            ConsignmentOpenListVo consignmentOpenListVo = new ConsignmentOpenListVo();
+            consignmentOpenListVo.setName(consignmentOpenDto.getName());
+            List<MediaVo> mediaVos = mediaService.initMediaVos(consignmentOpenDto.getBuiId(), COLLECTION_MODEL_TYPE);
+            if (!mediaVos.isEmpty()) {
+                consignmentOpenListVo.setImage(mediaVos.get(0).getMediaUrl());
+            }
+            consignmentOpenListVo.setPrice(consignmentOpenDto.getPrice());
+
+            listVoList.add(consignmentOpenListVo);
+        }
+        return listVoList;
     }
 
     private void cancelConsignment(CntConsignment cntConsignment) {

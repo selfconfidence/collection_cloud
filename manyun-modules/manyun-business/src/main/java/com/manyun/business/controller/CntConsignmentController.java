@@ -46,6 +46,12 @@ public class CntConsignmentController {
     @Autowired
     private ICntConsignmentService cntConsignmentService;
 
+    @GetMapping("/openConsignmentList")
+    public R<List<ConsignmentOpenListVo>> openConsignmentList(){
+
+        return R.ok(cntConsignmentService.openConsignmentList());
+    }
+
 
     @GetMapping("/queryDict/{keyword}")
     @ApiOperation(value = "/根据词条 查询寄售 藏品|盲盒 完整 标题信息",notes = "返回的都是 藏品|盲盒词条完整信息,已寄售状态的寄售业务名称")

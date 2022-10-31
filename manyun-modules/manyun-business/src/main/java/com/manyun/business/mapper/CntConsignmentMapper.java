@@ -1,7 +1,10 @@
 package com.manyun.business.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.manyun.business.domain.dto.ConsignmentOpenDto;
 import com.manyun.business.domain.entity.CntConsignment;
+
+import java.util.List;
 
 /**
  * <p>
@@ -12,5 +15,7 @@ import com.manyun.business.domain.entity.CntConsignment;
  * @since 2022-06-30
  */
 public interface CntConsignmentMapper extends BaseMapper<CntConsignment> {
+
+    List<ConsignmentOpenDto> openConsignmentList();
 
 }
