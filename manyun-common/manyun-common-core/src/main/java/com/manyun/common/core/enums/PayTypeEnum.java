@@ -12,7 +12,8 @@ import lombok.Getter;
 @Getter
 public enum PayTypeEnum
 {
-    WECHAT_TYPE(Integer.valueOf(1), "微信"), ALI_TYPE(2, "支付宝"), MONEY_TAPE(0, "余额"), CART_TAPE(3, "银联"), SHANDE_TYPE(4, "杉德"), LIANLIAN_TYPE(5, "连连支付");
+    WECHAT_TYPE(Integer.valueOf(1), "微信"), ALI_TYPE(2, "支付宝"), MONEY_TAPE(0, "余额"), CART_TAPE(3, "银联"),
+    SHANDE_TYPE(4, "杉德"), LIANLIAN_TYPE(5, "连连支付"), SANDWALLET_TYPE(6, "杉德钱包");
 
     private final Integer code;
     private final String info;
