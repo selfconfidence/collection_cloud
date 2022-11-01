@@ -12,10 +12,10 @@ import com.manyun.common.core.enums.SandAccountEnum;
 import com.manyun.common.security.utils.SecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,14 +35,15 @@ public class SandAccountController {
 
     @PostMapping("/openAccount")
     @ApiOperation("云账户开户")
-    public R<String> openAccount(@Valid @RequestBody OpenAccountForm form) {
+    public R<String> openAccount(@Valid @RequestBody OpenAccountForm openAccountForm) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         OpenAccountParams params = new OpenAccountParams();
         params.setUserId(loginBusinessUser.getUserId());
         Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId,loginBusinessUser.getUserId()));
         params.setUserName(money.getRealName());
         params.setNotifyUrl(url + SandAccountEnum.OPEN_ACCOUNT.getNotifyUrl());
-        params.setReturnUrl(form.getReturnUrl());
+        params.setReturnUrl(openAccountForm.getReturnUrl());
         return R.ok(SandPayUtil.openAccount(params));
     }
+
 }
