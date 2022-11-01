@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/sandAccount")
 @Api(tags = "杉德云账户相关api")
@@ -33,7 +35,7 @@ public class SandAccountController {
 
     @PostMapping("/openAccount")
     @ApiOperation("云账户开户")
-    public R<String> openAccount(@RequestBody OpenAccountForm form) {
+    public R<String> openAccount(@Valid @RequestBody OpenAccountForm form) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         OpenAccountParams params = new OpenAccountParams();
         params.setUserId(loginBusinessUser.getUserId());
