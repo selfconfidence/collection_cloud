@@ -289,6 +289,7 @@ public class SandPayUtil {
 
 
     public static String openAccount(OpenAccountParams openAccountParams) {
+        log.info("杉德开户参数----" + openAccountParams.toString());
         SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMddHHmmss");
         Calendar calendar = Calendar.getInstance();
         String createTime = sdf.format(calendar.getTime());
