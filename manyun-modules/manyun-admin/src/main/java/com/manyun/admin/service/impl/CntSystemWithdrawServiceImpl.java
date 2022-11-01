@@ -83,7 +83,7 @@ public class CntSystemWithdrawServiceImpl extends ServiceImpl<CntSystemWithdrawM
     @Transactional
     public void updateWithdrawStatus(UpdateWithDrawDto withDrawDto) {
         CntSystemWithdraw withdraw = getById(withDrawDto.getId());
-
+        Assert.isTrue(Integer.valueOf(0).equals(withdraw.getWithdrawStatus()), "打款状态有误，请核实");
         String orderNo = IdUtil.objectId();
 
         String orderInfo = "";
