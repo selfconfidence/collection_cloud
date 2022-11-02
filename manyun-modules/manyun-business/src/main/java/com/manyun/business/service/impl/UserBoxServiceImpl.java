@@ -185,8 +185,9 @@ public class UserBoxServiceImpl extends ServiceImpl<UserBoxMapper, UserBox> impl
         );
 
         // 流转记录
-      stepService.saveBatch(StepDto.builder().buiId(buiId).userId(tranUserId).modelType(BOX_MODEL_TYPE).reMark("转让方").formInfo(formatTran).build()
-      ,StepDto.builder().buiId(buiId).userId(toUserId).modelType(BOX_MODEL_TYPE).reMark("受让方").formInfo(format).build()
+        //StepDto.builder().buiId(buiId).userId(tranUserId).modelType(BOX_MODEL_TYPE).reMark("转让方").formInfo(formatTran).build()
+        //      ,
+      stepService.saveBatch(StepDto.builder().buiId(buiId).userId(toUserId).modelType(BOX_MODEL_TYPE).reMark("受让方").formInfo(format).build()
       );
 
 

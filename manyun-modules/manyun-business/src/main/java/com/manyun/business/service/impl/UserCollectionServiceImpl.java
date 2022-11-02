@@ -251,9 +251,8 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
        userCollection.setIsLink(OK_LINK.getCode());
        userCollection.createD(toUserId);
        save(userCollection);
-       stepService.saveBatch(StepDto.builder().buiId(userCollection.getLinkAddr()).userId(tranUserId).modelType(COLLECTION_MODEL_TYPE).reMark("转让方").formHash(oldCollectionHash).formInfo(formatTran).build()
-               ,StepDto.builder().buiId(userCollection.getLinkAddr()).userId(toUserId).modelType(COLLECTION_MODEL_TYPE).formHash(oldCollectionHash).reMark("受让方").formInfo(format).build()
-       );
+       //StepDto.builder().buiId(userCollection.getLinkAddr()).userId(tranUserId).modelType(COLLECTION_MODEL_TYPE).reMark("转让方").formHash(oldCollectionHash).formInfo(formatTran).build()
+       stepService.saveBatch(StepDto.builder().buiId(userCollection.getLinkAddr()).userId(toUserId).modelType(COLLECTION_MODEL_TYPE).formHash(oldCollectionHash).reMark("受让方").formInfo(format).build());
 
        // 开始转赠
        /*myChainService.tranForm(CallTranDto.builder()
