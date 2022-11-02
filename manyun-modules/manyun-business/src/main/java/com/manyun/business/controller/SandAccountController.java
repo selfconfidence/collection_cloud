@@ -2,6 +2,7 @@ package com.manyun.business.controller;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.design.pay.SandPayUtil;
+import com.manyun.business.design.pay.bean.sandAccount.AccountParamsForApp;
 import com.manyun.business.design.pay.bean.sandAccount.OpenAccountForm;
 import com.manyun.business.design.pay.bean.sandAccount.OpenAccountParams;
 import com.manyun.business.domain.entity.Money;
@@ -44,6 +45,20 @@ public class SandAccountController {
         params.setNotifyUrl(url + SandAccountEnum.OPEN_ACCOUNT.getNotifyUrl());
         params.setReturnUrl(openAccountForm.getReturnUrl());
         return R.ok(SandPayUtil.openAccount(params));
+    }
+
+
+    @PostMapping("/openAccountForApp")
+    @ApiOperation("云账户开户(app使用)")
+    public R<AccountParamsForApp> openAccountForApp(@Valid @RequestBody OpenAccountForm openAccountForm) {
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        OpenAccountParams params = new OpenAccountParams();
+        params.setUserId(loginBusinessUser.getUserId());
+        Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId,loginBusinessUser.getUserId()));
+        params.setUserName(money.getRealName());
+        params.setNotifyUrl(url + SandAccountEnum.OPEN_ACCOUNT.getNotifyUrl());
+        params.setReturnUrl(openAccountForm.getReturnUrl());
+        return R.ok(SandPayUtil.openAccountForApp(params));
     }
 
 }

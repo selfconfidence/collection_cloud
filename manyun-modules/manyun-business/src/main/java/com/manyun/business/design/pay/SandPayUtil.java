@@ -401,6 +401,55 @@ public class SandPayUtil {
     }
 
 
+    public static AccountParamsForApp openAccountForApp(OpenAccountParams openAccountParams) {
+        AccountParamsForApp accountParamsForApp = new AccountParamsForApp();
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMddHHmmss");
+        Calendar calendar = Calendar.getInstance();
+        String createTime = sdf.format(calendar.getTime());
+        calendar.add(Calendar.HOUR,1);
+        String endTime = sdf.format(calendar.getTime());
+
+        String version = "10";
+        //商户号
+        String mer_no = "6888801048981";
+        //商户key1
+        String mer_key = "PZWgkPqM09qpDbUngCDdGL5kgg/9jDd3wvZUn87m0CnI6CklVzmtMi2AkXOd7P4xWmEjjzEo5bo=";
+        //订单号
+
+        String mer_order_no = IdUtil.objectId();
+        //回调地址
+        String notify_url = openAccountParams.getNotifyUrl();
+
+        String return_url = openAccountParams.getReturnUrl();
+        //金额
+        String order_amt = "0.5";
+        //商品名称
+        String goods_name = "开户";
+        String userId = openAccountParams.getUserId();
+        String nickName = openAccountParams.getUserName();
+
+        String create_ip = IpUtils.getIpAddr(ServletUtils.getRequest()).replace(".","_");
+        //支付扩展域
+        //"userId":"用户在商户系统中的唯一编号", "nickName":"会员昵称","accountType"："账户类型"  （选填）
+        String pay_extra = "{\"userId\":\""+ userId +"\",\"nickName\":\""+nickName+"\",\"accountType\":\"1\"}";
+
+        accountParamsForApp.setUserId(userId);
+        accountParamsForApp.setNickName(nickName);
+        accountParamsForApp.setMer_order_no(mer_order_no);
+        accountParamsForApp.setCreate_time(createTime);
+        accountParamsForApp.setOrder_amt(order_amt);
+        accountParamsForApp.setNotify_url(notify_url);
+        accountParamsForApp.setCreate_ip(create_ip);
+        accountParamsForApp.setPay_extra(pay_extra);
+        accountParamsForApp.setAccsplit_flag("NO");
+        accountParamsForApp.setExpire_time(endTime);
+        accountParamsForApp.setGoods_name(goods_name);
+        accountParamsForApp.setProduct_code("00000001");
+
+        return accountParamsForApp;
+    }
+
+
     /**
      * 个人会员注册并开户
      * 需要先发送短信，然后再调用协议签约接口签约才算开户成功
