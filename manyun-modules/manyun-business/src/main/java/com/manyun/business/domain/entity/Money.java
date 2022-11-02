@@ -64,6 +64,9 @@ public class Money implements Serializable {
     @ApiModelProperty("连连开户状态")
     private String llAccountStatus;
 
+    @ApiModelProperty("杉德钱包开户状态: 0未开户，1已开户")
+    private Integer sandAccountStatus;
+
     @ApiModelProperty("创建人")
     private String createdBy;
 

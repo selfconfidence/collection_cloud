@@ -1,9 +1,6 @@
 package com.manyun.business.domain.dto;
 
-import com.manyun.common.core.enums.AliPayEnum;
-import com.manyun.common.core.enums.LianLianPayEnum;
-import com.manyun.common.core.enums.ShandePayEnum;
-import com.manyun.common.core.enums.WxPayEnum;
+import com.manyun.common.core.enums.*;
 import lombok.Builder;
 import lombok.Data;
 
@@ -33,6 +30,7 @@ public class PayInfoDto implements Serializable {
     private WxPayEnum wxPayEnum;
     private ShandePayEnum shandePayEnum;
     private LianLianPayEnum lianlianPayEnum;
+    private SandAccountEnum sandAccountEnum;
 
     //收款方用户id
     private String receiveUserId;
@@ -42,6 +40,9 @@ public class PayInfoDto implements Serializable {
 
     //服务费，连连支付需传
     private BigDecimal serviceCharge;
+
+    //C2C(TRUE),C2B(FALESE)
+    private boolean c2c;
 
 
 
