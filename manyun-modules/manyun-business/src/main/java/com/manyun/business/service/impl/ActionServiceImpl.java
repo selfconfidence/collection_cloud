@@ -219,7 +219,8 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
 
         //删除需消耗的合成材料
         actionTarList.stream().forEach(e ->{
-            userCollectionService.deleteMaterial(userId,e.getCollectionId(),e.getDeleteNum());
+            //userCollectionService.deleteMaterial(userId,e.getCollectionId(),e.getDeleteNum());
+            userCollectionService.updateMaterial(userId, e.getCollectionId(), e.getDeleteNum());
         });
 
         //增加用户收藏
