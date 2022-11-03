@@ -778,6 +778,8 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
            stepVo.setHeadImage(cntUserDto.getHeadImage());
            stepVo.setUserHostId(cntUserDto.getUserId());
            stepVo.setNickName(cntUserDto.getNickName());
+           // HASH 省略号
+           stepVo.setFormHash(stepVo.getFormHash().substring(0,stepVo.getFormHash().length() - 3).concat("***"));
            return stepVo;
        } ).collect(Collectors.toList());
 
