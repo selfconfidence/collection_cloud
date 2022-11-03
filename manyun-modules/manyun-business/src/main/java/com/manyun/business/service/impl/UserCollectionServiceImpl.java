@@ -429,6 +429,15 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         userCollectionMapper.deleteMaterial(userId,collectionId,deleteNum);
     }
 
+    @Override
+    public void updateMaterial(String userId,String collectionId, Integer deleteNum) {
+        List<UserCollection> list = list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getCollectionId, collectionId).eq(UserCollection::getUserId, userId));
+        for (int i=0; i<deleteNum; i++ ) {
+            list.get(i).setIsExist(2);
+        }
+        updateBatchById(list);
+    }
+
 
     @Override
     public String showUserCollection(String userId, String buiId, String info) {

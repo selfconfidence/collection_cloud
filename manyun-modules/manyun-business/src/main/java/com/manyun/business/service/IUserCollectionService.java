@@ -39,6 +39,7 @@ public interface IUserCollectionService extends IService<UserCollection> {
 
     void deleteMaterial(String userId,String collectionId, Integer deleteNum);
 
+    void updateMaterial(String userId,String collectionId, Integer deleteNum);
 
     String hideUserCollection(String buiId, String userId, String info);
 
