@@ -431,7 +431,7 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
 
     @Override
     public void updateMaterial(String userId,String collectionId, Integer deleteNum) {
-        List<UserCollection> list = list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getCollectionId, collectionId).eq(UserCollection::getUserId, userId));
+        List<UserCollection> list = list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getCollectionId, collectionId).eq(UserCollection::getUserId, userId).eq(UserCollection::getIsExist, 1));
         for (int i=0; i<deleteNum; i++ ) {
             list.get(i).setIsExist(2);
         }
