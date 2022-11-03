@@ -123,6 +123,7 @@
         cnt_user_collection
         where
         user_id = #{userId}
+        and is_exist = 1
         and collection_id in
         <foreach close=")" collection="collectionIds" item="collectionId" open="(" separator=",">
             #{collectionId}
