@@ -12,4 +12,8 @@
             LEFT JOIN cnt_money m ON u.id = m.user_id where u.id=#{userId}
     </select>
 
+    <update id="updateLock">
+        update cnt_money set money_balance =  money_balance - #{withdrawAmount} WHERE user_id = #{userId} and money_balance >=#{withdrawAmount};
+    </update>
+
 </mapper>

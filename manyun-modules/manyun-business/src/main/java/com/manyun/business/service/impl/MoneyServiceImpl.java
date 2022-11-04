@@ -363,8 +363,12 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
         cntSystemWithdraw.createD(userId);
         withdrawService.save(cntSystemWithdraw);
         //先将余额扣掉
-        userMoney.setMoneyBalance(userMoney.getMoneyBalance().subtract(systemWithdrawForm.getWithdrawAmount()));
-        updateById(userMoney);
+        //userMoney.setMoneyBalance(userMoney.getMoneyBalance().subtract(systemWithdrawForm.getWithdrawAmount()));
+        //updateById(userMoney);
+        int rows = moneyMapper.updateLock(userId, systemWithdrawForm.getWithdrawAmount());
+        if (rows == 0) {
+            return R.fail("余额有误，请核实");
+        }
         return R.ok();
     }
 
