@@ -150,7 +150,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="collectionNumber" resultMap="com.manyun.admin.domain.vo.CollectionNumberVo">
         SELECT
-           c.id,
+           c.id as userId,
            c.phone,
            c.link_addr,
            b.collection_name,
