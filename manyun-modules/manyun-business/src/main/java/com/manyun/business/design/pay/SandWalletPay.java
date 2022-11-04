@@ -17,6 +17,7 @@ import com.manyun.common.core.enums.PayTypeEnum;
 import com.manyun.common.pays.utils.llpay.LLianPayDateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -27,6 +28,10 @@ public class SandWalletPay implements RootPayServer {
 
     @Autowired
     private IMoneyService moneyService;
+
+    @Value("${open.url}")
+    private String url;
+
 
     @Override
     public PayVo execPayVo(PayInfoDto payInfoDto) {
@@ -41,12 +46,12 @@ public class SandWalletPay implements RootPayServer {
             String body = "";
             SandWalletPayParamsForApp payParamsForApp = null;
             if (payInfoDto.isC2c()) {
-                body = SandPayUtil.sandWalletPay(payInfoDto, sandOrderNo);
-                payParamsForApp = SandPayUtil.sandWalletPayForApp(payInfoDto, sandOrderNo);
+                body = SandPayUtil.sandWalletPay(payInfoDto, sandOrderNo, url);
+                payParamsForApp = SandPayUtil.sandWalletPayForApp(payInfoDto, sandOrderNo, url);
             } else {
                 UserMoneyDto userMoneyDto = moneyService.userMoneyInfo(payInfoDto.getUserId());
-                body = SandPayUtil.sanAccountPayC2B(payInfoDto, userMoneyDto.getRealName(), sandOrderNo);
-                payParamsForApp = SandPayUtil.sanAccountPayC2BForApp(payInfoDto, userMoneyDto.getRealName(), sandOrderNo);
+                body = SandPayUtil.sanAccountPayC2B(payInfoDto, userMoneyDto.getRealName(), sandOrderNo, url);
+                payParamsForApp = SandPayUtil.sanAccountPayC2BForApp(payInfoDto, userMoneyDto.getRealName(), sandOrderNo, url);
             }
 
             return Builder.of(PayVo::new).with(PayVo::setBody, body).with(PayVo::setPayParamsForApp, payParamsForApp).with(PayVo::setSandOrderNo, sandOrderNo).with(PayVo::setPayType, payInfoDto.getPayType()).with(PayVo::setOutHost, payInfoDto.getOutHost()).build();

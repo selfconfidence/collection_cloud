@@ -38,9 +38,6 @@ public class SandPayUtil {
     @Autowired
     private static IMoneyService moneyService;
 
-    @Value("${open.url}")
-    private static String url;
-
 
     public static void main(String[] args) {
         //openAccount(new OpenAccountParams());
@@ -57,7 +54,7 @@ public class SandPayUtil {
         log.info(sign);*/
     }
 
-    public static String sandWalletPay(PayInfoDto payInfoDto, String sandOrderNo) {
+    public static String sandWalletPay(PayInfoDto payInfoDto, String sandOrderNo, String openUrl) {
         SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMddHHmmss");
         Calendar calendar = Calendar.getInstance();
         String createTime = sdf.format(calendar.getTime());
@@ -72,7 +69,7 @@ public class SandPayUtil {
         //订单号
         String mer_order_no = sandOrderNo;
         //回调地址
-        String notify_url = url + payInfoDto.getSandAccountEnum().getNotifyUrl();
+        String notify_url = openUrl + payInfoDto.getSandAccountEnum().getNotifyUrl();
         String return_url = payInfoDto.getSandAccountEnum().getReturnUrl();
         //金额
         String order_amt = payInfoDto.getRealPayMoney().toString();
@@ -188,7 +185,7 @@ public class SandPayUtil {
      * @param payInfoDto
      * @return
      */
-    public static SandWalletPayParamsForApp sandWalletPayForApp(PayInfoDto payInfoDto, String sandOrderNo) {
+    public static SandWalletPayParamsForApp sandWalletPayForApp(PayInfoDto payInfoDto, String sandOrderNo, String url) {
         SandWalletPayParamsForApp sandWalletPayParamsForApp = new SandWalletPayParamsForApp();
         SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMddHHmmss");
         Calendar calendar = Calendar.getInstance();
@@ -227,7 +224,7 @@ public class SandPayUtil {
     }
 
 
-    public static String sanAccountPayC2B(PayInfoDto payInfoDto, String realName, String sandOrderNo) {
+    public static String sanAccountPayC2B(PayInfoDto payInfoDto, String realName, String sandOrderNo, String openUrl) {
         SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMddHHmmss");
         Calendar calendar = Calendar.getInstance();
         String createTime = sdf.format(calendar.getTime());
@@ -242,7 +239,7 @@ public class SandPayUtil {
         //订单号
         String mer_order_no = sandOrderNo;
         //回调地址
-        String notify_url = url + payInfoDto.getSandAccountEnum().getNotifyUrl();
+        String notify_url = openUrl + payInfoDto.getSandAccountEnum().getNotifyUrl();
         String return_url = payInfoDto.getSandAccountEnum().getReturnUrl();
         //金额
         String order_amt = payInfoDto.getRealPayMoney().toString();
@@ -334,7 +331,7 @@ public class SandPayUtil {
     }
 
 
-    public static SandWalletPayParamsForApp sanAccountPayC2BForApp(PayInfoDto payInfoDto, String realName, String sandOrderNo) {
+    public static SandWalletPayParamsForApp sanAccountPayC2BForApp(PayInfoDto payInfoDto, String realName, String sandOrderNo, String url) {
         SandWalletPayParamsForApp sandWalletPayParamsForApp = new SandWalletPayParamsForApp();
         SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMddHHmmss");
         Calendar calendar = Calendar.getInstance();
@@ -389,7 +386,7 @@ public class SandPayUtil {
 
         String mer_order_no = IdUtil.objectId();
         //回调地址
-        String notify_url = url + openAccountParams.getNotifyUrl();
+        String notify_url = openAccountParams.getNotifyUrl();
 
         String return_url = openAccountParams.getReturnUrl();
         //金额
@@ -502,7 +499,7 @@ public class SandPayUtil {
 
         String mer_order_no = IdUtil.objectId();
         //回调地址
-        String notify_url = url + openAccountParams.getNotifyUrl();
+        String notify_url = openAccountParams.getNotifyUrl();
 
         String return_url = openAccountParams.getReturnUrl();
         //金额
