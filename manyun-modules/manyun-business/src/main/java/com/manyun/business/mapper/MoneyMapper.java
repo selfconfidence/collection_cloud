@@ -3,6 +3,7 @@ package com.manyun.business.mapper;
 import com.manyun.business.domain.dto.UserMoneyDto;
 import com.manyun.business.domain.entity.Money;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 
@@ -23,6 +24,6 @@ public interface MoneyMapper extends BaseMapper<Money> {
      */
     UserMoneyDto userMoneyInfo(String userId);
 
-    int updateLock(String userId, BigDecimal withdrawAmount);
+    int updateLock(@Param("userId") String userId, @Param("withdrawAmount") BigDecimal withdrawAmount);
 
 }
