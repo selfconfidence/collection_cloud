@@ -49,4 +49,8 @@ public interface IAuctionSendService extends IService<AuctionSend> {
 
     R<BigDecimal> auctionSendCommission();
 
+    void reloadAuctionSendForMq(AuctionSend auctionSend);
+
+    void startAuction(String id);
+
 }

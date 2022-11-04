@@ -32,14 +32,13 @@ import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.CodeStatus;
 import com.manyun.common.core.domain.R;
-import com.manyun.common.core.enums.AuctionSendStatus;
-import com.manyun.common.core.enums.AuctionStatus;
-import com.manyun.common.core.enums.LianLianPayEnum;
-import com.manyun.common.core.enums.ShandePayEnum;
+import com.manyun.common.core.enums.*;
 import com.manyun.common.core.utils.ServletUtils;
 import com.manyun.common.core.utils.ip.IpUtils;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import com.manyun.common.mq.producers.deliver.DeliverProducer;
+import com.manyun.common.mq.producers.msg.DeliverMsg;
 import com.manyun.common.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -122,6 +121,9 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
     @Autowired
     private IMsgService msgService;
+
+    @Autowired
+    private DeliverProducer deliverProducer;
 
     @Autowired
     private RemoteBuiUserService userService;
@@ -415,11 +417,15 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         }
         AuctionSend auctionSend = auctionSendService.getById(auctionPayForm.getAuctionSendId());
         boolean canTrade = moneyService.checkLlpayStatus(payUserId) && moneyService.checkLlpayStatus(auctionSend.getUserId());
-        BigDecimal commission = BigDecimal.ZERO;
+        boolean canSandTrade  = moneyService.checkSandAccountStatus(payUserId) && moneyService.checkSandAccountStatus(auctionSend.getUserId());
+        BigDecimal commission = auctionSend.getCommission();
         if (Integer.valueOf(5).equals(auctionPayForm.getPayType())) {
-            commission = auctionSend.getCommission();
             Assert.isTrue(canTrade, "暂未开通连连支付，请选择其他支付方式");
         }
+        if (Integer.valueOf(6).equals(auctionPayForm.getPayType())) {
+            Assert.isTrue(canSandTrade, "暂未开通杉德云账户支付，请选择其他支付方式");
+        }
+
         Assert.isFalse(auctionSend.getUserId().equals(payUserId), "自己不可购买自己送拍的产品");
         AuctionOrder auctionOrder = auctionOrderService.getById(auctionSend.getAuctionOrderId());
         Assert.isFalse(Integer.valueOf(5).equals(auctionPayForm.getPayType()) && auctionOrder.getMoneyBln().compareTo(NumberUtil.add(0D)) >0, "当前状态暂不支持此支付方式");
@@ -433,6 +439,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .userId(payUserId).build(), (idStr) -> auctionSend.setAuctionOrderId(idStr));*/
         ShandePayEnum shandePayEnum = ShandePayEnum.AUCTION_SHANDE_PAY.setReturnUrl(auctionPayForm.getReturnUrl(), auctionPayForm.getReturnUrl());
         LianLianPayEnum lianLianPayEnum = LianLianPayEnum.AUCTION_SHANDE_PAY.setReturnUrl(auctionPayForm.getReturnUrl(), auctionPayForm.getReturnUrl());
+        SandAccountEnum sandAccountEnum = SandAccountEnum.AUCTION_SANDACCOUNT_PAY.setReturnUrl(auctionPayForm.getReturnUrl(),auctionPayForm.getReturnUrl());
 
         PayVo payVo =  rootPay.execPayVo(
                 PayInfoDto.builder()
@@ -443,10 +450,12 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                         .wxPayEnum(AUCTION_WECHAT_PAY)
                         .shandePayEnum(shandePayEnum)
                         .lianlianPayEnum(lianLianPayEnum)
+                        .sandAccountEnum(sandAccountEnum)
                         .ipaddr(IpUtils.getIpAddr(ServletUtils.getRequest()))
                         .goodsName(auctionOrder.getGoodsName())
                         .receiveUserId(auctionSend.getUserId())
                         .canTrade(canTrade)
+                        .c2c(true)
                         .serviceCharge(commission)
                         .userId(payUserId).build());
 
@@ -499,7 +508,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
     @Transactional(rollbackFor = Exception.class)
     public PayVo payMargin(String payUserId, AuctionPayMarginForm auctionPayMarginForm) {
         Assert.isFalse(Integer.valueOf(5).equals(auctionPayMarginForm.getPayType()), "保证金暂不支持此支付方式");
-
+        Assert.isFalse(Integer.valueOf(6).equals(auctionPayMarginForm.getPayType()), "保证金暂不支持此支付方式");
         CntUserDto cntUserDto = remoteBuiUserService.commUni(payUserId, SecurityConstants.INNER).getData();
         if (Integer.valueOf(0).equals(auctionPayMarginForm.getPayType())) {
             Assert.isTrue(SecurityUtils.matchesPassword(auctionPayMarginForm.getPayPass(),cntUserDto.getPayPass()),"支付密码错误,请核实!");
@@ -511,14 +520,18 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         AuctionMargin auctionMargin = auctionMarginService.getOne(Wrappers.<AuctionMargin>lambdaQuery().eq(AuctionMargin::getUserId, payUserId)
                 .eq(AuctionMargin::getAuctionSendId, auctionPayMarginForm.getAuctionSendId()));
         if (auctionMargin == null) {
+            Integer serviceVal = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_ORDER_TIME, Integer.class);
+            DelayLevelEnum defaultEnum = DelayLevelEnum.getDefaultEnum(serviceVal, DelayLevelEnum.LEVEL_6);
+            String idStr = IdUtil.getSnowflakeNextIdStr();
             auctionMargin = Builder.of(AuctionMargin::new).build();
-            auctionMargin.setId(IdUtil.getSnowflakeNextIdStr());
+            auctionMargin.setId(idStr);
             auctionMargin.setAuctionSendId(auctionPayMarginForm.getAuctionSendId());
             auctionMargin.setPayType(auctionPayMarginForm.getPayType());
             auctionMargin.setUserId(payUserId);
             auctionMargin.setMargin(margin);
-            auctionMargin.setEndTime(LocalDateTime.now().plusMinutes(systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_ORDER_TIME, Integer.class)));
+            auctionMargin.setEndTime(LocalDateTime.now().plusMinutes(DelayLevelEnum.getSourceConvertTime(defaultEnum, TimeUnit.MINUTES)));
             auctionMargin.createD(payUserId);
+            deliverProducer.sendCancelAuctionMargin(idStr, Builder.of(DeliverMsg::new).with(DeliverMsg::setBuiId,idStr).with(DeliverMsg::setBuiName,StrUtil.format("保证金订单取消了,订单编号为:{}",idStr)).with(DeliverMsg::setResetHost, idStr).build(), defaultEnum);
             auctionMarginService.save(auctionMargin);
         }
         //用户余额
@@ -527,6 +540,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
         ShandePayEnum shandePayEnum = ShandePayEnum.AUCTION_MARGIN_SHANDE_PAY.setReturnUrl(auctionPayMarginForm.getReturnUrl(), auctionPayMarginForm.getReturnUrl());
         LianLianPayEnum lianLianPayEnum = LianLianPayEnum.AUCTION_MARGIN_SHANDE_PAY.setReturnUrl(auctionPayMarginForm.getReturnUrl(), auctionPayMarginForm.getReturnUrl());
+        SandAccountEnum sandAccountEnum = SandAccountEnum.AUCTION_MARGIN_SANDACCOUNT_PAY.setReturnUrl(auctionPayMarginForm.getReturnUrl(), auctionPayMarginForm.getReturnUrl());
         PayVo payVo = rootPay.execPayVo(PayInfoDto.builder()
                 .payType(auctionPayMarginForm.getPayType())
                 .realPayMoney(auctionMargin1.getMargin().subtract(auctionMargin1.getMoneyBln()))
@@ -535,6 +549,8 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .wxPayEnum(MARGIN_WECHAT_PAY)
                 .shandePayEnum(shandePayEnum)
                 .lianlianPayEnum(lianLianPayEnum)
+                .sandAccountEnum(sandAccountEnum)
+                .c2c(false)
                 .ipaddr(IpUtils.getIpAddr(ServletUtils.getRequest()))
                 .goodsName(auctionSend.getGoodsName())
                 .userId(payUserId).build());
@@ -578,14 +594,16 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
             Assert.isTrue(SecurityUtils.matchesPassword(auctionPayFixedForm.getPayPass(),cntUserDto.getPayPass()),"支付密码错误,请核实!");
         }
-        LoginBusinessUser businessUser = SecurityUtils.getNotNullLoginBusinessUser();
 
         AuctionSend auctionSend = auctionSendService.getById(auctionPayFixedForm.getAuctionSendId());
         boolean canTrade = moneyService.checkLlpayStatus(userId) && moneyService.checkLlpayStatus(auctionSend.getUserId());
-        BigDecimal commission = BigDecimal.ZERO;
+        boolean canSandTrade  = moneyService.checkSandAccountStatus(userId) && moneyService.checkSandAccountStatus(auctionSend.getUserId());
+        BigDecimal commission = auctionSend.getCommission();
         if (Integer.valueOf(5).equals(auctionPayFixedForm.getPayType())) {
-            commission = auctionSend.getCommission();
             Assert.isTrue(canTrade, "暂未开通连连支付，请选择其他支付方式");
+        }
+        if (Integer.valueOf(6).equals(auctionPayFixedForm.getPayType())) {
+            Assert.isTrue(canSandTrade, "暂未开通杉德云账户支付，请选择其他支付方式");
         }
         Integer delayTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_DELAY_TIME, Integer.class);
 
@@ -610,7 +628,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
         AuctionPrice auctionPrice = new AuctionPrice();
         auctionPrice.setId(IdUtil.getSnowflakeNextIdStr());
         auctionPrice.setAuctionStatus(AuctionStatus.WAIT_PAY.getCode());
-        auctionPrice.setUserId(businessUser.getUserId());
+        auctionPrice.setUserId(userId);
         auctionPrice.setAuctionSendId(auctionPayFixedForm.getAuctionSendId());
         auctionPrice.setUserName(remoteBuiUserService.commUni(userId, SecurityConstants.INNER).getData().getNickName());
         auctionPrice.setCreatedTime(LocalDateTime.now());
@@ -645,6 +663,7 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
 
         ShandePayEnum shandePayEnum = ShandePayEnum.AUCTION_FIX_SHANDE_PAY.setReturnUrl(auctionPayFixedForm.getReturnUrl(), auctionPayFixedForm.getReturnUrl());
         LianLianPayEnum lianLianPayEnum = LianLianPayEnum.AUCTION_FIX_SHANDE_PAY.setReturnUrl(auctionPayFixedForm.getReturnUrl(), auctionPayFixedForm.getReturnUrl());
+        SandAccountEnum sandAccountEnum = SandAccountEnum.AUCTION_FIX_SANDACCOUNT_PAY.setReturnUrl(auctionPayFixedForm.getReturnUrl(), auctionPayFixedForm.getReturnUrl());
         Assert.isFalse(Integer.valueOf(5).equals(auctionPayFixedForm.getPayType()) && auctionOrder.getMoneyBln().compareTo(NumberUtil.add(0D)) >0, "当前状态暂不支持此支付方式");
         PayVo payVo = rootPay.execPayVo(PayInfoDto.builder()
                 .payType(auctionPayFixedForm.getPayType())
@@ -654,7 +673,9 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
                 .wxPayEnum(FIXED_WECHAT_PAY)
                 .shandePayEnum(shandePayEnum)
                 .lianlianPayEnum(lianLianPayEnum)
+                .sandAccountEnum(sandAccountEnum)
                 .canTrade(canTrade)
+                .c2c(true)
                 .receiveUserId(auctionSend.getUserId())
                 .serviceCharge(commission)
                 .ipaddr(IpUtils.getIpAddr(ServletUtils.getRequest()))
@@ -789,6 +810,52 @@ public class AuctionPriceServiceImpl extends ServiceImpl<AuctionPriceMapper, Auc
             return item;
         }).collect(Collectors.toList());
 
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void auctionEnd(String id) {
+        AuctionSend auctionSend = auctionSendService.getById(id);
+        Assert.isTrue(AuctionSendStatus.BID_BIDING.getCode().equals(auctionSend.getAuctionSendStatus()), "拍卖状态有误，请核实");
+        List<AuctionPrice> priceList = list(Wrappers.<AuctionPrice>lambdaQuery().eq(AuctionPrice::getAuctionSendId, auctionSend.getId()));
+        //无人竞拍，走流拍流程
+        if (priceList.isEmpty()) {
+            auctionSend.setAuctionSendStatus(AuctionSendStatus.BID_PASS.getCode());
+            //无人出价，但是有人交保证金，保证金退回
+            List<AuctionMargin> list = auctionMarginService.list(Wrappers.<AuctionMargin>lambdaQuery().eq(AuctionMargin::getAuctionSendId, auctionSend.getId()));
+            if (!list.isEmpty()) {
+                for (AuctionMargin auctionMargin : list) {
+                    Money buyerMoney = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId, auctionMargin.getUserId()));
+                    buyerMoney.setMoneyBalance(buyerMoney.getMoneyBalance().add(auctionMargin.getMargin()));
+                    moneyService.updateById(buyerMoney);
+                    logsService.saveLogs(LogInfoDto.builder().buiId(auctionMargin.getUserId()).jsonTxt("退还保证金").formInfo(auctionMargin.getMargin().toString()).isType(PULL_SOURCE).modelType(MONEY_TYPE).build());
+                }
+            }
+
+            String info = "已流拍，从拍卖市场退回";
+
+            //从拍卖市场退回
+            if (auctionSend.getGoodsType() == 1) {
+                userCollectionService.showUserCollection(auctionSend.getUserId(), auctionSend.getMyGoodsId(),info);
+            }
+            if (auctionSend.getGoodsType() == 2) {
+                userBoxService.showUserBox(auctionSend.getMyGoodsId(), auctionSend.getUserId(), info);
+            }
+            auctionSendService.updateById(auctionSend);
+        } else {
+            //走拍中流程
+            winnerOperation(auctionSend);
+        }
+    }
+
+    @Override
+    public void cancelAuctionMargin(String id) {
+        AuctionMargin auctionMargin = auctionMarginService.getById(id);
+        Assert.isTrue(Objects.nonNull(auctionMargin) && Integer.valueOf(0).equals(auctionMargin.getPayMarginStatus()), "保证金状态有误，请核实");
+        BigDecimal moneyBln = auctionMargin.getMoneyBln();
+        if (Objects.nonNull(moneyBln) && moneyBln.compareTo(NumberUtil.add(0D)) >=1){
+            moneyService.orderBack(auctionMargin.getUserId(),moneyBln,StrUtil.format("保证金已取消,此产生的消费 {},已经退还余额!" , moneyBln));
+        }
     }
 
 

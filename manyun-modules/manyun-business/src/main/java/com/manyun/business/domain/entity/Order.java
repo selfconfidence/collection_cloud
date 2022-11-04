@@ -91,6 +91,9 @@ public class Order implements Serializable {
     @ApiModelProperty("交易流水号(连连)")
     private String txnSeqno;
 
+    @ApiModelProperty("杉德云账户订单号")
+    private String sandOrderNo;
+
     public void createD(String createId){
         this.createdBy = createId;
         this.createdTime = LocalDateTime.now();

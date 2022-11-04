@@ -52,5 +52,7 @@ public interface IMoneyService extends IService<Money> {
 
     Boolean checkLlpayStatus(String userId);
 
+    Boolean checkSandAccountStatus(String userId);
+
     R systemWithdraw(SystemWithdrawForm systemWithdrawForm, String userId);
 }

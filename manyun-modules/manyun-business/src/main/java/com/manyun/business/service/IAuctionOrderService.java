@@ -38,5 +38,6 @@ public interface IAuctionOrderService extends IService<AuctionOrder> {
 
     void timeCancelAuction();
 
+    void cancelAuctionOrder(String id);
 
 }

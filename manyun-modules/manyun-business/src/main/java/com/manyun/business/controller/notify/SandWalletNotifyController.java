@@ -219,12 +219,12 @@ public class SandWalletNotifyController {
                 if (dataJson != null) {
                     log.info("后台通知业务数据为：" + JSONObject.toJSONString(dataJson, true));
                     log.info("orderStatus：" + orderStatus);
-                    log.info("tradeNo：" + tradeNo);
+                    log.info("tradeNo：" + tradeNo.split("-")[0]);
                     log.info("orderAmount", i);
                     if ("1".equals(orderStatus)){
-                        orderService.notifyPaySuccess(tradeNo);
-                        Order order = orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, tradeNo));
-                        Assert.isTrue(Objects.nonNull(order),"找不到对应订单编号!");
+                        orderService.notifyPaySuccess(tradeNo.split("-")[0]);
+                        /*Order order = orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, tradeNo.split("-")[0]));
+                        Assert.isTrue(Objects.nonNull(order),"找不到对应订单编号!");*/
                         /*logsService.saveLogs(
                                 LogInfoDto
                                         .builder()
@@ -277,7 +277,7 @@ public class SandWalletNotifyController {
                     log.info("respCode：" + respCode);
                     if ("00000".equals(respCode) && "00".equals(orderStatus)) {
                         //todo 处理业务逻辑
-                        orderService.notifyPayConsignmentSuccess(orderNo);
+                        orderService.notifyPayConsignmentSuccess(orderNo.split("-")[0]);
                     } else {
                         return null;
                     }
@@ -326,10 +326,10 @@ public class SandWalletNotifyController {
                 if (dataJson != null) {
                     log.info("后台通知业务数据为：" + JSONObject.toJSONString(dataJson, true));
                     log.info("orderStatus：" + orderStatus);
-                    log.info("tradeNo：" + tradeNo);
+                    log.info("tradeNo：" + tradeNo.split("-")[0]);
                     log.info("orderAmount", i);
                     if ("1".equals(orderStatus)){
-                        auctionPriceService.notifyPayMarginSuccess(tradeNo);
+                        auctionPriceService.notifyPayMarginSuccess(tradeNo.split("-")[0]);
                         /*Order order = orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, tradeNo));
                         Assert.isTrue(Objects.nonNull(order),"找不到对应订单编号!");
                         logsService.saveLogs(
@@ -386,7 +386,7 @@ public class SandWalletNotifyController {
                     log.info("respCode：" + respCode);
                     if ("00000".equals(respCode) && "00".equals(orderStatus)) {
                         //todo 处理业务逻辑
-                        auctionOrderService.notifyPaySuccess(orderNo);
+                        auctionOrderService.notifyPaySuccess(orderNo.split("-")[0]);
                     } else {
                         return null;
                     }
@@ -435,7 +435,7 @@ public class SandWalletNotifyController {
                     log.info("respCode：" + respCode);
                     if ("00000".equals(respCode) && "00".equals(orderStatus)) {
                         //todo 处理业务逻辑
-                        auctionOrderService.notifyPaySuccess(orderNo);
+                        auctionOrderService.notifyPaySuccess(orderNo.split("-")[0]);
                     } else {
                         return null;
                     }

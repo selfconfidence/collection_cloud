@@ -23,8 +23,11 @@ import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.enums.AuctionSendStatus;
 import com.manyun.common.core.enums.AuctionStatus;
+import com.manyun.common.core.enums.DelayLevelEnum;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import com.manyun.common.mq.producers.deliver.DeliverProducer;
+import com.manyun.common.mq.producers.msg.DeliverMsg;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +41,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -81,6 +85,9 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
 
     @Autowired
     private IMediaService mediaService;
+
+    @Autowired
+    private DeliverProducer deliverProducer;
 
     @Override
     public TableDataInfo<AuctionOrderVo> myAuctionOrderList(AuctionOrderQuery orderQuery, String userId) {
@@ -137,7 +144,10 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
         auctionOrder.setAuctionStatus(AuctionStatus.WAIT_PAY.getCode());
         auctionOrder.setPayTime(LocalDateTime.now());
         auctionOrder.setMoneyBln(NumberUtil.add(0D));
-        auctionOrder.setEndTime(LocalDateTime.now().plusMinutes(serviceVal));
+        //auctionOrder.setEndTime(LocalDateTime.now().plusMinutes(serviceVal));
+        DelayLevelEnum defaultEnum = DelayLevelEnum.getDefaultEnum(serviceVal, DelayLevelEnum.LEVEL_6);
+        auctionOrder.setEndTime(LocalDateTime.now().plusMinutes(DelayLevelEnum.getSourceConvertTime(defaultEnum, TimeUnit.MINUTES)));
+        deliverProducer.sendCancelAuctionOrder(idStr, Builder.of(DeliverMsg::new).with(DeliverMsg::setBuiId,idStr).with(DeliverMsg::setBuiName,StrUtil.format("拍卖订单取消了,订单编号为:{}",idStr)).with(DeliverMsg::setResetHost, idStr).build() ,defaultEnum );
         save(auctionOrder);
         consumer.accept(idStr);
         return orderNo;
@@ -248,6 +258,26 @@ public class AuctionOrderServiceImpl extends ServiceImpl<AuctionOrderMapper, Auc
             return item;
         }).collect(Collectors.toList());
         updateBatchById(updateOrder);
+
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelAuctionOrder(String id) {
+        AuctionOrder auctionOrder = getById(id);
+        Assert.isTrue(Objects.nonNull(auctionOrder) && AuctionStatus.WAIT_PAY.getCode().equals(auctionOrder.getAuctionStatus()), "订单状态有误，请核实");
+        AuctionSend auctionSend = auctionSendService.getById(auctionOrder.getSendAuctionId());
+        auctionSendService.reloadAuctionSendForMq(auctionSend);
+        AuctionPrice auctionPrice = auctionPriceService.getById(auctionOrder.getAuctionPriceId());
+        auctionPrice.setAuctionStatus(AuctionStatus.BID_BREAK.getCode());
+        auctionPriceService.updateById(auctionPrice);
+        auctionOrder.setAuctionStatus(AuctionStatus.BID_BREAK.getCode());
+        BigDecimal moneyBln = auctionOrder.getMoneyBln();
+        if (Objects.nonNull(moneyBln) && moneyBln.compareTo(NumberUtil.add(0D)) >=1){
+            moneyService.orderBack(auctionOrder.getToUserId(),moneyBln,StrUtil.format("订单已取消,此产生的消费 {},已经退还余额!" , moneyBln));
+        }
+        auctionOrder.updateD(auctionOrder.getToUserId());
+        updateById(auctionOrder);
 
     }
 

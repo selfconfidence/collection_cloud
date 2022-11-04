@@ -15,8 +15,8 @@ public class AuctionPayMarginForm {
     @NotBlank(message = "竞品编号不可为空")
     private String auctionSendId;
 
-    @ApiModelProperty(value = "支付类型,1=微信,2=支付宝,0=余额支付，3=银联, 4= 杉德，5=连连",required = true)
-    @Range(min = 0,max = 5,message = "支付类型错误")
+    @ApiModelProperty(value = "支付类型,1=微信,2=支付宝,0=余额支付，3=银联, 4= 杉德，5=连连, 6=杉德云账户",required = true)
+    @Range(min = 0,max = 6,message = "支付类型错误")
     private Integer payType;
 
     @ApiModelProperty(value = "是否余额抵扣, true抵扣，false不抵扣", required = true)

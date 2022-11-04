@@ -129,8 +129,8 @@ public class BuiTask
      * 定时刷新 盲盒,藏品的状态库存信息及活动状态
      */
     public void doTaskExe(){
-        boxService.taskCheckStatus();
-        cntCollectionService.taskCheckStatus();
+        //boxService.taskCheckStatus();
+        //cntCollectionService.taskCheckStatus();
         cntActionService.taskCheckStatus();
     }
 

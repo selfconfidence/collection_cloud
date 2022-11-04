@@ -25,9 +25,12 @@ import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.AuctionSendStatus;
+import com.manyun.common.core.enums.DelayLevelEnum;
 import com.manyun.common.core.exception.ServiceException;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
+import com.manyun.common.mq.producers.deliver.DeliverProducer;
+import com.manyun.common.mq.producers.msg.DeliverMsg;
 import com.manyun.common.security.utils.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectFactory;
@@ -42,6 +45,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.manyun.common.core.enums.UserRealStatus.OK_REAL;
@@ -92,6 +96,9 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
 
     @Autowired
     private RemoteBuiUserService userService;
+
+    @Autowired
+    private DeliverProducer deliverProducer;
 
     /**
      * 查询保证金比例
@@ -144,8 +151,10 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
         Integer preTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_PRE_TIME, Integer.class);
         Integer bidTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_BID_TIME, Integer.class);
         Integer delayTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_DELAY_TIME, Integer.class);
+        String idStr = IdUtil.getSnowflakeNextIdStr();
+        DelayLevelEnum defaultEnum = DelayLevelEnum.getDefaultEnum(preTime, DelayLevelEnum.LEVEL_6);
         AuctionSend auctionSend = Builder.of(AuctionSend::new)
-                .with(AuctionSend::setId, IdUtil.getSnowflakeNextIdStr())
+                .with(AuctionSend::setId, idStr)
                 .with(AuctionSend::setUserId, userId)
                 .with(AuctionSend::setAuctionSendStatus, AuctionSendStatus.WAIT_START.getCode())
                 .with(AuctionSend::setMyGoodsId, auctionSendForm.getMyGoodsId())
@@ -160,9 +169,10 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
                 .with(AuctionSend::setCommission, systemService.getVal(BusinessConstants.SystemTypeConstant.COMMISSION_SCALE, BigDecimal.class))
                 .with(AuctionSend::setMargin, auctionSendForm.getStartPrice()
                         .multiply(systemService.getVal(BusinessConstants.SystemTypeConstant.MARGIN_SCALE, BigDecimal.class)).setScale(2, RoundingMode.HALF_UP))
-                .with(AuctionSend::setStartTime, LocalDateTime.now().plusMinutes(preTime))
+                .with(AuctionSend::setStartTime, LocalDateTime.now().plusMinutes(DelayLevelEnum.getSourceConvertTime(defaultEnum, TimeUnit.MINUTES)))
                 .with(AuctionSend::setEndTime,LocalDateTime.now().plusMinutes(preTime + bidTime + delayTime)).build();
         auctionSend.createD(userId);
+        deliverProducer.sendAuctionStart(idStr, Builder.of(DeliverMsg::new).with(DeliverMsg::setBuiId,idStr).with(DeliverMsg::setBuiName,StrUtil.format("拍卖开始了,拍卖编号为:{}",idStr)).with(DeliverMsg::setResetHost, idStr).build(), defaultEnum);
         save(auctionSend);
     }
 
@@ -379,6 +389,20 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
 
     }
 
+    @Override
+    public void reloadAuctionSendForMq(AuctionSend auctionSend) {
+        auctionSend.setAuctionSendStatus(AuctionSendStatus.BID_BREAK.getCode());
+        auctionSend.updateD(auctionSend.getUserId());
+        String info = "已违约，从拍卖市场退回";
+        if (auctionSend.getGoodsType() == 1) {
+            userCollectionService.showUserCollection(auctionSend.getUserId(), auctionSend.getMyGoodsId(), info);
+        }
+        if (auctionSend.getGoodsType() == 2) {
+            userBoxService.showUserBox(auctionSend.getMyGoodsId(), auctionSend.getUserId(), info);
+        }
+        updateById(auctionSend);
+    }
+
     //流拍后重新送拍
     @Override
     public R reAuctionSend(AuctionSendForm auctionSendForm, String auctionSendId) {
@@ -475,6 +499,26 @@ public class AuctionSendServiceImpl extends ServiceImpl<AuctionSendMapper, Aucti
             }
         }
         updateBatchById(list);
+    }
+
+    /**
+     * 开始拍卖，此时再将结束时间赋值
+     * @param id
+     */
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void startAuction(String id) {
+        Integer bidTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_BID_TIME, Integer.class);
+        Integer delayTime = systemService.getVal(BusinessConstants.SystemTypeConstant.AUCTION_DELAY_TIME, Integer.class);
+        DelayLevelEnum defaultEnum = DelayLevelEnum.getDefaultEnum(bidTime, DelayLevelEnum.LEVEL_6);
+        AuctionSend auctionSend = getById(id);
+        Assert.isTrue(Objects.nonNull(auctionSend) && AuctionSendStatus.WAIT_START.getCode().equals(auctionSend.getAuctionSendStatus()),"待支付订单才可取消!");
+        auctionSend.setAuctionSendStatus(AuctionSendStatus.BID_BIDING.getCode());
+        auctionSend.setEndTime(LocalDateTime.now().plusMinutes(DelayLevelEnum.getSourceConvertTime(defaultEnum, TimeUnit.MINUTES)));
+        deliverProducer.sendAuctionEnd(id, Builder.of(DeliverMsg::new).with(DeliverMsg::setBuiId,id).with(DeliverMsg::setBuiName,StrUtil.format("拍卖取消了,编号为:{}",id)).with(DeliverMsg::setResetHost, IdUtil.getSnowflakeNextIdStr()).build(), defaultEnum);
+        auctionSend.updateD(auctionSend.getUserId());
+        updateById(auctionSend);
     }
 
 }

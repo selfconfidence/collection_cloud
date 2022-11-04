@@ -43,6 +43,9 @@ public class LianLianPay implements RootPayServer {
     @Autowired
     private IMoneyService moneyService;
 
+    @Autowired
+    private SandWalletPay sandWalletPay;
+
     @Resource
     private RemoteBuiUserService remoteBuiUserService;
 
@@ -59,8 +62,7 @@ public class LianLianPay implements RootPayServer {
             CntUserDto cntUserDto = remoteBuiUserService.commUni(payInfoDto.getUserId(), SecurityConstants.INNER).getData();
             String orderId = (payInfoDto.getOutHost() + "-" + LLianPayDateUtils.getTimestamp());
             Order orderInfo = orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, payInfoDto.getOutHost()));
-            Assert.isTrue(Objects.nonNull(orderInfo),"未查询到该订单信息!");
-            if(!orderId.equals(orderInfo.getTxnSeqno())){
+            if(Objects.nonNull(orderInfo) && !orderId.equals(orderInfo.getTxnSeqno())){
                 orderInfo.setTxnSeqno(orderId);
                 orderService.updateById(orderInfo);
             }
@@ -82,6 +84,7 @@ public class LianLianPay implements RootPayServer {
                             .build(), payInfoDto.isCanTrade());
             return Builder.of(PayVo::new).with(PayVo::setBody, body).with(PayVo::setTxnSeqno,orderId).with(PayVo::setPayType, payInfoDto.getPayType()).with(PayVo::setOutHost, payInfoDto.getOutHost()).build();
         }
-        throw new IllegalArgumentException("not fount pay_type = " + payInfoDto.getPayType());
+        return sandWalletPay.execPayVo(payInfoDto);
+
     }
 }

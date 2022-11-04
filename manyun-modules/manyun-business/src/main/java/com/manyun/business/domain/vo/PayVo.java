@@ -1,6 +1,7 @@
 package com.manyun.business.domain.vo;
 
 import cn.hutool.core.util.NumberUtil;
+import com.manyun.business.design.pay.bean.sandAccount.SandWalletPayParamsForApp;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -24,4 +25,10 @@ public class PayVo implements Serializable {
     private Integer payType;
 
     private transient String txnSeqno;
+
+    //杉德云账户单号
+    private transient String sandOrderNo;
+
+    @ApiModelProperty("杉德云账户支付APP所需参数")
+    private SandWalletPayParamsForApp payParamsForApp;
 }

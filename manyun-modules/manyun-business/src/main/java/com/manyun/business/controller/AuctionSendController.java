@@ -55,9 +55,9 @@ public class AuctionSendController {
     @PostMapping("/auctionSend")
     @ApiOperation("提交送拍")
     @Lock("auctionSend")
-    public R auctionSend(@Valid @RequestBodyRsa AuctionSendForm auctionSendForm) {
-        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
-        return auctionSendService.auctionSend(auctionSendForm, loginBusinessUser.getUserId());
+    public R auctionSend(@Valid @RequestBody AuctionSendForm auctionSendForm) {
+        //LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        return auctionSendService.auctionSend(auctionSendForm, "1573126945499090944");
     }
 
     @GetMapping("/auctionSendConfig")

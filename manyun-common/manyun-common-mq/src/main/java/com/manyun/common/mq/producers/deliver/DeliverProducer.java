@@ -78,5 +78,54 @@ public class DeliverProducer extends DeliverAbs {
          );
     }
 
+    public void sendAuctionStart(String keys, DeliverMsg payLoad, DelayLevelEnum delayLevelEnum) {
+        String topic = mqConfig.getTopic(0);
+        String tar = StrUtil.format("{}:{}", topic, mqConfig.getTarget(topic, 2));
+        asyncSend(tar, keys, payLoad, delayLevelEnum, 6000, (sendResult) -> {
+            log.info("拍卖开始发送消息成功!keys:{},消息内容:{}", keys, payLoad);
+        },
+         (throwable) ->{
+            log.info("拍卖开始发送消息失败!keys:{},消息内容:{},异常信息:{}",keys, payLoad, throwable.getMessage());
+         }
+         );
+    }
+
+    public void sendAuctionEnd(String keys, DeliverMsg payLoad, DelayLevelEnum delayLevelEnum) {
+        String topic = mqConfig.getTopic(0);
+        String tar = StrUtil.format("{}:{}", topic, mqConfig.getTarget(topic, 3));
+        asyncSend(tar, keys, payLoad, delayLevelEnum, 6000, (sendResult) -> {
+            log.info("拍卖结束发送消息成功!keys:{},消息内容:{}", keys, payLoad);
+        },
+        (throwable) ->{
+            log.info("拍卖结束发送消息失败!keys:{},消息内容:{},异常信息:{}",keys, payLoad, throwable.getMessage());
+        }
+        );
+    }
+
+
+    public void sendCancelAuctionOrder(String keys, DeliverMsg payLoad, DelayLevelEnum delayLevelEnum) {
+        String topic = mqConfig.getTopic(0);
+        String tar = StrUtil.format("{}:{}", topic, mqConfig.getTarget(topic, 4));
+        asyncSend(tar, keys, payLoad, delayLevelEnum, 6000, (sendResult) -> {
+                    log.info("取消拍卖订单发送消息成功!keys:{},消息内容:{}", keys, payLoad);
+                },
+                (throwable) ->{
+                    log.info("取消拍卖订单发送消息失败!keys:{},消息内容:{},异常信息:{}",keys, payLoad, throwable.getMessage());
+                }
+        );
+    }
+
+    public void sendCancelAuctionMargin(String keys, DeliverMsg payLoad, DelayLevelEnum delayLevelEnum) {
+        String topic = mqConfig.getTopic(0);
+        String tar = StrUtil.format("{}:{}", topic, mqConfig.getTarget(topic, 5));
+        asyncSend(tar, keys, payLoad, delayLevelEnum, 6000, (sendResult) -> {
+                    log.info("取消保证金发送消息成功!keys:{},消息内容:{}", keys, payLoad);
+                },
+                (throwable) ->{
+                    log.info("取消保证金发送消息失败!keys:{},消息内容:{},异常信息:{}",keys, payLoad, throwable.getMessage());
+                }
+        );
+    }
+
 
 }

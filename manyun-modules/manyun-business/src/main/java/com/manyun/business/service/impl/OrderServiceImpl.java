@@ -30,10 +30,7 @@ import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.domain.R;
-import com.manyun.common.core.enums.DelayLevelEnum;
-import com.manyun.common.core.enums.LianLianPayEnum;
-import com.manyun.common.core.enums.PayTypeEnum;
-import com.manyun.common.core.enums.ShandePayEnum;
+import com.manyun.common.core.enums.*;
 import com.manyun.common.core.utils.ServletUtils;
 import com.manyun.common.core.utils.StringUtils;
 import com.manyun.common.core.utils.ip.IpUtils;
@@ -539,19 +536,28 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         ICntConsignmentService consignmentService = cntConsignmentServiceObjectFactory.getObject();
         CntConsignment cntConsignment = consignmentService.getOne(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getOrderId, order.getId()));
         boolean canTrade = false;
+        boolean canSandTrade = false;
+        boolean c2c = false;
         String sendUserId = null;
         BigDecimal serviceCharge = BigDecimal.ZERO;
         if (cntConsignment != null) {
             canTrade = moneyService.checkLlpayStatus(userId) && moneyService.checkLlpayStatus(cntConsignment.getSendUserId());
+            canSandTrade  = moneyService.checkSandAccountStatus(userId) && moneyService.checkSandAccountStatus(cntConsignment.getSendUserId());
             sendUserId = cntConsignment.getSendUserId();
             if (Integer.valueOf(5).equals(orderPayForm.getPayType())) {
                 Assert.isTrue(canTrade, "暂未开通连连支付，请选择其他支付方式");
                 serviceCharge = cntConsignment.getServerCharge();
             }
+            if (Integer.valueOf(6).equals(orderPayForm.getPayType())) {
+                Assert.isTrue(canSandTrade, "暂未开通杉德云账户支付，请选择其他支付方式");
+                serviceCharge = cntConsignment.getServerCharge();
+                c2c = true;
+            }
         }
 
         ShandePayEnum shandePayEnum =  switchCase(order.getId(),orderPayForm.getReturnUrl(), orderPayForm.getReturnUrl());
         LianLianPayEnum lianLianPayEnum =  switchCaseLianLian(order.getId(),orderPayForm.getReturnUrl(), orderPayForm.getReturnUrl());
+        SandAccountEnum sandAccountEnum = switchCaseSandAccount(order.getId(),orderPayForm.getReturnUrl(), orderPayForm.getReturnUrl());
 
         // 判定用户的余额是否充足
         PayVo payVo =  rootPay.execPayVo(
@@ -564,7 +570,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                         .receiveUserId(sendUserId)
                         .serviceCharge(serviceCharge)
                         .lianlianPayEnum(lianLianPayEnum)
+                        .sandAccountEnum(sandAccountEnum)
                         .goodsName(order.getCollectionName())
+                        .c2c(c2c)
                         .ipaddr(IpUtils.getIpAddr(ServletUtils.getRequest()))
                         .userId(userId).build());
         // 走这一步如果 是余额支付 那就说明扣款成功了！！！
@@ -614,6 +622,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             return ShandePayEnum.CONSIGNMENT_SHANDE_PAY.setReturnUrl(returnUrl,defaultUrl);
         else
             return ShandePayEnum.COLLECTION_BOX_SHANDE_PAY.setReturnUrl(returnUrl,defaultUrl);
+    }
+
+    private SandAccountEnum switchCaseSandAccount(String id, String returnUrl, String defaultUrl) {
+        // 唯一验证 从寄售中获取这个订单
+        ICntConsignmentService consignmentService = cntConsignmentServiceObjectFactory.getObject();
+        CntConsignment cntConsignment = consignmentService.getOne(Wrappers.<CntConsignment>lambdaQuery().eq(CntConsignment::getOrderId, id));
+        if (cntConsignment != null)
+            return SandAccountEnum.CONSIGNMENT_SANDACCOUNT_PAY.setReturnUrl(returnUrl,defaultUrl);
+        else
+            return SandAccountEnum.COLLECTION_BOX_SANDACCOUNT_PAY.setReturnUrl(returnUrl,defaultUrl);
     }
 
     /**

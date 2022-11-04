@@ -51,4 +51,9 @@ public interface IAuctionPriceService extends IService<AuctionPrice> {
     void checkDelayWinner();
 
     void checkPayMarginFail();
+
+    //拍卖结束
+    void auctionEnd(String id);
+
+    void cancelAuctionMargin(String id);
 }

@@ -55,7 +55,7 @@ public class SandPayUtil {
         System.out.println(sign);*/
     }
 
-    public static String sandWalletPay(PayInfoDto payInfoDto) {
+    public static String sandWalletPay(PayInfoDto payInfoDto, String sandOrderNo) {
         SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMddHHmmss");
         Calendar calendar = Calendar.getInstance();
         String createTime = sdf.format(calendar.getTime());
@@ -68,7 +68,7 @@ public class SandPayUtil {
         //商户key1
         String mer_key = "PZWgkPqM09qpDbUngCDdGL5kgg/9jDd3wvZUn87m0CnI6CklVzmtMi2AkXOd7P4xWmEjjzEo5bo=";
         //订单号
-        String mer_order_no = payInfoDto.getOutHost();
+        String mer_order_no = sandOrderNo;
         //回调地址
         String notify_url = payInfoDto.getSandAccountEnum().getNotifyUrl();
         String return_url = payInfoDto.getSandAccountEnum().getReturnUrl();
@@ -181,7 +181,51 @@ public class SandPayUtil {
         return url;
     }
 
-    public static String sanAccountPayC2B(PayInfoDto payInfoDto, String realName) {
+    /**
+     * 杉德钱包支付（app使用）
+     * @param payInfoDto
+     * @return
+     */
+    public static SandWalletPayParamsForApp sandWalletPayForApp(PayInfoDto payInfoDto, String sandOrderNo) {
+        SandWalletPayParamsForApp sandWalletPayParamsForApp = new SandWalletPayParamsForApp();
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMddHHmmss");
+        Calendar calendar = Calendar.getInstance();
+        String createTime = sdf.format(calendar.getTime());
+        calendar.add(Calendar.HOUR,1);
+        String endTime = sdf.format(calendar.getTime());
+
+        //订单号
+        String mer_order_no = sandOrderNo;
+        //回调地址
+        String notify_url = payInfoDto.getSandAccountEnum().getNotifyUrl();
+        //金额
+        String order_amt = payInfoDto.getRealPayMoney().toString();
+        //商品名称
+        String goods_name = payInfoDto.getGoodsName();
+
+        String create_ip = payInfoDto.getIpaddr().replace(".","_");
+
+        String pay_extra = "{\"operationType\":\"1\",\"recvUserId\":\""+ payInfoDto.getReceiveUserId()+"\",\"bizType\":\"2\",\"payUserId\":\""+payInfoDto.getUserId()+"\",\"userFeeAmt\":\""+payInfoDto.getServiceCharge()+"\"}";
+        //String pay_extra = "{\"userId\":\""+userNumber+"\",\"userName\":\""+realName+"\",\"idCard\":\""+cartNo+"\"}";
+        //md5key
+        sandWalletPayParamsForApp.setPayUserId(payInfoDto.getUserId());
+        sandWalletPayParamsForApp.setRecvUserId(payInfoDto.getReceiveUserId());
+        sandWalletPayParamsForApp.setMer_order_no(mer_order_no);
+        sandWalletPayParamsForApp.setCreate_time(createTime);
+        sandWalletPayParamsForApp.setOrder_amt(order_amt);
+        sandWalletPayParamsForApp.setNotify_url(notify_url);
+        sandWalletPayParamsForApp.setCreate_ip(create_ip);
+        sandWalletPayParamsForApp.setPay_extra(pay_extra);
+        sandWalletPayParamsForApp.setAccsplit_flag("NO");
+        sandWalletPayParamsForApp.setExpire_time(endTime);
+        sandWalletPayParamsForApp.setGoods_name(goods_name);
+        sandWalletPayParamsForApp.setProduct_code("04010003");
+        sandWalletPayParamsForApp.setUserFeeAmt(payInfoDto.getServiceCharge().toString());
+        return sandWalletPayParamsForApp;
+    }
+
+
+    public static String sanAccountPayC2B(PayInfoDto payInfoDto, String realName, String sandOrderNo) {
         SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMddHHmmss");
         Calendar calendar = Calendar.getInstance();
         String createTime = sdf.format(calendar.getTime());
@@ -194,7 +238,7 @@ public class SandPayUtil {
         //商户key1
         String mer_key = "PZWgkPqM09qpDbUngCDdGL5kgg/9jDd3wvZUn87m0CnI6CklVzmtMi2AkXOd7P4xWmEjjzEo5bo=";
         //订单号
-        String mer_order_no = IdUtil.objectId();
+        String mer_order_no = sandOrderNo;
         //回调地址
         String notify_url = payInfoDto.getSandAccountEnum().getNotifyUrl();
         String return_url = payInfoDto.getSandAccountEnum().getReturnUrl();
@@ -285,6 +329,44 @@ public class SandPayUtil {
 
         System.out.println("最终链接：\n\n"+url);
         return url;
+    }
+
+
+    public static SandWalletPayParamsForApp sanAccountPayC2BForApp(PayInfoDto payInfoDto, String realName, String sandOrderNo) {
+        SandWalletPayParamsForApp sandWalletPayParamsForApp = new SandWalletPayParamsForApp();
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMddHHmmss");
+        Calendar calendar = Calendar.getInstance();
+        String createTime = sdf.format(calendar.getTime());
+        calendar.add(Calendar.HOUR,1);
+        String endTime = sdf.format(calendar.getTime());
+
+        //订单号
+        String mer_order_no = sandOrderNo;
+        //回调地址
+        String notify_url = payInfoDto.getSandAccountEnum().getNotifyUrl();
+        //金额
+        String order_amt = payInfoDto.getRealPayMoney().toString();
+        //商品名称
+        String goods_name = payInfoDto.getGoodsName();
+
+        String create_ip = payInfoDto.getIpaddr().replace(".","_");
+        //支付扩展域
+        //"userId":"用户在商户系统中的唯一编号", "nickName":"会员昵称","accountType"："账户类型"  （选填）
+        String pay_extra = "{\"userId\":\""+payInfoDto.getUserId()+"\",\"nickName\":\""+realName+"\",\"accountType\":\"1\"}";
+        //String pay_extra = "{\"userId\":\""+payInfoDto.getUserId()+"\",\"userName\":\""+realName+"\",\"idCard\":\""+cartNo+"\"}";
+        sandWalletPayParamsForApp.setPayUserId(payInfoDto.getUserId());
+        sandWalletPayParamsForApp.setMer_order_no(mer_order_no);
+        sandWalletPayParamsForApp.setCreate_time(createTime);
+        sandWalletPayParamsForApp.setOrder_amt(order_amt);
+        sandWalletPayParamsForApp.setNotify_url(notify_url);
+        sandWalletPayParamsForApp.setCreate_ip(create_ip);
+        sandWalletPayParamsForApp.setPay_extra(pay_extra);
+        sandWalletPayParamsForApp.setAccsplit_flag("NO");
+        sandWalletPayParamsForApp.setExpire_time(endTime);
+        sandWalletPayParamsForApp.setGoods_name(goods_name);
+        sandWalletPayParamsForApp.setProduct_code("04010001");
+        sandWalletPayParamsForApp.setUserName(realName);
+        return sandWalletPayParamsForApp;
     }
 
 
