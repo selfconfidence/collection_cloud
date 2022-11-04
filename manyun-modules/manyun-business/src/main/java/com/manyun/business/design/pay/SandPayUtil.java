@@ -15,6 +15,7 @@ import com.manyun.common.core.utils.ServletUtils;
 import com.manyun.common.core.utils.ip.IpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import sun.misc.BASE64Encoder;
@@ -37,7 +38,8 @@ public class SandPayUtil {
     @Autowired
     private static IMoneyService moneyService;
 
-
+    @Value("${open.url}")
+    private static String url;
 
 
     public static void main(String[] args) {
@@ -70,7 +72,7 @@ public class SandPayUtil {
         //订单号
         String mer_order_no = sandOrderNo;
         //回调地址
-        String notify_url = payInfoDto.getSandAccountEnum().getNotifyUrl();
+        String notify_url = url + payInfoDto.getSandAccountEnum().getNotifyUrl();
         String return_url = payInfoDto.getSandAccountEnum().getReturnUrl();
         //金额
         String order_amt = payInfoDto.getRealPayMoney().toString();
@@ -197,7 +199,7 @@ public class SandPayUtil {
         //订单号
         String mer_order_no = sandOrderNo;
         //回调地址
-        String notify_url = payInfoDto.getSandAccountEnum().getNotifyUrl();
+        String notify_url = url + payInfoDto.getSandAccountEnum().getNotifyUrl();
         //金额
         String order_amt = payInfoDto.getRealPayMoney().toString();
         //商品名称
@@ -240,7 +242,7 @@ public class SandPayUtil {
         //订单号
         String mer_order_no = sandOrderNo;
         //回调地址
-        String notify_url = payInfoDto.getSandAccountEnum().getNotifyUrl();
+        String notify_url = url + payInfoDto.getSandAccountEnum().getNotifyUrl();
         String return_url = payInfoDto.getSandAccountEnum().getReturnUrl();
         //金额
         String order_amt = payInfoDto.getRealPayMoney().toString();
@@ -343,7 +345,7 @@ public class SandPayUtil {
         //订单号
         String mer_order_no = sandOrderNo;
         //回调地址
-        String notify_url = payInfoDto.getSandAccountEnum().getNotifyUrl();
+        String notify_url = url + payInfoDto.getSandAccountEnum().getNotifyUrl();
         //金额
         String order_amt = payInfoDto.getRealPayMoney().toString();
         //商品名称
@@ -387,7 +389,7 @@ public class SandPayUtil {
 
         String mer_order_no = IdUtil.objectId();
         //回调地址
-        String notify_url = openAccountParams.getNotifyUrl();
+        String notify_url = url + openAccountParams.getNotifyUrl();
 
         String return_url = openAccountParams.getReturnUrl();
         //金额
@@ -500,7 +502,7 @@ public class SandPayUtil {
 
         String mer_order_no = IdUtil.objectId();
         //回调地址
-        String notify_url = openAccountParams.getNotifyUrl();
+        String notify_url = url + openAccountParams.getNotifyUrl();
 
         String return_url = openAccountParams.getReturnUrl();
         //金额
