@@ -52,7 +52,7 @@ public class SandPayUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(sign);*/
+        log.info(sign);*/
     }
 
     public static String sandWalletPay(PayInfoDto payInfoDto, String sandOrderNo) {
@@ -140,11 +140,11 @@ public class SandPayUtil {
             }
         }
         signature = signature.substring(0,signature.length()-1);
-        System.out.println("参与签名字符串：\n"+signature);
+        log.info("参与签名字符串：\n"+signature);
 
         String sign = MD5Util.encode(signature).toUpperCase();
 
-        System.out.println("签名串：\n"+sign);
+        log.info("签名串：\n"+sign);
 
 
         //拼接url
@@ -177,7 +177,7 @@ public class SandPayUtil {
                 "&sign_type=MD5" +
                 "&sign="+sign+"" ;
 
-        System.out.println("最终链接：\n\n"+url);
+        log.info("最终链接：\n\n"+url);
         return url;
     }
 
@@ -290,11 +290,11 @@ public class SandPayUtil {
             }
         }
         signature = signature.substring(0,signature.length()-1);
-        System.out.println("参与签名字符串：\n"+signature);
+        log.info("参与签名字符串：\n"+signature);
 
         String sign = MD5Util.encode(signature).toUpperCase();
 
-        System.out.println("签名串：\n"+sign);
+        log.info("签名串：\n"+sign);
 
 
         //拼接url
@@ -327,7 +327,7 @@ public class SandPayUtil {
                 "&sign_type=MD5" +
                 "&sign="+sign+"" ;
 
-        System.out.println("最终链接：\n\n"+url);
+        log.info("最终链接：\n\n"+url);
         return url;
     }
 
