@@ -283,7 +283,7 @@ public class SnapshotServiceImpl implements ISnapshotService {
      */
     @Override
     public TableDataInfo<CollectionNumberVo> collectionNumberQuery(CollectionNumberQuery collectionNumberQuery) {
-        /*PageHelper.startPage(collectionNumberQuery.getPageNum(),collectionNumberQuery.getPageSize());
+        PageHelper.startPage(collectionNumberQuery.getPageNum(),collectionNumberQuery.getPageSize());
         List<CntUserCollection> userCollectionList = userCollectionService.list(
                 Wrappers
                         .<CntUserCollection>lambdaQuery()
@@ -306,15 +306,15 @@ public class SnapshotServiceImpl implements ISnapshotService {
                 }
             }
             return collectionNumberVo;
-        }).collect(Collectors.toList()), userCollectionList);*/
-        PageHelper.startPage(collectionNumberQuery.getPageNum(), collectionNumberQuery.getPageSize());
+        }).collect(Collectors.toList()), userCollectionList);
+        /*PageHelper.startPage(collectionNumberQuery.getPageNum(), collectionNumberQuery.getPageSize());
         List<CollectionNumberVo> collectionNumberVos = cntUserCollectionMapper.collectionNumber(collectionNumberQuery.getCollectionId());
 
         return TableDataInfoUtil.pageTableDataInfo(collectionNumberVos.parallelStream().map(m ->{
             CollectionNumberVo collectionNumberVo=new CollectionNumberVo();
             BeanUtil.copyProperties(m,collectionNumberVo);
             return collectionNumberVo;
-        }).collect(Collectors.toList()),collectionNumberVos);
+        }).collect(Collectors.toList()),collectionNumberVos);*/
 
     }
 
