@@ -1,5 +1,8 @@
 package com.manyun.business.design.pay;
 
+import cn.hutool.core.lang.UUID;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.design.pay.bean.sandAccount.SandWalletPayParamsForApp;
@@ -29,7 +32,7 @@ public class SandWalletPay implements RootPayServer {
     public PayVo execPayVo(PayInfoDto payInfoDto) {
         IOrderService orderService = SpringUtil.getBean(IOrderService.class);
         if (PayTypeEnum.SANDWALLET_TYPE.getCode().equals(payInfoDto.getPayType())) {
-            String sandOrderNo = (payInfoDto.getOutHost() + "-" + LLianPayDateUtils.getTimestamp());
+            String sandOrderNo = (payInfoDto.getOutHost() + "-" + RandomUtil.randomNumbers(7));
             Order orderInfo = orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, payInfoDto.getOutHost()));
             if(Objects.nonNull(orderInfo) && !sandOrderNo.equals(orderInfo.getSandOrderNo())){
                 orderInfo.setSandOrderNo(sandOrderNo);
@@ -50,4 +53,5 @@ public class SandWalletPay implements RootPayServer {
         }
         throw new IllegalArgumentException("not fount pay_type = " + payInfoDto.getPayType());
     }
+
 }
