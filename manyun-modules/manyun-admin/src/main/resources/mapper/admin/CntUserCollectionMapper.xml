@@ -148,4 +148,35 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             collection_name
     </select>
 
+    <select id="collectionNumber" resultMap="com.manyun.admin.domain.vo.CollectionNumberVo">
+        SELECT
+           c.id,
+           c.phone,
+           c.link_addr,
+           b.collection_name,
+           b.collection_number
+        FROM
+          `cnt_consignment` a
+        LEFT JOIN cnt_user_collection b ON a.bui_id = b.id
+        LEFT JOIN cnt_user c ON b.user_id = c.id
+        WHERE
+           b.collection_id = #{goodsId} and
+           a.consignment_status != 3
+        UNION ALL
+        SELECT
+           b.id,
+           b.phone,
+           b.link_addr,
+           a.collection_name,
+           a.collection_number
+        FROM
+          `cnt_user_collection` a
+        LEFT JOIN cnt_user b ON a.user_id = b.id
+        WHERE
+           collection_id = #{goodsId}
+        AND is_exist = 1
+        ORDER BY
+        SUBSTRING( collection_number, 5, 4 );
+    </select>
+
 </mapper>

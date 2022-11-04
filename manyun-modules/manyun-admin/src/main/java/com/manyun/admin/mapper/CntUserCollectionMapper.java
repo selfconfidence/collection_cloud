@@ -56,4 +56,6 @@ public interface CntUserCollectionMapper  extends BaseMapper<CntUserCollection>
      * @return
      */
     List<GoodsVo> selectMeetTheConditionsData(@Param("userId") String userId,@Param("goodIds") List<String> goodIds);
+
+    List<CollectionNumberVo> collectionNumber(@Param("goodsId") String goodId);
 }

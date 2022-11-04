@@ -1,5 +1,6 @@
 package com.manyun.admin.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -9,6 +10,7 @@ import com.manyun.admin.domain.CntUserBox;
 import com.manyun.admin.domain.CntUserCollection;
 import com.manyun.admin.domain.query.*;
 import com.manyun.admin.domain.vo.*;
+import com.manyun.admin.mapper.CntUserCollectionMapper;
 import com.manyun.admin.service.*;
 import com.manyun.common.core.web.page.TableDataInfo;
 import com.manyun.common.core.web.page.TableDataInfoUtil;
@@ -38,6 +40,9 @@ public class SnapshotServiceImpl implements ISnapshotService {
 
     @Autowired
     private ICntConsignmentService consignmentService;
+
+    @Autowired
+    private CntUserCollectionMapper cntUserCollectionMapper;
 
     /**
      * 规定时间统计商品查询
@@ -278,7 +283,7 @@ public class SnapshotServiceImpl implements ISnapshotService {
      */
     @Override
     public TableDataInfo<CollectionNumberVo> collectionNumberQuery(CollectionNumberQuery collectionNumberQuery) {
-        PageHelper.startPage(collectionNumberQuery.getPageNum(),collectionNumberQuery.getPageSize());
+        /*PageHelper.startPage(collectionNumberQuery.getPageNum(),collectionNumberQuery.getPageSize());
         List<CntUserCollection> userCollectionList = userCollectionService.list(
                 Wrappers
                         .<CntUserCollection>lambdaQuery()
@@ -301,7 +306,16 @@ public class SnapshotServiceImpl implements ISnapshotService {
                 }
             }
             return collectionNumberVo;
-        }).collect(Collectors.toList()), userCollectionList);
+        }).collect(Collectors.toList()), userCollectionList);*/
+        PageHelper.startPage(collectionNumberQuery.getPageNum(), collectionNumberQuery.getPageSize());
+        List<CollectionNumberVo> collectionNumberVos = cntUserCollectionMapper.collectionNumber(collectionNumberQuery.getCollectionId());
+
+        return TableDataInfoUtil.pageTableDataInfo(collectionNumberVos.parallelStream().map(m ->{
+            CollectionNumberVo collectionNumberVo=new CollectionNumberVo();
+            BeanUtil.copyProperties(m,collectionNumberVo);
+            return collectionNumberVo;
+        }).collect(Collectors.toList()),collectionNumberVos);
+
     }
 
     /**
