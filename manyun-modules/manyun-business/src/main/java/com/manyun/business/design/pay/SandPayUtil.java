@@ -711,8 +711,8 @@ public class SandPayUtil {
         JSONObject invoke = invoke(param, SandMethodEnum.CEAS_ELEC_QUERY_ACCOUNT_BALANCE);
         BigDecimal availableBal = BigDecimal.ZERO;
         log.info("杉德余额查询-----" + invoke.toString());
-        if (Objects.nonNull(invoke)) {
-            JSONArray accountList = invoke.getJSONArray("accountList");
+        JSONArray accountList = invoke.getJSONArray("accountList");
+        if (Objects.nonNull(accountList)) {
             JSONObject jsonObject = accountList.getJSONObject(0);
             availableBal = jsonObject.getBigDecimal("availableBal");
         }
