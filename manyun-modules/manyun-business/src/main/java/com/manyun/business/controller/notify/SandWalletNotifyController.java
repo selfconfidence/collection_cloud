@@ -65,7 +65,7 @@ public class SandWalletNotifyController {
         boolean valid;
         try {
             valid = CryptoUtil.verifyDigitalSign(data.getBytes("utf-8"), Base64.decodeBase64(sign),
-                    CertUtil.getPublicKey(), "SHA1WithRSA");
+                    CertUtil.getPublicProKey(), "SHA1WithRSA");
             if (!valid) {
                 log.info("验签失败");
                 log.info("签名字符串(data)为："+ data);

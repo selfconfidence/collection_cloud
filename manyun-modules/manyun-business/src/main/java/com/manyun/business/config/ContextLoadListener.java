@@ -39,7 +39,7 @@ public class ContextLoadListener implements CommandLineRunner {
 			//加载配置文件
 			SDKConfig.getConfig().loadPropertiesFromSrc();
 			//加载证书
-			CertUtil.init(SDKConfig.getConfig().getSandCertPath(), SDKConfig.getConfig().getSignCertPath(), SDKConfig.getConfig().getSignCertPwd());
+			CertUtil.init(SDKConfig.getConfig().getSandCertPath(),SDKConfig.getConfig().getSandProCertPath(), SDKConfig.getConfig().getSignCertPath(), SDKConfig.getConfig().getSignCertPwd());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

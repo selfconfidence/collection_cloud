@@ -42,25 +42,33 @@ public class CertUtil {
 
 	public static final String PUBLIC_KEY = "public_key";
 	public static final String PRIVATE_KEY = "private_key";
+	public static final String PUBLIC_PRO_KEY = "public_pro_key";
 
 	private static final Logger logger = LoggerFactory.getLogger(CertUtil.class);
 
 	private static final ConcurrentHashMap<String, Object> keys = new ConcurrentHashMap<String, Object>();
 
-	public static void init(String publicKeyPath, String privateKeyPath, String keyPassword) throws Exception {
+	public static void init(String publicKeyPath,String publicProKeyPath, String privateKeyPath, String keyPassword) throws Exception {
 		// 加载私钥
 		initPulbicKey(publicKeyPath);
 		// 加载公钥
 		initPrivateKey(privateKeyPath, keyPassword);
+		//加载账户侧公钥
+		initPulbicProKey(publicProKeyPath);
 	}
 
 	public static PublicKey getPublicKey() {
 		return (PublicKey) keys.get(PUBLIC_KEY);
 	}
 
+	public static PublicKey getPublicProKey() {
+		return (PublicKey) keys.get(PUBLIC_PRO_KEY);
+	}
+
 	public static PrivateKey getPrivateKey() {
 		return (PrivateKey) keys.get(PRIVATE_KEY);
 	}
+
 
 	private static void initPulbicKey(String publicKeyPath) throws Exception {
 
@@ -78,6 +86,28 @@ public class CertUtil {
 				keys.put(PUBLIC_KEY, publicKey);
 			} catch (Exception e) {
 				logger.error("无法加载公钥[{}]", new Object[] { publicKeyPath });
+				logger.error(e.getMessage(), e);
+				throw e;
+			}
+		}
+	}
+
+	private static void initPulbicProKey(String publicProKeyPath) throws Exception {
+
+		String classpathKey = "classpath:";
+		if (publicProKeyPath != null) {
+			try {
+				InputStream inputStream = null;
+				if (publicProKeyPath.startsWith(classpathKey)) {
+					inputStream = CertUtil.class.getClassLoader()
+							.getResourceAsStream(publicProKeyPath.substring(classpathKey.length()));
+				} else {
+					inputStream = new FileInputStream(publicProKeyPath);
+				}
+				PublicKey publicProKey = CertUtil.getPublicKey(inputStream);
+				keys.put(PUBLIC_PRO_KEY, publicProKey);
+			} catch (Exception e) {
+				logger.error("无法加载公钥[{}]", new Object[] { publicProKeyPath });
 				logger.error(e.getMessage(), e);
 				throw e;
 			}

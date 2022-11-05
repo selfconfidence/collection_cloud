@@ -47,6 +47,9 @@ public class SDKConfig {
 	/** 杉德证书路径. */
 	private String sandCertPath;
 
+	/** 杉德账户侧证书路径. */
+	private String sandProCertPath;
+
 	/** 配置文件中的通讯地址常量. */
 	public static final String SDK_URL = "sandsdk.url";
 	/** 配置文件中的商户号常量. */
@@ -59,6 +62,8 @@ public class SDKConfig {
 	public static final String SDK_SIGN_CERT_PWD = "sandsdk.signCert.pwd";
 	/** 配置文件中的杉德证书路径常量. */
 	public static final String SDK_SNAD_CERT_PATH = "sandsdk.sandCert.path";
+	/** 配置文件中的杉德账户侧证书路径常量. */
+	public static final String SDK_SAND_PRO_CERT_PATH = "sandsdk.sandProCert.path";
 
 	/** 操作对象. */
 	private static SDKConfig config = new SDKConfig();
@@ -189,6 +194,11 @@ public class SDKConfig {
 			this.sandCertPath = value.trim();
 			logger.info("配置项：杉德公钥证书路径==>"+SDK_SNAD_CERT_PATH +"==>"+ value+" 已加载");
 		}
+		value = pro.getProperty(SDK_SAND_PRO_CERT_PATH);
+		if (!StringUtils.isEmpty(value)) {
+			this.sandProCertPath = value.trim();
+			logger.info("配置项：杉德公钥账户侧证书路径==>"+SDK_SAND_PRO_CERT_PATH +"==>"+ value+" 已加载");
+		}
 	}
 
 	public String getUrl() {
@@ -247,6 +257,11 @@ public class SDKConfig {
 		this.properties = properties;
 	}
 
+	public String getSandProCertPath() {
+		return sandProCertPath;
+	}
 
-
+	public void setSandProCertPath(String sandProCertPath) {
+		this.sandProCertPath = sandProCertPath;
+	}
 }
