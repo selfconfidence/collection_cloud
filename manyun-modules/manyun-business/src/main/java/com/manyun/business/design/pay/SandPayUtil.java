@@ -10,6 +10,7 @@ import com.manyun.business.design.pay.bean.sandAccount.*;
 import com.manyun.business.design.pay.bean.sandEnum.SandMethodEnum;
 import com.manyun.business.domain.dto.PayInfoDto;
 import com.manyun.business.service.IMoneyService;
+import com.manyun.business.service.IOrderService;
 import com.manyun.common.core.utils.MD5Util;
 import com.manyun.common.core.utils.ServletUtils;
 import com.manyun.common.core.utils.ip.IpUtils;
@@ -27,6 +28,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -40,6 +43,12 @@ public class SandPayUtil {
 
 
     public static void main(String[] args) {
+        /*LocalDateTime time = LocalDateTime.now();
+        String times = time.format(DateTimeFormatter.ofPattern("YYYYMMddHHmmss"));
+        System.out.println(times);
+        System.out.println(time.minusSeconds(10).format(DateTimeFormatter.ofPattern("YYYYMMddHHmmss")));*/
+        //LocalDateTime.now().minusSeconds(10).format(DateTimeFormatter.ofPattern("YYYYMMddHHmmss"));
+
         //openAccount(new OpenAccountParams());
         //sandWalletPay();
         //sanAccountPayC2B();
@@ -54,12 +63,12 @@ public class SandPayUtil {
         log.info(sign);*/
     }
 
-    public static String sandWalletPay(PayInfoDto payInfoDto, String sandOrderNo, String openUrl) {
+    public static String sandWalletPay(PayInfoDto payInfoDto, String sandOrderNo, String openUrl, LocalDateTime orderEndTime) {
         SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMddHHmmss");
         Calendar calendar = Calendar.getInstance();
         String createTime = sdf.format(calendar.getTime());
         calendar.add(Calendar.HOUR,1);
-        String endTime = sdf.format(calendar.getTime());
+        String endTime = orderEndTime.format(DateTimeFormatter.ofPattern("YYYYMMddHHmmss"));
 
         String version = "10";
         //商户号
@@ -185,13 +194,13 @@ public class SandPayUtil {
      * @param payInfoDto
      * @return
      */
-    public static SandWalletPayParamsForApp sandWalletPayForApp(PayInfoDto payInfoDto, String sandOrderNo, String url) {
+    public static SandWalletPayParamsForApp sandWalletPayForApp(PayInfoDto payInfoDto, String sandOrderNo, String url, LocalDateTime orderEndTime) {
         SandWalletPayParamsForApp sandWalletPayParamsForApp = new SandWalletPayParamsForApp();
         SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMddHHmmss");
         Calendar calendar = Calendar.getInstance();
         String createTime = sdf.format(calendar.getTime());
         calendar.add(Calendar.HOUR,1);
-        String endTime = sdf.format(calendar.getTime());
+        String endTime = orderEndTime.format(DateTimeFormatter.ofPattern("YYYYMMddHHmmss"));
 
         //订单号
         String mer_order_no = sandOrderNo;
@@ -224,12 +233,12 @@ public class SandPayUtil {
     }
 
 
-    public static String sanAccountPayC2B(PayInfoDto payInfoDto, String realName, String sandOrderNo, String openUrl) {
+    public static String sanAccountPayC2B(PayInfoDto payInfoDto, String realName, String sandOrderNo, String openUrl, LocalDateTime orderEndTime) {
         SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMddHHmmss");
         Calendar calendar = Calendar.getInstance();
         String createTime = sdf.format(calendar.getTime());
         calendar.add(Calendar.HOUR,1);
-        String endTime = sdf.format(calendar.getTime());
+        String endTime = orderEndTime.format(DateTimeFormatter.ofPattern("YYYYMMddHHmmss"));
 
         String version = "10";
         //商户号
@@ -331,13 +340,13 @@ public class SandPayUtil {
     }
 
 
-    public static SandWalletPayParamsForApp sanAccountPayC2BForApp(PayInfoDto payInfoDto, String realName, String sandOrderNo, String url) {
+    public static SandWalletPayParamsForApp sanAccountPayC2BForApp(PayInfoDto payInfoDto, String realName, String sandOrderNo, String url, LocalDateTime orderEndTime) {
         SandWalletPayParamsForApp sandWalletPayParamsForApp = new SandWalletPayParamsForApp();
         SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMddHHmmss");
         Calendar calendar = Calendar.getInstance();
         String createTime = sdf.format(calendar.getTime());
         calendar.add(Calendar.HOUR,1);
-        String endTime = sdf.format(calendar.getTime());
+        String endTime = orderEndTime.format(DateTimeFormatter.ofPattern("YYYYMMddHHmmss"));
 
         //订单号
         String mer_order_no = sandOrderNo;

@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Component
@@ -39,6 +40,7 @@ public class SandWalletPay implements RootPayServer {
         if (PayTypeEnum.SANDWALLET_TYPE.getCode().equals(payInfoDto.getPayType())) {
             String sandOrderNo = (payInfoDto.getOutHost() + "-" + RandomUtil.randomNumbers(7));
             Order orderInfo = orderService.getOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderNo, payInfoDto.getOutHost()));
+            LocalDateTime endTime = orderInfo.getEndTime();
             if(Objects.nonNull(orderInfo) && !sandOrderNo.equals(orderInfo.getSandOrderNo())){
                 orderInfo.setSandOrderNo(sandOrderNo);
                 orderService.updateById(orderInfo);
@@ -46,12 +48,12 @@ public class SandWalletPay implements RootPayServer {
             String body = "";
             SandWalletPayParamsForApp payParamsForApp = null;
             if (payInfoDto.isC2c()) {
-                body = SandPayUtil.sandWalletPay(payInfoDto, sandOrderNo, url);
-                payParamsForApp = SandPayUtil.sandWalletPayForApp(payInfoDto, sandOrderNo, url);
+                body = SandPayUtil.sandWalletPay(payInfoDto, sandOrderNo, url, endTime);
+                payParamsForApp = SandPayUtil.sandWalletPayForApp(payInfoDto, sandOrderNo, url, endTime);
             } else {
                 UserMoneyDto userMoneyDto = moneyService.userMoneyInfo(payInfoDto.getUserId());
-                body = SandPayUtil.sanAccountPayC2B(payInfoDto, userMoneyDto.getRealName(), sandOrderNo, url);
-                payParamsForApp = SandPayUtil.sanAccountPayC2BForApp(payInfoDto, userMoneyDto.getRealName(), sandOrderNo, url);
+                body = SandPayUtil.sanAccountPayC2B(payInfoDto, userMoneyDto.getRealName(), sandOrderNo, url, endTime);
+                payParamsForApp = SandPayUtil.sanAccountPayC2BForApp(payInfoDto, userMoneyDto.getRealName(), sandOrderNo, url, endTime);
             }
 
             return Builder.of(PayVo::new).with(PayVo::setBody, body).with(PayVo::setPayParamsForApp, payParamsForApp).with(PayVo::setSandOrderNo, sandOrderNo).with(PayVo::setPayType, payInfoDto.getPayType()).with(PayVo::setOutHost, payInfoDto.getOutHost()).build();
