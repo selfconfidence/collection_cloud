@@ -531,7 +531,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Transactional(rollbackFor = Exception.class)
     ///ShandePayEnum.COLLECTION_BOX_SHANDE_PAY.setReturnUrl(orderPayForm.getReturnUrl())
     public PayVo unifiedOrder(OrderPayForm orderPayForm,String userId) {
-        Assert.isTrue(Integer.valueOf(6).equals(orderPayForm.getPayType()) && moneyService.checkSandAccountStatus(userId), "暂未开通杉德云账户");
+        if (Integer.valueOf(6).equals(orderPayForm.getPayType())) {
+            Assert.isTrue(moneyService.checkSandAccountStatus(userId), "暂未开通杉德云账户");
+        }
         Order order = getById(orderPayForm.getOrderId());
         Assert.isFalse(Integer.valueOf(5).equals(orderPayForm.getPayType()) && order.getMoneyBln().compareTo(NumberUtil.add(0D)) >0, "当前状态暂不支持此支付方式");
         checkUnified(order,userId,orderPayForm.getPayPass(),orderPayForm.getPayType());
