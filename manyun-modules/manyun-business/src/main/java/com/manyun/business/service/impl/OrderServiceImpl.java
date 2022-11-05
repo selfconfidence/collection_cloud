@@ -433,6 +433,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (Integer.valueOf(5).equals(order.getPayType())) {
             canTrade = moneyService.checkLlpayStatus(cntConsignment.getPayUserId()) && moneyService.checkLlpayStatus(cntConsignment.getSendUserId());
         }
+        if (Integer.valueOf(6).equals(order.getPayType())) {
+            canTrade = moneyService.checkSandAccountStatus(cntConsignment.getPayUserId()) && moneyService.checkSandAccountStatus(cntConsignment.getSendUserId());
+        }
 
         // 更改订单状态, 绑定对应的 （藏品/盲盒）
         order.setOrderStatus(OVER_ORDER.getCode());
