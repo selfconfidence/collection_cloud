@@ -81,13 +81,12 @@ public class SandAccountController {
     @PostMapping("/accountBalanceQuery")
     @ApiOperation("杉德云账户余额查询")
     public R<BigDecimal> accountBalanceQuery() {
-        /*LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
         Boolean isOpen = moneyService.checkSandAccountStatus(loginBusinessUser.getUserId());
         if (isOpen) {
             return R.ok(SandPayUtil.accountBalanceQuery(loginBusinessUser.getUserId()));
         }
-        return R.ok(BigDecimal.ZERO);*/
-        return R.ok(SandPayUtil.accountBalanceQuery("1585829959652347904"));
+        return R.ok(BigDecimal.ZERO);
     }
 
 }
