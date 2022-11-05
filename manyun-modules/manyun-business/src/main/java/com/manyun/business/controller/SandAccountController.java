@@ -1,5 +1,6 @@
 package com.manyun.business.controller;
 
+import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.manyun.business.design.pay.SandPayUtil;
 import com.manyun.business.design.pay.bean.sandAccount.AccountParamsForApp;
@@ -7,7 +8,10 @@ import com.manyun.business.design.pay.bean.sandAccount.OpenAccountForm;
 import com.manyun.business.design.pay.bean.sandAccount.OpenAccountParams;
 import com.manyun.business.domain.entity.Money;
 import com.manyun.business.service.IMoneyService;
+import com.manyun.comm.api.RemoteBuiUserService;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.comm.api.model.LoginBusinessUser;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.enums.SandAccountEnum;
 import com.manyun.common.security.utils.SecurityUtils;
@@ -22,6 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+import static com.manyun.common.core.enums.UserRealStatus.OK_REAL;
+
 @RestController
 @RequestMapping("/sandAccount")
 @Api(tags = "杉德云账户相关api")
@@ -29,6 +35,9 @@ public class SandAccountController {
 
     @Autowired
     private IMoneyService moneyService;
+
+    @Autowired
+    private RemoteBuiUserService userService;
 
 
     @Value("${open.url}")
@@ -38,6 +47,9 @@ public class SandAccountController {
     @ApiOperation("云账户开户")
     public R<String> openAccount(@Valid @RequestBody OpenAccountForm openAccountForm) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        R<CntUserDto> cntUserDtoR = userService.commUni(loginBusinessUser.getUserId(), SecurityConstants.INNER);
+        CntUserDto data = cntUserDtoR.getData();
+        Assert.isTrue(OK_REAL.getCode().equals(data.getIsReal()),"暂未实名认证,请实名认证!");
         OpenAccountParams params = new OpenAccountParams();
         params.setUserId(loginBusinessUser.getUserId());
         Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId,loginBusinessUser.getUserId()));
@@ -52,6 +64,9 @@ public class SandAccountController {
     @ApiOperation("云账户开户(app使用)")
     public R<AccountParamsForApp> openAccountForApp(@Valid @RequestBody OpenAccountForm openAccountForm) {
         LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        R<CntUserDto> cntUserDtoR = userService.commUni(loginBusinessUser.getUserId(), SecurityConstants.INNER);
+        CntUserDto data = cntUserDtoR.getData();
+        Assert.isTrue(OK_REAL.getCode().equals(data.getIsReal()),"暂未实名认证,请实名认证!");
         OpenAccountParams params = new OpenAccountParams();
         params.setUserId(loginBusinessUser.getUserId());
         Money money = moneyService.getOne(Wrappers.<Money>lambdaQuery().eq(Money::getUserId,loginBusinessUser.getUserId()));
