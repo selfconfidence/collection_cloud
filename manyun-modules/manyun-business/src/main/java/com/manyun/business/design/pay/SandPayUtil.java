@@ -710,6 +710,7 @@ public class SandPayUtil {
         param.put("accountType", "01"); //账户类型 01：支付电子户 02：宝易付权益电子户 03：无资金权益户
         JSONObject invoke = invoke(param, SandMethodEnum.CEAS_ELEC_QUERY_ACCOUNT_BALANCE);
         BigDecimal availableBal = BigDecimal.ZERO;
+        log.info("杉德余额查询-----" + invoke.toString());
         if (Objects.nonNull(invoke)) {
             JSONArray accountList = invoke.getJSONArray("accountList");
             JSONObject jsonObject = accountList.getJSONObject(0);
