@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+import java.math.BigDecimal;
+
 import static com.manyun.common.core.enums.UserRealStatus.OK_REAL;
 
 @RestController
@@ -74,6 +76,18 @@ public class SandAccountController {
         params.setNotifyUrl(url + SandAccountEnum.OPEN_ACCOUNT.getNotifyUrl());
         params.setReturnUrl(openAccountForm.getReturnUrl());
         return R.ok(SandPayUtil.openAccountForApp(params));
+    }
+
+    @PostMapping("/accountBalanceQuery")
+    @ApiOperation("杉德云账户余额查询")
+    public R<BigDecimal> accountBalanceQuery() {
+        /*LoginBusinessUser loginBusinessUser = SecurityUtils.getNotNullLoginBusinessUser();
+        Boolean isOpen = moneyService.checkSandAccountStatus(loginBusinessUser.getUserId());
+        if (isOpen) {
+            return R.ok(SandPayUtil.accountBalanceQuery(loginBusinessUser.getUserId()));
+        }
+        return R.ok(BigDecimal.ZERO);*/
+        return R.ok(SandPayUtil.accountBalanceQuery("1585829959652347904"));
     }
 
 }

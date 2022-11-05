@@ -605,7 +605,7 @@ public class CntConsignmentServiceImpl extends ServiceImpl<CntConsignmentMapper,
     private void checkAll(String userId, UserConsignmentForm userConsignmentForm) {
         // 是否开通连连钱包
         Money serviceOne = moneyService.getOne(Wrappers.<Money>lambdaQuery().select(Money::getLlAccountStatus).eq(Money::getUserId, userId));
-        Assert.isTrue("1".equals(serviceOne.getLlAccountStatus()),"开通连连支付才可寄售！");
+        Assert.isTrue("1".equals(serviceOne.getLlAccountStatus()) || Integer.valueOf(1).equals(serviceOne.getSandAccountStatus()),"开通杉德云账户或连连支付才可寄售！");
         Integer type = userConsignmentForm.getType();
         // 藏品
         if (BusinessConstants.ModelTypeConstant.COLLECTION_TAYPE.equals(type))

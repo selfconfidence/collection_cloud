@@ -534,6 +534,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Transactional(rollbackFor = Exception.class)
     ///ShandePayEnum.COLLECTION_BOX_SHANDE_PAY.setReturnUrl(orderPayForm.getReturnUrl())
     public PayVo unifiedOrder(OrderPayForm orderPayForm,String userId) {
+        if (Integer.valueOf(5).equals(orderPayForm.getPayType())) {
+            Assert.isTrue(moneyService.checkLlpayStatus(userId), "暂未开通连连支付");
+        }
         if (Integer.valueOf(6).equals(orderPayForm.getPayType())) {
             Assert.isTrue(moneyService.checkSandAccountStatus(userId), "暂未开通杉德云账户");
         }
@@ -552,11 +555,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             canSandTrade  = moneyService.checkSandAccountStatus(userId) && moneyService.checkSandAccountStatus(cntConsignment.getSendUserId());
             sendUserId = cntConsignment.getSendUserId();
             if (Integer.valueOf(5).equals(orderPayForm.getPayType())) {
-                Assert.isTrue(canTrade, "暂未开通连连支付，请选择其他支付方式");
+                Assert.isTrue(canTrade, "寄售方暂未开通连连支付，请选择其他支付方式");
                 serviceCharge = cntConsignment.getServerCharge();
             }
             if (Integer.valueOf(6).equals(orderPayForm.getPayType())) {
-                Assert.isTrue(canSandTrade, "暂未开通杉德云账户支付，请选择其他支付方式");
+                Assert.isTrue(canSandTrade, "寄售方暂未开通杉德云账户支付，请选择其他支付方式");
                 serviceCharge = cntConsignment.getServerCharge();
                 c2c = true;
             }

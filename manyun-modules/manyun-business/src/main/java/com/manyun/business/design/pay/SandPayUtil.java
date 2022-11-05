@@ -5,6 +5,7 @@ import cn.com.sand.ceas.sdk.config.CertCache;
 import cn.com.sand.ceas.sdk.util.SignatureUtils;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.manyun.business.design.pay.bean.sandAccount.*;
 import com.manyun.business.design.pay.bean.sandEnum.SandMethodEnum;
@@ -23,6 +24,7 @@ import sun.misc.BASE64Encoder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -33,6 +35,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Component
 @Slf4j
@@ -700,12 +703,19 @@ public class SandPayUtil {
      * 账户余额查询
      * 个人账户余额查询
      */
-    public void accountBalanceQuery() {
+    public static BigDecimal accountBalanceQuery(String bizUserNo) {
         JSONObject param = new JSONObject();
-        //param.put("customerOrderNo", DemoBase.getCustomerOrderNo()); //商户订单号 可以和关联卡订单号一致
-        param.put("bizUserNo", ""); //会员编号
+        param.put("customerOrderNo", IdUtil.objectId()); //商户订单号 可以和关联卡订单号一致
+        param.put("bizUserNo", bizUserNo); //会员编号
         param.put("accountType", "01"); //账户类型 01：支付电子户 02：宝易付权益电子户 03：无资金权益户
-        invoke(param, SandMethodEnum.CEAS_ELEC_QUERY_ACCOUNT_BALANCE);
+        JSONObject invoke = invoke(param, SandMethodEnum.CEAS_ELEC_QUERY_ACCOUNT_BALANCE);
+        BigDecimal availableBal = BigDecimal.ZERO;
+        if (Objects.nonNull(invoke)) {
+            JSONArray accountList = invoke.getJSONArray("accountList");
+            JSONObject jsonObject = accountList.getJSONObject(0);
+            availableBal = jsonObject.getBigDecimal("availableBal");
+        }
+        return availableBal;
     }
 
     /**
@@ -884,7 +894,7 @@ public class SandPayUtil {
     /**
      * 通用调用方法
      */
-    private JSONObject invoke(JSONObject param, SandMethodEnum sandMethodEnum) {
+    private static JSONObject invoke(JSONObject param, SandMethodEnum sandMethodEnum) {
         JSONObject resp = null;
         try {
             resp = CeasHttpUtil.doPost(param, sandMethodEnum);
