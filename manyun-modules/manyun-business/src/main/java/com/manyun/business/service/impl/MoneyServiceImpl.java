@@ -281,7 +281,7 @@ public class MoneyServiceImpl extends ServiceImpl<MoneyMapper, Money> implements
                 if (OrderStatus.OVER_ORDER.getCode().equals(order.getOrderStatus())) {
                     payStatus = 1;
                 }
-                payType = Optional.<Integer>of(order.getPayType()).orElse(Integer.valueOf(0));
+                payType = Optional.<Integer>ofNullable(order.getPayType()).orElse(Integer.valueOf(0));
                 moneyBln = order.getMoneyBln();
                 payTime = order.getPayTime();
                 break;
