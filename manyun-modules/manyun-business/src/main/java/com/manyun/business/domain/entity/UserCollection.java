@@ -43,6 +43,9 @@ public class UserCollection implements Serializable {
     @ApiModelProperty("藏品哈希;购买后")
     private String collectionHash;
 
+    @ApiModelProperty("链上标识码")
+    private String tokeId;
+
     @ApiModelProperty("链上地址;购买后 此标识,代表业务系统藏品唯一标识,往下传递即可")
     private String linkAddr;
 

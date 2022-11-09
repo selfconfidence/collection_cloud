@@ -10,6 +10,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.manyun.business.design.mychain.MyChainService;
 import com.manyun.business.design.pay.LLPayUtils;
 import com.manyun.business.design.pay.RootPay;
 import com.manyun.business.design.pay.ShandePay;
@@ -139,6 +140,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Autowired
     private RedisService redisService;
+
+    @Autowired
+    private MyChainService chainService;
 
     @Override
     public TableDataInfo<OrderVo> pageQueryList(OrderQuery orderQuery, String userId) {
@@ -464,6 +468,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             UserCollection sourceUserCollection = userCollectionService.getById(cntConsignment.getBuiId());
             userCollection.setCollectionHash(sourceUserCollection.getCollectionHash());
             userCollection.setCollectionNumber(sourceUserCollection.getCollectionNumber());
+            userCollection.setTokeId(sourceUserCollection.getTokeId());
             userCollection.setRealCompany(sourceUserCollection.getRealCompany());
             userCollection.setLinkAddr(sourceUserCollection.getLinkAddr());
             userCollectionService.save(userCollection);
@@ -471,8 +476,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             updateById(order);
             // 增加流转记录
             //StepDto.builder().buiId(userCollection.getLinkAddr()).userId(cntConsignment.getSendUserId()).modelType(COLLECTION_MODEL_TYPE).reMark("转让方").formHash(userCollection.getCollectionHash()).formInfo("寄售市场已寄售成功").build()
-            //                    ,
-            stepService.saveBatch(StepDto.builder().buiId(userCollection.getLinkAddr()).userId(cntConsignment.getPayUserId()).modelType(COLLECTION_MODEL_TYPE).formHash(userCollection.getCollectionHash()).reMark("受让方").formInfo(info).build());
+            // 链上查询流转记录
+            // 开始
+            CntUserDto cntUserDto = remoteBuiUserService.commUni(cntConsignment.getSendUserId(), SecurityConstants.INNER).getData();
+            chainService.tranForm(CallTranDto.builder().form(cntConsignment.getSendUserId()).account(cntUserDto.getId()).userKey(cntUserDto.getUserKey()).tokenId(Integer.valueOf(sourceUserCollection.getTokeId())).to(cntConsignment.getPayUserId()).build(), (tranFormHash)->{
+                stepService.saveBatch(StepDto.builder().formTranHash(tranFormHash).buiId(userCollection.getLinkAddr()).userId(cntConsignment.getPayUserId()).modelType(COLLECTION_MODEL_TYPE).formHash(userCollection.getCollectionHash()).reMark("受让方").formInfo(info).build());
+            });
+
 
         }
 

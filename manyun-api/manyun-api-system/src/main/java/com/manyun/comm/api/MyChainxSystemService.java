@@ -1,6 +1,7 @@
 package com.manyun.comm.api;
 
 import com.manyun.comm.api.domain.dto.CallAccountDto;
+import com.manyun.comm.api.domain.vo.ChainAccountVo;
 import com.manyun.comm.api.factory.RemoteChainxFallbackFactory;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.constant.ServiceNameConstants;
@@ -33,4 +34,8 @@ public interface MyChainxSystemService {
      */
      @PostMapping("/mychain/accountCreate")
      R<String> accountCreate(@RequestBody CallAccountDto callAccountDto,@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+
+    @GetMapping("/mychain/createInit/{account}")
+    R<ChainAccountVo> createInit(@PathVariable("account") String account,@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+
 }

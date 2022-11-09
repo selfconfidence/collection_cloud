@@ -78,6 +78,9 @@ public class CntUser implements Serializable {
     @ApiModelProperty("邀请海报")
     private String inviteUrl;
 
+    @ApiModelProperty("区块链私钥")
+    private String userKey;
+
     @ApiModelProperty("创建时间")
     private LocalDateTime createdTime;
 

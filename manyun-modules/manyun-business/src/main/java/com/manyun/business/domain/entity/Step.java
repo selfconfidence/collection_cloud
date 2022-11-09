@@ -43,8 +43,12 @@ public class Step implements Serializable {
     private String formInfo;
 
 
-    @ApiModelProperty("流转哈希")
+    @ApiModelProperty("流转哈希_固定不变")
     private String formHash;
+
+
+    @ApiModelProperty("流转记录溯源")
+    private String formTranHash;
 
     @ApiModelProperty("创建人")
     private String createdBy;

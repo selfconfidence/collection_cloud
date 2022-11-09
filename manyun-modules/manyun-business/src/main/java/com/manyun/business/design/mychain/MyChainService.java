@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.crypto.asymmetric.KeyType;
 import cn.hutool.crypto.asymmetric.RSA;
 import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -14,9 +15,11 @@ import com.manyun.business.domain.dto.CallTranDto;
 import com.manyun.business.domain.entity.UserCollection;
 import com.manyun.business.service.IUserCollectionService;
 import com.manyun.comm.api.domain.dto.CallAccountDto;
+import com.manyun.comm.api.domain.vo.ChainAccountVo;
 import com.manyun.common.core.exception.LinkTranException;
 import com.manyun.common.core.exception.LinkUpException;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +29,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static com.manyun.common.core.enums.CollectionLink.NOT_LINK;
@@ -53,6 +57,8 @@ public class MyChainService {
     private String megerBase = "/callMychain/tranForm";
     private String createAccountBase = "/callMychain/createAccount";
 
+    private String createInitAccountBase = "/callMychain/createInit";
+
     @Autowired
     private ObjectFactory<IUserCollectionService> userCollectionServiceObjectFactory;
 
@@ -70,12 +76,13 @@ public class MyChainService {
      *                        5s   10s  20s
      */
     @Retryable(maxAttempts = 3,value = LinkUpException.class,backoff = @Backoff(multiplier = 2,value = 5000L))
-    public void accountCollectionUp(CallCommitDto callCommitDto, Consumer<String> consumer){
+    public void accountCollectionUp(CallCommitDto callCommitDto, BiConsumer<String,String> consumer){
         try {
             log.info("开始上链:{}",callCommitDto.toString());
-            String hash = httpAccountCollectionUp(callCommitDto);
-            consumer.accept(hash);
-            log.info("上链成功:对应得 hash 为:{}",hash);
+            String body = httpAccountCollectionUp(callCommitDto);
+            cn.hutool.json.JSONObject jsonObject = JSONUtil.parseObj(body);
+            consumer.accept(jsonObject.getStr("tx_hash"),jsonObject.getStr("token_id"));
+            log.info("上链成功:对应得 hash 为:{}",jsonObject);
         }catch (Exception e){
             throw new LinkUpException(callCommitDto.getUserCollectionId(), e.getMessage());
         }
@@ -138,7 +145,7 @@ public class MyChainService {
             consumer.accept(hash);
             log.info("转赠链成功:对应得 hash 为:{}",hash);
         }catch (Exception e){
-            throw new LinkTranException(callTranDto.getUserCollectionId(),e.getMessage());
+            throw new LinkTranException(callTranDto.getAccount(),e.getMessage());
         }
 
     }
@@ -205,5 +212,14 @@ public class MyChainService {
         Assert.isTrue(bodyJsonObj.getInteger("code").equals(200),bodyJsonObj.getString("msg"));
         return bodyJsonObj.getString("data");
 
+    }
+
+    public ChainAccountVo createInit(String account) {
+        String body = HttpUtil.get(linkHttp.concat(createInitAccountBase.concat("/").concat(account)));
+        JSONObject bodyJsonObj = JSON.parseObject(body);
+        Assert.isTrue(bodyJsonObj.getInteger("code").equals(200),bodyJsonObj.getString("msg"));
+        String data = bodyJsonObj.getString("data");
+        ChainAccountVo chainAccountVo = JSONUtil.toBean(data, ChainAccountVo.class);
+        return chainAccountVo;
     }
 }

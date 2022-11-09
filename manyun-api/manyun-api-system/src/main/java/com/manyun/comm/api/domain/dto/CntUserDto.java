@@ -64,6 +64,9 @@ public class CntUserDto implements Serializable {
     @ApiModelProperty("支付密码")
     private String payPass;
 
+    @ApiModelProperty("用户私钥")
+    private String userKey;
+
     @ApiModelProperty("创建人")
     private String createdBy;
 

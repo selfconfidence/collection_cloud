@@ -31,8 +31,9 @@ public class CallCommitDto {
    private String sellway;
    private String artSize;
    private String location;
+   private String account;
+   private String userKey;
    private String userCollectionId;
-
 
 
 }

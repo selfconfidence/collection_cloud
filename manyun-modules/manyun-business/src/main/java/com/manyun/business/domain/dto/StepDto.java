@@ -44,4 +44,8 @@ public class StepDto implements Serializable {
     @ApiModelProperty("流转哈希")
     private String formHash;
 
+
+    @ApiModelProperty("流转记录溯源")
+    private String formTranHash;
+
 }

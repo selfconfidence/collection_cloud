@@ -18,10 +18,12 @@ public class CallTranDto {
      *      *     date:艺术品年代
      *      *     owner:艺术品拥有者
      */
-   private String artId;
-   private String date;
-   private String owner;
-   private String userCollectionId;
+    private String form;
+    private String to;
+    private Integer tokenId;
+
+    private String account;
+    private String userKey;
 
 
 

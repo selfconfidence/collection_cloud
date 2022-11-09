@@ -15,7 +15,10 @@ import com.manyun.business.domain.vo.*;
 import com.manyun.business.mapper.CntActionMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.manyun.comm.api.RemoteBuiUserService;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.common.core.constant.BusinessConstants;
+import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
 import com.manyun.common.core.domain.R;
 import com.manyun.common.core.utils.DateUtils;
@@ -76,6 +79,9 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
 
     @Autowired
     private MyChainService myChainService;
+
+    @Autowired
+    private RemoteBuiUserService buiUserService;
 
     /**
      * 查询活动合成列表
@@ -239,9 +245,12 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
         userCollectionService.save(userCollection);
 
         //合成藏品上链
+        CntUserDto cntUserDto = buiUserService.commUni(userId, SecurityConstants.INNER).getData();
         BigDecimal realPrice = collectionServiceObjectFactory.getObject().getById(userCollection.getCollectionId()).getRealPrice();
         myChainService.accountCollectionUp(CallCommitDto.builder()
                 .userCollectionId(userCollection.getId())
+                        .userKey(cntUserDto.getUserKey())
+                        .account(userId)
                 .artId(userCollection.getLinkAddr())
                 .artName(userCollection.getCollectionName())
                 .artSize("80")
@@ -250,12 +259,13 @@ public class ActionServiceImpl extends ServiceImpl<CntActionMapper, Action> impl
                 .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM")))
                 .sellway(userCollection.getSourceInfo())
                 .owner(userCollection.getUserId())
-                .build(), (hash)->{
+                .build(), (hash,tokenId)->{
             userCollection.setIsLink(OK_LINK.getCode());
             userCollection.setRealCompany(REAL_COMPANY);
             // 编号特殊生成
             userCollection.setCollectionNumber(StrUtil.format("CNT_{}",userCollectionService.autoCollectionNum(userCollection.getCollectionId())));
             userCollection.setCollectionHash(hash);
+            userCollection.setTokeId(tokenId);
             userCollection.updateD(userCollection.getUserId());
             userCollectionService.updateById(userCollection);
         });

@@ -24,6 +24,7 @@ import com.manyun.business.mapper.UserCollectionMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.manyun.comm.api.RemoteBuiUserService;
+import com.manyun.comm.api.domain.dto.CntUserDto;
 import com.manyun.common.core.constant.BusinessConstants;
 import com.manyun.common.core.constant.SecurityConstants;
 import com.manyun.common.core.domain.Builder;
@@ -98,6 +99,9 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
     @Autowired
     private IMediaService mediaService;
 
+    @Autowired
+    private MyChainService chainService;
+
 
     /**
      * 直接上链即可,转让的新增个函数进行处理
@@ -131,9 +135,12 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         // 开始上链 // 组装所有上链所需要数据结构 并且不能报错
         ThreadUtil.execute(()->{
             for (UserCollection userCollection : userCollections) {
+                CntUserDto cntUserDto = remoteBuiUserService.commUni(userCollection.getUserId(), SecurityConstants.INNER).getData();
                 BigDecimal realPrice = collectionServiceObjectFactory.getObject().getById(userCollection.getCollectionId()).getRealPrice();
                 myChainService.accountCollectionUp(CallCommitDto.builder()
                         .userCollectionId(userCollection.getId())
+                                .account(userCollection.getUserId())
+                                .userKey(cntUserDto.getUserKey())
                         .artId(userCollection.getLinkAddr())
                         .artName(userCollection.getCollectionName())
                         .artSize("80")
@@ -142,13 +149,14 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                         .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM")))
                         .sellway(userCollection.getSourceInfo())
                         .owner(userCollection.getUserId())
-                        .build(), (hash)->{
+                        .build(), (hash,token)->{
                     userCollection.setIsLink(OK_LINK.getCode());
                     userCollection.setRealCompany(REAL_COMPANY);
                     // 编号特殊生成 借助 redis 原子性操作
                     userCollection.setCollectionNumber(StrUtil.format("CNT_{}",autoCollectionNum(userCollection.getCollectionId())));
                     //userCollection.setLinkAddr(hash);
                     userCollection.setCollectionHash(hash);
+                    userCollection.setTokeId(token);
                     userCollection.updateD(userCollection.getUserId());
                     updateById(userCollection);
                 });
@@ -194,13 +202,14 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                    .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM")))
                    .sellway(userCollection.getSourceInfo())
                    .owner(userCollection.getUserId())
-                   .build(), (hash)->{
+                   .build(), (hash,tokenId)->{
                userCollection.setIsLink(OK_LINK.getCode());
                userCollection.setRealCompany(REAL_COMPANY);
                // 编号特殊生成 借助 redis 原子性操作
                userCollection.setCollectionNumber(StrUtil.format("CNT_{}",autoCollectionNum(userCollection.getCollectionId())));
                //userCollection.setLinkAddr(hash);
                userCollection.setCollectionHash(hash);
+               userCollection.setTokeId(tokenId);
                userCollection.updateD(userCollection.getUserId());
                updateById(userCollection);
            });
@@ -252,7 +261,12 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
        userCollection.createD(toUserId);
        save(userCollection);
        //StepDto.builder().buiId(userCollection.getLinkAddr()).userId(tranUserId).modelType(COLLECTION_MODEL_TYPE).reMark("转让方").formHash(oldCollectionHash).formInfo(formatTran).build()
-       stepService.saveBatch(StepDto.builder().buiId(userCollection.getLinkAddr()).userId(toUserId).modelType(COLLECTION_MODEL_TYPE).formHash(oldCollectionHash).reMark("受让方").formInfo(format).build());
+
+       CntUserDto cntUserDto = remoteBuiUserService.commUni(tranUserId, SecurityConstants.INNER).getData();
+       chainService.tranForm(CallTranDto.builder().form(tranUserId).account(cntUserDto.getId()).userKey(cntUserDto.getUserKey()).tokenId(Integer.valueOf(userCollection.getTokeId())).to(toUserId).build(), (tranFormHash)->{
+           stepService.saveBatch(StepDto.builder().buiId(userCollection.getLinkAddr()).userId(toUserId).formTranHash(tranFormHash).modelType(COLLECTION_MODEL_TYPE).formHash(oldCollectionHash).reMark("受让方").formInfo(format).build());
+       });
+
 
        // 开始转赠
        /*myChainService.tranForm(CallTranDto.builder()
@@ -377,9 +391,11 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         UserCollection userCollection = getOne(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getUserId,userId).eq(UserCollection::getId,userCollectionId));
         Assert.isTrue(Objects.nonNull(userCollection) && NOT_LINK.getCode().equals(userCollection.getIsLink()),"藏品信息有误,请核实!");
         BigDecimal realPrice = collectionServiceObjectFactory.getObject().getById(userCollection.getCollectionId()).getRealPrice();
-
+        CntUserDto cntUserDto = remoteBuiUserService.commUni(userCollection.getUserId(), SecurityConstants.INNER).getData();
         myChainService.accountCollectionUp(CallCommitDto.builder()
                 .userCollectionId(userCollection.getId())
+                        .userKey(cntUserDto.getUserKey())
+                        .account(userId)
                 .artId(userCollection.getLinkAddr())
                 .artName(userCollection.getCollectionName())
                 .artSize("80")
@@ -388,13 +404,14 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
                 .date(userCollection.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM")))
                 .sellway(userCollection.getSourceInfo())
                 .owner(userCollection.getUserId())
-                        .build(), (hash)->{
+                        .build(), (hash,token)->{
                     userCollection.setIsLink(OK_LINK.getCode());
                     userCollection.setRealCompany(REAL_COMPANY);
                     // 编号特殊生成
                     userCollection.setCollectionNumber(StrUtil.format("CNT_{}",autoCollectionNum(userCollection.getCollectionId())));
                     //userCollection.setLinkAddr(hash);
                     userCollection.setCollectionHash(hash);
+                    userCollection.setTokeId(token);
                     userCollection.updateD(userCollection.getUserId());
                     updateById(userCollection);
                     // TODO 会有个 bug 就是如果是转赠失败的话，那么统一上链处理，流转记录得不到记录。
