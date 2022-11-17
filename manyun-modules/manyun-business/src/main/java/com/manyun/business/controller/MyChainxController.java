@@ -63,6 +63,24 @@ public class MyChainxController {
     }
 
 
+    /**
+     * 根据用户区块链地址查询 藏品
+     */
+    @GetMapping("/getLinkAddr/{linkAddr}")
+    @ApiOperation("区块链地址查询")
+    public R getUserLinkAddr(@PathVariable("linkAddr") String linkAddr){
+        return R.ok(userCollectionService.getUserLinkAddr(linkAddr));
+    }
+
+//    /**
+//     * 根据用户区块链地址查询 藏品
+//     */
+//    @GetMapping("/getCollectionLink")
+//    @ApiOperation("根据藏品区块链地址查询藏品流转记录")
+//    public R getCollectionLink(){
+//
+//        return R.ok();
+//    }
 
 
 

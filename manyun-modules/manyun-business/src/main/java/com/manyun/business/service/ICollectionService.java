@@ -60,4 +60,6 @@ public interface ICollectionService extends IService<CntCollection> {
     List<KeywordVo> thisAssertQueryDict(String userId, String keyword);
 
     TableDataInfo<CollectionVo> homeCacheList();
+
+    List<StepVo> initStepVo(String linkAddr, String collectionModelType);
 }

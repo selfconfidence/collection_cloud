@@ -4,6 +4,7 @@ import com.manyun.business.domain.dto.UserCollectionCountDto;
 import com.manyun.business.domain.entity.UserCollection;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.manyun.business.domain.form.PushMuseumForm;
+import com.manyun.business.domain.vo.ChainxLinkVo;
 import com.manyun.business.domain.vo.MuseumListVo;
 import com.manyun.business.domain.vo.UserCollectionVo;
 import com.manyun.common.core.domain.R;
@@ -52,6 +53,8 @@ public interface IUserCollectionService extends IService<UserCollection> {
     void pushMuseum(PushMuseumForm pushMuseumForm, String userId);
 
     List<MuseumListVo> museumList(String userId);
+
+    ChainxLinkVo getUserLinkAddr(String linkAddr);
 
 //    String showUserCollection(String buiId, String userId, String info);
 }

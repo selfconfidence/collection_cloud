@@ -69,4 +69,6 @@ public interface ICntUserService extends IService<CntUser> {
 
 
     void payEncrypt(String userId);
+
+    void newRegLink();
 }

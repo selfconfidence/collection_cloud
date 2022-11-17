@@ -768,8 +768,9 @@ public class CollectionServiceImpl extends ServiceImpl<CntCollectionMapper, CntC
     }
 
 
+    @Override
 
-    private List<StepVo> initStepVo(String linkAddr, String collectionModelType) {
+    public List<StepVo> initStepVo(String linkAddr, String collectionModelType) {
         List<Step> stepList = stepService.list(Wrappers.<Step>lambdaQuery().eq(Step::getBuiId, linkAddr).eq(Step::getModelType, collectionModelType).orderByDesc(Step::getCreatedTime));
        return stepList.parallelStream().map(item ->{
            StepVo stepVo = Builder.of(StepVo::new).build();

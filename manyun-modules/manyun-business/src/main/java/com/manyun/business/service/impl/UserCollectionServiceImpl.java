@@ -17,9 +17,7 @@ import com.manyun.business.domain.dto.*;
 import com.manyun.business.domain.entity.CntCollection;
 import com.manyun.business.domain.entity.UserCollection;
 import com.manyun.business.domain.form.PushMuseumForm;
-import com.manyun.business.domain.vo.MediaVo;
-import com.manyun.business.domain.vo.MuseumListVo;
-import com.manyun.business.domain.vo.UserCollectionVo;
+import com.manyun.business.domain.vo.*;
 import com.manyun.business.mapper.UserCollectionMapper;
 import com.manyun.business.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -597,5 +595,53 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         }
         return museumList;
 
+    }
+
+    @Override
+    public ChainxLinkVo getUserLinkAddr(String linkAddr) {
+        ChainxLinkVo chainxLinkVo = new ChainxLinkVo();
+        // 查询用户的 区块链地址
+        CntUserDto cntUserDto = remoteBuiUserService.commUni(linkAddr, SecurityConstants.INNER).getData();
+        if (Objects.nonNull(cntUserDto)){
+            chainxLinkVo.setLinkFlag(1);
+            // 用户藏品数量相关
+            ChainxUserLinkVo chainxUserLinkVo = new ChainxUserLinkVo();
+            chainxUserLinkVo.setLinkAddr(cntUserDto.getLinkAddr());
+            chainxUserLinkVo.setCreatedTime(cntUserDto.getCreatedTime());
+
+            List<UserCollection> userCollections = list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getUserId, cntUserDto.getId()).eq(UserCollection::getIsExist, USE_EXIST.getCode()).orderByDesc(UserCollection::getCreatedTime));
+            chainxUserLinkVo.setUserCollections(userCollections.parallelStream().map(item ->{
+                ChainxUserCollectionLinkVo chainxUserCollectionLinkVo = new ChainxUserCollectionLinkVo();
+                chainxUserCollectionLinkVo.setCollectionHash(item.getCollectionHash());
+                chainxUserCollectionLinkVo.setCollectionName(item.getCollectionName());
+                chainxUserCollectionLinkVo.setCreatedTime(item.getCreatedTime());
+                return chainxUserCollectionLinkVo;
+            }).collect(Collectors.toList()));
+            chainxLinkVo.setData(chainxUserLinkVo);
+            return chainxLinkVo;
+        }
+
+        List<UserCollection> userCollections = list(Wrappers.<UserCollection>lambdaQuery().eq(UserCollection::getLinkAddr, linkAddr));
+        if (!userCollections.isEmpty()){
+            // 藏品详情信息 附属 流转记录
+            chainxLinkVo.setLinkFlag(2);
+            ChainxCollectionLinkVo chainxCollectionLinkVo = new ChainxCollectionLinkVo();
+            UserCollection userCollection = userCollections.get(0);
+            CollectionAllVo collectionAllVo = collectionServiceObjectFactory.getObject().info(userCollection.getCollectionId());
+
+            chainxCollectionLinkVo.setCollectionName(userCollection.getCollectionName());
+            chainxCollectionLinkVo.setCollectionHash(userCollection.getCollectionHash());
+            chainxCollectionLinkVo.setCnfCreationdVo(collectionAllVo.getCollectionVo().getCnfCreationdVo());
+            chainxCollectionLinkVo.setCollectionNumber(collectionAllVo.getCollectionVo().getId());
+            chainxCollectionLinkVo.setPublishOther(collectionAllVo.getCollectionInfoVo().getPublishOther());
+            chainxCollectionLinkVo.setPublishInfo(collectionAllVo.getCollectionInfoVo().getPublishInfo());
+            String linkAddr1 = userCollection.getLinkAddr();
+            List<StepVo> stepVoList = collectionServiceObjectFactory.getObject().initStepVo(linkAddr1, COLLECTION_MODEL_TYPE);
+            chainxCollectionLinkVo.setStepVos(stepVoList);
+            chainxLinkVo.setData(chainxCollectionLinkVo);
+            return chainxLinkVo;
+        }
+        Assert.isFalse(true,"区块链地址输入有误,请核实!");
+        return chainxLinkVo;
     }
 }

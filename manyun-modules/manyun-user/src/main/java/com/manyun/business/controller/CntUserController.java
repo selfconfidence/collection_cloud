@@ -30,6 +30,7 @@ import com.manyun.common.security.utils.SecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
@@ -69,6 +70,15 @@ public class CntUserController extends BaseController {
         CntUserDto cntUserDto = Builder.of(CntUserDto::new).build();
         BeanUtil.copyProperties(cntUser,cntUserDto);
         return R.ok(cntUserDto);
+    }
+
+    @GetMapping("/newRegLink")
+    @ApiOperation("用户注册区块链地址")
+    @Lock("newRegLink")
+    @Async
+    public R newRegLink(){
+        userService.newRegLink();
+        return R.ok();
     }
 
 

@@ -9,6 +9,7 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.google.common.collect.Lists;
 import com.manyun.business.config.AliRealConfig;
 import com.manyun.business.config.AsyncUtil;
 import com.manyun.business.config.InviteUtil.PosterUtil;
@@ -51,6 +52,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -455,6 +457,25 @@ public class CntUserServiceImpl extends ServiceImpl<CntUserMapper, CntUser> impl
             return item;
         }).collect(Collectors.toList());
         updateBatchById(cntUserList);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void newRegLink() {
+        List<CntUser> cntUsers = list(Wrappers.<CntUser>lambdaQuery().eq(CntUser::getIsReal, 2));
+        ArrayList<CntUser> newCntUsers = Lists.newArrayList();
+        for (CntUser cntUser : cntUsers) {
+            if (StrUtil.isNotBlank(cntUser.getUserKey()))continue;
+            ChainAccountVo chainAccountVo = myChainxSystemService.createInit(cntUser.getId(), SecurityConstants.INNER).getData();
+            if (Objects.nonNull(chainAccountVo)){
+                cntUser.setUserKey(chainAccountVo.getUser_key());
+                cntUser.setLinkAddr(chainAccountVo.getLink_user());
+                newCntUsers.add(cntUser);
+            }
+        }
+        if (!newCntUsers.isEmpty()){
+            updateBatchById(newCntUsers);
+        }
     }
 
     @Override

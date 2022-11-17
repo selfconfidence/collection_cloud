@@ -18,6 +18,7 @@ import com.manyun.comm.api.domain.dto.CallAccountDto;
 import com.manyun.comm.api.domain.vo.ChainAccountVo;
 import com.manyun.common.core.exception.LinkTranException;
 import com.manyun.common.core.exception.LinkUpException;
+import com.manyun.common.core.exception.base.BaseException;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.ObjectFactory;
@@ -221,5 +222,9 @@ public class MyChainService {
         String data = bodyJsonObj.getString("data");
         ChainAccountVo chainAccountVo = JSONUtil.toBean(data, ChainAccountVo.class);
         return chainAccountVo;
+    }
+
+    public void getUserLinkAddr(String linkAddr) {
+          throw new BaseException("NOT FUNCTION IMPL");
     }
 }
